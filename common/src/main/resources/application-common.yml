@@ -1,0 +1,22 @@
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    placeholder-replacement: true
+    placeholders:
+      schema: pyokemon
+    validate-on-migrate: true
+    out-of-order: false
+    table: flyway_schema_history
+    encoding: UTF-8
+    create-schemas: true
+
+logging:
+  level:
+    com.pyokemon: DEBUG
+    org.springframework.jdbc: DEBUG
+  config: classpath:log4j2.yml

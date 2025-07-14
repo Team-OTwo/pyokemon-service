@@ -1,0 +1,26 @@
+Configuration:
+  status: INFO
+  
+  Properties:
+    Property:
+      - name: log-pattern
+        value: "[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [%X{spanId}] - %highlight{%msg%n}"
+  
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: ${log-pattern}
+        disableAnsi: false
+  
+  Loggers:
+    Root:
+      level: INFO
+      AppenderRef:
+        - ref: Console
+    Logger:
+      - name: com.pyokemon
+        level: DEBUG
+      - name: org.springframework
+        level: INFO 

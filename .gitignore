@@ -1,0 +1,100 @@
+### Gradle ###
+.gradle/
+build/
+gradle-8.5/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+gradle-app.setting
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Java ###
+# Compiled class file
+*.class
+
+# Log file
+*.log
+logs/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+### Spring Boot ###
+application-*.yml
+!application-common.yml
+!application.yml
+!application-flyway.yml
+
+### Docker ###
+docker/volumes/
+docker/data/
+
+### Local configuration file (security sensitive) ###
+*-local.properties
+*-local.yml
+*-local.yaml
+
+### Node ###
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+### Project specific ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Generated files
+.awscache/
+.mvn/
+target/
+.flattened-pom.xml
+
+# Temporary files
+tmp/
+temp/
+*.swp
+*.swo 
