@@ -56,6 +56,22 @@ services:
       - "9092:9092"
     volumes:
       - kafka_data:/var/lib/kafka/data
+      
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    container_name: pyokemon-ganache
+    restart: unless-stopped
+    ports:
+      - "8545:8545"
+    command:
+      - "--deterministic"
+      - "--mnemonic=pyokemon blockchain did service test mnemonic words please do not use in production"
+      - "--gasLimit=10000000"
+      - "--accounts=10"
+      - "--defaultBalanceEther=1000"
+      - "--blockTime=2"
+    volumes:
+      - ganache_data:/ganache_data
 
 volumes:
   user_mysql_data:
@@ -67,4 +83,6 @@ volumes:
   zookeeper_logs:
     driver: local
   kafka_data:
+    driver: local
+  ganache_data:
     driver: local 

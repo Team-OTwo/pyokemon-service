@@ -1,0 +1,25 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: did-service
+
+# 블록체인 관련 설정
+blockchain:
+  ethereum:
+    # 로컬 Ganache 또는 테스트넷 URL
+    url: http://localhost:8545
+    # 관리자 계정 비밀키 (실제 환경에서는 환경변수 등으로 안전하게 관리해야 함)
+    private-key: ${BLOCKCHAIN_ADMIN_PRIVATE_KEY:0x45b1f2ab2d1e68a22af571d0aabb0a9d99916c9b34ae6f2a0f17f2cd8db23bf0}
+    # 이미 배포된 컨트랙트 주소 (없으면 자동 배포)
+    contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x0000000000000000000000000000000000000000}
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.pyokemon: DEBUG
+    org.web3j: INFO 
