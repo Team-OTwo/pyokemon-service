@@ -1,4 +1,4 @@
-# 파이오케몬 DID 모듈
+# 표케몬 DID 모듈
 
 이더리움 블록체인을 활용한 분산형 신원 증명(DID, Decentralized Identifier) 시스템 모듈입니다.
 
