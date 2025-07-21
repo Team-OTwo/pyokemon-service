@@ -294,7 +294,7 @@ public abstract class BaseEntity {
 - `main`: 안정적인 프로덕션 코드
 - `develop`: 개발 중인 코드의 통합 브랜치
 - `feature/기능명`: 새로운 기능 개발
-- `fix/버그명`: 버그 수정
+- `bugfix/버그명`: 버그 수정
 - `release/버전`: 릴리스 준비
 
 ### PR(Pull Request) 규칙
