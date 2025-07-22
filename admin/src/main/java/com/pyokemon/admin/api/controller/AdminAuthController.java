@@ -38,6 +38,6 @@ public class AdminAuthController {
         
         // 실제 환경에서는 토큰 생성 및 반환이 필요합니다.
         return ResponseEntity.ok(ResponseDto.success(admin, "로그인 성공"));
-        // to do: 토큰 생성 및 반환
+        // to do: 토큰 생성 및 반환 해야함
     }
 } 
