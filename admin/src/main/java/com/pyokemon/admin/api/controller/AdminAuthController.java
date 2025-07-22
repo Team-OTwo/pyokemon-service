@@ -31,7 +31,7 @@ public class AdminAuthController {
         
         Admin admin = adminOptional.get();
         // 실제 환경에서는 비밀번호 검증 로직이 필요합니다.
-        // 여기서는 간단히 구현합니다.
+        // 여기서는 간단히 구현함.
         if (!admin.getPassword().equals(loginDto.getPassword())) {
             return ResponseEntity.badRequest().body(ResponseDto.error("비밀번호가 일치하지 않습니다.", "INVALID_PASSWORD"));
         }
