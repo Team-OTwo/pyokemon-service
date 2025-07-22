@@ -62,5 +62,13 @@ subprojects {
     build.dependsOn spotlessApply
 }
 
-// Root project build also depends on spotlessApply
+// Task to install git hooks
+task installGitHooks(type: Copy) {
+    from file("${rootProject.projectDir}/githook/pre-commit")
+    into file("${rootProject.projectDir}/.git/hooks")
+    fileMode 0755 // Make the hook executable
+}
+
+// Root project build also depends on spotlessApply and installGitHooks
 build.dependsOn spotlessApply
+build.dependsOn installGitHooks

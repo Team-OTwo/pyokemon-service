@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "Running spotlessApply before commit..."
+./gradlew spotlessApply
+
+# Store the exit code of the spotlessApply command
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo "spotlessApply failed, commit aborted"
+  exit 1
+fi
+
+exit 0
