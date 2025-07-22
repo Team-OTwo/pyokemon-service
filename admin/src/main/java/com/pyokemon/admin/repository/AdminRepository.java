@@ -8,9 +8,7 @@ import java.util.Optional;
 
 @Mapper
 public interface AdminRepository {
-    List<Admin> findAll();
-    Optional<Admin> findById(Long id);
+    // List<Admin> findAll();
+    // Optional<Admin> findById(Long id);
     Optional<Admin> findByUsername(String username);
-    Admin save(Admin admin);
-    void deleteById(Long id);
 } 

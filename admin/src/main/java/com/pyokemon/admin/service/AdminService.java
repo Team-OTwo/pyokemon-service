@@ -14,23 +14,17 @@ public class AdminService {
     
     private final AdminRepository adminRepository;
     
-    public List<Admin> getAllAdmins() {
-        return adminRepository.findAll();
-    }
+    // 관리자 조회
+    // public List<Admin> getAllAdmins() {
+    //     return adminRepository.findAll();
+    // }
     
-    public Optional<Admin> getAdminById(Long id) {
-        return adminRepository.findById(id);
-    }
+    // 관리자 조회
+    // public Optional<Admin> getAdminById(Long id) {
+    //     return adminRepository.findById(id);
+    // }
     
     public Optional<Admin> getAdminByUsername(String username) {
         return adminRepository.findByUsername(username);
-    }
-    
-    public Admin createAdmin(Admin admin) {
-        return adminRepository.save(admin);
-    }
-    
-    public void deleteAdmin(Long id) {
-        adminRepository.deleteById(id);
     }
 } 
