@@ -30,10 +30,11 @@ mybatis:
 server:
   port: 8081
 
-# 서비스 URL 설정
-service:
-  performance:
-    url: http://localhost:8082
+# JWT 설정
+jwt:
+  secret: "pyokemon-admin-jwt-secret-key-2024-very-long-and-secure-key-for-production"
+  access-token-validity-in-minutes: 30
+  refresh-token-validity-in-days: 7
 
 # Springdoc OpenAPI 설정
 springdoc:
