@@ -78,7 +78,7 @@ spring:
 
 ### 마이그레이션 파일 작성 규칙
 - 파일명 형식: `V{1:Create, 2: Insert}_{순서}__{설명}.sql`
-  - 예: `V1_001__Create_user_table.sql`, `V2_001__Insert_user_table.sql`
+  - 예: `V1_001__Create_payment_table.sql`, `V2_001__Insert_user_table.sql`
 - 각 마이그레이션 파일은 멱등성을 보장해야 합니다.
 
 ### 마이그레이션 실행 방법
