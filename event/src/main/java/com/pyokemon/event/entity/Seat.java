@@ -14,8 +14,8 @@ public class Seat {
     private Long venueId;
     private Long seatClassId;
     private Long floor;
-    private Long row;
-    private Long col;
+    private String row;
+    private String col;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
