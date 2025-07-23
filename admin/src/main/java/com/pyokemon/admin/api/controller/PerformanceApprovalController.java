@@ -22,7 +22,7 @@ public class PerformanceApprovalController {
     
     private final RestTemplate restTemplate;
     
-    @Value("${service.performance.url}")
+    //@Value("${service.performance.url}")
     private String performanceServiceUrl;
     
     @PostMapping("/{id}/approve")
