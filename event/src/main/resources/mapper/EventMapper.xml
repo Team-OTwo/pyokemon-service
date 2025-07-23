@@ -18,4 +18,36 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <resultMap id="eventDetailResultMap" type="com.pyokemon.event.dto.EventDetailResponseDTO">
+        <id property="eventId" column="event_id"/>
+        <result property="title" column="title"/>
+        <result property="ageLimit" column="age_limit"/>
+        <result property="description" column="description"/>
+        <result property="genre" column="genre"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="eventScheduleId" column="event_schedule_id"/>
+        <result property="ticketOpenAt" column="ticket_open_at"/>
+        <result property="eventDate" column="event_date"/>
+        <result property="venueName" column="venue_name"/>
+    </resultMap>
+
+    <select id="findEventDetailByEventId" resultMap="eventDetailResultMap">
+        SELECT
+        e.event_id,
+        e.title,
+        e.age_limit,
+        e.description,
+        e.genre,
+        e.thumbnail_url,
+        es.event_schedule_id,
+        es.ticket_open_at,
+        es.event_date,
+        v.venue_name
+        FROM tb_event e
+        JOIN tb_event_schedule es ON es.event_id = e.event_id
+        Join tb_venue v on e.event_id= es.venue_id = v.venue_id
+
+        WHERE e.event_id = #{event_id}
+    </select>
+
 </mapper>
