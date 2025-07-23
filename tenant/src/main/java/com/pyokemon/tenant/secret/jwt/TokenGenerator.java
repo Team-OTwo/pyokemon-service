@@ -60,7 +60,7 @@ public class TokenGenerator {
     String tokenType = refreshToken ? "refresh" : "access";
 
     // JWT Token 생성
-    String token = Jwts.builder().setSubject(userId).claim("usrId", userId)
+    String token = Jwts.builder().setSubject(userId).claim("userId", userId)
         .claim("deviceType", deviceType).claim("tokenType", tokenType).setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + tokenExpiresIn * 1000L))
         .setHeaderParam("typ", "JWT").signWith(getSecretKey()).compact();
@@ -105,6 +105,27 @@ public class TokenGenerator {
 
     return userId;
 
+  }
+
+  // access token에서 사용자 ID 추출 메서드
+  public String validateAccessToken(String accessToken) {
+    final Claims claims = this.verifyAndGetClaims(accessToken);
+
+    if (claims == null) {
+      return null;
+    }
+
+    Date expirationDate = claims.getExpiration();
+    if (expirationDate == null || expirationDate.before(new Date())) {
+      return null;
+    }
+
+    String tokenType = claims.get("tokenType", String.class);
+    if (!"access".equals(tokenType)) {
+      return null;
+    }
+
+    return claims.get("userId", String.class);
   }
 
   // 토큰에서 claims를 꺼내는 내부 메서드

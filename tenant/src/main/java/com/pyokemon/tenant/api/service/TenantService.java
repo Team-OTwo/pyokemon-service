@@ -2,7 +2,6 @@ package com.pyokemon.tenant.api.service;
 
 import java.util.List;
 
-import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +16,7 @@ import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.exception.TenantException;
 import com.pyokemon.tenant.mapper.TenantMapper;
+import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -184,7 +184,7 @@ public class TenantService {
       throw TenantException.loginFailed();
     }
 
-    // 4. JWT 토큰 생성 및 반환  
+    // 4. JWT 토큰 생성 및 반환
     // Access Token만 발급 (WEB 디바이스 타입으로 설정)
     return tokenGenerator.generateAccessToken(tenant.getLoginId(), "WEB").getAccess().getToken();
   }
@@ -192,13 +192,13 @@ public class TenantService {
   // 로그아웃
   public void logout(String token) {
     // Gateway에서 이미 토큰 검증을 완료했으므로 여기서는 비즈니스 로직만 처리
-    
+
     // TODO: 필요시 토큰 블랙리스트 추가 (Redis 등)
     // addTokenToBlacklist(token);
-    
+
     // TODO: 로그아웃 로그 기록
     // logoutHistoryService.recordLogout(getCurrentUserId(), token);
-    
+
     // 현재는 클라이언트에서 토큰을 삭제하는 것으로 로그아웃 처리 완료
   }
 
