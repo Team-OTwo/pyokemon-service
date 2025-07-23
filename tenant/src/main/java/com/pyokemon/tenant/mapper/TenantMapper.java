@@ -13,7 +13,7 @@ import com.pyokemon.tenant.api.entity.Tenant;
 @Component
 public class TenantMapper {
 
-  //Tenant 엔티티를 TenantDetailResponseDto로 변환
+  // Tenant 엔티티를 TenantDetailResponseDto로 변환
   public TenantDetailResponseDto toResponseDto(Tenant tenant) {
     if (tenant == null) {
       return null;
@@ -25,7 +25,7 @@ public class TenantMapper {
         .createdAt(tenant.getCreatedAt()).updatedAt(tenant.getUpdatedAt()).build();
   }
 
-  //Tenant 리스트를 TenantListResponseDto로 변환
+  // Tenant 리스트를 TenantListResponseDto로 변환
   public TenantListResponseDto toListResponseDto(List<Tenant> tenants) {
     if (tenants == null || tenants.isEmpty()) {
       return TenantListResponseDto.of(List.of());
@@ -37,16 +37,16 @@ public class TenantMapper {
     return TenantListResponseDto.of(tenantDtos);
   }
 
-  //CreateTenantRequestDto를 Tenant 엔티티로 변환
+  // CreateTenantRequestDto를 Tenant 엔티티로 변환
   public Tenant toEntity(CreateTenantRequestDto request, String encodedPassword) {
     if (request == null) {
       return null;
     }
 
     return Tenant.builder().loginId(request.getLoginId()).password(encodedPassword)
-        .corpName(request.getCorpName()).corpId(request.getBusinessNumber())
-        .city(request.getCity()).street(request.getStreet())
-        .zipcode(request.getZipcode()).ceoName(request.getCeoName()).build();
+        .corpName(request.getCorpName()).corpId(request.getBusinessNumber()).city(request.getCity())
+        .street(request.getStreet()).zipcode(request.getZipcode()).ceoName(request.getCeoName())
+        .build();
   }
 
 }

@@ -19,6 +19,18 @@ spring:
   flyway:
     locations: classpath:db/migration/tenant
 
+  # Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pyokemon.tenant.api.entity

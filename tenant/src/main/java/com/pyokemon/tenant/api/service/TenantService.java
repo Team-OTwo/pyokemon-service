@@ -2,6 +2,7 @@ package com.pyokemon.tenant.api.service;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class TenantService {
 
@@ -35,7 +37,7 @@ public class TenantService {
     // 1. Repository에서 전체 데이터 조회
     List<Tenant> tenants = tenantRepository.findAll();
 
-    // 2. DTO 변환 및 반환
+    // 2. DTO 변환
     return tenantMapper.toListResponseDto(tenants);
   }
 
@@ -45,21 +47,10 @@ public class TenantService {
     if (id == null) {
       throw new TenantException("테넌트 ID는 필수입니다", "TENANT_ID_REQUIRED");
     }
-
     // 2. Repository에서 데이터 조회
     Tenant tenant = tenantRepository.findById(id).orElseThrow(TenantException::notFound);
-
     // 3. DTO 변환 및 반환
     return tenantMapper.toResponseDto(tenant);
-  }
-
-  // 로그인 아이디로 테넌트 찾기
-  private Tenant findByLoginId(String loginId) {
-    if (loginId == null || loginId.trim().isEmpty()) {
-      throw new TenantException("로그인 ID는 필수입니다", "LOGIN_ID_REQUIRED");
-    }
-
-    return tenantRepository.findByLoginId(loginId).orElseThrow(TenantException::notFound);
   }
 
   // 테넌트 등록 - Admin
@@ -193,13 +184,8 @@ public class TenantService {
   public void logout(String token) {
     // Gateway에서 이미 토큰 검증을 완료했으므로 여기서는 비즈니스 로직만 처리
 
-    // TODO: 필요시 토큰 블랙리스트 추가 (Redis 등)
-    // addTokenToBlacklist(token);
-
-    // TODO: 로그아웃 로그 기록
-    // logoutHistoryService.recordLogout(getCurrentUserId(), token);
-
-    // 현재는 클라이언트에서 토큰을 삭제하는 것으로 로그아웃 처리 완료
+    // TODO: 필요시 토큰 블랙리스트 추가
+    log.info("로그아웃");
   }
 
   // 테넌트 삭제 - Admin
