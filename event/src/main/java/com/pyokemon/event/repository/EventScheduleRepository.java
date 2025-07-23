@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface EventScheduleRepository {
     List<EventSchedule> selectTodayOpenedTickets();
+    List<EventSchedule> selectTicketsToBeOpened();
 }

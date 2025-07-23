@@ -15,4 +15,8 @@ public class EventScheduleService {
     public List<EventSchedule> getTodayOpenedTickets() {
        return eventScheduleRepository.selectTodayOpenedTickets();
     }
+
+    public List<EventSchedule> getTicketsToBeOpened() {
+        return eventScheduleRepository.selectTicketsToBeOpened();
+    }
 }
