@@ -13,28 +13,30 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * 비밀번호 암호화를 위한 PasswordEncoder Bean
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  /**
+   * 비밀번호 암호화를 위한 PasswordEncoder Bean
+   */
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    /**
-     * Spring Security 기본 설정 (Gateway에서 인증 처리하므로 최소한만)
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/tenant/login").permitAll()  // 로그인은 인증 없이 허용
-                .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()  // Swagger 허용
-                .anyRequest().permitAll()  // Gateway에서 인증하므로 모든 요청 허용
-            );
+  /**
+   * Spring Security 기본 설정 (Gateway에서 인증 처리하므로 최소한만)
+   */
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/tenant/login").permitAll() // 로그인은
+                                                                                             // 인증
+                                                                                             // 없이
+                                                                                             // 허용
+            .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Swagger 허용
+            .anyRequest().permitAll() // Gateway에서 인증하므로 모든 요청 허용
+        );
 
-        return http.build();
-    }
-} 
+    return http.build();
+  }
+}

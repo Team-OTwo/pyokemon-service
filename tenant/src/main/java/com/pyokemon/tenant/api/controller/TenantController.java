@@ -8,7 +8,7 @@ import com.pyokemon.tenant.api.service.TenantService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/tenants")
+@RequestMapping("/api/")
 @RequiredArgsConstructor
 public class TenantController {
 
