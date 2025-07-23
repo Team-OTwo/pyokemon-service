@@ -13,5 +13,5 @@ CREATE INDEX idx_admin_username ON tb_admin(username);
 
 -- 기본 관리자 계정 추가
 INSERT INTO tb_admin (username, password, role, created_at, updated_at) VALUES
-('admin', '$2a$10$8TuVlyq0JKUNWJYEr3/TaeJ.9k9YNgJnZlUXqCqhOZQKMSJKLGdI2', 'ADMIN', NOW(), NOW());
+('admin', 'admin123', 'ADMIN', NOW(), NOW());
 
