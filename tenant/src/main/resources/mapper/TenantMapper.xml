@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.tenant.api.repository.TenantRepository">
+
+    <resultMap id="tenantResultMap" type="Tenant">
+        <id property="id" column="tenant_id"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="corpName" column="corp_name"/>
+        <result property="corpId" column="corp_id"/>
+        <result property="city" column="city"/>
+        <result property="street" column="street"/>
+        <result property="zipcode" column="zipcode"/>
+        <result property="ceo" column="ceo"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="tenantResultMap">
+        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        FROM tb_tenant
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" parameterType="Long" resultMap="tenantResultMap">
+        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        FROM tb_tenant
+        WHERE tenant_id = #{id}
+    </select>
+
+    <select id="findByEmail" parameterType="String" resultMap="tenantResultMap">
+        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        FROM tb_tenant
+        WHERE email = #{email}
+    </select>
+
+    <select id="findByCorpId" parameterType="String" resultMap="tenantResultMap">
+        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        FROM tb_tenant
+        WHERE corp_id = #{corpId}
+    </select>
+
+    <select id="existsByEmail" parameterType="String" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM tb_tenant
+        WHERE email = #{email}
+    </select>
+
+    <select id="existsByCorpId" parameterType="String" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM tb_tenant
+        WHERE corp_id = #{corpId}
+    </select>
+
+    <select id="existsById" parameterType="Long" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM tb_tenant
+        WHERE tenant_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="Tenant" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_tenant (email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at)
+        VALUES (#{email}, #{password}, #{corpName}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+
+    <update id="update" parameterType="Tenant">
+        UPDATE tb_tenant
+        SET email = #{email},
+            password = #{password},
+            corp_name = #{corpName},
+            corp_id = #{corpId},
+            city = #{city},
+            street = #{street},
+            zipcode = #{zipcode},
+            ceo = #{ceo},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM tb_tenant
+        WHERE tenant_id = #{id}
+    </delete>
+
+</mapper>

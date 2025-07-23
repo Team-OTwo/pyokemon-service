@@ -11,23 +11,23 @@ import com.pyokemon.tenant.api.entity.TenantDid;
 @Mapper
 public interface TenantDidRepository {
 
-    List<TenantDid> findAll();
+  List<TenantDid> findAll();
 
-    Optional<TenantDid> findById(@Param("tenantDidId") Long tenantDidId);
+  Optional<TenantDid> findById(@Param("tenantDidId") Long tenantDidId);
 
-    List<TenantDid> findByTenantId(@Param("tenantId") Long tenantId);
+  List<TenantDid> findByTenantId(@Param("tenantId") Long tenantId);
 
-    Optional<TenantDid> findByDid(@Param("did") String did);
+  Optional<TenantDid> findByDid(@Param("did") String did);
 
-    List<TenantDid> findValidByTenantId(@Param("tenantId") Long tenantId);
+  List<TenantDid> findValidByTenantId(@Param("tenantId") Long tenantId);
 
-    boolean existsByDid(@Param("did") String did);
+  boolean existsByDid(@Param("did") String did);
 
-    void insert(TenantDid tenantDid);
+  void insert(TenantDid tenantDid);
 
-    void update(TenantDid tenantDid);
+  void update(TenantDid tenantDid);
 
-    void deleteById(@Param("tenantDidId") Long tenantDidId);
+  void deleteById(@Param("tenantDidId") Long tenantDidId);
 
-    void updateValidStatus(@Param("tenantDidId") Long tenantDidId, @Param("isValid") Boolean isValid);
-} 
+  void updateValidStatus(@Param("tenantDidId") Long tenantDidId, @Param("isValid") Boolean isValid);
+}

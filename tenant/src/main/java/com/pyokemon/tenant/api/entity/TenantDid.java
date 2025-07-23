@@ -1,8 +1,8 @@
 package com.pyokemon.tenant.api.entity;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TenantDid {
 
-    private Long tenantDidId;
-    private Long tenantId;
-    private String did;
-    private Boolean isValid;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long tenantDidId;
+  private Long tenantId;
+  private String did;
+  private Boolean isValid;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
 }

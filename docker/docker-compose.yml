@@ -27,6 +27,19 @@ services:
     volumes:
       - event_mysql_data:/var/lib/mysql
 
+  tenant-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-tenant-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_tenant
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3305:3306"
+    volumes:
+      - tenant_mysql_data:/var/lib/mysql
+
   redis:
     image: redis:7-alpine
     container_name: pyokemon-redis
@@ -74,6 +87,8 @@ volumes:
   user_mysql_data:
     driver: local
   event_mysql_data:
+    driver: local
+  tenant_mysql_data:
     driver: local
   redis_data:
     driver: local
