@@ -1,6 +1,7 @@
-package com.pyokemon.user.entity;
+package com.pyokemon.user.api.entity;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,15 +17,11 @@ import lombok.Setter;
 public class User {
 
   private Long id;
-  private String username;
+  private String name;
   private String email;
   private String password;
-  private String nickname;
-  private UserStatus status;
+  private String phone;
+  private LocalDate birth;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-
-  public enum UserStatus {
-    ACTIVE, INACTIVE, SUSPENDED
-  }
 }
