@@ -27,6 +27,19 @@ services:
     volumes:
       - event_mysql_data:/var/lib/mysql
 
+  payment-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-payment-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_payment
+      MYSQL_USER: pyokemon_payment
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3309:3306"
+    volumes:
+      - payment_mysql_data:/var/lib/mysql
+
   redis:
     image: redis:7-alpine
     container_name: pyokemon-redis
@@ -74,6 +87,8 @@ volumes:
   user_mysql_data:
     driver: local
   event_mysql_data:
+    driver: local
+  payment_mysql_data:
     driver: local
   redis_data:
     driver: local
