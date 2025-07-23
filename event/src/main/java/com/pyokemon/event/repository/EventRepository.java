@@ -1,5 +1,6 @@
 package com.pyokemon.event.repository;
 
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.entity.Event;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,5 @@ public interface EventRepository{
     List<Event> findByGenre(String genre);
     List<Event> findByTitleContainingIgnoreCase(String title);
     List<Event> findByAgeLimit(Long ageLimit);
+    EventDetailResponseDTO findEventDetailByEventId(Long eventId);
 }
