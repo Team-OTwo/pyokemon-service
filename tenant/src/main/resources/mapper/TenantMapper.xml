@@ -7,40 +7,46 @@
 
     <resultMap id="tenantResultMap" type="Tenant">
         <id property="id" column="tenant_id"/>
-        <result property="email" column="email"/>
+        <result property="loginId" column="login_id"/>
         <result property="password" column="password"/>
         <result property="corpName" column="corp_name"/>
         <result property="corpId" column="corp_id"/>
         <result property="city" column="city"/>
         <result property="street" column="street"/>
         <result property="zipcode" column="zipcode"/>
-        <result property="ceo" column="ceo"/>
+        <result property="ceoName" column="ceo_name"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <select id="findAll" resultMap="tenantResultMap">
-        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         ORDER BY created_at DESC
     </select>
 
     <select id="findById" parameterType="Long" resultMap="tenantResultMap">
-        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE tenant_id = #{id}
     </select>
 
     <select id="findByEmail" parameterType="String" resultMap="tenantResultMap">
-        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE email = #{email}
     </select>
 
     <select id="findByCorpId" parameterType="String" resultMap="tenantResultMap">
-        SELECT tenant_id, email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at
+        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE corp_id = #{corpId}
+    </select>
+
+    <select id="findByLoginId" parameterType="String" resultMap="tenantResultMap">
+        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
+        FROM tb_tenant
+        WHERE login_id = #{loginId}
     </select>
 
     <select id="existsByEmail" parameterType="String" resultType="boolean">
@@ -55,6 +61,12 @@
         WHERE corp_id = #{corpId}
     </select>
 
+    <select id="existsByLoginId" parameterType="String" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM tb_tenant
+        WHERE login_id = #{loginId}
+    </select>
+
     <select id="existsById" parameterType="Long" resultType="boolean">
         SELECT COUNT(1) > 0
         FROM tb_tenant
@@ -62,20 +74,20 @@
     </select>
 
     <insert id="insert" parameterType="Tenant" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_tenant (email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at)
-        VALUES (#{email}, #{password}, #{corpName}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO tb_tenant (login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at)
+        VALUES (#{loginId}, #{password}, #{corpName}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceoName}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>
 
     <update id="update" parameterType="Tenant">
         UPDATE tb_tenant
-        SET email = #{email},
+        SET login_id = #{loginId},
             password = #{password},
             corp_name = #{corpName},
             corp_id = #{corpId},
             city = #{city},
             street = #{street},
             zipcode = #{zipcode},
-            ceo = #{ceo},
+            ceo_name = #{ceoName},
             updated_at = CURRENT_TIMESTAMP
         WHERE tenant_id = #{id}
     </update>

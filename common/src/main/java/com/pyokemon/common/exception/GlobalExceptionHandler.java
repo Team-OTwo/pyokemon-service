@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ResponseDto<Map<String, String>>> handleValidationException(
-      MethodArgumentNotValidException e) {
+          MethodArgumentNotValidException e) {
     log.error("Validation exception occurred", e);
 
     Map<String, String> errors = new HashMap<>();
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 
     ResponseDto<Map<String, String>> response = ResponseDto.error("유효성 검증 실패", "VALIDATION_ERROR");
     response = ResponseDto.<Map<String, String>>builder().success(false).message("유효성 검증 실패")
-        .errorCode("VALIDATION_ERROR").data(errors).build();
+            .errorCode("VALIDATION_ERROR").data(errors).build();
 
     return ResponseEntity.badRequest().body(response);
   }
