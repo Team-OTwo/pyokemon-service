@@ -1,14 +1,14 @@
-package com.pyokemon.user.controller;
+package com.pyokemon.user.api.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pyokemon.user.entity.User;
-import com.pyokemon.user.service.UserService;
+import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.user.api.dto.UserRegisterRequest;
+import com.pyokemon.user.api.dto.UserResponse;
+import com.pyokemon.user.api.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -16,59 +16,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  @GetMapping
-  public ResponseEntity<List<User>> getAllUsers() {
-    List<User> users = userService.getAllUsers();
-    return ResponseEntity.ok(users);
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<User> getUserById(@PathVariable Long id) {
-    return userService.getUserById(id).map(user -> ResponseEntity.ok(user))
-        .orElse(ResponseEntity.notFound().build());
-  }
-
-  @GetMapping("/username/{username}")
-  public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-    return userService.getUserByUsername(username).map(user -> ResponseEntity.ok(user))
-        .orElse(ResponseEntity.notFound().build());
-  }
-
-  @GetMapping("/email/{email}")
-  public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-    return userService.getUserByEmail(email).map(user -> ResponseEntity.ok(user))
-        .orElse(ResponseEntity.notFound().build());
-  }
-
-  @PostMapping
-  public ResponseEntity<User> createUser(@RequestBody User user) {
-    try {
-      User createdUser = userService.createUser(user);
-      return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
+    @PostMapping("/register")
+    public ResponseEntity<ResponseDto<UserResponse>> registerUser(
+            @Valid @RequestBody UserRegisterRequest request) {
+        return ResponseEntity.ok(
+            ResponseDto.success(
+                UserResponse.from(
+                    userService.registerUser(request)
+                )
+            )
+        );
     }
-  }
-
-  @PutMapping("/{id}")
-  public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-    try {
-      User updatedUser = userService.updateUser(id, userDetails);
-      return ResponseEntity.ok(updatedUser);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.notFound().build();
-    }
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-    try {
-      userService.deleteUser(id);
-      return ResponseEntity.noContent().build();
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.notFound().build();
-    }
-  }
 }
