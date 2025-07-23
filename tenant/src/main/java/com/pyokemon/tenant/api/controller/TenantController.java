@@ -1,6 +1,5 @@
 package com.pyokemon.tenant.api.controller;
 
-import com.pyokemon.tenant.api.entity.Tenant;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdateProfileRequestDto;
 import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
 import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
+import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.api.service.TenantService;
 import com.pyokemon.tenant.exception.TenantException;
@@ -122,19 +122,19 @@ public class TenantController {
     try {
       // Bearer 접두사 제거
       String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-      
+
       // TokenGenerator로 access token에서 loginId 추출
       String loginId = tokenGenerator.validateAccessToken(token);
       if (loginId == null) {
         throw TenantException.accessDenied();
       }
-      
+
       // Repository에서 loginId로 Tenant 조회
-      Tenant tenant = tenantRepository.findByLoginId(loginId)
-          .orElseThrow(TenantException::notFound);
-      
+      Tenant tenant =
+          tenantRepository.findByLoginId(loginId).orElseThrow(TenantException::notFound);
+
       return tenant.getId();
-      
+
     } catch (Exception e) {
       // 토큰 파싱 실패 시 접근 거부
       throw TenantException.accessDenied();
