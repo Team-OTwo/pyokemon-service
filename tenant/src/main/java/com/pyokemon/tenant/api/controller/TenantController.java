@@ -1,16 +1,18 @@
 package com.pyokemon.tenant.api.controller;
 
-import com.pyokemon.tenant.api.service.TenantService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.pyokemon.tenant.api.service.TenantService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/tenants")
 @RequiredArgsConstructor
 public class TenantController {
 
-    private final TenantService tenantService;
+  private final TenantService tenantService;
 
 
 }

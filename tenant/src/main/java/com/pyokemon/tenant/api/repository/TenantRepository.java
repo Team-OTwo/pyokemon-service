@@ -19,8 +19,6 @@ public interface TenantRepository {
 
   Optional<Tenant> findByCorpId(@Param("corpId") String corpId);
 
-  boolean existsByEmail(@Param("email") String email);
-
   boolean existsByCorpId(@Param("corpId") String corpId);
 
   void insert(Tenant tenant);
