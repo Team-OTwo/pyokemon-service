@@ -21,7 +21,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.pyokemon.user.entity
+  type-aliases-package: com.pyokemon.user.api.entity
   configuration:
     map-underscore-to-camel-case: true
     default-fetch-size: 100
