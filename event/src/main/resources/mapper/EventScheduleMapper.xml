@@ -15,4 +15,34 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+<!--    GetEventListResponseDTO용 resultMap-->
+    <resultMap id="eventListResponseMap" type="com.pyokemon.event.dto.GetEventListResponseDTO">
+        <id property="eventScheduleId" column="event_schedule_id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="venueId" column="venue_id"/>
+        <result property="ticketOpenAt" column="ticket_open_at"/>
+        <result property="eventDate" column="event_date"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result column="title" property="title"/>
+        <result column="venue_name" property="venueName"/>
+    </resultMap>
+
+    <select id="selectTodayOpenedTickets" resultMap="eventListResponseMap">
+        SELECT
+            es.event_schedule_id,
+            es.event_id,
+            es.venue_id,
+            es.ticket_open_at,
+            es.event_date,
+            e.title AS title,
+            v.venue_name AS venue_name
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE DATE(es.ticket_open_at) = CURDATE()
+        LIMIT 9
+    </select>
+
+
 </mapper>
