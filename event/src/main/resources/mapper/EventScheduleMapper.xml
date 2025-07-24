@@ -5,16 +5,6 @@
 
 <mapper namespace="com.pyokemon.event.repository.EventScheduleRepository">
 
-    <resultMap id="eventScheduleResultMap" type="com.pyokemon.event.entity.EventSchedule">
-        <id property="eventScheduleId" column="event_schedule_id"/>
-        <result property="eventId" column="event_id"/>
-        <result property="venueId" column="venue_id"/>
-        <result property="ticketOpenAt" column="ticket_open_at"/>
-        <result property="eventDate" column="event_date"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
 <!--    GetEventListResponseDTO용 resultMap-->
     <resultMap id="eventListResponseMap" type="com.pyokemon.event.dto.GetEventListResponseDTO">
         <id property="eventScheduleId" column="event_schedule_id"/>

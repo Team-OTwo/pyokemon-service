@@ -1,11 +1,11 @@
 package com.pyokemon.event.repository;
 
 import com.pyokemon.event.entity.EventSchedule;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-@Repository
+@Mapper
 public interface EventScheduleRepository {
     List<EventSchedule> selectTodayOpenedTickets();
     List<EventSchedule> selectTicketsToBeOpened();
