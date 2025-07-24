@@ -34,11 +34,7 @@ public class AdminService {
         // 실제로는 JWT 토큰을 생성해야 함
         return "admin_token_" + admin.getId();
     }
-    
-    // 관리자 조회
-    // public Optional<Admin> getAdminById(Long id) {
-    //     return adminRepository.findById(id);
-    // }
+
     
     public Optional<Admin> getAdminByUsername(String username) {
         return adminRepository.findByUsername(username);
