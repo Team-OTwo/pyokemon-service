@@ -7,6 +7,6 @@ import java.util.List;
 
 @Mapper
 public interface EventScheduleRepository {
-    List<EventSchedule> selectTodayOpenedTickets();
-    List<EventSchedule> selectTicketsToBeOpened();
+    List<EventItemResponseDTO> selectTodayOpenedTickets();
+    List<EventItemResponseDTO> selectTicketsToBeOpened();
 }
