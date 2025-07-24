@@ -68,7 +68,7 @@ public class TenantService {
     }
 
     // 2. 사업자번호 중복 체크
-    if (tenantRepository.existsByCorpId(request.getBusinessNumber())) {
+    if (tenantRepository.existsByCorpId(request.getCorpId())) {
       throw new BusinessException(TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getMessage(),
           TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getCode());
     }

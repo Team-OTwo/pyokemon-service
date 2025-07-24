@@ -44,7 +44,7 @@ public class TenantConverter {
     }
 
     return Tenant.builder().loginId(request.getLoginId()).password(encodedPassword)
-        .corpName(request.getCorpName()).corpId(request.getBusinessNumber()).city(request.getCity())
+        .corpName(request.getCorpName()).corpId(request.getCorpId()).city(request.getCity())
         .street(request.getStreet()).zipcode(request.getZipcode()).ceoName(request.getCeoName())
         .build();
   }

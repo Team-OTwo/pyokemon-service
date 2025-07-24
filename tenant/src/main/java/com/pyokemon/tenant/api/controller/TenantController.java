@@ -24,6 +24,7 @@ import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequestMapping("/api/tenants")
 @RequiredArgsConstructor
 public class TenantController {
 

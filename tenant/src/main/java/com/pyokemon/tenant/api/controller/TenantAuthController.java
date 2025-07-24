@@ -14,13 +14,14 @@ import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequestMapping("/api/tenants/auth")
 @RequiredArgsConstructor
 public class TenantAuthController {
 
   private final TenantService tenantService;
 
   // 로그인 /tenants/auth/login
-  @PostMapping("/auth/login")
+  @PostMapping("/login")
   public ResponseEntity<ResponseDto<TokenDto.AccessRefreshToken>> login(
       @Valid @RequestBody LoginRequestDto request) {
     TokenDto.AccessRefreshToken tokens = tenantService.login(request);
@@ -28,7 +29,7 @@ public class TenantAuthController {
   }
 
   // 로그아웃 /tenants/auth/logout
-  @PostMapping("/auth/logout")
+  @PostMapping("/logout")
   public ResponseEntity<ResponseDto<Void>> logout() {
     String token = GatewayRequestHeaderUtils.getBearerTokenOrThrowException();
     tenantService.logout(token);
@@ -36,7 +37,7 @@ public class TenantAuthController {
   }
 
   // 토큰 갱신 /tenants/auth/refresh
-  @PostMapping("/auth/refresh")
+  @PostMapping("/refresh")
   public ResponseEntity<ResponseDto<TokenDto.AccessToken>> refresh(
       @Valid @RequestBody TokenDto.RefreshRequest request) {
     TokenDto.AccessToken newToken = tenantService.refresh(request);
