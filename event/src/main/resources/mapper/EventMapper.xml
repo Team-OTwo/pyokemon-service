@@ -5,7 +5,20 @@
 
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
 
-    <select id="findEventDetailByEventId">
+    <resultMap id="eventDetailResultMap" type="com.pyokemon.event.dto.EventDetailResponseDTO">
+        <id property="eventId" column="event_id"/>
+        <result property="title" column="title"/>
+        <result property="ageLimit" column="age_limit"/>
+        <result property="description" column="description"/>
+        <result property="genre" column="genre"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="eventScheduleId" column="event_schedule_id"/>
+        <result property="ticketOpenAt" column="ticket_open_at"/>
+        <result property="eventDate" column="event_date"/>
+        <result property="venueName" column="venue_name"/>
+    </resultMap>
+
+    <select id="findEventDetailByEventId" resultMap="eventDetailResultMap">
         SELECT
         e.event_id,
         e.title,
