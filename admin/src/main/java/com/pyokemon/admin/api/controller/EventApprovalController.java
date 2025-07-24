@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EventApprovalController {
     
-    private final RestTemplate restTemplate;
+    // private final RestTemplate restTemplate;
     
     //@Value("${service.event.url}")
     private String eventServiceUrl;
@@ -39,12 +39,12 @@ public class EventApprovalController {
             );
             
             // 공연 서비스 API 호출
-            ResponseEntity<ResponseDto<Void>> response = restTemplate.exchange(
+            /*ResponseEntity<ResponseDto<Void>> response = restTemplate.exchange(
                     url,
                     HttpMethod.PUT,
                     new HttpEntity<>(requestBody),
                     new ParameterizedTypeReference<ResponseDto<Void>>() {}
-            );
+            );*/
             
             return ResponseEntity.ok(ResponseDto.success("공연이 승인되었습니다."));
         } catch (Exception e) {
@@ -66,12 +66,12 @@ public class EventApprovalController {
             );
             
             // 공연 서비스 API 호출
-            ResponseEntity<ResponseDto<Void>> response = restTemplate.exchange(
+            /* ResponseEntity<ResponseDto<Void>> response = restTemplate.exchange(
                     url,
                     HttpMethod.PUT,
                     new HttpEntity<>(requestBody),
                     new ParameterizedTypeReference<ResponseDto<Void>>() {}
-            );
+            ); */
             
             return ResponseEntity.ok(ResponseDto.success("공연이 거절되었습니다."));
         } catch (Exception e) {

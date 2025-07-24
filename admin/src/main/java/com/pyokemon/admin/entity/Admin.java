@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Admin extends BaseEntity {
     private Long id;
-    private String username;
+    private String adminId;
     private String password;
-    private String role;
+    private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 } 

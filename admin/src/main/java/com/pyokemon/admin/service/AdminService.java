@@ -3,41 +3,70 @@ package com.pyokemon.admin.service;
 import com.pyokemon.admin.dto.AdminLoginDto;
 import com.pyokemon.admin.entity.Admin;
 import com.pyokemon.admin.repository.AdminRepository;
+import com.pyokemon.admin.secret.jwt.TokenGenerator;
+import com.pyokemon.admin.secret.jwt.dto.TokenDto;
 import com.pyokemon.admin.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminService {
     
     private final AdminRepository adminRepository;
     private final PasswordUtil passwordUtil;
+    private final TokenGenerator tokenGenerator;
     
-    public String login(AdminLoginDto loginDto) {
-        Optional<Admin> adminOpt = adminRepository.findByUsername(loginDto.getUsername());
+    public TokenDto.AccessRefreshToken login(AdminLoginDto loginDto) {
+
+        if(loginDto.getAdminId() == null || loginDto.getAdminId().isEmpty()){
+            throw new RuntimeException("아이디는 필수입니다.");
+        }
+        if(loginDto.getPassword() == null || loginDto.getPassword().isEmpty()){
+            throw new RuntimeException("비밀번호는 필수입니다.");
+        }
+        Optional<Admin> adminOpt = adminRepository.findByAdminId(loginDto.getAdminId());
+
+        if (adminOpt.isEmpty()){
+            throw new RuntimeException("존재하지 않는 사용자입니다.");
+        }
+
+        Admin admin = adminOpt.get();
+
+        if (!passwordUtil.matchPassword(loginDto.getPassword(), admin.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 액세스 토큰과 리프레시 토큰 모두 발급
+        return tokenGenerator.generateAccessRefreshToken(admin.getAdminId(), "web");
+    }
+    
+    /**
+     * 리프레시 토큰을 검증하고 새 액세스 토큰을 발급합니다.
+     * 
+     * @param refreshToken 리프레시 토큰
+     * @return 새 액세스 토큰
+     */
+    public TokenDto.AccessToken refreshAccessToken(String refreshToken) {
+        // 리프레시 토큰 검증
+        String userId = tokenGenerator.validateJwtToken(refreshToken);
         
+        if (userId == null) {
+            throw new RuntimeException("유효하지 않은 리프레시 토큰입니다.");
+        }
+        
+        // 사용자 존재 여부 확인
+        Optional<Admin> adminOpt = adminRepository.findByAdminId(userId);
         if (adminOpt.isEmpty()) {
             throw new RuntimeException("존재하지 않는 사용자입니다.");
         }
         
-        Admin admin = adminOpt.get();
-        
-        // BCrypt로 해싱된 비밀번호 검증
-        if (!passwordUtil.matchPassword(loginDto.getPassword(), admin.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-        
-        // 실제로는 JWT 토큰을 생성해야 함
-        return "admin_token_" + admin.getId();
-    }
-
-    
-    public Optional<Admin> getAdminByUsername(String username) {
-        return adminRepository.findByUsername(username);
+        // 새 액세스 토큰 발급
+        return tokenGenerator.generateAccessToken(userId);
     }
     
     /**
@@ -49,17 +78,12 @@ public class AdminService {
      */
     public Admin createAdmin(Admin admin) {
         // 중복 사용자명 확인
-        if (adminRepository.findByUsername(admin.getUsername()).isPresent()) {
+        if (adminRepository.findByAdminId(admin.getAdminId()).isPresent()) {
             throw new RuntimeException("이미 존재하는 사용자명입니다.");
         }
         
         // 비밀번호 해싱
         admin.setPassword(passwordUtil.encodePassword(admin.getPassword()));
-        
-        // 역할이 설정되지 않은 경우 기본값 설정
-        if (admin.getRole() == null || admin.getRole().isEmpty()) {
-            admin.setRole("ADMIN");
-        }
         
         // 관리자 저장
         int result = adminRepository.save(admin);

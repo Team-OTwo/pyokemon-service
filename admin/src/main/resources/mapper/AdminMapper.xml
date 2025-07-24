@@ -8,36 +8,42 @@
     <resultMap id="adminResultMap" type="com.pyokemon.admin.entity.Admin">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
+        <result property="adminId" column="adminId"/>
         <result property="password" column="password"/>
-        <result property="role" column="role"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <!-- 모든 관리자 조회 -->
     <!-- <select id="findAll" resultMap="adminResultMap">
-        SELECT id, username, password, role, created_at, updated_at
+        SELECT id, username, password, admin_id, created_at, updated_at
         FROM tb_admin
         ORDER BY created_at DESC
     </select> -->
 
     <!-- 관리자 조회 -->
     <!-- <select id="findById" parameterType="Long" resultMap="adminResultMap">
-        SELECT id, username, password, role, created_at, updated_at
+        SELECT id, username, password, admin_id, created_at, updated_at
         FROM tb_admin
         WHERE id = #{id}
     </select> -->
 
     <select id="findByUsername" parameterType="String" resultMap="adminResultMap">
-        SELECT id, username, password, role, created_at, updated_at
+        SELECT id, username, password, admin_id, created_at, updated_at
         FROM tb_admin
         WHERE username = #{username}
     </select>
 
+    <select id="findByAdminId" parameterType="String" resultMap="adminResultMap">
+        SELECT id, username, password, admin_id, created_at, updated_at
+        FROM tb_admin
+        WHERE admin_id = #{admin_id}
+    </select>
+
     <!-- 관리자 저장 -->
     <insert id="save" parameterType="com.pyokemon.admin.entity.Admin" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_admin (username, password, role)
-        VALUES (#{username}, #{password}, #{role})
+        INSERT INTO tb_admin (username, password, admin_id)
+        VALUES (#{username}, #{password}, #{admin_id})
     </insert>
 
 </mapper> 
