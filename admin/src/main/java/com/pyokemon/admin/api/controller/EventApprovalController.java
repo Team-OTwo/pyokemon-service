@@ -1,6 +1,6 @@
 package com.pyokemon.admin.api.controller;
 
-import com.pyokemon.admin.dto.PerformanceApprovalDto;
+import com.pyokemon.admin.dto.EventApprovalDto;
 import com.pyokemon.common.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,21 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/performances")
+@RequestMapping("/api/admin/events")
 @RequiredArgsConstructor
-public class PerformanceApprovalController {
+public class EventApprovalController {
     
     private final RestTemplate restTemplate;
     
-    //@Value("${service.performance.url}")
-    private String performanceServiceUrl;
+    //@Value("${service.event.url}")
+    private String eventServiceUrl;
     
     @PostMapping("/{id}/approve")
-    public ResponseEntity<ResponseDto<Void>> approvePerformance(
+    public ResponseEntity<ResponseDto<Void>> approveEvent(
             @PathVariable Long id,
-            @Valid @RequestBody PerformanceApprovalDto requestDto) {
+            @Valid @RequestBody EventApprovalDto requestDto) {
         
-        String url = performanceServiceUrl + "/api/performances/" + id + "/status";
+        String url = eventServiceUrl + "/api/events/" + id + "/status";
         
         try {
             // 상태 변경 요청 객체 생성
@@ -53,11 +53,11 @@ public class PerformanceApprovalController {
     }
     
     @PostMapping("/{id}/reject")
-    public ResponseEntity<ResponseDto<Void>> rejectPerformance(
+    public ResponseEntity<ResponseDto<Void>> rejectEvent(
             @PathVariable Long id,
-            @Valid @RequestBody PerformanceApprovalDto requestDto) {
+            @Valid @RequestBody EventApprovalDto requestDto) {
         
-        String url = performanceServiceUrl + "/api/performances/" + id + "/status";
+        String url = eventServiceUrl + "/api/events/" + id + "/status";
         
         try {
             // 상태 변경 요청 객체 생성
