@@ -27,6 +27,10 @@ mybatis:
     default-fetch-size: 100
     default-statement-timeout: 30
 
+service:
+  event:
+    url: http://localhost:8082  # 개발 환경에서의 이벤트 서비스 URL
+
 server:
   port: 8081
 
@@ -35,15 +39,3 @@ jwt:
   secret-key: "pyokemon-admin-jwt-secret-key-2024-very-long-and-secure-key-for-production"
   access-token-validity-in-minutes: 30
   refresh-token-validity-in-days: 7
-
-# Springdoc OpenAPI 설정
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    tags-sorter: alpha
-    operations-sorter: alpha
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
