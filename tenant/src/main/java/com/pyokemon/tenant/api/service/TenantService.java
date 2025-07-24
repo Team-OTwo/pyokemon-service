@@ -184,7 +184,7 @@ public class TenantService {
   public void logout(String token) {
     // Gateway에서 이미 토큰 검증을 완료했으므로 여기서는 비즈니스 로직만 처리
 
-    // TODO: 필요시 토큰 블랙리스트 추가
+    // TODO: 토큰 블랙리스트 추가
     log.info("로그아웃");
   }
 

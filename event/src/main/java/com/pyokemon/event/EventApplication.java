@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
 @MapperScan("com.pyokemon.event.repository")
 public class EventApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(EventApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(EventApplication.class, args);
+  }
 }

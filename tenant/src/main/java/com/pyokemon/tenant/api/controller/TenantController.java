@@ -23,7 +23,7 @@ import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/tenants")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class TenantController {
 
@@ -55,7 +55,7 @@ public class TenantController {
         .body(ResponseDto.success(response, "테넌트 등록 성공"));
   }
 
-  // 테넌트 삭제 DELETE /api/tenants/{id}
+  // 테넌트 삭제 DELETE /api/tenant/{id}
   @AdminOnly
   @DeleteMapping("/{id}")
   public ResponseEntity<ResponseDto<Void>> deleteTenant(@PathVariable Long id) {
@@ -63,7 +63,7 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success("테넌트 삭제 성공"));
   }
 
-  // 로그인 POST /api/tenants/login
+  // 로그인 POST /api/tenant/login
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<String>> login(@Valid @RequestBody LoginRequestDto request) {
     String token = tenantService.login(request);
