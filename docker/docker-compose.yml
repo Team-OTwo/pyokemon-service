@@ -14,19 +14,6 @@ services:
     volumes:
       - user_mysql_data:/var/lib/mysql
 
-  admin-mysql:
-    image: mysql:8.0
-    container_name: pyokemon-admin-mysql
-    environment:
-      MYSQL_DATABASE: pyokemon_admin
-      MYSQL_USER: pyokemon
-      MYSQL_PASSWORD: pyokemon123
-      MYSQL_ROOT_PASSWORD: root_password
-    ports:
-      - "3311:3306"
-    volumes:
-      - admin_mysql_data:/var/lib/mysql
-
   event-mysql:
     image: mysql:8.0
     container_name: pyokemon-event-mysql
@@ -150,8 +137,6 @@ services:
 
 volumes:
   user_mysql_data:
-    driver: local
-  admin_mysql_data:
     driver: local
   event_mysql_data:
     driver: local
