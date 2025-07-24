@@ -25,4 +25,4 @@ public class TenantAccessAspect {
     log.debug("Tenant access granted for method: {}", joinPoint.getSignature().getName());
     return joinPoint.proceed();
   }
-} 
+}

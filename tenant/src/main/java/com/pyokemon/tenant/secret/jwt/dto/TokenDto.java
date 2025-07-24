@@ -1,37 +1,18 @@
 package com.pyokemon.tenant.secret.jwt.dto;
 
 import jakarta.validation.constraints.NotBlank;
-
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TokenDto {
 
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class JwtToken {
-    private String token;
-    private Integer expiresIn;
-  }
+  public record JwtToken(String token, Integer expiresIn) {}
 
-  @Getter
-  @RequiredArgsConstructor
-  public static class AccessToken {
-    private final JwtToken access;
-  }
+  public record AccessToken(JwtToken access) {}
 
-  @Getter
-  @Setter
-  @RequiredArgsConstructor
-  public static class AccessRefreshToken {
-    private final JwtToken access;
-    private final JwtToken refresh;
-  }
+  public record AccessRefreshToken(JwtToken access, JwtToken refresh) {}
 
-  @Getter
-  @Setter
+  @Data
   @NoArgsConstructor
   public static class RefreshRequest {
     @NotBlank(message = "리프레시 토큰은 필수입니다")
