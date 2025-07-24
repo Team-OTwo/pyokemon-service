@@ -27,7 +27,7 @@ import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
 import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
-import com.pyokemon.tenant.exception.TenantException;
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.tenant.mapper.TenantConverter;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import com.pyokemon.tenant.secret.jwt.dto.TokenDto;
@@ -59,33 +59,15 @@ class TenantServiceTest {
   @BeforeEach
   void setUp() {
     // 테스트용 Tenant 엔티티
-    testTenant = Tenant.builder()
-        .id(1L)
-        .loginId("test-tenant")
-        .password("encoded-password")
-        .corpName("테스트 회사")
-        .corpId("123-45-67890")
-        .city("서울시")
-        .street("강남구 테헤란로")
-        .zipcode("12345")
-        .ceoName("홍길동")
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
+    testTenant = Tenant.builder().id(1L).loginId("test-tenant").password("encoded-password")
+        .corpName("테스트 회사").corpId("123-45-67890").city("서울시").street("강남구 테헤란로").zipcode("12345")
+        .ceoName("홍길동").createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
 
     // 테스트용 응답 DTO
-    testResponseDto = TenantDetailResponseDto.builder()
-        .id(1L)
-        .loginId("test-tenant")
-        .corpName("테스트 회사")
-        .corpId("123-45-67890")
-        .city("서울시")
-        .street("강남구 테헤란로")
-        .zipcode("12345")
-        .ceoName("홍길동")
-        .createdAt(testTenant.getCreatedAt())
-        .updatedAt(testTenant.getUpdatedAt())
-        .build();
+    testResponseDto =
+        TenantDetailResponseDto.builder().id(1L).loginId("test-tenant").corpName("테스트 회사")
+            .corpId("123-45-67890").city("서울시").street("강남구 테헤란로").zipcode("12345").ceoName("홍길동")
+            .createdAt(testTenant.getCreatedAt()).updatedAt(testTenant.getUpdatedAt()).build();
 
     // 테스트용 생성 요청 DTO
     testCreateRequest = new CreateTenantRequestDto();
@@ -138,7 +120,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.getTenantById(tenantId))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findById(tenantId);
       verify(tenantConverter, never()).toResponseDto(any());
@@ -149,7 +131,7 @@ class TenantServiceTest {
     void getTenantById_NullId() {
       // when & then
       assertThatThrownBy(() -> tenantService.getTenantById(null))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findById(any());
     }
@@ -164,7 +146,8 @@ class TenantServiceTest {
     void createTenant_Success() {
       // given
       given(tenantRepository.existsByLoginId(testCreateRequest.getLoginId())).willReturn(false);
-      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber())).willReturn(false);
+      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber()))
+          .willReturn(false);
       given(passwordEncoder.encode(testCreateRequest.getPassword())).willReturn("encoded-password");
       given(tenantConverter.toEntity(testCreateRequest, "encoded-password")).willReturn(testTenant);
       given(tenantConverter.toResponseDto(testTenant)).willReturn(testResponseDto);
@@ -193,7 +176,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.createTenant(testCreateRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).existsByLoginId(testCreateRequest.getLoginId());
       verify(tenantRepository, never()).existsByCorpId(any());
@@ -205,11 +188,12 @@ class TenantServiceTest {
     void createTenant_DuplicateBusinessNumber() {
       // given
       given(tenantRepository.existsByLoginId(testCreateRequest.getLoginId())).willReturn(false);
-      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber())).willReturn(true);
+      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber()))
+          .willReturn(true);
 
       // when & then
       assertThatThrownBy(() -> tenantService.createTenant(testCreateRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).existsByLoginId(testCreateRequest.getLoginId());
       verify(tenantRepository).existsByCorpId(testCreateRequest.getBusinessNumber());
@@ -227,11 +211,15 @@ class TenantServiceTest {
       // given
       TokenDto.JwtToken accessToken = new TokenDto.JwtToken("access-token", 3600);
       TokenDto.JwtToken refreshToken = new TokenDto.JwtToken("refresh-token", 86400);
-      TokenDto.AccessRefreshToken expectedTokens = new TokenDto.AccessRefreshToken(accessToken, refreshToken);
+      TokenDto.AccessRefreshToken expectedTokens =
+          new TokenDto.AccessRefreshToken(accessToken, refreshToken);
 
-      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId())).willReturn(Optional.of(testTenant));
-      given(passwordEncoder.matches(testLoginRequest.getPassword(), testTenant.getPassword())).willReturn(true);
-      given(tokenGenerator.generateAccessRefreshToken(testTenant.getLoginId(), "WEB")).willReturn(expectedTokens);
+      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId()))
+          .willReturn(Optional.of(testTenant));
+      given(passwordEncoder.matches(testLoginRequest.getPassword(), testTenant.getPassword()))
+          .willReturn(true);
+      given(tokenGenerator.generateAccessRefreshToken(testTenant.getLoginId(), "WEB"))
+          .willReturn(expectedTokens);
 
       // when
       TokenDto.AccessRefreshToken result = tenantService.login(testLoginRequest);
@@ -250,11 +238,12 @@ class TenantServiceTest {
     @DisplayName("존재하지 않는 사용자로 로그인 시 예외 발생")
     void login_UserNotFound() {
       // given
-      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId())).willReturn(Optional.empty());
+      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId()))
+          .willReturn(Optional.empty());
 
       // when & then
       assertThatThrownBy(() -> tenantService.login(testLoginRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findByLoginId(testLoginRequest.getLoginId());
       verify(passwordEncoder, never()).matches(any(), any());
@@ -265,12 +254,14 @@ class TenantServiceTest {
     @DisplayName("잘못된 비밀번호로 로그인 시 예외 발생")
     void login_WrongPassword() {
       // given
-      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId())).willReturn(Optional.of(testTenant));
-      given(passwordEncoder.matches(testLoginRequest.getPassword(), testTenant.getPassword())).willReturn(false);
+      given(tenantRepository.findByLoginId(testLoginRequest.getLoginId()))
+          .willReturn(Optional.of(testTenant));
+      given(passwordEncoder.matches(testLoginRequest.getPassword(), testTenant.getPassword()))
+          .willReturn(false);
 
       // when & then
       assertThatThrownBy(() -> tenantService.login(testLoginRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findByLoginId(testLoginRequest.getLoginId());
       verify(passwordEncoder).matches(testLoginRequest.getPassword(), testTenant.getPassword());
@@ -287,7 +278,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.login(emptyLoginIdRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findByLoginId(any());
     }
@@ -302,7 +293,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.login(emptyPasswordRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findByLoginId(any());
     }
@@ -317,7 +308,8 @@ class TenantServiceTest {
     void getAllTenants_Success() {
       // given
       List<Tenant> tenants = Arrays.asList(testTenant);
-      TenantListResponseDto expectedResponse = TenantListResponseDto.of(Arrays.asList(testResponseDto));
+      TenantListResponseDto expectedResponse =
+          TenantListResponseDto.of(Arrays.asList(testResponseDto));
 
       given(tenantRepository.findAll()).willReturn(tenants);
       given(tenantConverter.toListResponseDto(tenants)).willReturn(expectedResponse);
@@ -385,7 +377,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.deleteTenant(tenantId))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).existsById(tenantId);
       verify(tenantRepository, never()).deleteById(any());
@@ -396,7 +388,7 @@ class TenantServiceTest {
     void deleteTenant_NullId() {
       // when & then
       assertThatThrownBy(() -> tenantService.deleteTenant(null))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).existsById(any());
       verify(tenantRepository, never()).deleteById(any());
@@ -413,13 +405,16 @@ class TenantServiceTest {
       // given
       TokenDto.RefreshRequest refreshRequest = new TokenDto.RefreshRequest();
       refreshRequest.setRefreshToken("valid-refresh-token");
-      
+
       TokenDto.JwtToken newAccessToken = new TokenDto.JwtToken("new-access-token", 3600);
       TokenDto.AccessToken expectedResponse = new TokenDto.AccessToken(newAccessToken);
 
-      given(tokenGenerator.validateJwtToken(refreshRequest.getRefreshToken())).willReturn(testTenant.getLoginId());
-      given(tenantRepository.findByLoginId(testTenant.getLoginId())).willReturn(Optional.of(testTenant));
-      given(tokenGenerator.generateAccessToken(testTenant.getLoginId(), "WEB")).willReturn(expectedResponse);
+      given(tokenGenerator.validateJwtToken(refreshRequest.getRefreshToken()))
+          .willReturn(testTenant.getLoginId());
+      given(tenantRepository.findByLoginId(testTenant.getLoginId()))
+          .willReturn(Optional.of(testTenant));
+      given(tokenGenerator.generateAccessToken(testTenant.getLoginId(), "WEB"))
+          .willReturn(expectedResponse);
 
       // when
       TokenDto.AccessToken result = tenantService.refresh(refreshRequest);
@@ -439,12 +434,12 @@ class TenantServiceTest {
       // given
       TokenDto.RefreshRequest refreshRequest = new TokenDto.RefreshRequest();
       refreshRequest.setRefreshToken("invalid-refresh-token");
-      
+
       given(tokenGenerator.validateJwtToken(refreshRequest.getRefreshToken())).willReturn(null);
 
       // when & then
       assertThatThrownBy(() -> tenantService.refresh(refreshRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tokenGenerator).validateJwtToken(refreshRequest.getRefreshToken());
       verify(tenantRepository, never()).findByLoginId(any());
@@ -457,13 +452,14 @@ class TenantServiceTest {
       // given
       TokenDto.RefreshRequest refreshRequest = new TokenDto.RefreshRequest();
       refreshRequest.setRefreshToken("valid-refresh-token");
-      
-      given(tokenGenerator.validateJwtToken(refreshRequest.getRefreshToken())).willReturn("non-existent-user");
+
+      given(tokenGenerator.validateJwtToken(refreshRequest.getRefreshToken()))
+          .willReturn("non-existent-user");
       given(tenantRepository.findByLoginId("non-existent-user")).willReturn(Optional.empty());
 
       // when & then
       assertThatThrownBy(() -> tenantService.refresh(refreshRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tokenGenerator).validateJwtToken(refreshRequest.getRefreshToken());
       verify(tenantRepository).findByLoginId("non-existent-user");
@@ -479,7 +475,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.refresh(refreshRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tokenGenerator, never()).validateJwtToken(any());
     }
@@ -501,19 +497,12 @@ class TenantServiceTest {
       updateRequest.setZipcode("54321");
       updateRequest.setCeoName("김철수");
 
-      updatedTenant = Tenant.builder()
-          .id(testTenant.getId())
-          .loginId(testTenant.getLoginId())
-          .password(testTenant.getPassword())
-          .corpId(testTenant.getCorpId())
-          .corpName(updateRequest.getCorpName())
-          .city(updateRequest.getCity())
-          .street(updateRequest.getStreet())
-          .zipcode(updateRequest.getZipcode())
-          .ceoName(updateRequest.getCeoName())
-          .createdAt(testTenant.getCreatedAt())
-          .updatedAt(LocalDateTime.now())
-          .build();
+      updatedTenant = Tenant.builder().id(testTenant.getId()).loginId(testTenant.getLoginId())
+          .password(testTenant.getPassword()).corpId(testTenant.getCorpId())
+          .corpName(updateRequest.getCorpName()).city(updateRequest.getCity())
+          .street(updateRequest.getStreet()).zipcode(updateRequest.getZipcode())
+          .ceoName(updateRequest.getCeoName()).createdAt(testTenant.getCreatedAt())
+          .updatedAt(LocalDateTime.now()).build();
     }
 
     @Test
@@ -521,21 +510,15 @@ class TenantServiceTest {
     void updateProfile_Success() {
       // given
       Long tenantId = 1L;
-      TenantDetailResponseDto updatedResponseDto = TenantDetailResponseDto.builder()
-          .id(tenantId)
-          .loginId(testTenant.getLoginId())
-          .corpName(updateRequest.getCorpName())
-          .corpId(testTenant.getCorpId())
-          .city(updateRequest.getCity())
-          .street(updateRequest.getStreet())
-          .zipcode(updateRequest.getZipcode())
-          .ceoName(updateRequest.getCeoName())
-          .createdAt(testTenant.getCreatedAt())
-          .updatedAt(updatedTenant.getUpdatedAt())
-          .build();
+      TenantDetailResponseDto updatedResponseDto =
+          TenantDetailResponseDto.builder().id(tenantId).loginId(testTenant.getLoginId())
+              .corpName(updateRequest.getCorpName()).corpId(testTenant.getCorpId())
+              .city(updateRequest.getCity()).street(updateRequest.getStreet())
+              .zipcode(updateRequest.getZipcode()).ceoName(updateRequest.getCeoName())
+              .createdAt(testTenant.getCreatedAt()).updatedAt(updatedTenant.getUpdatedAt()).build();
 
-      given(tenantRepository.findById(tenantId))
-          .willReturn(Optional.of(testTenant))  // 첫 번째 호출: 기존 테넌트
+      given(tenantRepository.findById(tenantId)).willReturn(Optional.of(testTenant)) // 첫 번째 호출: 기존
+                                                                                     // 테넌트
           .willReturn(Optional.of(updatedTenant)); // 두 번째 호출: 업데이트된 테넌트
       given(tenantConverter.toResponseDto(any(Tenant.class))).willReturn(updatedResponseDto);
 
@@ -562,7 +545,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.updateProfile(tenantId, updateRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findById(tenantId);
       verify(tenantRepository, never()).update(any());
@@ -573,7 +556,7 @@ class TenantServiceTest {
     void updateProfile_NullId() {
       // when & then
       assertThatThrownBy(() -> tenantService.updateProfile(null, updateRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findById(any());
       verify(tenantRepository, never()).update(any());
@@ -601,15 +584,18 @@ class TenantServiceTest {
       String newEncodedPassword = "new-encoded-password";
 
       given(tenantRepository.findById(tenantId)).willReturn(Optional.of(testTenant));
-      given(passwordEncoder.matches(passwordRequest.getCurrentPassword(), testTenant.getPassword())).willReturn(true);
-      given(passwordEncoder.encode(passwordRequest.getNewPassword())).willReturn(newEncodedPassword);
+      given(passwordEncoder.matches(passwordRequest.getCurrentPassword(), testTenant.getPassword()))
+          .willReturn(true);
+      given(passwordEncoder.encode(passwordRequest.getNewPassword()))
+          .willReturn(newEncodedPassword);
 
       // when
       tenantService.changePassword(tenantId, passwordRequest);
 
       // then
       verify(tenantRepository).findById(tenantId);
-      verify(passwordEncoder).matches(passwordRequest.getCurrentPassword(), testTenant.getPassword());
+      verify(passwordEncoder).matches(passwordRequest.getCurrentPassword(),
+          testTenant.getPassword());
       verify(passwordEncoder).encode(passwordRequest.getNewPassword());
       verify(tenantRepository).update(any(Tenant.class));
     }
@@ -620,14 +606,16 @@ class TenantServiceTest {
       // given
       Long tenantId = 1L;
       given(tenantRepository.findById(tenantId)).willReturn(Optional.of(testTenant));
-      given(passwordEncoder.matches(passwordRequest.getCurrentPassword(), testTenant.getPassword())).willReturn(false);
+      given(passwordEncoder.matches(passwordRequest.getCurrentPassword(), testTenant.getPassword()))
+          .willReturn(false);
 
       // when & then
       assertThatThrownBy(() -> tenantService.changePassword(tenantId, passwordRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findById(tenantId);
-      verify(passwordEncoder).matches(passwordRequest.getCurrentPassword(), testTenant.getPassword());
+      verify(passwordEncoder).matches(passwordRequest.getCurrentPassword(),
+          testTenant.getPassword());
       verify(passwordEncoder, never()).encode(any());
       verify(tenantRepository, never()).update(any());
     }
@@ -641,7 +629,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.changePassword(tenantId, passwordRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).findById(tenantId);
       verify(passwordEncoder, never()).matches(any(), any());
@@ -659,7 +647,7 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.changePassword(tenantId, emptyCurrentPasswordRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findById(any());
     }
@@ -675,9 +663,9 @@ class TenantServiceTest {
 
       // when & then
       assertThatThrownBy(() -> tenantService.changePassword(tenantId, emptyNewPasswordRequest))
-          .isInstanceOf(TenantException.class);
+          .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository, never()).findById(any());
     }
   }
-} 
+}
