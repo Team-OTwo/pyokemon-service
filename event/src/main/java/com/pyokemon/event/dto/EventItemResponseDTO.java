@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class GetEventListResponseDTO {
+public class EventItemResponseDTO {
     private Long eventScheduleId;
     private Long eventId;
     private Long venueId;
