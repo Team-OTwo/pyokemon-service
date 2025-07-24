@@ -1,6 +1,5 @@
 package com.pyokemon.tenant.api.controller;
 
-import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -30,7 +29,6 @@ public class TenantController {
 
   private final TenantService tenantService;
   private final TenantRepository tenantRepository;
-  private final TokenGenerator tokenGenerator;
 
   // 전체 테넌트 리스트 조회 GET /api/tenants
   @AdminOnly
@@ -118,13 +116,13 @@ public class TenantController {
     try {
       // Gateway에서 X-Auth-UserId 헤더로 사용자 정보 전달 (이미 JWT 검증 완료)
       String loginId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-      
+
       // Repository에서 loginId로 Tenant 조회
-      Tenant tenant = tenantRepository.findByLoginId(loginId)
-          .orElseThrow(TenantException::notFound);
-      
+      Tenant tenant =
+          tenantRepository.findByLoginId(loginId).orElseThrow(TenantException::notFound);
+
       return tenant.getId();
-      
+
     } catch (Exception e) {
       // 헤더에서 사용자 정보 추출 실패 시 접근 거부
       throw TenantException.accessDenied();
