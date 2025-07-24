@@ -1,5 +1,6 @@
 package com.pyokemon.tenant.web.context;
 
+import com.pyokemon.tenant.exception.TenantException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -33,8 +34,8 @@ public class GatewayRequestHeaderUtils {
   // 사용자 ID가 없으면 예외를 던지도록 강제
   public static String getUserIdOrThrowException() {
     String userId = getUserId();
-    if (userId == null) {
-      // TODO throw new NotFound
+    if (userId == null || userId.trim().isEmpty()) {
+      throw TenantException.accessDenied();
     }
     return userId;
   }
@@ -42,8 +43,8 @@ public class GatewayRequestHeaderUtils {
   // 디바이스 정보가 없으면 예외 던짐
   public static String getClientDeviceOrThrowException() {
     String clientDevice = getClientDevice();
-    if (clientDevice == null) {
-      // TODO throw new NotFound
+    if (clientDevice == null || clientDevice.trim().isEmpty()) {
+      throw new TenantException("클라이언트 디바이스 정보가 없습니다", "CLIENT_DEVICE_REQUIRED");
     }
     return clientDevice;
   }
@@ -51,8 +52,8 @@ public class GatewayRequestHeaderUtils {
   // IP 주소가 없으면 예외 던짐
   public static String getClientAddressOrThrowException() {
     String clientAddress = getClientAddress();
-    if (clientAddress == null) {
-      // TODO throw new NotFound
+    if (clientAddress == null || clientAddress.trim().isEmpty()) {
+      throw new TenantException("클라이언트 IP 정보가 없습니다", "CLIENT_ADDRESS_REQUIRED");
     }
     return clientAddress;
   }

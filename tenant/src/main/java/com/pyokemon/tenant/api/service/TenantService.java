@@ -2,7 +2,6 @@ package com.pyokemon.tenant.api.service;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +19,7 @@ import com.pyokemon.tenant.mapper.TenantMapper;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

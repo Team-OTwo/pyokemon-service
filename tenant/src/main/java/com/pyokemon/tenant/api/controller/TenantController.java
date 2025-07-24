@@ -1,5 +1,6 @@
 package com.pyokemon.tenant.api.controller;
 
+import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.api.service.TenantService;
 import com.pyokemon.tenant.exception.TenantException;
-import com.pyokemon.tenant.secret.jwt.TokenGenerator;
+import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,8 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class TenantController {
 
   private final TenantService tenantService;
-  private final TokenGenerator tokenGenerator;
   private final TenantRepository tenantRepository;
+  private final TokenGenerator tokenGenerator;
 
   // 전체 테넌트 리스트 조회 GET /api/tenants
   @AdminOnly
@@ -40,7 +41,6 @@ public class TenantController {
   }
 
   // 특정 테넌트 상세 조회 GET /api/tenants/{id}
-  @AdminOnly
   @GetMapping("/{id}")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getTenantById(@PathVariable Long id) {
     TenantDetailResponseDto response = tenantService.getTenantById(id);
@@ -84,11 +84,9 @@ public class TenantController {
 
   // 내 정보 조회 /api/tenant/profile
   @GetMapping("/profile")
-  public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getMyProfile(
-      @RequestHeader("Authorization") String authHeader) {
-    // TODO: JWT 토큰에서 사용자 ID 추출하는 유틸 메서드 필요
-    // 현재는 임시로 하드코딩 (실제로는 토큰 파싱 필요)
-    Long currentTenantId = getCurrentTenantIdFromToken(authHeader);
+  public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getMyProfile() {
+    // Gateway에서 이미 JWT 검증 완료, 헤더에서 사용자 정보 추출
+    Long currentTenantId = getCurrentTenantId();
 
     TenantDetailResponseDto response = tenantService.getTenantById(currentTenantId);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
@@ -97,9 +95,8 @@ public class TenantController {
   // 정보 수정 /api/tenant/profile
   @PutMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> updateProfile(
-      @RequestHeader("Authorization") String authHeader,
       @Valid @RequestBody UpdateProfileRequestDto request) {
-    Long currentTenantId = getCurrentTenantIdFromToken(authHeader);
+    Long currentTenantId = getCurrentTenantId();
 
     TenantDetailResponseDto response = tenantService.updateProfile(currentTenantId, request);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 수정 성공"));
@@ -109,34 +106,27 @@ public class TenantController {
   // 비밀번호 변경 /api/tenant/password
   @PatchMapping("/password")
   public ResponseEntity<ResponseDto<Void>> changePassword(
-      @RequestHeader("Authorization") String authHeader,
       @Valid @RequestBody UpdatePasswordRequestDto request) {
-    Long currentTenantId = getCurrentTenantIdFromToken(authHeader);
+    Long currentTenantId = getCurrentTenantId();
 
     tenantService.changePassword(currentTenantId, request);
     return ResponseEntity.ok(ResponseDto.success("비밀번호 변경 성공"));
   }
 
-  // JWT 토큰에서 사용자 ID 추출
-  private Long getCurrentTenantIdFromToken(String authHeader) {
+  // Gateway에서 전달받은 헤더에서 현재 사용자 ID 추출
+  private Long getCurrentTenantId() {
     try {
-      // Bearer 접두사 제거
-      String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-
-      // TokenGenerator로 access token에서 loginId 추출
-      String loginId = tokenGenerator.validateAccessToken(token);
-      if (loginId == null) {
-        throw TenantException.accessDenied();
-      }
-
+      // Gateway에서 X-Auth-UserId 헤더로 사용자 정보 전달 (이미 JWT 검증 완료)
+      String loginId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+      
       // Repository에서 loginId로 Tenant 조회
-      Tenant tenant =
-          tenantRepository.findByLoginId(loginId).orElseThrow(TenantException::notFound);
-
+      Tenant tenant = tenantRepository.findByLoginId(loginId)
+          .orElseThrow(TenantException::notFound);
+      
       return tenant.getId();
-
+      
     } catch (Exception e) {
-      // 토큰 파싱 실패 시 접근 거부
+      // 헤더에서 사용자 정보 추출 실패 시 접근 거부
       throw TenantException.accessDenied();
     }
   }

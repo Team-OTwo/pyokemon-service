@@ -11,10 +11,10 @@ public class SecureHashUtils {
     try {
       // SHA-256 MessageDigest 인스턴스 생성
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      
+
       // 문자열을 바이트 배열로 변환 후 해시 계산
       byte[] hashBytes = digest.digest(message.getBytes(StandardCharsets.UTF_8));
-      
+
       // 바이트 배열을 16진수 문자열로 변환
       StringBuilder hexString = new StringBuilder();
       for (byte b : hashBytes) {
@@ -24,9 +24,9 @@ public class SecureHashUtils {
         }
         hexString.append(hex);
       }
-      
+
       return hexString.toString();
-      
+
     } catch (NoSuchAlgorithmException e) {
       // SHA-256이 지원되지 않는 경우 (일반적으로 발생하지 않음)
       throw new RuntimeException("SHA-256 해시 알고리즘을 찾을 수 없습니다", e);
