@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EventScheduleService {
 
-    @Autowired
-    private EventScheduleRepository eventScheduleRepository;
+    private final EventScheduleRepository eventScheduleRepository;
     public List<EventSchedule> getTodayOpenedTickets() {
        return eventScheduleRepository.selectTodayOpenedTickets();
     }
