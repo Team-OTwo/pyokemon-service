@@ -3,55 +3,23 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.event.repository.PriceRepository">
 
-  <resultMap id="priceResultMap" type="com.pyokemon.event.entity.Price">
-    <id property="priceId" column="price_id"/>
-    <result property="eventScheduleId" column="event_schedule_id"/>
-    <result property="seatClassId" column="seat_class_id"/>
-    <result property="price" column="price"/>
-    <result property="createdAt" column="created_at"/>
-    <result property="updatedAt" column="updated_at"/>
-  </resultMap>
+    <insert id="save" parameterType="Price" useGeneratedKeys="true" keyProperty="priceId" keyColumn="price_id">
+        INSERT INTO tb_price (
+            event_schedule_id, 
+            seat_class_id, 
+            price, 
+            created_at,
+            updated_at
+        ) VALUES (
+            #{eventScheduleId}, 
+            #{seatClassId}, 
+            #{price}, 
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="priceId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
   
-  <insert id="save" parameterType="com.pyokemon.event.entity.Price" useGeneratedKeys="true" keyProperty="priceId" keyColumn="price_id">
-    INSERT INTO tb_price (
-      event_schedule_id, 
-      seat_class_id, 
-      price, 
-      created_at,
-      updated_at
-    ) VALUES (
-      #{eventScheduleId}, 
-      #{seatClassId}, 
-      #{price}, 
-      #{createdAt},
-      #{updatedAt}
-    )
-    <selectKey resultType="long" keyProperty="priceId" order="AFTER">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-  </insert>
-  
-  <select id="findById" parameterType="long" resultMap="priceResultMap">
-    SELECT 
-      price_id,
-      event_schedule_id, 
-      seat_class_id, 
-      price,
-      created_at,
-      updated_at
-    FROM tb_price 
-    WHERE price_id = #{priceId}
-  </select>
-  
-  <select id="findByEventScheduleId" parameterType="long" resultMap="priceResultMap">
-    SELECT 
-      price_id,
-      event_schedule_id, 
-      seat_class_id, 
-      price,
-      created_at,
-      updated_at
-    FROM tb_price 
-    WHERE event_schedule_id = #{eventScheduleId}
-  </select>
 </mapper> 

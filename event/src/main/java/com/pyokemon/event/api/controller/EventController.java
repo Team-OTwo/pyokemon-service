@@ -29,21 +29,21 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Event API", description = "APIs for event management")
 public class EventController {
 
-  private final EventService eventService;
+    private final EventService eventService;
 
-  @Operation(summary = "Register a new event",
-      description = "Register a new event with schedules and prices",
-      responses = {
-          @ApiResponse(responseCode = "201", description = "Event registered successfully",
-              content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-          @ApiResponse(responseCode = "400", description = "Invalid input data",
-              content = @Content(schema = @Schema(implementation = ResponseDto.class)))})
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public ResponseDto<EventResponseDto> registerEvent(
-      @Valid @RequestBody EventRegisterDto eventRegisterDto) {
-    log.info("Registering event: {}", eventRegisterDto.getTitle());
-    EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
-    return ResponseDto.success(registeredEvent, "Event registered successfully");
-  }
+    @Operation(summary = "Register a new event",
+            description = "Register a new event with schedules and prices",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Event registered successfully",
+                            content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data",
+                            content = @Content(schema = @Schema(implementation = ResponseDto.class)))})
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto<EventResponseDto> registerEvent(
+            @Valid @RequestBody EventRegisterDto eventRegisterDto) {
+        log.info("Registering event: {}", eventRegisterDto.getTitle());
+        EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
+        return ResponseDto.success(registeredEvent, "Event registered successfully");
+    }
 }

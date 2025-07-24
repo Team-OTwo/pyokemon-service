@@ -2,12 +2,13 @@ package com.pyokemon.event.repository;
 
 import java.util.Optional;
 
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import com.pyokemon.event.entity.Venue;
 
-@Repository
+@Mapper
 public interface VenueRepository {
-  // Add method for finding a venue by ID
+  @Select("SELECT venue_id, venue_name, city, street, zipcode, created_at, updated_at FROM tb_venue WHERE venue_id = #{venueId}")
   Optional<Venue> findById(Long venueId);
 }

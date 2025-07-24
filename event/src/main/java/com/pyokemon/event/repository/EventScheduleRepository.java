@@ -3,18 +3,15 @@ package com.pyokemon.event.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.entity.EventSchedule;
 
-@Repository
+@Mapper
 public interface EventScheduleRepository {
-  // Add method for saving an event schedule
   Long save(EventSchedule eventSchedule);
 
-  // Add method for finding event schedules by event ID
   List<EventSchedule> findByEventId(Long eventId);
 
-  // Add method for finding an event schedule by ID
   Optional<EventSchedule> findById(Long eventScheduleId);
 }
