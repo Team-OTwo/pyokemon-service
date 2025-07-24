@@ -15,7 +15,7 @@ import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.exception.TenantException;
-import com.pyokemon.tenant.mapper.TenantMapper;
+import com.pyokemon.tenant.mapper.TenantConverter;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TenantService {
 
   private final TenantRepository tenantRepository;
-  private final TenantMapper tenantMapper;
+  private final TenantConverter tenantConverter;
   private final TokenGenerator tokenGenerator;
   private final PasswordEncoder passwordEncoder;
 

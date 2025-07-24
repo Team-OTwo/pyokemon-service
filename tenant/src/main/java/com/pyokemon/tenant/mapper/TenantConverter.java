@@ -11,7 +11,7 @@ import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 
 @Component
-public class TenantMapper {
+public class TenantConverter {
 
   // Tenant 엔티티를 TenantDetailResponseDto로 변환
   public TenantDetailResponseDto toResponseDto(Tenant tenant) {
