@@ -14,8 +14,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class EventController {
-    @Autowired
-    private EventScheduleService eventScheduleService;
+
+    private final EventScheduleService eventScheduleService;
 
     //오늘 오픈 티켓
     @GetMapping("/open-today")
