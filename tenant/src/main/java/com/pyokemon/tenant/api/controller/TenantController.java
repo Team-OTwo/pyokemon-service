@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.tenant.annotation.AdminOnly;
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
-import com.pyokemon.tenant.api.dto.request.LoginRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdateProfileRequestDto;
 import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
@@ -63,22 +62,7 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success("테넌트 삭제 성공"));
   }
 
-  // 로그인 POST /tenants/login
-  @PostMapping("/login")
-  public ResponseEntity<ResponseDto<String>> login(@Valid @RequestBody LoginRequestDto request) {
-    String token = tenantService.login(request);
-    return ResponseEntity.ok(ResponseDto.success(token, "로그인 성공"));
-  }
 
-  // 로그아웃 /tenants/logout
-  @PostMapping("/logout")
-  public ResponseEntity<ResponseDto<Void>> logout(
-      @RequestHeader("Authorization") String authHeader) {
-    // "Bearer " 접두사 제거
-    String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-    tenantService.logout(token);
-    return ResponseEntity.ok(ResponseDto.success("로그아웃 성공"));
-  }
 
   // 내 정보 조회 /tenants/profile
   @GetMapping("/profile")

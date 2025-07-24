@@ -8,6 +8,8 @@ import com.pyokemon.tenant.exception.TenantException;
 // Gateway에서 전달한 요청 헤더 정보를 쉽게 꺼내기 위한 유틸 클래스
 public class GatewayRequestHeaderUtils {
 
+  private static final String BEARER_PREFIX = "Bearer ";
+
   // 요청 헤더에서 특정 키의 값을 문자열로 가져옴
   public static String getRequestHeaderParamAsString(String key) {
     // 현재 쓰레드의 요청 정보를 가져옴 (Spring의 RequestContextHolder 사용)
@@ -25,6 +27,21 @@ public class GatewayRequestHeaderUtils {
   // 사용자 역할 가져오기  
   public static String getUserRole() {
     return getRequestHeaderParamAsString("X-User-Role");
+  }
+
+  // Authorization 헤더 가져오기
+  public static String getAuthorizationHeader() {
+    return getRequestHeaderParamAsString("Authorization");
+  }
+
+  // Bearer 토큰 추출 (Bearer 접두사 제거)
+  public static String getBearerToken() {
+    String authHeader = getAuthorizationHeader();
+    if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+      return null;
+    }
+    String token = authHeader.substring(BEARER_PREFIX.length()).trim();
+    return token.isEmpty() ? null : token;
   }
 
   // 클라이언트 디바이스 정보 가져오기 (ex: WEB, MOBILE 등)
@@ -53,6 +70,29 @@ public class GatewayRequestHeaderUtils {
       throw new TenantException("사용자 권한 정보가 없습니다", "USER_ROLE_REQUIRED");
     }
     return userRole;
+  }
+
+  // Bearer 토큰이 없으면 예외 던짐
+  public static String getBearerTokenOrThrowException() {
+    String authHeader = getAuthorizationHeader();
+    
+    // Authorization 헤더 체크
+    if (authHeader == null || authHeader.trim().isEmpty()) {
+      throw new TenantException("Authorization 헤더가 없습니다", "AUTHORIZATION_HEADER_MISSING");
+    }
+    
+    // Bearer 접두사 체크
+    if (!authHeader.startsWith(BEARER_PREFIX)) {
+      throw new TenantException("Bearer 토큰이 아닙니다", "INVALID_AUTHORIZATION_HEADER");
+    }
+    
+    // 토큰 추출 및 검증
+    String token = authHeader.substring(BEARER_PREFIX.length()).trim();
+    if (token.isEmpty()) {
+      throw new TenantException("토큰이 비어있습니다", "EMPTY_TOKEN");
+    }
+    
+    return token;
   }
 
   // 디바이스 정보가 없으면 예외 던짐

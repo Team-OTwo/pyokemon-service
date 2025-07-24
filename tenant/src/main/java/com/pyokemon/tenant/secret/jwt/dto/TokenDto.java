@@ -1,5 +1,6 @@
 package com.pyokemon.tenant.secret.jwt.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,5 +27,13 @@ public class TokenDto {
   public static class AccessRefreshToken {
     private final JwtToken access;
     private final JwtToken refresh;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  public static class RefreshRequest {
+    @NotBlank(message = "리프레시 토큰은 필수입니다")
+    private String refreshToken;
   }
 }

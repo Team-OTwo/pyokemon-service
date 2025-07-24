@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
 import com.pyokemon.tenant.api.dto.request.LoginRequestDto;
+
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdateProfileRequestDto;
 import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
@@ -17,6 +18,7 @@ import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.exception.TenantException;
 import com.pyokemon.tenant.mapper.TenantConverter;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
+import com.pyokemon.tenant.secret.jwt.dto.TokenDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -156,7 +158,7 @@ public class TenantService {
   }
 
   // 로그인
-  public String login(LoginRequestDto request) {
+  public TokenDto.AccessRefreshToken login(LoginRequestDto request) {
     // 1. 유효성 검증
     if (request.getLoginId() == null || request.getLoginId().trim().isEmpty()) {
       throw new TenantException("아이디는 필수입니다", "LOGIN_ID_REQUIRED");
@@ -175,9 +177,8 @@ public class TenantService {
       throw TenantException.loginFailed();
     }
 
-    // 4. JWT 토큰 생성 및 반환
-    // Access Token만 발급 (WEB 디바이스 타입으로 설정)
-    return tokenGenerator.generateAccessToken(tenant.getLoginId(), "WEB").getAccess().getToken();
+    // 4. JWT 토큰 생성 및 반환 (Access + Refresh 토큰)
+    return tokenGenerator.generateAccessRefreshToken(tenant.getLoginId(), "WEB");
   }
 
   // 로그아웃
@@ -186,6 +187,27 @@ public class TenantService {
 
     // TODO: 토큰 블랙리스트 추가
     log.info("로그아웃");
+  }
+
+  // 토큰 갱신
+  public TokenDto.AccessToken refresh(TokenDto.RefreshRequest request) {
+    // 1. 유효성 검증
+    if (request.getRefreshToken() == null || request.getRefreshToken().trim().isEmpty()) {
+      throw new TenantException("리프레시 토큰은 필수입니다", "REFRESH_TOKEN_REQUIRED");
+    }
+
+    // 2. 리프레시 토큰 검증 및 사용자 ID 추출
+    String loginId = tokenGenerator.validateJwtToken(request.getRefreshToken());
+    if (loginId == null) {
+      throw new TenantException("유효하지 않은 리프레시 토큰입니다", "INVALID_REFRESH_TOKEN");
+    }
+
+    // 3. 사용자 존재 여부 확인
+    Tenant tenant = tenantRepository.findByLoginId(loginId)
+        .orElseThrow(() -> new TenantException("존재하지 않는 사용자입니다", "USER_NOT_FOUND"));
+
+    // 4. 새로운 Access 토큰 발급
+    return tokenGenerator.generateAccessToken(tenant.getLoginId(), "WEB");
   }
 
   // 테넌트 삭제 - Admin
