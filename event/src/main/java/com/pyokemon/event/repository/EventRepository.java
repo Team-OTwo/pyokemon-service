@@ -2,11 +2,11 @@ package com.pyokemon.event.repository;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.entity.Event;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-@Repository
+@Mapper
 public interface EventRepository{
     List<Event> findByTenantId(Long tenantId);
     List<Event> findByStatus(Event.EventStatus status);
