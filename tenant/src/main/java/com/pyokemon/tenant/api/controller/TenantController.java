@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.tenant.annotation.AdminOnly;
+import com.pyokemon.tenant.annotation.TenantOnly;
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdateProfileRequestDto;
@@ -65,6 +66,7 @@ public class TenantController {
 
 
   // 내 정보 조회 /tenants/profile
+  @TenantOnly
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getMyProfile() {
     Long currentTenantId = getCurrentTenantId();
@@ -74,7 +76,8 @@ public class TenantController {
   }
 
   // 정보 수정 /tenants/profile
-  @PostMapping("/profile")
+  @TenantOnly
+  @PutMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> updateProfile(
       @Valid @RequestBody UpdateProfileRequestDto request) {
     Long currentTenantId = getCurrentTenantId();
@@ -85,7 +88,8 @@ public class TenantController {
 
 
   // 비밀번호 변경 /tenants/password
-  @PostMapping("/password")
+  @TenantOnly
+  @PatchMapping("/password")
   public ResponseEntity<ResponseDto<Void>> changePassword(
       @Valid @RequestBody UpdatePasswordRequestDto request) {
     Long currentTenantId = getCurrentTenantId();

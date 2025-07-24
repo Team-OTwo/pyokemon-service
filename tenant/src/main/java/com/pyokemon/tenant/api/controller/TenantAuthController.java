@@ -42,4 +42,4 @@ public class TenantAuthController {
     TokenDto.AccessToken newToken = tenantService.refresh(request);
     return ResponseEntity.ok(ResponseDto.success(newToken, "토큰 갱신 성공"));
   }
-} 
+}

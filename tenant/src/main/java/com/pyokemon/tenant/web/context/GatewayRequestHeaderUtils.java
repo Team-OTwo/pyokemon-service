@@ -24,7 +24,7 @@ public class GatewayRequestHeaderUtils {
     return getRequestHeaderParamAsString("X-Auth-UserId");
   }
 
-  // 사용자 역할 가져오기  
+  // 사용자 역할 가져오기
   public static String getUserRole() {
     return getRequestHeaderParamAsString("X-User-Role");
   }
@@ -75,23 +75,23 @@ public class GatewayRequestHeaderUtils {
   // Bearer 토큰이 없으면 예외 던짐
   public static String getBearerTokenOrThrowException() {
     String authHeader = getAuthorizationHeader();
-    
+
     // Authorization 헤더 체크
     if (authHeader == null || authHeader.trim().isEmpty()) {
       throw new TenantException("Authorization 헤더가 없습니다", "AUTHORIZATION_HEADER_MISSING");
     }
-    
+
     // Bearer 접두사 체크
     if (!authHeader.startsWith(BEARER_PREFIX)) {
       throw new TenantException("Bearer 토큰이 아닙니다", "INVALID_AUTHORIZATION_HEADER");
     }
-    
+
     // 토큰 추출 및 검증
     String token = authHeader.substring(BEARER_PREFIX.length()).trim();
     if (token.isEmpty()) {
       throw new TenantException("토큰이 비어있습니다", "EMPTY_TOKEN");
     }
-    
+
     return token;
   }
 
@@ -119,9 +119,28 @@ public class GatewayRequestHeaderUtils {
     return "ADMIN".equals(userRole);
   }
 
+  // 테넌트 권한인지 체크
+  public static boolean isTenant() {
+    String userRole = getUserRole();
+    return "TENANT".equals(userRole);
+  }
+
+  // 일반 사용자 권한인지 체크
+  public static boolean isUser() {
+    String userRole = getUserRole();
+    return "USER".equals(userRole);
+  }
+
   // 관리자 권한이 아니면 예외 던짐
   public static void requireAdminRole() {
     if (!isAdmin()) {
+      throw TenantException.accessDenied();
+    }
+  }
+
+  // 테넌트 권한이 아니면 예외 던짐
+  public static void requireTenantRole() {
+    if (!isTenant()) {
       throw TenantException.accessDenied();
     }
   }

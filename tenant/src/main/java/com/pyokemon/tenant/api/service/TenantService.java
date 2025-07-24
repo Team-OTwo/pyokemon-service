@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
 import com.pyokemon.tenant.api.dto.request.LoginRequestDto;
-
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdateProfileRequestDto;
 import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
@@ -72,11 +71,11 @@ public class TenantService {
     String encodedPassword = passwordEncoder.encode(request.getPassword());
 
     // 4. 엔티티 생성 및 저장
-    Tenant tenant = tenantMapper.toEntity(request, encodedPassword);
+    Tenant tenant = tenantConverter.toEntity(request, encodedPassword);
     tenantRepository.insert(tenant);
 
     // 5. 저장된 데이터 DTO 변환 후 반환
-    return tenantMapper.toResponseDto(tenant);
+    return tenantConverter.toResponseDto(tenant);
   }
 
   // 프로필 수정
@@ -111,7 +110,7 @@ public class TenantService {
     // 5. 업데이트된 데이터 조회 및 DTO 변환
     Tenant savedTenant = tenantRepository.findById(tenantId).orElseThrow(TenantException::notFound);
 
-    return tenantMapper.toResponseDto(savedTenant);
+    return tenantConverter.toResponseDto(savedTenant);
   }
 
   // 비밀번호 변경

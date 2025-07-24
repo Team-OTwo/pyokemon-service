@@ -1,6 +1,7 @@
 package com.pyokemon.tenant.secret.jwt.dto;
 
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
