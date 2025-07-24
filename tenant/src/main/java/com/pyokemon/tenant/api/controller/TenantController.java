@@ -83,7 +83,6 @@ public class TenantController {
   // 내 정보 조회 /tenants/profile
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getMyProfile() {
-    // Gateway에서 이미 JWT 검증 완료, 헤더에서 사용자 정보 추출
     Long currentTenantId = getCurrentTenantId();
 
     TenantDetailResponseDto response = tenantService.getTenantById(currentTenantId);

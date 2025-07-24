@@ -22,6 +22,11 @@ public class GatewayRequestHeaderUtils {
     return getRequestHeaderParamAsString("X-Auth-UserId");
   }
 
+  // 사용자 역할 가져오기  
+  public static String getUserRole() {
+    return getRequestHeaderParamAsString("X-User-Role");
+  }
+
   // 클라이언트 디바이스 정보 가져오기 (ex: WEB, MOBILE 등)
   public static String getClientDevice() {
     return getRequestHeaderParamAsString("X-Client-Device");
@@ -41,6 +46,15 @@ public class GatewayRequestHeaderUtils {
     return userId;
   }
 
+  // 사용자 역할이 없으면 예외 던짐
+  public static String getUserRoleOrThrowException() {
+    String userRole = getUserRole();
+    if (userRole == null || userRole.trim().isEmpty()) {
+      throw new TenantException("사용자 권한 정보가 없습니다", "USER_ROLE_REQUIRED");
+    }
+    return userRole;
+  }
+
   // 디바이스 정보가 없으면 예외 던짐
   public static String getClientDeviceOrThrowException() {
     String clientDevice = getClientDevice();
@@ -57,5 +71,18 @@ public class GatewayRequestHeaderUtils {
       throw new TenantException("클라이언트 IP 정보가 없습니다", "CLIENT_ADDRESS_REQUIRED");
     }
     return clientAddress;
+  }
+
+  // 관리자 권한인지 체크
+  public static boolean isAdmin() {
+    String userRole = getUserRole();
+    return "ADMIN".equals(userRole);
+  }
+
+  // 관리자 권한이 아니면 예외 던짐
+  public static void requireAdminRole() {
+    if (!isAdmin()) {
+      throw TenantException.accessDenied();
+    }
   }
 }

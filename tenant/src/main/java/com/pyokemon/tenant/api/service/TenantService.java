@@ -38,7 +38,7 @@ public class TenantService {
     List<Tenant> tenants = tenantRepository.findAll();
 
     // 2. DTO 변환
-    return tenantMapper.toListResponseDto(tenants);
+    return tenantConverter.toListResponseDto(tenants);
   }
 
   // 특정 테넌트 상세 조회
@@ -50,7 +50,7 @@ public class TenantService {
     // 2. Repository에서 데이터 조회
     Tenant tenant = tenantRepository.findById(id).orElseThrow(TenantException::notFound);
     // 3. DTO 변환 및 반환
-    return tenantMapper.toResponseDto(tenant);
+    return tenantConverter.toResponseDto(tenant);
   }
 
   // 테넌트 등록 - Admin
