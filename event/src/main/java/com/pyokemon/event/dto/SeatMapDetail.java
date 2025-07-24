@@ -1,10 +1,19 @@
 package com.pyokemon.event.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SeatMapDetail {
     private Long seatId;
     private String row;
     private String col;
-    private String seatGrade; // 개별 좌석이 어떤 등급인지 표시하기 위해 유지
+    private String seatGrade;
     private boolean isBooked;
 
     public Long getSeatId() { return seatId; }

@@ -1,10 +1,19 @@
 package com.pyokemon.event.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventScheduleSeatResponse {
     private Long eventScheduleId;
-    private List<SeatGradeRemaining> remainingSeatsByGrade; // 이름 변경
+    private List<SeatGradeRemaining> remainingSeatsByGrade;
     private List<SeatMapDetail> seatMap;
 
     // Getters and Setters

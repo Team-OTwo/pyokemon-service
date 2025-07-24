@@ -1,5 +1,14 @@
 package com.pyokemon.event.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SeatGradeRemaining {
     private String seatGrade;
     private Integer remainingSeats;
