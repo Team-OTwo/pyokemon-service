@@ -18,7 +18,7 @@ public class SecurityConfig {
    */
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder(12); // Work factor 12 (보안 강화)
   }
 
   /**

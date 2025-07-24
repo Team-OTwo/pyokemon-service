@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.TenantErrorCode;
 import com.pyokemon.tenant.annotation.AdminOnly;
 import com.pyokemon.tenant.annotation.TenantOnly;
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
@@ -17,8 +19,6 @@ import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
 import com.pyokemon.tenant.api.service.TenantService;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.code.TenantErrorCode;
 import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -106,15 +106,16 @@ public class TenantController {
       String loginId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
 
       // Repository에서 loginId로 Tenant 조회
-      Tenant tenant =
-          tenantRepository.findByLoginId(loginId).orElseThrow(() -> 
-        new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode()));
+      Tenant tenant = tenantRepository.findByLoginId(loginId)
+          .orElseThrow(() -> new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+              TenantErrorCode.TENANT_NOT_FOUND.getCode()));
 
       return tenant.getId();
 
     } catch (Exception e) {
       // 헤더에서 사용자 정보 추출 실패 시 접근 거부
-      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(), TenantErrorCode.ACCESS_DENIED.getCode());
+      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(),
+          TenantErrorCode.ACCESS_DENIED.getCode());
     }
   }
 }

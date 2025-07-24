@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
 import com.pyokemon.tenant.api.dto.request.LoginRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
@@ -27,7 +28,6 @@ import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
 import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
-import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.tenant.mapper.TenantConverter;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import com.pyokemon.tenant.secret.jwt.dto.TokenDto;

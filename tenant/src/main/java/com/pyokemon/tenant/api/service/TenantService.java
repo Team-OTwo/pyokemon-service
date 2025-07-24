@@ -2,11 +2,12 @@ package com.pyokemon.tenant.api.service;
 
 import java.util.List;
 
-import com.pyokemon.common.exception.code.TenantErrorCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.TenantErrorCode;
 import com.pyokemon.tenant.api.dto.request.CreateTenantRequestDto;
 import com.pyokemon.tenant.api.dto.request.LoginRequestDto;
 import com.pyokemon.tenant.api.dto.request.UpdatePasswordRequestDto;
@@ -15,7 +16,6 @@ import com.pyokemon.tenant.api.dto.response.TenantDetailResponseDto;
 import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 import com.pyokemon.tenant.api.repository.TenantRepository;
-import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.tenant.mapper.TenantConverter;
 import com.pyokemon.tenant.secret.jwt.TokenGenerator;
 import com.pyokemon.tenant.secret.jwt.dto.TokenDto;
@@ -47,11 +47,13 @@ public class TenantService {
   public TenantDetailResponseDto getTenantById(Long id) {
     // 1. 유효성 검증
     if (id == null) {
-      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(), TenantErrorCode.TENANT_ID_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(),
+          TenantErrorCode.TENANT_ID_REQUIRED.getCode());
     }
     // 2. Repository에서 데이터 조회
-    Tenant tenant = tenantRepository.findById(id).orElseThrow(() -> 
-        new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode()));
+    Tenant tenant = tenantRepository.findById(id)
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+            TenantErrorCode.TENANT_NOT_FOUND.getCode()));
     // 3. DTO 변환 및 반환
     return tenantConverter.toResponseDto(tenant);
   }
@@ -61,12 +63,14 @@ public class TenantService {
   public TenantDetailResponseDto createTenant(CreateTenantRequestDto request) {
     // 1. 로그인 ID 중복 체크
     if (tenantRepository.existsByLoginId(request.getLoginId())) {
-      throw new BusinessException(TenantErrorCode.LOGIN_ID_DUPLICATED.getMessage(), TenantErrorCode.LOGIN_ID_DUPLICATED.getCode());
+      throw new BusinessException(TenantErrorCode.LOGIN_ID_DUPLICATED.getMessage(),
+          TenantErrorCode.LOGIN_ID_DUPLICATED.getCode());
     }
 
     // 2. 사업자번호 중복 체크
     if (tenantRepository.existsByCorpId(request.getBusinessNumber())) {
-      throw new BusinessException(TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getMessage(), TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getCode());
+      throw new BusinessException(TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getMessage(),
+          TenantErrorCode.BUSINESS_NUMBER_DUPLICATED.getCode());
     }
 
     // 3. 비밀번호 암호화
@@ -85,13 +89,14 @@ public class TenantService {
   public TenantDetailResponseDto updateProfile(Long tenantId, UpdateProfileRequestDto request) {
     // 1. 유효성 검증
     if (tenantId == null) {
-      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(), TenantErrorCode.TENANT_ID_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(),
+          TenantErrorCode.TENANT_ID_REQUIRED.getCode());
     }
 
     // 2. 기존 테넌트 조회
-    Tenant existingTenant =
-        tenantRepository.findById(tenantId).orElseThrow(() -> 
-            new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode()));
+    Tenant existingTenant = tenantRepository.findById(tenantId)
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+            TenantErrorCode.TENANT_NOT_FOUND.getCode()));
 
     // 3. 수정할 정보 업데이트 (비밀번호와 로그인ID, 사업자번호는 수정 불가)
     Tenant updatedTenant =
@@ -111,8 +116,9 @@ public class TenantService {
     tenantRepository.update(updatedTenant);
 
     // 5. 업데이트된 데이터 조회 및 DTO 변환
-    Tenant savedTenant = tenantRepository.findById(tenantId).orElseThrow(() -> 
-        new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode()));
+    Tenant savedTenant = tenantRepository.findById(tenantId)
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+            TenantErrorCode.TENANT_NOT_FOUND.getCode()));
 
     return tenantConverter.toResponseDto(savedTenant);
   }
@@ -122,25 +128,29 @@ public class TenantService {
   public void changePassword(Long tenantId, UpdatePasswordRequestDto request) {
     // 1. 유효성 검증
     if (tenantId == null) {
-      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(), TenantErrorCode.TENANT_ID_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(),
+          TenantErrorCode.TENANT_ID_REQUIRED.getCode());
     }
 
     if (request.getCurrentPassword() == null || request.getCurrentPassword().trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.OLD_PASSWORD_REQUIRED.getMessage(), TenantErrorCode.OLD_PASSWORD_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.OLD_PASSWORD_REQUIRED.getMessage(),
+          TenantErrorCode.OLD_PASSWORD_REQUIRED.getCode());
     }
 
     if (request.getNewPassword() == null || request.getNewPassword().trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.NEW_PASSWORD_REQUIRED.getMessage(), TenantErrorCode.NEW_PASSWORD_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.NEW_PASSWORD_REQUIRED.getMessage(),
+          TenantErrorCode.NEW_PASSWORD_REQUIRED.getCode());
     }
 
     // 2. 기존 테넌트 조회
-    Tenant existingTenant =
-        tenantRepository.findById(tenantId).orElseThrow(() -> 
-            new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode()));
+    Tenant existingTenant = tenantRepository.findById(tenantId)
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+            TenantErrorCode.TENANT_NOT_FOUND.getCode()));
 
     // 3. 현재 비밀번호 검증
     if (!passwordEncoder.matches(request.getCurrentPassword(), existingTenant.getPassword())) {
-      throw new BusinessException(TenantErrorCode.CURRENT_PASSWORD_MISMATCH.getMessage(), TenantErrorCode.CURRENT_PASSWORD_MISMATCH.getCode());
+      throw new BusinessException(TenantErrorCode.CURRENT_PASSWORD_MISMATCH.getMessage(),
+          TenantErrorCode.CURRENT_PASSWORD_MISMATCH.getCode());
     }
 
     // 4. 새 비밀번호 암호화
@@ -165,20 +175,24 @@ public class TenantService {
   public TokenDto.AccessRefreshToken login(LoginRequestDto request) {
     // 1. 유효성 검증
     if (request.getLoginId() == null || request.getLoginId().trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.LOGIN_ID_REQUIRED.getMessage(), TenantErrorCode.LOGIN_ID_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.LOGIN_ID_REQUIRED.getMessage(),
+          TenantErrorCode.LOGIN_ID_REQUIRED.getCode());
     }
 
     if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.PASSWORD_REQUIRED.getMessage(), TenantErrorCode.PASSWORD_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.PASSWORD_REQUIRED.getMessage(),
+          TenantErrorCode.PASSWORD_REQUIRED.getCode());
     }
 
     // 2. 사용자 조회
     Tenant tenant = tenantRepository.findByLoginId(request.getLoginId())
-        .orElseThrow(() -> new BusinessException(TenantErrorCode.LOGIN_FAILED.getMessage(), TenantErrorCode.LOGIN_FAILED.getCode()));
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.LOGIN_FAILED.getMessage(),
+            TenantErrorCode.LOGIN_FAILED.getCode()));
 
     // 3. 비밀번호 검증
     if (!passwordEncoder.matches(request.getPassword(), tenant.getPassword())) {
-      throw new BusinessException(TenantErrorCode.LOGIN_FAILED.getMessage(), TenantErrorCode.LOGIN_FAILED.getCode());
+      throw new BusinessException(TenantErrorCode.LOGIN_FAILED.getMessage(),
+          TenantErrorCode.LOGIN_FAILED.getCode());
     }
 
     // 4. JWT 토큰 생성 및 반환 (Access + Refresh 토큰)
@@ -197,18 +211,21 @@ public class TenantService {
   public TokenDto.AccessToken refresh(TokenDto.RefreshRequest request) {
     // 1. 유효성 검증
     if (request.getRefreshToken() == null || request.getRefreshToken().trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.REFRESH_TOKEN_REQUIRED.getMessage(), TenantErrorCode.REFRESH_TOKEN_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.REFRESH_TOKEN_REQUIRED.getMessage(),
+          TenantErrorCode.REFRESH_TOKEN_REQUIRED.getCode());
     }
 
     // 2. 리프레시 토큰 검증 및 사용자 ID 추출
     String loginId = tokenGenerator.validateJwtToken(request.getRefreshToken());
     if (loginId == null) {
-      throw new BusinessException(TenantErrorCode.INVALID_REFRESH_TOKEN.getMessage(), TenantErrorCode.INVALID_REFRESH_TOKEN.getCode());
+      throw new BusinessException(TenantErrorCode.INVALID_REFRESH_TOKEN.getMessage(),
+          TenantErrorCode.INVALID_REFRESH_TOKEN.getCode());
     }
 
     // 3. 사용자 존재 여부 확인
     Tenant tenant = tenantRepository.findByLoginId(loginId)
-        .orElseThrow(() -> new BusinessException(TenantErrorCode.USER_NOT_FOUND.getMessage(), TenantErrorCode.USER_NOT_FOUND.getCode()));
+        .orElseThrow(() -> new BusinessException(TenantErrorCode.USER_NOT_FOUND.getMessage(),
+            TenantErrorCode.USER_NOT_FOUND.getCode()));
 
     // 4. 새로운 Access 토큰 발급
     return tokenGenerator.generateAccessToken(tenant.getLoginId(), "WEB");
@@ -219,19 +236,22 @@ public class TenantService {
   public void deleteTenant(Long id) {
     // 1. 유효성 검증
     if (id == null) {
-      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(), TenantErrorCode.TENANT_ID_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.TENANT_ID_REQUIRED.getMessage(),
+          TenantErrorCode.TENANT_ID_REQUIRED.getCode());
     }
 
     // 2. 삭제할 테넌트가 존재하는지 확인
     if (!tenantRepository.existsById(id)) {
-      throw new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(), TenantErrorCode.TENANT_NOT_FOUND.getCode());
+      throw new BusinessException(TenantErrorCode.TENANT_NOT_FOUND.getMessage(),
+          TenantErrorCode.TENANT_NOT_FOUND.getCode());
     }
 
     // 3. 테넌트 삭제
     try {
       tenantRepository.deleteById(id);
     } catch (Exception e) {
-      throw new BusinessException(TenantErrorCode.TENANT_DELETE_FAILED.getMessage(), TenantErrorCode.TENANT_DELETE_FAILED.getCode(), e);
+      throw new BusinessException(TenantErrorCode.TENANT_DELETE_FAILED.getMessage(),
+          TenantErrorCode.TENANT_DELETE_FAILED.getCode(), e);
     }
   }
 

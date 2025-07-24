@@ -1,10 +1,10 @@
 package com.pyokemon.tenant.web.context;
 
-import com.pyokemon.common.exception.code.TenantErrorCode;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.TenantErrorCode;
 
 // Gateway에서 전달한 요청 헤더 정보를 쉽게 꺼내기 위한 유틸 클래스
 public class GatewayRequestHeaderUtils {
@@ -59,7 +59,8 @@ public class GatewayRequestHeaderUtils {
   public static String getUserIdOrThrowException() {
     String userId = getUserId();
     if (userId == null || userId.trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(), TenantErrorCode.ACCESS_DENIED.getCode());
+      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(),
+          TenantErrorCode.ACCESS_DENIED.getCode());
     }
     return userId;
   }
@@ -68,7 +69,8 @@ public class GatewayRequestHeaderUtils {
   public static String getUserRoleOrThrowException() {
     String userRole = getUserRole();
     if (userRole == null || userRole.trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.USER_ROLE_REQUIRED.getMessage(), TenantErrorCode.USER_ROLE_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.USER_ROLE_REQUIRED.getMessage(),
+          TenantErrorCode.USER_ROLE_REQUIRED.getCode());
     }
     return userRole;
   }
@@ -79,18 +81,21 @@ public class GatewayRequestHeaderUtils {
 
     // Authorization 헤더 체크
     if (authHeader == null || authHeader.trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.AUTHORIZATION_HEADER_MISSING.getMessage(), TenantErrorCode.AUTHORIZATION_HEADER_MISSING.getCode());
+      throw new BusinessException(TenantErrorCode.AUTHORIZATION_HEADER_MISSING.getMessage(),
+          TenantErrorCode.AUTHORIZATION_HEADER_MISSING.getCode());
     }
 
     // Bearer 접두사 체크
     if (!authHeader.startsWith(BEARER_PREFIX)) {
-      throw new BusinessException(TenantErrorCode.INVALID_AUTHORIZATION_HEADER.getMessage(), TenantErrorCode.INVALID_AUTHORIZATION_HEADER.getCode());
+      throw new BusinessException(TenantErrorCode.INVALID_AUTHORIZATION_HEADER.getMessage(),
+          TenantErrorCode.INVALID_AUTHORIZATION_HEADER.getCode());
     }
 
     // 토큰 추출 및 검증
     String token = authHeader.substring(BEARER_PREFIX.length()).trim();
     if (token.isEmpty()) {
-      throw new BusinessException(TenantErrorCode.EMPTY_TOKEN.getMessage(), TenantErrorCode.EMPTY_TOKEN.getCode());
+      throw new BusinessException(TenantErrorCode.EMPTY_TOKEN.getMessage(),
+          TenantErrorCode.EMPTY_TOKEN.getCode());
     }
 
     return token;
@@ -100,7 +105,8 @@ public class GatewayRequestHeaderUtils {
   public static String getClientDeviceOrThrowException() {
     String clientDevice = getClientDevice();
     if (clientDevice == null || clientDevice.trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.CLIENT_DEVICE_REQUIRED.getMessage(), TenantErrorCode.CLIENT_DEVICE_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.CLIENT_DEVICE_REQUIRED.getMessage(),
+          TenantErrorCode.CLIENT_DEVICE_REQUIRED.getCode());
     }
     return clientDevice;
   }
@@ -109,7 +115,8 @@ public class GatewayRequestHeaderUtils {
   public static String getClientAddressOrThrowException() {
     String clientAddress = getClientAddress();
     if (clientAddress == null || clientAddress.trim().isEmpty()) {
-      throw new BusinessException(TenantErrorCode.CLIENT_ADDRESS_REQUIRED.getMessage(), TenantErrorCode.CLIENT_ADDRESS_REQUIRED.getCode());
+      throw new BusinessException(TenantErrorCode.CLIENT_ADDRESS_REQUIRED.getMessage(),
+          TenantErrorCode.CLIENT_ADDRESS_REQUIRED.getCode());
     }
     return clientAddress;
   }
@@ -135,14 +142,16 @@ public class GatewayRequestHeaderUtils {
   // 관리자 권한이 아니면 예외 던짐
   public static void requireAdminRole() {
     if (!isAdmin()) {
-      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(), TenantErrorCode.ACCESS_DENIED.getCode());
+      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(),
+          TenantErrorCode.ACCESS_DENIED.getCode());
     }
   }
 
   // 테넌트 권한이 아니면 예외 던짐
   public static void requireTenantRole() {
     if (!isTenant()) {
-      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(), TenantErrorCode.ACCESS_DENIED.getCode());
+      throw new BusinessException(TenantErrorCode.ACCESS_DENIED.getMessage(),
+          TenantErrorCode.ACCESS_DENIED.getCode());
     }
   }
 }
