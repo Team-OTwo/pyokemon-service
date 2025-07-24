@@ -15,4 +15,16 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <select id="findById" parameterType="long" resultMap="venueResultMap">
+        SELECT 
+            venue_id,
+            venue_name, 
+            city, 
+            street, 
+            zipcode,
+            created_at,
+            updated_at
+        FROM tb_venue 
+        WHERE venue_id = #{venueId}
+    </select>
 </mapper>

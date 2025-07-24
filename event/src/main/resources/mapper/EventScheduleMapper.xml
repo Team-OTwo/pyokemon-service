@@ -15,4 +15,50 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <insert id="save" parameterType="com.pyokemon.event.entity.EventSchedule" useGeneratedKeys="true" keyProperty="eventScheduleId" keyColumn="event_schedule_id">
+        INSERT INTO tb_event_schedule (
+            event_id,
+            venue_id,
+            ticket_open_at,
+            event_date,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{eventId},
+            #{venueId},
+            #{ticketOpenAt},
+            #{eventDate},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventScheduleId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="findById" parameterType="long" resultMap="eventScheduleResultMap">
+        SELECT
+            event_schedule_id,
+            event_id,
+            venue_id,
+            ticket_open_at,
+            event_date,
+            created_at,
+            updated_at
+        FROM tb_event_schedule
+        WHERE event_schedule_id = #{eventScheduleId}
+    </select>
+
+    <select id="findByEventId" parameterType="long" resultMap="eventScheduleResultMap">
+        SELECT
+            event_schedule_id,
+            event_id,
+            venue_id,
+            ticket_open_at,
+            event_date,
+            created_at,
+            updated_at
+        FROM tb_event_schedule
+        WHERE event_id = #{eventId}
+    </select>
 </mapper>

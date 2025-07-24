@@ -13,9 +13,131 @@
         <result property="description" column="description"/>
         <result property="genre" column="genre"/>
         <result property="thumbnailUrl" column="thumbnail_url"/>
-        <result property="EventStatus" column="EventStatus"/>
+        <result property="status" column="status" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <insert id="save" parameterType="com.pyokemon.event.entity.Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
+        INSERT INTO tb_event (
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{tenantId},
+            #{title},
+            #{ageLimit},
+            #{description},
+            #{genre},
+            #{thumbnailUrl},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="findById" parameterType="long" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE event_id = #{eventId}
+    </select>
+
+    <select id="findByTenantId" parameterType="long" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE tenant_id = #{tenantId}
+    </select>
+
+    <select id="findByStatus" parameterType="com.pyokemon.event.entity.Event$EventStatus" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE status = #{status}
+    </select>
+
+    <select id="findByGenre" parameterType="string" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE genre = #{genre}
+    </select>
+
+    <select id="findByTitleContainingIgnoreCase" parameterType="string" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE LOWER(title) LIKE CONCAT('%', LOWER(#{title}), '%')
+    </select>
+
+    <select id="findByAgeLimit" parameterType="long" resultMap="eventResultMap">
+        SELECT
+            event_id,
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        FROM tb_event
+        WHERE age_limit &lt;= #{ageLimit}
+    </select>
 </mapper>
