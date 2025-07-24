@@ -4,12 +4,10 @@ import com.pyokemon.event.dto.EventScheduleSeatResponse;
 import com.pyokemon.event.dto.SeatGradeRemaining;
 import com.pyokemon.event.dto.SeatMapDetail;
 import com.pyokemon.event.entity.Booking;
+import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
-import com.pyokemon.event.repository.BookingRepository;
-import com.pyokemon.event.repository.EventScheduleRepository;
-import com.pyokemon.event.repository.SeatClassRepository;
-import com.pyokemon.event.repository.SeatRepository;
+import com.pyokemon.event.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,27 +22,33 @@ public class BookingSeatService {
     private final SeatRepository seatRepository;
     private final SeatClassRepository seatClassRepository;
     private final BookingRepository bookingRepository;
+    private final PriceRepository priceRepository;
 
     public BookingSeatService(EventScheduleRepository eventScheduleRepository,
                               SeatRepository seatRepository,
                               SeatClassRepository seatClassRepository,
-                              BookingRepository bookingRepository) {
+                              BookingRepository bookingRepository,
+                              PriceRepository priceRepository) {
         this.eventScheduleRepository = eventScheduleRepository;
         this.seatRepository = seatRepository;
         this.seatClassRepository = seatClassRepository;
         this.bookingRepository = bookingRepository;
+        this.priceRepository = priceRepository;
     }
+
 
     public EventScheduleSeatResponse getEventScheduleSeats(Long eventScheduleId) {
         Long venueId = findVenueId(eventScheduleId);
         Map<Long, Long> totalSeats = findTotalSeatsByClass(venueId);
         Map<Long, Long> bookedSeats = findBookedSeatsCount(eventScheduleId);
+        Map<Long, Integer> priceMap = findSeatClassPriceMap(eventScheduleId);
 
         List<SeatGradeRemaining> list = findAllSeatClasses().stream()
                 .map(sc -> {
                     int remain = totalSeats.getOrDefault(sc.getSeatClassId(), 0L).intValue()
                             - bookedSeats.getOrDefault(sc.getSeatClassId(), 0L).intValue();
-                    return new SeatGradeRemaining(sc.getClassName(), remain);
+                    int price = priceMap.getOrDefault(sc.getSeatClassId(), 0);
+                    return new SeatGradeRemaining(sc.getClassName(), remain, price);
                 })
                 .collect(Collectors.toList());
 
@@ -109,5 +113,11 @@ public class BookingSeatService {
         return findBookedSeats(scheduleId).stream()
                 .map(Booking::getSeatId)
                 .collect(Collectors.toSet());
+    }
+
+    private Map<Long, Integer> findSeatClassPriceMap(Long eventScheduleId) {
+        List<Price> prices = priceRepository.findByEventScheduleId(eventScheduleId);
+        return prices.stream()
+                .collect(Collectors.toMap(Price::getSeatClassId, Price::getPrice));
     }
 }

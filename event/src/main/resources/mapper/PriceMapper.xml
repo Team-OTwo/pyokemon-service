@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.event.repository.PriceRepository">
+
+    <select id="findByEventScheduleId" resultType="Price">
+        SELECT *
+        FROM tb_price
+        WHERE event_schedule_id = #{eventScheduleId}
+    </select>
+
+</mapper>
