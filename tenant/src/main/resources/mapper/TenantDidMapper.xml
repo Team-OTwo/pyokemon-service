@@ -5,41 +5,32 @@
 
 <mapper namespace="com.pyokemon.tenant.api.repository.TenantDidRepository">
 
-    <resultMap id="tenantDidResultMap" type="TenantDid">
-        <id property="tenantDidId" column="tenant_did_id"/>
-        <result property="tenantId" column="tenant_id"/>
-        <result property="did" column="did"/>
-        <result property="isValid" column="is_valid"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
-    <select id="findAll" resultMap="tenantDidResultMap">
+    <select id="findAll" resultType="TenantDid">
         SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
         FROM tb_tenant_did
         ORDER BY created_at DESC
     </select>
 
-    <select id="findById" parameterType="Long" resultMap="tenantDidResultMap">
+    <select id="findById" parameterType="Long" resultType="TenantDid">
         SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
         FROM tb_tenant_did
         WHERE tenant_did_id = #{tenantDidId}
     </select>
 
-    <select id="findByTenantId" parameterType="Long" resultMap="tenantDidResultMap">
+    <select id="findByTenantId" parameterType="Long" resultType="TenantDid">
         SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
         FROM tb_tenant_did
         WHERE tenant_id = #{tenantId}
         ORDER BY created_at DESC
     </select>
 
-    <select id="findByDid" parameterType="String" resultMap="tenantDidResultMap">
+    <select id="findByDid" parameterType="String" resultType="TenantDid">
         SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
         FROM tb_tenant_did
         WHERE did = #{did}
     </select>
 
-    <select id="findValidByTenantId" parameterType="Long" resultMap="tenantDidResultMap">
+    <select id="findValidByTenantId" parameterType="Long" resultType="TenantDid">
         SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
         FROM tb_tenant_did
         WHERE tenant_id = #{tenantId}
@@ -79,4 +70,4 @@
         WHERE tenant_did_id = #{tenantDidId}
     </update>
 
-</mapper> 
+</mapper>
