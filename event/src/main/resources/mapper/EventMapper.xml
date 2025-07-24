@@ -32,7 +32,7 @@
         v.venue_name
         FROM tb_event e
         JOIN tb_event_schedule es ON es.event_id = e.event_id
-        Join tb_venue v on e.event_id= es.venue_id = v.venue_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
 
         WHERE e.event_id = #{event_id}
     </select>
