@@ -1,7 +1,7 @@
 package com.pyokemon.event.controller;
 
 
-import com.pyokemon.event.entity.EventSchedule;
+import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.service.EventScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ public class EventController {
 
     //오늘 오픈 티켓
     @GetMapping("/open-today")
-    public List<EventSchedule> getOpenTicketsToday() {
+    public List<EventItemResponseDTO> getOpenTicketsToday() {
         return eventScheduleService.getTodayOpenedTickets();
     }
 
     //오픈 예정 티켓
     @GetMapping("/to-be-opend")
-    public List<EventSchedule> getOpenTicketsToBeOpened() {
+    public List<EventItemResponseDTO> getOpenTicketsToBeOpened() {
         return eventScheduleService.getTicketsToBeOpened();
     }
 
