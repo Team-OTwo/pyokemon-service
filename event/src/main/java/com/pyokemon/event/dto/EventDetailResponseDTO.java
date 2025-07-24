@@ -22,9 +22,7 @@ public class EventDetailResponseDTO {
 
     // event schedule
     private Long eventScheduleId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime ticketOpenAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     // venue
