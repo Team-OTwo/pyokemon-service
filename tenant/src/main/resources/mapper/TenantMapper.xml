@@ -3,98 +3,71 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.pyokemon.tenant.api.repository.TenantRepository">
+<mapper namespace="com.pyokemon.tenant.api.repository.TenantDidRepository">
 
-    <resultMap id="tenantResultMap" type="Tenant">
-        <id property="id" column="tenant_id"/>
-        <result property="loginId" column="login_id"/>
-        <result property="password" column="password"/>
-        <result property="corpName" column="corp_name"/>
-        <result property="corpId" column="corp_id"/>
-        <result property="city" column="city"/>
-        <result property="street" column="street"/>
-        <result property="zipcode" column="zipcode"/>
-        <result property="ceoName" column="ceo_name"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
-    <select id="findAll" resultMap="tenantResultMap">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
-        FROM tb_tenant
+    <select id="findAll" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
         ORDER BY created_at DESC
     </select>
 
-    <select id="findById" parameterType="Long" resultMap="tenantResultMap">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
-        FROM tb_tenant
-        WHERE tenant_id = #{id}
+    <select id="findById" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_did_id = #{tenantDidId}
     </select>
 
-    <select id="findByEmail" parameterType="String" resultMap="tenantResultMap">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
-        FROM tb_tenant
-        WHERE email = #{email}
+    <select id="findByTenantId" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_id = #{tenantId}
+        ORDER BY created_at DESC
     </select>
 
-    <select id="findByCorpId" parameterType="String" resultMap="tenantResultMap">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
-        FROM tb_tenant
-        WHERE corp_id = #{corpId}
+    <select id="findByDid" parameterType="String" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE did = #{did}
     </select>
 
-    <select id="findByLoginId" parameterType="String" resultMap="tenantResultMap">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
-        FROM tb_tenant
-        WHERE login_id = #{loginId}
+    <select id="findValidByTenantId" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_id = #{tenantId}
+          AND is_valid = true
+        ORDER BY created_at DESC
     </select>
 
-    <select id="existsByEmail" parameterType="String" resultType="boolean">
+    <select id="existsByDid" parameterType="String" resultType="boolean">
         SELECT COUNT(1) > 0
-        FROM tb_tenant
-        WHERE email = #{email}
+        FROM tb_tenant_did
+        WHERE did = #{did}
     </select>
 
-    <select id="existsByCorpId" parameterType="String" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM tb_tenant
-        WHERE corp_id = #{corpId}
-    </select>
-
-    <select id="existsByLoginId" parameterType="String" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM tb_tenant
-        WHERE login_id = #{loginId}
-    </select>
-
-    <select id="existsById" parameterType="Long" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM tb_tenant
-        WHERE tenant_id = #{id}
-    </select>
-
-    <insert id="insert" parameterType="Tenant" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_tenant (login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at)
-        VALUES (#{loginId}, #{password}, #{corpName}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceoName}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    <insert id="insert" parameterType="TenantDid" useGeneratedKeys="true" keyProperty="tenantDidId">
+        INSERT INTO tb_tenant_did (tenant_id, did, is_valid, created_at, updated_at)
+        VALUES (#{tenantId}, #{did}, #{isValid}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>
 
-    <update id="update" parameterType="Tenant">
-        UPDATE tb_tenant
-        SET login_id = #{loginId},
-            password = #{password},
-            corp_name = #{corpName},
-            corp_id = #{corpId},
-            city = #{city},
-            street = #{street},
-            zipcode = #{zipcode},
-            ceo_name = #{ceoName},
+    <update id="update" parameterType="TenantDid">
+        UPDATE tb_tenant_did
+        SET tenant_id = #{tenantId},
+            did = #{did},
+            is_valid = #{isValid},
             updated_at = CURRENT_TIMESTAMP
-        WHERE tenant_id = #{id}
+        WHERE tenant_did_id = #{tenantDidId}
     </update>
 
     <delete id="deleteById" parameterType="Long">
-        DELETE FROM tb_tenant
-        WHERE tenant_id = #{id}
+        DELETE FROM tb_tenant_did
+        WHERE tenant_did_id = #{tenantDidId}
     </delete>
+
+    <update id="updateValidStatus">
+        UPDATE tb_tenant_did
+        SET is_valid = #{isValid},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_did_id = #{tenantDidId}
+    </update>
 
 </mapper>
