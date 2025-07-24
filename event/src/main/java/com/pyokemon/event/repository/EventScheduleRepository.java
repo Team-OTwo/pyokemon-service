@@ -1,7 +1,12 @@
 package com.pyokemon.event.repository;
 
-import org.springframework.stereotype.Repository;
+import com.pyokemon.event.dto.EventItemResponseDTO;
+import org.apache.ibatis.annotations.Mapper;
 
-@Repository
+import java.util.List;
+
+@Mapper
 public interface EventScheduleRepository {
+    List<EventItemResponseDTO> selectTodayOpenedTickets();
+    List<EventItemResponseDTO> selectTicketsToBeOpened();
 }
