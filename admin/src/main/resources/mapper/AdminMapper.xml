@@ -34,4 +34,10 @@
         WHERE username = #{username}
     </select>
 
+    <!-- 관리자 저장 -->
+    <insert id="save" parameterType="com.pyokemon.admin.entity.Admin" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_admin (username, password, role)
+        VALUES (#{username}, #{password}, #{role})
+    </insert>
+
 </mapper> 

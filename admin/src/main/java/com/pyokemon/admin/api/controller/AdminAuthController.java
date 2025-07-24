@@ -5,6 +5,7 @@ import com.pyokemon.admin.dto.JwtResponseDto;
 import com.pyokemon.admin.entity.Admin;
 import com.pyokemon.admin.service.AdminService;
 import com.pyokemon.admin.util.JwtUtil;
+import com.pyokemon.admin.util.PasswordUtil;
 import com.pyokemon.common.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class AdminAuthController {
 
     private final AdminService adminService;
     private final JwtUtil jwtUtil;
+    private final PasswordUtil passwordUtil;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDto<JwtResponseDto>> login(@Valid @RequestBody AdminLoginDto loginDto) {
@@ -32,9 +34,8 @@ public class AdminAuthController {
         }
         
         Admin admin = adminOptional.get();
-        // 실제 환경에서는 비밀번호 검증 로직이 필요합니다.
-        // 여기서는 간단히 구현함.
-        if (!admin.getPassword().equals(loginDto.getPassword())) {
+        // 비밀번호 검증 - BCrypt 해싱 비교
+        if (!passwordUtil.matchPassword(loginDto.getPassword(), admin.getPassword())) {
             return ResponseEntity.badRequest().body(ResponseDto.error("비밀번호가 일치하지 않습니다.", "INVALID_PASSWORD"));
         }
         
