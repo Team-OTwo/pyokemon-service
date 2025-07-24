@@ -25,7 +25,7 @@ public class EventController {
     }
 
     //오픈 예정 티켓
-    @GetMapping("/tobeopend")
+    @GetMapping("/to-be-opend")
     public List<EventSchedule> getOpenTicketsToBeOpened() {
         return eventScheduleService.getTicketsToBeOpened();
     }
