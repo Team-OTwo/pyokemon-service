@@ -5,20 +5,7 @@
 
 <mapper namespace="com.pyokemon.event.repository.EventScheduleRepository">
 
-<!--    GetEventListResponseDTO용 resultMap-->
-    <resultMap id="eventListResponseMap" type="com.pyokemon.event.dto.GetEventListResponseDTO">
-        <id property="eventScheduleId" column="event_schedule_id"/>
-        <result property="eventId" column="event_id"/>
-        <result property="venueId" column="venue_id"/>
-        <result property="ticketOpenAt" column="ticket_open_at"/>
-        <result property="eventDate" column="event_date"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-        <result column="title" property="title"/>
-        <result column="venue_name" property="venueName"/>
-    </resultMap>
-
-    <select id="selectTodayOpenedTickets" resultMap="eventListResponseMap">
+    <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
         SELECT
             es.event_schedule_id,
             es.event_id,
@@ -34,7 +21,7 @@
         LIMIT 9
     </select>
 
-    <select id="selectTicketsToBeOpened" resultMap="eventListResponseMap">
+    <select id="selectTicketsToBeOpened" resultType="EventItemResponseDTO">
         SELECT
             es.event_schedule_id,
             es.event_id,
