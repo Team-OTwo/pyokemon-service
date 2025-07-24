@@ -23,14 +23,13 @@ import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class TenantController {
 
   private final TenantService tenantService;
   private final TenantRepository tenantRepository;
 
-  // 전체 테넌트 리스트 조회 GET /api/tenants
+  // 전체 테넌트 리스트 조회 GET /tenants
   @AdminOnly
   @GetMapping
   public ResponseEntity<ResponseDto<TenantListResponseDto>> getAllTenants() {
@@ -38,14 +37,15 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success(response, "테넌트 리스트 조회 성공"));
   }
 
-  // 특정 테넌트 상세 조회 GET /api/tenants/{id}
+  // 특정 테넌트 상세 조회 GET /tenants/{id}
+  @AdminOnly
   @GetMapping("/{id}")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getTenantById(@PathVariable Long id) {
     TenantDetailResponseDto response = tenantService.getTenantById(id);
     return ResponseEntity.ok(ResponseDto.success(response, "테넌트 상세 조회 성공"));
   }
 
-  // 테넌트 등록 POST /api/tenants
+  // 테넌트 등록 POST /tenants
   @AdminOnly
   @PostMapping
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> createTenant(
@@ -55,7 +55,7 @@ public class TenantController {
         .body(ResponseDto.success(response, "테넌트 등록 성공"));
   }
 
-  // 테넌트 삭제 DELETE /api/tenant/{id}
+  // 테넌트 삭제 DELETE /tenants/{id}
   @AdminOnly
   @DeleteMapping("/{id}")
   public ResponseEntity<ResponseDto<Void>> deleteTenant(@PathVariable Long id) {
@@ -63,14 +63,14 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success("테넌트 삭제 성공"));
   }
 
-  // 로그인 POST /api/tenant/login
+  // 로그인 POST /tenants/login
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<String>> login(@Valid @RequestBody LoginRequestDto request) {
     String token = tenantService.login(request);
     return ResponseEntity.ok(ResponseDto.success(token, "로그인 성공"));
   }
 
-  // 로그아웃 /api/tenant/logout
+  // 로그아웃 /tenants/logout
   @PostMapping("/logout")
   public ResponseEntity<ResponseDto<Void>> logout(
       @RequestHeader("Authorization") String authHeader) {
@@ -80,7 +80,7 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success("로그아웃 성공"));
   }
 
-  // 내 정보 조회 /api/tenant/profile
+  // 내 정보 조회 /tenants/profile
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> getMyProfile() {
     // Gateway에서 이미 JWT 검증 완료, 헤더에서 사용자 정보 추출
@@ -90,8 +90,8 @@ public class TenantController {
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
   }
 
-  // 정보 수정 /api/tenant/profile
-  @PutMapping("/profile")
+  // 정보 수정 /tenants/profile
+  @PostMapping("/profile")
   public ResponseEntity<ResponseDto<TenantDetailResponseDto>> updateProfile(
       @Valid @RequestBody UpdateProfileRequestDto request) {
     Long currentTenantId = getCurrentTenantId();
@@ -101,8 +101,8 @@ public class TenantController {
   }
 
 
-  // 비밀번호 변경 /api/tenant/password
-  @PatchMapping("/password")
+  // 비밀번호 변경 /tenants/password
+  @PostMapping("/password")
   public ResponseEntity<ResponseDto<Void>> changePassword(
       @Valid @RequestBody UpdatePasswordRequestDto request) {
     Long currentTenantId = getCurrentTenantId();
