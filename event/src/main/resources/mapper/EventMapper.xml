@@ -5,17 +5,4 @@
 
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
 
-    <resultMap id="eventResultMap" type="com.pyokemon.event.entity.Event">
-        <id property="eventId" column="event_id"/>
-        <result property="tenantId" column="tenant_id"/>
-        <result property="title" column="title"/>
-        <result property="ageLimit" column="age_limit"/>
-        <result property="description" column="description"/>
-        <result property="genre" column="genre"/>
-        <result property="thumbnailUrl" column="thumbnail_url"/>
-        <result property="EventStatus" column="EventStatus"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
 </mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.event.repository.BookingRepository">
+
+    <select id="findByEventScheduleIdAndStatus" resultType="Booking">
+        SELECT booking_id, event_schedule_id, user_id, payment_id, status, created_at, updated_at, seat_id
+        FROM tb_booking
+        WHERE event_schedule_id = #{param1}
+              AND status = #{param2}
+    </select>
+
+    <select id="findById" resultType="Booking">
+        SELECT booking_id, event_schedule_id, user_id, payment_id, status, created_at, updated_at, seat_id
+        FROM tb_booking
+        WHERE booking_id = #{param1}
+    </select>
+
+</mapper>
