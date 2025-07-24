@@ -12,9 +12,7 @@ public class GetEventListResponseDTO {
     private Long eventScheduleId;
     private Long eventId;
     private Long venueId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime ticketOpenAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private String title;
