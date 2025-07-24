@@ -32,8 +32,9 @@ server:
 
 # JWT 설정
 jwt:
-  secret: "pyokemon-admin-jwt-secret-key-2024-very-long-and-secure-key-for-production"
-  expiration: 86400000  # 24시간
+  secret-key: "pyokemon-admin-jwt-secret-key-2024-very-long-and-secure-key-for-production"
+  access-token-validity-in-minutes: 30
+  refresh-token-validity-in-days: 7
 
 # Springdoc OpenAPI 설정
 springdoc:

@@ -3,7 +3,7 @@
 -- BCrypt 해싱된 값: $2a$10$6oWzULtSt38YKgEO8MZF7.9HEq7PGZ9.XC4FbDAVSz9DNPp9T1pAy
 
 UPDATE tb_admin 
-SET password = '$2a$10$6oWzULtSt38YKgEO8MZF7.9HEq7PGZ9.XC4FbDAVSz9DNPp9T1pAy'
+SET password = '$2a$12$9i2iC6EELJNoysVqZ0u0M.mpia57yrmwcs3i1ZX36GROsxhwceEEe'
 WHERE username = 'admin' AND password = 'admin123';
 
 -- 다른 관리자 계정이 있다면 여기에 추가 

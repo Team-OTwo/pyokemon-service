@@ -8,7 +8,7 @@
     <resultMap id="adminResultMap" type="com.pyokemon.admin.entity.Admin">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
-        <result property="adminId" column="adminId"/>
+        <result property="adminId" column="admin_id"/>
         <result property="password" column="password"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -37,13 +37,13 @@
     <select id="findByAdminId" parameterType="String" resultMap="adminResultMap">
         SELECT id, username, password, admin_id, created_at, updated_at
         FROM tb_admin
-        WHERE admin_id = #{admin_id}
+        WHERE admin_id = #{adminId}
     </select>
 
     <!-- 관리자 저장 -->
     <insert id="save" parameterType="com.pyokemon.admin.entity.Admin" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_admin (username, password, admin_id)
-        VALUES (#{username}, #{password}, #{admin_id})
+        VALUES (#{username}, #{password}, #{adminId})
     </insert>
 
 </mapper> 
