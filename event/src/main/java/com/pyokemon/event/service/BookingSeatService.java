@@ -40,16 +40,10 @@ public class BookingSeatService { // 클래스 이름 변경
         this.bookingRepository = bookingRepository;
     }
 
-    /**
-     * 특정 공연 일정의 좌석 배치도 및 잔여 좌석 정보를 조회합니다.
-     * 이 메서드는 예매와 관련된 좌석 정보 (예약 가능 여부, 잔여 좌석수)를 제공합니다.
-     * @param eventScheduleId 조회하려는 공연 일정 ID
-     * @return EventScheduleSeatResponse DTO
-     */
     public EventScheduleSeatResponse getEventScheduleSeats(Long eventScheduleId) {
         // 1. 공연 일정 유효성 검사 및 venue_id 가져오기
         EventSchedule eventSchedule = eventScheduleRepository.findById(eventScheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Event schedule not found with ID: " + eventScheduleId));
+                .orElseThrow(() -> new IllegalArgumentException("No eventScheduleID" + eventScheduleId));
         Long venueId = eventSchedule.getVenueId();
 
         // 2. 모든 좌석 등급 조회
@@ -65,10 +59,9 @@ public class BookingSeatService { // 클래스 이름 변경
 
 
         // 4. 해당 공연 일정에 대해 예약된 좌석 정보 조회
-        // 가정: Booking 엔티티에 seatId 필드가 있고, tb_booking 테이블에 seat_id 컬럼이 존재합니다.
         List<Booking> bookedSeatsForSchedule = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, Booking.Booked.BOOKED);
         Map<Long, Long> bookedSeatsCountByClassId = bookedSeatsForSchedule.stream()
-                .map(Booking::getSeatId) // Booking 엔티티에 getSeatId()가 있다고 가정
+                .map(Booking::getSeatId)
                 .map(seatRepository::findById)
                 .filter(java.util.Optional::isPresent)
                 .map(java.util.Optional::get)
@@ -91,8 +84,8 @@ public class BookingSeatService { // 클래스 이름 변경
 
         // 6. seatMap DTO 구성 (개별 좌석 상태)
         List<Long> bookedSeatIds = bookedSeatsForSchedule.stream()
-                .map(Booking::getSeatId) // Booking 엔티티에 getSeatId()가 있다고 가정
-                .collect(Collectors.toList());
+                .map(Booking::getSeatId)
+                .toList();
 
         List<SeatMapDetail> seatMapDetails = allVenueSeats.stream()
                 .map(seat -> {
