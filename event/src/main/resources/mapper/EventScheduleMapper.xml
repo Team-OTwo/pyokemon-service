@@ -25,6 +25,14 @@
         </selectKey>
     </insert>
 
+
+    <select id="findById" resultType="EventSchedule" parameterType="long">
+        SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
+        FROM tb_event_schedule
+        WHERE event_schedule_id = #{param1}
+    </select>
+
+
     <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
         SELECT
             es.event_schedule_id,

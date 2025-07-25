@@ -49,4 +49,5 @@
 
         WHERE e.event_id = #{event_id}
     </select>
+
 </mapper>

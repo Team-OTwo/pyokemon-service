@@ -3,15 +3,14 @@ CREATE TABLE tb_seat (
     venue_id BIGINT NOT NULL,
     seat_class_id BIGINT NOT NULL,
     floor BIGINT NOT NULL,
-    `row` BIGINT NOT NULL,
-    col BIGINT NOT NULL,
+    `row` VARCHAR(10) NOT NULL,
+    col VARCHAR(10) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_seat_venue FOREIGN KEY (venue_id) REFERENCES tb_venue(venue_id),
     CONSTRAINT fk_seat_class FOREIGN KEY (seat_class_id) REFERENCES tb_seat_class(seat_class_id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 CREATE INDEX idx_seat_venue_id ON tb_seat(venue_id);
 CREATE INDEX idx_seat_class_id ON tb_seat(seat_class_id);
