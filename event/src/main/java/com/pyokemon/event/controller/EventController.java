@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/event")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
 
-    @GetMapping("/detail/{eventId}")
+    @GetMapping("/{eventId}")
     public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId){
         EventDetailResponseDTO dto = eventService.getEventDetailByEventId(eventId);
         return ResponseEntity.ok(dto);
