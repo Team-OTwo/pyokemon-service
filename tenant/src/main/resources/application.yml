@@ -46,7 +46,7 @@ mybatis:
 
 # JWT 설정
 jwt:
-  secretKey: pyokemon-tenant-jwt-secret-key-2024-very-long-secret-key-for-security
+  secretKey: cHlva2Vtb24tdGVuYW50LWp3dC1zZWNyZXQta2V5LTIwMjQtdmVyeS1sb25nLXNlY3JldC1rZXktZm9yLXNlY3VyaXR5
   expiresIn: 86400000  # 24시간 (밀리초)
   mobileExpiresIn: 86400000  # 24시간 (밀리초)
 

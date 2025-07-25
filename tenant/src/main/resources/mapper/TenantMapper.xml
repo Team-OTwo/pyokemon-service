@@ -7,28 +7,28 @@
 
     <!-- 사업자번호로 조회 -->
     <select id="findByCorpId" parameterType="String" resultType="Tenant">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
+        SELECT tenant_id as id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE corp_id = #{corpId}
     </select>
 
     <!-- 로그인 ID로 조회 -->
     <select id="findByLoginId" parameterType="String" resultType="Tenant">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
+        SELECT tenant_id as id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE login_id = #{loginId}
     </select>
 
     <!-- ID로 조회 -->
     <select id="findById" parameterType="Long" resultType="Tenant">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
+        SELECT tenant_id as id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         WHERE tenant_id = #{id}
     </select>
 
     <!-- 전체 조회 -->
     <select id="findAll" resultType="Tenant">
-        SELECT tenant_id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
+        SELECT tenant_id as id, login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at
         FROM tb_tenant
         ORDER BY created_at DESC
     </select>
