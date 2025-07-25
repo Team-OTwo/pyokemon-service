@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegisterRequest {
+public class UserRegisterRequestDto {
 
     @NotBlank(message = "이름은 필수입니다")
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,20}$", 

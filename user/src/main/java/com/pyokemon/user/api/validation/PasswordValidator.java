@@ -1,4 +1,4 @@
-package com.pyokemon.user.api.util;
+package com.pyokemon.user.api.validation;
 
 import java.util.regex.Pattern;
 
