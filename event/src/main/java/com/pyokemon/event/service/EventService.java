@@ -39,7 +39,7 @@ public class EventService {
   @Transactional
   public EventResponseDto registerEvent(EventRegisterDto eventRegisterDto) {
 
-    // Validate venue existence
+    // 공연장 유효성 검사
     if (eventRegisterDto.getSchedules() != null && !eventRegisterDto.getSchedules().isEmpty()) {
       for (EventScheduleDto scheduleDto : eventRegisterDto.getSchedules()) {
         if (!validateVenueExists(scheduleDto.getVenueId())) {
@@ -49,7 +49,7 @@ public class EventService {
       }
     }
 
-    // Set event status to PENDING for new registrations
+    // 새로 추가된 공연 status PENDING으로 설정
     eventRegisterDto.setStatus(Event.EventStatus.PENDING);
 
     // Create and save event
