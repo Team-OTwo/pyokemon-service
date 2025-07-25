@@ -4,6 +4,7 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.entity.Event;
 import org.apache.ibatis.annotations.Mapper;
 
+
 import java.util.List;
 
 @Mapper

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.tenant.api.repository.TenantDidRepository">
+
+    <select id="findAll" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_did_id = #{tenantDidId}
+    </select>
+
+    <select id="findByTenantId" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_id = #{tenantId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByDid" parameterType="String" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE did = #{did}
+    </select>
+
+    <select id="findValidByTenantId" parameterType="Long" resultType="TenantDid">
+        SELECT tenant_did_id, tenant_id, did, is_valid, created_at, updated_at
+        FROM tb_tenant_did
+        WHERE tenant_id = #{tenantId}
+          AND is_valid = true
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="existsByDid" parameterType="String" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM tb_tenant_did
+        WHERE did = #{did}
+    </select>
+
+    <insert id="insert" parameterType="TenantDid" useGeneratedKeys="true" keyProperty="tenantDidId">
+        INSERT INTO tb_tenant_did (tenant_id, did, is_valid, created_at, updated_at)
+        VALUES (#{tenantId}, #{did}, #{isValid}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+
+    <update id="update" parameterType="TenantDid">
+        UPDATE tb_tenant_did
+        SET tenant_id = #{tenantId},
+            did = #{did},
+            is_valid = #{isValid},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_did_id = #{tenantDidId}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM tb_tenant_did
+        WHERE tenant_did_id = #{tenantDidId}
+    </delete>
+
+    <update id="updateValidStatus">
+        UPDATE tb_tenant_did
+        SET is_valid = #{isValid},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_did_id = #{tenantDidId}
+    </update>
+
+</mapper>

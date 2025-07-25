@@ -21,5 +21,19 @@ logging:
     org.springframework.jdbc: DEBUG
   config: classpath:log4j2.yml
 
+
 mybatis:
   type-aliases-package: com.pyokemon.event.dto, com.pyokemon.common.entity
+
+# Springdoc OpenAPI 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
