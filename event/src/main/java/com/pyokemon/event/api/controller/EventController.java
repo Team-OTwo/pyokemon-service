@@ -22,13 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+  private final EventService eventService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDto<EventResponseDto> registerEvent(
-            @Valid @RequestBody EventRegisterDto eventRegisterDto) {;
-        EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
-        return ResponseDto.success(registeredEvent, "Event registered successfully");
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseDto<EventResponseDto> registerEvent(
+      @Valid @RequestBody EventRegisterDto eventRegisterDto) {
+    ;
+    EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
+    return ResponseDto.success(registeredEvent, "Event registered successfully");
+  }
 }

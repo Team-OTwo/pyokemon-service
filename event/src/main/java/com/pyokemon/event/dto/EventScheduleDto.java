@@ -20,24 +20,24 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EventScheduleDto {
 
-    private Long eventScheduleId;
+  private Long eventScheduleId;
 
-    private Long eventId;
+  private Long eventId;
 
-    @NotNull(message = "Venue ID is required")
-    private Long venueId;
+  @NotNull(message = "Venue ID is required")
+  private Long venueId;
 
-    @NotNull(message = "Ticket open date is required")
-    @Future(message = "Ticket open date must be in the future")
-    private LocalDateTime ticketOpenAt;
+  @NotNull(message = "Ticket open date is required")
+  @Future(message = "Ticket open date must be in the future")
+  private LocalDateTime ticketOpenAt;
 
-    @NotNull(message = "Event date is required")
-    @Future(message = "Event date must be in the future")
-    private LocalDateTime eventDate;
+  @NotNull(message = "Event date is required")
+  @Future(message = "Event date must be in the future")
+  private LocalDateTime eventDate;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-    @Valid
-    private List<PriceDto> prices;
+  @Valid
+  private List<PriceDto> prices;
 }

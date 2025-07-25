@@ -24,31 +24,31 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EventRegisterDto {
 
-    private Long eventId;
+  private Long eventId;
 
-    @NotNull(message = "Tenant ID is required")
-    private Long tenantId;
+  @NotNull(message = "Tenant ID is required")
+  private Long tenantId;
 
-    @NotBlank(message = "Title is required")
-    @Size(max = 100, message = "Title must be less than 100 characters")
-    private String title;
+  @NotBlank(message = "Title is required")
+  @Size(max = 100, message = "Title must be less than 100 characters")
+  private String title;
 
-    @NotNull(message = "Age limit is required")
-    @Min(value = 0, message = "Age limit cannot be negative")
-    private Long ageLimit;
+  @NotNull(message = "Age limit is required")
+  @Min(value = 0, message = "Age limit cannot be negative")
+  private Long ageLimit;
 
-    @NotBlank(message = "Description is required")
-    private String description;
+  @NotBlank(message = "Description is required")
+  private String description;
 
-    @NotBlank(message = "Genre is required")
-    private String genre;
+  @NotBlank(message = "Genre is required")
+  private String genre;
 
-    private String thumbnailUrl;
+  private String thumbnailUrl;
 
-    private EventStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private EventStatus status;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-    @Valid
-    private List<EventScheduleDto> schedules;
+  @Valid
+  private List<EventScheduleDto> schedules;
 }

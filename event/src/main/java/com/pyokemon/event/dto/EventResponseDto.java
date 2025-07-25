@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventResponseDto {
-    private Long eventId;
-    private Long tenantId;
-    private String title;
-    private Long ageLimit;
-    private String description;
-    private String genre;
-    private String thumbnailUrl;
-    private EventStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long eventId;
+  private Long tenantId;
+  private String title;
+  private Long ageLimit;
+  private String description;
+  private String genre;
+  private String thumbnailUrl;
+  private EventStatus status;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 }
