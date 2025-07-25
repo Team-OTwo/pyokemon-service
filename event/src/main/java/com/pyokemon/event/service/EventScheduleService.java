@@ -1,22 +1,24 @@
 package com.pyokemon.event.service;
 
-import com.pyokemon.event.dto.EventItemResponseDTO;
-import com.pyokemon.event.repository.EventScheduleRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.pyokemon.event.dto.EventItemResponseDTO;
+import com.pyokemon.event.repository.EventScheduleRepository;
 
 @Service
 @RequiredArgsConstructor
 public class EventScheduleService {
 
-    private final EventScheduleRepository eventScheduleRepository;
-    public List<EventItemResponseDTO> getTodayOpenedTickets() {
-       return eventScheduleRepository.selectTodayOpenedTickets();
-    }
+  private final EventScheduleRepository eventScheduleRepository;
 
-    public List<EventItemResponseDTO> getTicketsToBeOpened() {
-        return eventScheduleRepository.selectTicketsToBeOpened();
-    }
+  public List<EventItemResponseDTO> getTodayOpenedTickets() {
+    return eventScheduleRepository.selectTodayOpenedTickets();
+  }
+
+  public List<EventItemResponseDTO> getTicketsToBeOpened() {
+    return eventScheduleRepository.selectTicketsToBeOpened();
+  }
 }

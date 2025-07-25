@@ -4,6 +4,32 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
+    <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
+        INSERT INTO tb_event (
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{tenantId},
+            #{title},
+            #{ageLimit},
+            #{description},
+            #{genre},
+            #{thumbnailUrl},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
     <select id="findEventDetailByEventId" resultType="EventDetailResponseDTO">
         SELECT
@@ -23,6 +49,4 @@
 
         WHERE e.event_id = #{event_id}
     </select>
-
-
 </mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.event.repository.PriceRepository">
+
+    <insert id="save" parameterType="Price" useGeneratedKeys="true" keyProperty="priceId" keyColumn="price_id">
+        INSERT INTO tb_price (
+            event_schedule_id, 
+            seat_class_id, 
+            price, 
+            created_at,
+            updated_at
+        ) VALUES (
+            #{eventScheduleId}, 
+            #{seatClassId}, 
+            #{price}, 
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="priceId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+  
+</mapper> 

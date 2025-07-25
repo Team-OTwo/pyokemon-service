@@ -1,18 +1,25 @@
 package com.pyokemon.event.repository;
 
-import com.pyokemon.event.dto.EventDetailResponseDTO;
-import com.pyokemon.event.entity.Event;
-import org.apache.ibatis.annotations.Mapper;
-
-
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+
+import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.entity.Event;
+
 @Mapper
-public interface EventRepository{
-    List<Event> findByTenantId(Long tenantId);
-    List<Event> findByStatus(Event.EventStatus status);
-    List<Event> findByGenre(String genre);
-    List<Event> findByTitleContainingIgnoreCase(String title);
-    List<Event> findByAgeLimit(Long ageLimit);
-    EventDetailResponseDTO findEventDetailByEventId(Long eventId);
+public interface EventRepository {
+  List<Event> findByTenantId(Long tenantId);
+
+  List<Event> findByStatus(Event.EventStatus status);
+
+  List<Event> findByGenre(String genre);
+
+  List<Event> findByTitleContainingIgnoreCase(String title);
+
+  List<Event> findByAgeLimit(Long ageLimit);
+
+  Long save(Event event);
+
+  EventDetailResponseDTO findEventDetailByEventId(Long eventId);
 }
