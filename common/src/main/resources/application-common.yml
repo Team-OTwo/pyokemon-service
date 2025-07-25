@@ -20,3 +20,6 @@ logging:
     com.pyokemon: DEBUG
     org.springframework.jdbc: DEBUG
   config: classpath:log4j2.yml
+
+mybatis:
+  type-aliases-package: com.pyokemon.event.dto, com.pyokemon.common.entity
