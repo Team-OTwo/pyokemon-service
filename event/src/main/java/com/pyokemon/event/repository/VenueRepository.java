@@ -1,7 +1,13 @@
 package com.pyokemon.event.repository;
 
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import com.pyokemon.event.entity.Venue;
+
+@Mapper
 public interface VenueRepository {
+  Optional<Venue> findById(Long venueId);
 }

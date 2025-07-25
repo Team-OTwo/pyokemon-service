@@ -4,11 +4,66 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pyokemon.event.repository.EventScheduleRepository">
+    <insert id="save" parameterType="EventSchedule" useGeneratedKeys="true" keyProperty="eventScheduleId" keyColumn="event_schedule_id">
+        INSERT INTO tb_event_schedule (
+            event_id,
+            venue_id,
+            ticket_open_at,
+            event_date,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{eventId},
+            #{venueId},
+            #{ticketOpenAt},
+            #{eventDate},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventScheduleId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
 
     <select id="findById" resultType="EventSchedule" parameterType="long">
         SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
         FROM tb_event_schedule
         WHERE event_schedule_id = #{param1}
     </select>
+
+
+    <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
+        SELECT
+            es.event_schedule_id,
+            es.event_id,
+            es.venue_id,
+            es.ticket_open_at,
+            es.event_date,
+            e.title AS title,
+            v.venue_name AS venue_name
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE DATE(es.ticket_open_at) = CURDATE()
+        LIMIT 9
+    </select>
+
+    <select id="selectTicketsToBeOpened" resultType="EventItemResponseDTO">
+        SELECT
+            es.event_schedule_id,
+            es.event_id,
+            es.venue_id,
+            es.ticket_open_at,
+            es.event_date,
+            e.title AS title,
+            v.venue_name AS venue_name
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE DATE(ticket_open_at) = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+            LIMIT 8
+    </select>
+
 
 </mapper>

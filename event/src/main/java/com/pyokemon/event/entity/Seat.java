@@ -1,8 +1,8 @@
 package com.pyokemon.event.entity;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -18,4 +18,5 @@ public class Seat {
     private String col;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 }
