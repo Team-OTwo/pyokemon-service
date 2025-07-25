@@ -18,7 +18,7 @@ import java.util.List;
 public class BookingController {
     private final BookingSeatService bookingSeatService;
 
-    @GetMapping("/schedules/{eventScheduleId}")
+    @GetMapping("/booking/{eventScheduleId}")
     public ResponseEntity<EventScheduleSeatResponse> getEventScheduleSeats(@PathVariable Long eventScheduleId) {
         EventScheduleSeatResponse response = bookingSeatService.getEventScheduleSeats(eventScheduleId);
         if (response == null) {
@@ -27,12 +27,16 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/schedules/{eventScheduleId}/seats")
-    public ResponseEntity<List<SeatMapDetail>> getSeatMapOnly(@PathVariable Long eventScheduleId) {
-        List<SeatMapDetail> seatMap = bookingSeatService.getSeatMapOnly(eventScheduleId);
+    @GetMapping("/booking/{eventScheduleId}/{seatGrade}")
+    public ResponseEntity<List<SeatMapDetail>> getSeatMapByGrade(
+            @PathVariable Long eventScheduleId,
+            @PathVariable String seatGrade
+    ) {
+        List<SeatMapDetail> seatMap = bookingSeatService.getSeatMapOnlyByGrade(eventScheduleId, seatGrade);
         if (seatMap == null || seatMap.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(seatMap);
     }
+
 }

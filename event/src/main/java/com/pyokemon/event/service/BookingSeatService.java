@@ -1,5 +1,6 @@
 package com.pyokemon.event.service;
 
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.EventScheduleSeatResponse;
 import com.pyokemon.event.dto.SeatGradeRemaining;
 import com.pyokemon.event.dto.SeatMapDetail;
@@ -120,4 +121,29 @@ public class BookingSeatService {
         return prices.stream()
                 .collect(Collectors.toMap(Price::getSeatClassId, Price::getPrice));
     }
+
+    public List<SeatMapDetail> getSeatMapOnlyByGrade(Long eventScheduleId, String seatGrade) {
+        Long venueId = findVenueId(eventScheduleId);
+        List<Seat> seats = findVenueSeats(venueId);
+        Map<Long, String> classMap = findSeatClassNameMap();
+        Set<Long> bookedIds = findBookedSeatIds(eventScheduleId);
+
+        List<SeatMapDetail> result = seats.stream()
+                .filter(seat -> seatGrade.equalsIgnoreCase(classMap.get(seat.getSeatClassId())))
+                .map(seat -> new SeatMapDetail(
+                        seat.getSeatId(),
+                        seat.getRow(),
+                        seat.getCol(),
+                        classMap.get(seat.getSeatClassId()),
+                        bookedIds.contains(seat.getSeatId())
+                ))
+                .collect(Collectors.toList());
+
+        if (result.isEmpty()) {
+            throw new BusinessException("등록된 좌석이 없습니다.", "SEAT_NOT_FOUND");
+        }
+
+        return result;
+    }
+
 }
