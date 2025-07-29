@@ -19,9 +19,7 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
-            authz -> authz.requestMatchers("/api/login", "/api/users", "/api/tenants").permitAll()
-                .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll().anyRequest()
-                .authenticated());
+            authz -> authz.anyRequest().permitAll());  // Gateway에서 인증 처리하므로 모든 요청 허용
 
     return http.build();
   }
