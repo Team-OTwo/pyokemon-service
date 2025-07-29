@@ -1,11 +1,12 @@
 package com.pyokemon.event.repository;
 
-import com.pyokemon.event.entity.Booking;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import com.pyokemon.event.entity.Booking;
 
 @Mapper
 public interface BookingRepository {
-    List<Booking> findByEventScheduleIdAndStatus(Long eventScheduleId, Booking.Booked status);
+  List<Booking> findByEventScheduleIdAndStatus(Long eventScheduleId, Booking.Booked status);
 }

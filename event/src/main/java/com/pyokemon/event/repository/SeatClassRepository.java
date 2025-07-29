@@ -1,11 +1,12 @@
 package com.pyokemon.event.repository;
 
-import com.pyokemon.event.entity.SeatClass;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import com.pyokemon.event.entity.SeatClass;
 
 @Mapper
 public interface SeatClassRepository {
-    List<SeatClass> findAll();
+  List<SeatClass> findAll();
 }

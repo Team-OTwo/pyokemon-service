@@ -1,0 +1,13 @@
+CREATE TABLE tb_tenant (
+    tenant_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_id BIGINT NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    corp_id VARCHAR(20) NOT NULL,
+    city VARCHAR(20) NOT NULL,
+    street VARCHAR(20) NOT NULL,
+    zipcode VARCHAR(20) NOT NULL,
+    ceo VARCHAR(20) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES tb_account(account_id)
+); 
