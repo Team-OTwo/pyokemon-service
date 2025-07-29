@@ -1,15 +1,11 @@
 package com.pyokemon.tenant.aop;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.pyokemon.tenant.exception.TenantException;
+import com.pyokemon.tenant.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,28 +20,10 @@ public class AdminAccessAspect {
   @Around("@annotation(com.pyokemon.tenant.annotation.AdminOnly)")
   public Object checkAdminAccess(ProceedingJoinPoint joinPoint) throws Throwable {
 
-    // HTTP 요청에서 권한 정보 확인
-    HttpServletRequest request = getCurrentRequest();
-
-    // TODO: 실제로는 JWT 토큰이나 Spring Security Context에서 권한 확인
-    // 현재는 임시로 헤더 체크
-    String userRole = request.getHeader("X-User-Role");
-
-    if (!"ADMIN".equals(userRole)) {
-      log.warn("Admin access denied for method: {}", joinPoint.getSignature().getName());
-      throw TenantException.accessDenied();
-    }
+    // Gateway에서 전달받은 권한 정보로 Admin 체크
+    GatewayRequestHeaderUtils.requireAdminRole();
 
     log.debug("Admin access granted for method: {}", joinPoint.getSignature().getName());
     return joinPoint.proceed();
-  }
-
-  /**
-   * 현재 HTTP 요청 객체 가져오기
-   */
-  private HttpServletRequest getCurrentRequest() {
-    ServletRequestAttributes attributes =
-        (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-    return attributes.getRequest();
   }
 }

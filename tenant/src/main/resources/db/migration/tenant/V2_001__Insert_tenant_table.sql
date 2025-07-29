@@ -1,5 +1,5 @@
 -- 샘플 테넌트 데이터 삽입
-INSERT INTO tb_tenant (email, password, corp_name, corp_id, city, street, zipcode, ceo, created_at, updated_at) VALUES
+INSERT INTO tb_tenant (login_id, password, corp_name, corp_id, city, street, zipcode, ceo_name, created_at, updated_at) VALUES
 ('admin@pyokemon.com', '$2a$10$8TuVlyq0JKUNWJYEr3/TaeJ.9k9YNgJnZlUXqCqhOZQKMSJKLGdI2', '파이오케몬', 'PYOKEMON001', '서울시', '강남구 테헤란로 123', '06234', '김대표', NOW(), NOW()),
 ('nintendo@company.com', '$2a$10$8TuVlyq0JKUNWJYEr3/TaeJ.9k9YNgJnZlUXqCqhOZQKMSJKLGdI2', '닌텐도코리아', 'NINTENDO001', '서울시', '중구 명동길 456', '04567', '이사장', NOW(), NOW()),
 ('gamefreak@company.com', '$2a$10$8TuVlyq0JKUNWJYEr3/TaeJ.9k9YNgJnZlUXqCqhOZQKMSJKLGdI2', '게임프리크', 'GAMEFREAK01', '부산시', '해운대구 센텀로 789', '48058', '박CEO', NOW(), NOW()),
