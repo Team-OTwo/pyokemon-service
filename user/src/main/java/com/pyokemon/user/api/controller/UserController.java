@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.user.api.dto.UserRegisterRequestDto;
 import com.pyokemon.user.api.dto.UserResponse;
+import com.pyokemon.user.api.dto.UserUpdateRequestDto;
 import com.pyokemon.user.api.service.UserService;
 
 import jakarta.validation.Valid;
@@ -34,6 +35,12 @@ public class UserController {
             @Valid @RequestBody UserLoginRequestDto request) {
         TokenDto.AccessRefreshToken tokens = userService.loginUser(request);
         return ResponseEntity.ok(ResponseDto.success(tokens, "로그인 성공"));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<ResponseDto<UserResponse>> updateUser(
+            @Valid @RequestBody UserUpdateRequestDto request) {
+        return ResponseEntity.ok(ResponseDto.success(UserResponse.from(userService.updateUser(request))));
     }
 
     @PostMapping("/refresh")
