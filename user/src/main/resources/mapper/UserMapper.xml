@@ -46,6 +46,7 @@
         WHERE id = #{id}
     </select>
 
+
     <insert id="insert" parameterType="com.pyokemon.user.api.entity.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_user (name, email, password, phone, birth, created_at, updated_at)
         VALUES (#{name}, #{email}, #{password}, #{phone}, #{birth}, NOW(), NOW())

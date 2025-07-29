@@ -24,6 +24,6 @@ public interface UserRepository {
     void insert(User user);
 
     void update(User user);
-
+  
     void deleteById(@Param("id") Long id);
 }

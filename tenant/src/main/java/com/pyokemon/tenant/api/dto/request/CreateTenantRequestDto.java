@@ -2,22 +2,15 @@ package com.pyokemon.tenant.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class CreateTenantRequestDto {
 
   @NotBlank(message = "대표자명은 필수입니다")
   private String ceoName;
-
-  @NotBlank(message = "사업자번호는 필수입니다")
-  private String businessNumber;
 
   @NotBlank(message = "회사명은 필수입니다")
   private String corpName;

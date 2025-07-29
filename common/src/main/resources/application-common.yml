@@ -23,7 +23,7 @@ logging:
 
 
 mybatis:
-  type-aliases-package: com.pyokemon.common.entity
+  type-aliases-package: com.pyokemon.common.entity, com.pyokemon.event.entity,com.pyokemon.event.dto
   configuration:
     map-underscore-to-camel-case: true
     default-fetch-size: 100

@@ -139,7 +139,6 @@ public class UserService {
         // 새 액세스 토큰 발급
         return tokenGenerator.generateAccessToken(userId, "web");
     }
-
     private void validateDuplicateUser(UserRegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw UserException.duplicateEmail(request.getEmail());

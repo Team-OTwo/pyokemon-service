@@ -11,7 +11,7 @@ import com.pyokemon.tenant.api.dto.response.TenantListResponseDto;
 import com.pyokemon.tenant.api.entity.Tenant;
 
 @Component
-public class TenantMapper {
+public class TenantConverter {
 
   // Tenant 엔티티를 TenantDetailResponseDto로 변환
   public TenantDetailResponseDto toResponseDto(Tenant tenant) {
@@ -44,7 +44,7 @@ public class TenantMapper {
     }
 
     return Tenant.builder().loginId(request.getLoginId()).password(encodedPassword)
-        .corpName(request.getCorpName()).corpId(request.getBusinessNumber()).city(request.getCity())
+        .corpName(request.getCorpName()).corpId(request.getCorpId()).city(request.getCity())
         .street(request.getStreet()).zipcode(request.getZipcode()).ceoName(request.getCeoName())
         .build();
   }
