@@ -14,6 +14,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class UserSecurityConfig {
 
   /**
+   * 비밀번호 암호화를 위한 PasswordEncoder Bean
+   */
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  /**
    * Spring Security 기본 설정 (Gateway에서 인증 처리하므로 최소한만)
    */
   @Bean
