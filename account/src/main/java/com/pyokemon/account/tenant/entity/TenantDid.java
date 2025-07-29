@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TenantDid {
 
-  private String tenantDidId;
+  private Long tenantDidId;
   private Long tenantId;
   private String did;
   private Boolean isValid;
