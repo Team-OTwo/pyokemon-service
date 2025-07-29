@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -26,7 +27,7 @@ public class TokenGenerator {
     if (secretKey == null) {
       synchronized (this) {
         if (secretKey == null) {
-          secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(configProperties.getSecretKey()));
+          secretKey = Keys.hmacShaKeyFor(configProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
         }
       }
     }
