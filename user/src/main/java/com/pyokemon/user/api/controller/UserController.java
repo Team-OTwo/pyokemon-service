@@ -48,7 +48,6 @@ public class UserController {
         // "Bearer " 접두사 제거
         String refreshToken = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
 
-        // 리프레시 토큰으로 새 액세스 토큰 발급
         TokenDto.AccessToken accessToken = userService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(ResponseDto.success(accessToken, "토큰 갱신 성공"));
     }
