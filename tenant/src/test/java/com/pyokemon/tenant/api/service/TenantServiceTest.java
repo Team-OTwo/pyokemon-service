@@ -74,7 +74,7 @@ class TenantServiceTest {
     testCreateRequest.setLoginId("test-tenant");
     testCreateRequest.setPassword("password123");
     testCreateRequest.setCorpName("테스트 회사");
-    testCreateRequest.setBusinessNumber("123-45-67890");
+    testCreateRequest.setCorpId("123-45-67890");
     testCreateRequest.setCity("서울시");
     testCreateRequest.setStreet("강남구 테헤란로");
     testCreateRequest.setZipcode("12345");
@@ -146,7 +146,7 @@ class TenantServiceTest {
     void createTenant_Success() {
       // given
       given(tenantRepository.existsByLoginId(testCreateRequest.getLoginId())).willReturn(false);
-      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber()))
+      given(tenantRepository.existsByCorpId(testCreateRequest.getCorpId()))
           .willReturn(false);
       given(passwordEncoder.encode(testCreateRequest.getPassword())).willReturn("encoded-password");
       given(tenantConverter.toEntity(testCreateRequest, "encoded-password")).willReturn(testTenant);
@@ -161,7 +161,7 @@ class TenantServiceTest {
       assertThat(result.getCorpName()).isEqualTo(testCreateRequest.getCorpName());
 
       verify(tenantRepository).existsByLoginId(testCreateRequest.getLoginId());
-      verify(tenantRepository).existsByCorpId(testCreateRequest.getBusinessNumber());
+      verify(tenantRepository).existsByCorpId(testCreateRequest.getCorpId());
       verify(passwordEncoder).encode(testCreateRequest.getPassword());
       verify(tenantRepository).insert(testTenant);
       verify(tenantConverter).toEntity(testCreateRequest, "encoded-password");
@@ -188,7 +188,7 @@ class TenantServiceTest {
     void createTenant_DuplicateBusinessNumber() {
       // given
       given(tenantRepository.existsByLoginId(testCreateRequest.getLoginId())).willReturn(false);
-      given(tenantRepository.existsByCorpId(testCreateRequest.getBusinessNumber()))
+      given(tenantRepository.existsByCorpId(testCreateRequest.getCorpId()))
           .willReturn(true);
 
       // when & then
@@ -196,7 +196,7 @@ class TenantServiceTest {
           .isInstanceOf(BusinessException.class);
 
       verify(tenantRepository).existsByLoginId(testCreateRequest.getLoginId());
-      verify(tenantRepository).existsByCorpId(testCreateRequest.getBusinessNumber());
+      verify(tenantRepository).existsByCorpId(testCreateRequest.getCorpId());
       verify(tenantRepository, never()).insert(any());
     }
   }
