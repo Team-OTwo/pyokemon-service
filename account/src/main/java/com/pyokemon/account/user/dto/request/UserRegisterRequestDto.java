@@ -19,7 +19,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserRegisterRequestDto {
 
-  @org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank(message = "로그인 ID는 필수입니다.")
+  @org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank(
+      message = "로그인 ID는 필수입니다.")
   private String loginId;
 
   @NotBlank(message = "비밀번호는 필수입니다.")
