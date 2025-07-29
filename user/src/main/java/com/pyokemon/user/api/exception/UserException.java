@@ -1,6 +1,7 @@
 package com.pyokemon.user.api.exception;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.user.api.entity.User;
 
 // 테넌트 예외
 public class UserException extends BusinessException {
