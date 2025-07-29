@@ -15,12 +15,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EventSchedule {
 
-    private Long eventScheduleId;
-    private Long eventId;
-    private Long venueId;
-    private LocalDateTime ticketOpenAt;
-    private LocalDateTime eventDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long eventScheduleId;
+  private Long eventId;
+  private Long venueId;
+  private LocalDateTime ticketOpenAt;
+  private LocalDateTime eventDate;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
 }

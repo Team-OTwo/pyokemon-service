@@ -13,7 +13,6 @@ services:
       - "3306:3306"
     volumes:
       - user_mysql_data:/var/lib/mysql
-
   event-mysql:
     image: mysql:8.0
     container_name: pyokemon-event-mysql
@@ -26,7 +25,30 @@ services:
       - "3308:3306"
     volumes:
       - event_mysql_data:/var/lib/mysql
-
+  tenant-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-tenant-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_tenant
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3305:3306"
+    volumes:
+      - tenant_mysql_data:/var/lib/mysql
+  did-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-did-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_did
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - did_mysql_data:/var/lib/mysql
   payment-mysql:
     image: mysql:8.0
     container_name: pyokemon-payment-mysql
@@ -39,7 +61,31 @@ services:
       - "3309:3306"
     volumes:
       - payment_mysql_data:/var/lib/mysql
+  noti-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-noti-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_noti
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3310:3306"
+    volumes:
+      - noti_mysql_data:/var/lib/mysql
 
+  admin-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-admin-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_admin
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3311:3306"
+    volumes:
+      - admin_mysql_data:/var/lib/mysql
   redis:
     image: redis:7-alpine
     container_name: pyokemon-redis
@@ -87,6 +133,10 @@ volumes:
   user_mysql_data:
     driver: local
   event_mysql_data:
+    driver: local
+  payment_mysql_data:
+    driver: local
+  did_mysql_data:
     driver: local
   payment_mysql_data:
     driver: local

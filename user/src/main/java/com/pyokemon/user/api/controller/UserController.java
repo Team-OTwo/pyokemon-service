@@ -1,4 +1,4 @@
-package com.pyokemon.user.controller;
+package com.pyokemon.user.api.controller;
 
 import java.util.List;
 

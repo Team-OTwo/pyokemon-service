@@ -1,8 +1,8 @@
 package com.pyokemon.event.entity;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class SeatClass {
-    private Long seatClassId;
-    private String className;
-    private Integer priority;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long seatClassId;
+  private String className;
+  private Integer priority;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 }

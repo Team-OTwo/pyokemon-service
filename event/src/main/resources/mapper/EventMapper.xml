@@ -4,18 +4,50 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
+    <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
+        INSERT INTO tb_event (
+            tenant_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{tenantId},
+            #{title},
+            #{ageLimit},
+            #{description},
+            #{genre},
+            #{thumbnailUrl},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-    <resultMap id="eventResultMap" type="com.pyokemon.event.entity.Event">
-        <id property="eventId" column="event_id"/>
-        <result property="tenantId" column="tenant_id"/>
-        <result property="title" column="title"/>
-        <result property="ageLimit" column="age_limit"/>
-        <result property="description" column="description"/>
-        <result property="genre" column="genre"/>
-        <result property="thumbnailUrl" column="thumbnail_url"/>
-        <result property="EventStatus" column="EventStatus"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
+    <select id="findEventDetailByEventId" resultType="EventDetailResponseDTO">
+        SELECT
+        e.event_id,
+        e.title,
+        e.age_limit,
+        e.description,
+        e.genre,
+        e.thumbnail_url,
+        es.event_schedule_id,
+        es.ticket_open_at,
+        es.event_date,
+        v.venue_name
+        FROM tb_event e
+        JOIN tb_event_schedule es ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
+
+        WHERE e.event_id = #{event_id}
+    </select>
 
 </mapper>

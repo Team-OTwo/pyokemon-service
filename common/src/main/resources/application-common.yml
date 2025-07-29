@@ -20,3 +20,26 @@ logging:
     com.pyokemon: DEBUG
     org.springframework.jdbc: DEBUG
   config: classpath:log4j2.yml
+
+
+mybatis:
+  type-aliases-package: com.pyokemon.common.entity, com.pyokemon.event.entity,com.pyokemon.event.dto
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+
+
+# Springdoc OpenAPI 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alphaZ
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+

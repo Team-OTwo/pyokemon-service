@@ -4,4 +4,3 @@ include 'common'
 include 'user'
 include 'event'
 include 'payment'
-
