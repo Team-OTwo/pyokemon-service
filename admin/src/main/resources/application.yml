@@ -29,7 +29,7 @@ mybatis:
 
 service:
   event:
-    url: http://localhost:8082  # 개발 환경에서의 이벤트 서비스 URL
+    url: http://localhost:8084 # 개발 환경에서의 이벤트 서비스 URL
 
 server:
   port: 8081

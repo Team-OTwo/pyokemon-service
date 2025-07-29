@@ -30,27 +30,27 @@ public class AdminException extends BusinessException {
   public static AdminException accessDenied() {
     return new AdminException("접근 권한이 없습니다", "ADMIN_ACCESS_DENIED");
   }
-  
+
   // 비밀번호 불일치
   public static AdminException passwordMismatch() {
     return new AdminException("비밀번호가 일치하지 않습니다", "ADMIN_PASSWORD_MISMATCH");
   }
-  
+
   // 이미 존재하는 관리자
   public static AdminException alreadyExists() {
     return new AdminException("이미 존재하는 관리자입니다", "ADMIN_ALREADY_EXISTS");
   }
-  
+
   // 토큰 만료
   public static AdminException tokenExpired() {
     return new AdminException("토큰이 만료되었습니다", "ADMIN_TOKEN_EXPIRED");
   }
-  
+
   // 유효하지 않은 토큰
   public static AdminException invalidToken() {
     return new AdminException("유효하지 않은 토큰입니다", "ADMIN_TOKEN_INVALID");
   }
-  
+
   // 이벤트 승인 관련 예외
   public static AdminException eventApprovalFailed() {
     return new AdminException("이벤트 승인에 실패했습니다", "ADMIN_EVENT_APPROVAL_FAILED");

@@ -15,10 +15,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventApprovalDto {
-    // === 요청 및 응답 공통 필드 ===
-    private Long id;
-     // 승인/거절 사유 (요청 시 사용)
-    private String reason;
-     // 공연 상태 (응답 시 사용) PENDING, APPROVED, REJECTED 중 하나
-    private String status;
-} 
+  // === 요청 및 응답 공통 필드 ===
+  private Long id;
+  // 승인/거절 사유 (요청 시 사용)
+  private String reason;
+  // 공연 상태 (응답 시 사용) PENDING, APPROVED, REJECTED 중 하나
+  private String status;
+}
