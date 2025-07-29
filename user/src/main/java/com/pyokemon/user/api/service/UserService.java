@@ -3,7 +3,12 @@ package com.pyokemon.user.api.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.user.api.dto.UserLoginRequestDto;
+import com.pyokemon.user.api.dto.UserUpdateRequestDto;
 import com.pyokemon.user.api.exception.UserException;
+import com.pyokemon.user.api.secret.jwt.TokenGenerator;
+import com.pyokemon.user.api.secret.jwt.dto.TokenDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenGenerator tokenGenerator;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -31,25 +37,32 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Optional<User> getUserByName(String username) {
-        return userRepository.findByName(username);
-    }
-
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Transactional
-    public User updateUser(Long id, User userDetails) {
-        if (!userRepository.existsById(id)) {
-            throw UserException.notFound();
+    public User updateUser(UserUpdateRequestDto request) {
+        if(request.getPassword() == null || request.getPassword().isEmpty()){
+            throw new UserException("비밀번호는 필수입니다.", "USER_PASSWORD_REQUIRED");
         }
-        if (userDetails.getPassword() != null) {
-            validatePassword(userDetails.getPassword());
-            userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        if(request.getNewPassword() == null || request.getNewPassword().isEmpty()){
+            throw new UserException("새 비밀번호는 필수입니다.", "USER_NEW_PASSWORD_REQUIRED");
         }
-        userRepository.update(userDetails);
-        return userDetails;
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(UserException::notFound);
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new UserException("기존 비밀번호가 다릅니다.", "PASSWORD_NOT_MATCHED");
+        }
+
+        validatePassword(request.getPassword());
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        userRepository.update(user);
+
+        return user;
     }
 
     @Transactional
@@ -84,21 +97,58 @@ public class UserService {
         return user;
     }
 
+    public TokenDto.AccessRefreshToken loginUser(UserLoginRequestDto request) {
+        if (request.getEmail() == null || request.getEmail().isEmpty()){
+            throw new UserException("이메일은 필수입니다", "EMAIL_REQUIRED");
+        }
+
+        if (request.getPassword() == null || request.getPassword().isEmpty()){
+            throw new UserException("비밀번호는 필수입니다.", "PASSWORD_REQUIRED");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(UserException::loginFailed);
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw UserException.loginFailed();
+        }
+        
+        // Todo: device type 구분
+        return tokenGenerator.generateAccessRefreshToken(user.getEmail(), "web");
+    }
+
+    /**
+     * 리프레시 토큰을 검증하고 새 액세스 토큰을 발급합니다.
+     *
+     * @param refreshToken 리프레시 토큰
+     * @return 새 액세스 토큰
+     */
+    public TokenDto.AccessToken refreshAccessToken(String refreshToken) {
+        // 리프레시 토큰 검증
+        String userId = tokenGenerator.validateJwtToken(refreshToken);
+
+        if (userId == null) {
+            throw new UserException("유효하지 않은 토큰입니다.", "USER_TOKEN_INVALID");
+        }
+
+        // 사용자 존재 여부 확인
+        Optional<User> userOpt = userRepository.findByEmail(userId);
+        if (userOpt.isEmpty()) {
+            throw UserException.notFound();
+        }
+
+        // 새 액세스 토큰 발급
+        return tokenGenerator.generateAccessToken(userId, "web");
+    }
+
     private void validateDuplicateUser(UserRegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw UserException.duplicateEmail(request.getEmail());
         }
     }
 
-    private void validateNewUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw UserException.duplicateEmail(user.getEmail());
-        }
-    }
-
     private void validatePassword(String password) {
         if (!PasswordValidator.isValid(password)) {
-            throw UserException.loginFailed();
+            throw new UserException("유효하지 않은 비밀번호입니다.", "USER_PASSWORD_NOT_VALID");
         }
     }
 }
