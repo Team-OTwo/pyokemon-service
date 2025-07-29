@@ -2,26 +2,6 @@
 
 MSA(Microservice Architecture) 기반의 Pyokemon 서비스입니다.
 
-## 🚀 프로젝트 설정
-
-### IDE 설정 (필수)
-
-#### IntelliJ IDEA 설정
-1. **File → Settings → Editor → Code Style → Java**
-2. **Tab size: 4**
-3. **Indent: 4**
-4. **Continuation indent: 8**
-5. **Use tab character: ❌ (체크 해제)**
-6. **Smart tabs: ❌ (체크 해제)**
-
-#### Eclipse 설정
-- 프로젝트에 포함된 `eclipse-java-google-style.xml` 사용
-
-### 코드 포맷팅
-- **Spotless**를 사용하여 Google Java Style 적용
-- **pre-commit hook**이 자동으로 포맷팅 실행
-- 수동 포맷팅: `./gradlew spotlessApply`
-
 ## 기술 스택
 
 - **Java**: 21
