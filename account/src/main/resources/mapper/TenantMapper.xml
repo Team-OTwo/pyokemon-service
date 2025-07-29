@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.account.tenant.repository.TenantRepository">
+
+    <select id="findByTenantId" resultType="Tenant">
+        SELECT * FROM tb_tenant WHERE tenant_id = #{tenantId}
+    </select>
+
+    <select id="findByAccountId" resultType="Tenant">
+        SELECT * FROM tb_tenant WHERE account_id = #{accountId}
+    </select>
+
+    <select id="findAll" resultType="Tenant">
+        SELECT * FROM tb_tenant ORDER BY created_at DESC
+    </select>
+
+    <insert id="insert" parameterType="Tenant" useGeneratedKeys="true" keyProperty="tenantId">
+        INSERT INTO tb_tenant (account_id, name, corp_id, city, street, zipcode, ceo)
+        VALUES (#{accountId}, #{name}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo})
+    </insert>
+
+    <update id="update" parameterType="Tenant">
+        UPDATE tb_tenant 
+        SET name = #{name}, corp_id = #{corpId}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}
+        WHERE tenant_id = #{tenantId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tb_tenant WHERE tenant_id = #{tenantId}
+    </delete>
+
+</mapper> 

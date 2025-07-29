@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.account.admin.repository.AdminRepository">
+
+    <select id="findByAdminId" resultType="Admin">
+        SELECT * FROM tb_admin WHERE admin_id = #{adminId}
+    </select>
+
+    <select id="findByAccountId" resultType="Admin">
+        SELECT * FROM tb_admin WHERE account_id = #{accountId}
+    </select>
+
+    <insert id="insert" parameterType="Admin" useGeneratedKeys="true" keyProperty="adminId">
+        INSERT INTO tb_admin (account_id, name)
+        VALUES (#{accountId}, #{name})
+    </insert>
+
+    <update id="update" parameterType="Admin">
+        UPDATE tb_admin 
+        SET name = #{name}
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tb_admin WHERE admin_id = #{adminId}
+    </delete>
+
+</mapper> 

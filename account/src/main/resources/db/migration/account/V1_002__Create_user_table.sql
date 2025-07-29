@@ -1,0 +1,10 @@
+CREATE TABLE tb_user (
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_id BIGINT NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    birth DATE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES tb_account(account_id)
+); 
