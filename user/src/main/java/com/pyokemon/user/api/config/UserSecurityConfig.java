@@ -29,10 +29,8 @@ public class UserSecurityConfig {
     http.csrf(csrf -> csrf.disable())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/user/login").permitAll() // 로그인은
-                                                                                             // 인증
-                                                                                             // 없이
-                                                                                             // 허용
+        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/users/login").permitAll()
+            .requestMatchers("/api/users/register").permitAll()
             .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Swagger 허용
             .anyRequest().permitAll() // Gateway에서 인증하므로 모든 요청 허용
         );
