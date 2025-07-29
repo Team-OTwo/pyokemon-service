@@ -15,11 +15,7 @@ public interface UserRepository {
 
     Optional<User> findById(@Param("id") Long id);
 
-    Optional<User> findByName(@Param("name") String name);
-
     Optional<User> findByEmail(@Param("email") String email);
-
-    boolean existsByName(@Param("name") String name);
 
     boolean existsByEmail(@Param("email") String email);
 
@@ -28,6 +24,6 @@ public interface UserRepository {
     void insert(User user);
 
     void update(User user);
-
+  
     void deleteById(@Param("id") Long id);
 }

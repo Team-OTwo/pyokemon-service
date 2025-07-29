@@ -5,7 +5,7 @@
 
 <mapper namespace="com.pyokemon.user.api.repository.UserRepository">
 
-    <resultMap id="userResultMap" type="User">
+    <resultMap id="userResultMap" type="com.pyokemon.user.api.entity.User">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="email" column="email"/>
@@ -28,22 +28,10 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findByName" parameterType="String" resultMap="userResultMap">
-        SELECT id, name, email, password, phone, birth, created_at, updated_at
-        FROM tb_user
-        WHERE name = #{name}
-    </select>
-
     <select id="findByEmail" parameterType="String" resultMap="userResultMap">
         SELECT id, name, email, password, phone, birth, created_at, updated_at
         FROM tb_user
         WHERE email = #{email}
-    </select>
-
-    <select id="existsByName" parameterType="String" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM tb_user
-        WHERE name = #{name}
     </select>
 
     <select id="existsByEmail" parameterType="String" resultType="boolean">
@@ -58,12 +46,13 @@
         WHERE id = #{id}
     </select>
 
-    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+
+    <insert id="insert" parameterType="com.pyokemon.user.api.entity.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_user (name, email, password, phone, birth, created_at, updated_at)
         VALUES (#{name}, #{email}, #{password}, #{phone}, #{birth}, NOW(), NOW())
     </insert>
 
-    <update id="update" parameterType="User">
+    <update id="update" parameterType="com.pyokemon.user.api.entity.User">
         UPDATE tb_user
         SET name = #{name},
             email = #{email},
