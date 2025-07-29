@@ -10,6 +10,10 @@
         SELECT * FROM tb_tenant WHERE account_id = #{accountId}
     </select>
 
+    <select id="findByCorpId" resultType="Tenant">
+        SELECT * FROM tb_tenant WHERE corp_id = #{corpId}
+    </select>
+
     <select id="findAll" resultType="Tenant">
         SELECT * FROM tb_tenant ORDER BY created_at DESC
     </select>

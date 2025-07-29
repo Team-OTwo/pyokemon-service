@@ -18,8 +18,8 @@ public class SecurityConfig {
     http.csrf(csrf -> csrf.disable())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            authz -> authz.anyRequest().permitAll());  // Gateway에서 인증 처리하므로 모든 요청 허용
+        .authorizeHttpRequests(authz -> authz.anyRequest().permitAll()); // Gateway에서 인증 처리하므로 모든 요청
+                                                                         // 허용
 
     return http.build();
   }

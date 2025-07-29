@@ -14,6 +14,8 @@ public interface TenantRepository {
 
   Optional<Tenant> findByAccountId(Long accountId);
 
+  Optional<Tenant> findByCorpId(String corpId);
+
   List<Tenant> findAll();
 
   int insert(Tenant tenant);

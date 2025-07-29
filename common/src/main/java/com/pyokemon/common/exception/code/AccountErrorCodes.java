@@ -20,6 +20,8 @@ public final class AccountErrorCodes {
 
   // 중복 관련 에러
   public static final String LOGIN_ID_DUPLICATED = "LOGIN_ID_DUPLICATED";
+  public static final String DUPLICATE_LOGIN_ID = "DUPLICATE_LOGIN_ID";
+  public static final String DUPLICATE_CORP_ID = "DUPLICATE_CORP_ID";
   public static final String EMAIL_DUPLICATED = "EMAIL_DUPLICATED";
   public static final String PHONE_DUPLICATED = "PHONE_DUPLICATED";
 
@@ -29,6 +31,9 @@ public final class AccountErrorCodes {
   public static final String EMAIL_REQUIRED = "EMAIL_REQUIRED";
   public static final String NAME_REQUIRED = "NAME_REQUIRED";
   public static final String PHONE_REQUIRED = "PHONE_REQUIRED";
+
+  // 테넌트 관련 에러
+  public static final String TENANT_NOT_FOUND = "TENANT_NOT_FOUND";
 
   // 시스템 에러
   public static final String INTERNAL_ERROR = "INTERNAL_ERROR";

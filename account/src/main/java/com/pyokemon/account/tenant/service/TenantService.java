@@ -1,6 +1,7 @@
 package com.pyokemon.account.tenant.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,40 +31,164 @@ public class TenantService {
 
   @Transactional
   public TenantProfileResponseDto registerTenant(TenantRegisterRequestDto request) {
-    // TODO: 구현 필요
-    return TenantProfileResponseDto.builder().tenantId(1L).accountId(1L)
-        .loginId(request.getLoginId()).name(request.getName()).corpId(request.getCorpId())
-        .city(request.getCity()).street(request.getStreet()).zipcode(request.getZipcode())
-        .ceo(request.getCeo()).build();
+    // 1. 로그인 ID 중복 체크
+    if (accountRepository.findByLoginId(request.getLoginId()).isPresent()) {
+      throw new BusinessException(AccountErrorCodes.DUPLICATE_LOGIN_ID, "이미 사용 중인 로그인 ID입니다.");
+    }
+
+    // 2. 사업자번호 중복 체크
+    if (tenantRepository.findByCorpId(request.getCorpId()).isPresent()) {
+      throw new BusinessException(AccountErrorCodes.DUPLICATE_CORP_ID, "이미 등록된 사업자번호입니다.");
+    }
+
+    // 3. Account 생성
+    String encodedPassword = passwordEncoder.encode(request.getPassword());
+    Account account = Account.builder()
+        .loginId(request.getLoginId())
+        .password(encodedPassword)
+        .role("TENANT")
+        .status("ACTIVE")
+        .build();
+    
+    accountRepository.insert(account);
+
+    // 4. Tenant 생성
+    Tenant tenant = Tenant.builder()
+        .accountId(account.getAccountId())
+        .name(request.getName())
+        .corpId(request.getCorpId())
+        .city(request.getCity())
+        .street(request.getStreet())
+        .zipcode(request.getZipcode())
+        .ceo(request.getCeo())
+        .build();
+
+    tenantRepository.insert(tenant);
+
+    // 5. 응답 생성
+    return TenantProfileResponseDto.builder()
+        .tenantId(tenant.getTenantId())
+        .accountId(account.getAccountId())
+        .loginId(account.getLoginId())
+        .name(tenant.getName())
+        .corpId(tenant.getCorpId())
+        .city(tenant.getCity())
+        .street(tenant.getStreet())
+        .zipcode(tenant.getZipcode())
+        .ceo(tenant.getCeo())
+        .createdAt(tenant.getCreatedAt())
+        .updatedAt(tenant.getUpdatedAt())
+        .build();
   }
 
   @Transactional(readOnly = true)
   public TenantProfileResponseDto getTenantProfile(Long tenantId) {
-    // TODO: 구현 필요
-    return TenantProfileResponseDto.builder().tenantId(tenantId).accountId(1L)
-        .loginId("dummy-login-id").name("dummy-name").corpId("dummy-corp-id").city("dummy-city")
-        .street("dummy-street").zipcode("dummy-zipcode").ceo("dummy-ceo").build();
+    Tenant tenant = tenantRepository.findByTenantId(tenantId)
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    Account account = accountRepository.findByAccountId(tenant.getAccountId())
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.ACCOUNT_NOT_FOUND, "계정을 찾을 수 없습니다."));
+
+    return TenantProfileResponseDto.builder()
+        .tenantId(tenant.getTenantId())
+        .accountId(account.getAccountId())
+        .loginId(account.getLoginId())
+        .name(tenant.getName())
+        .corpId(tenant.getCorpId())
+        .city(tenant.getCity())
+        .street(tenant.getStreet())
+        .zipcode(tenant.getZipcode())
+        .ceo(tenant.getCeo())
+        .createdAt(tenant.getCreatedAt())
+        .updatedAt(tenant.getUpdatedAt())
+        .build();
   }
 
   @Transactional
   public TenantProfileResponseDto updateTenantProfile(Long tenantId,
       UpdateTenantProfileRequestDto request) {
-    // TODO: 구현 필요
-    return TenantProfileResponseDto.builder().tenantId(tenantId).accountId(1L)
-        .loginId("dummy-login-id").name(request.getName()).corpId(request.getCorpId())
-        .city(request.getCity()).street(request.getStreet()).zipcode(request.getZipcode())
-        .ceo(request.getCeo()).build();
+    // 1. 테넌트 존재 확인
+    Tenant tenant = tenantRepository.findByTenantId(tenantId)
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    // 2. 사업자번호 중복 체크 (자신 제외)
+    Optional<Tenant> existingTenant = tenantRepository.findByCorpId(request.getCorpId());
+    if (existingTenant.isPresent() && !existingTenant.get().getTenantId().equals(tenantId)) {
+      throw new BusinessException(AccountErrorCodes.DUPLICATE_CORP_ID, "이미 등록된 사업자번호입니다.");
+    }
+
+    // 3. 테넌트 정보 업데이트
+    Tenant updatedTenant = Tenant.builder()
+        .tenantId(tenant.getTenantId())
+        .accountId(tenant.getAccountId())
+        .name(request.getName())
+        .corpId(request.getCorpId())
+        .city(request.getCity())
+        .street(request.getStreet())
+        .zipcode(request.getZipcode())
+        .ceo(request.getCeo())
+        .build();
+
+    tenantRepository.update(updatedTenant);
+
+    // 4. 업데이트된 테넌트 조회
+    Tenant savedTenant = tenantRepository.findByTenantId(tenantId)
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    Account account = accountRepository.findByAccountId(savedTenant.getAccountId())
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.ACCOUNT_NOT_FOUND, "계정을 찾을 수 없습니다."));
+
+    return TenantProfileResponseDto.builder()
+        .tenantId(savedTenant.getTenantId())
+        .accountId(account.getAccountId())
+        .loginId(account.getLoginId())
+        .name(savedTenant.getName())
+        .corpId(savedTenant.getCorpId())
+        .city(savedTenant.getCity())
+        .street(savedTenant.getStreet())
+        .zipcode(savedTenant.getZipcode())
+        .ceo(savedTenant.getCeo())
+        .createdAt(savedTenant.getCreatedAt())
+        .updatedAt(savedTenant.getUpdatedAt())
+        .build();
   }
 
   @Transactional
   public void deleteTenant(Long tenantId) {
-    // TODO: 구현 필요
+    // 1. 테넌트 존재 확인
+    Tenant tenant = tenantRepository.findByTenantId(tenantId)
+        .orElseThrow(() -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    // 2. Account 상태를 DELETED로 변경 (Soft Delete)
+    accountRepository.updateStatus(tenant.getAccountId(), "DELETED");
+
+    // 3. 테넌트 정보 삭제
+    tenantRepository.delete(tenantId);
   }
 
   @Transactional(readOnly = true)
   public TenantListResponseDto getAllTenants() {
-    // TODO: 구현 필요
-    return TenantListResponseDto.builder().tenants(java.util.Collections.emptyList()).totalCount(0)
+    List<Tenant> tenants = tenantRepository.findAll();
+    
+    List<TenantListResponseDto.TenantSummaryDto> tenantSummaries = tenants.stream()
+        .map(tenant -> {
+          Account account = accountRepository.findByAccountId(tenant.getAccountId())
+              .orElse(null);
+          
+          return TenantListResponseDto.TenantSummaryDto.builder()
+              .tenantId(tenant.getTenantId())
+              .loginId(account != null ? account.getLoginId() : "N/A")
+              .name(tenant.getName())
+              .corpId(tenant.getCorpId())
+              .city(tenant.getCity())
+              .createdAt(tenant.getCreatedAt())
+              .build();
+        })
+        .collect(Collectors.toList());
+
+    return TenantListResponseDto.builder()
+        .tenants(tenantSummaries)
+        .totalCount(tenantSummaries.size())
         .build();
   }
 }
