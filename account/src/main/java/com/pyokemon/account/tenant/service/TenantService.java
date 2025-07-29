@@ -31,11 +31,11 @@ public class TenantService {
 
   @Transactional
   public TenantProfileResponseDto registerTenant(TenantRegisterRequestDto request) {
-    //로그인 ID 중복 체크
+    // 로그인 ID 중복 체크
     if (accountRepository.findByLoginId(request.getLoginId()).isPresent()) {
       throw new BusinessException(AccountErrorCodes.DUPLICATE_LOGIN_ID, "이미 사용 중인 로그인 ID입니다.");
     }
-    //사업자번호 중복 체크
+    // 사업자번호 중복 체크
     if (tenantRepository.findByCorpId(request.getCorpId()).isPresent()) {
       throw new BusinessException(AccountErrorCodes.DUPLICATE_CORP_ID, "이미 등록된 사업자번호입니다.");
     }
@@ -84,14 +84,64 @@ public class TenantService {
 
   @Transactional
   public void deleteTenant(Long tenantId) {
-    //테넌트 존재 확인
+    // 테넌트 존재 확인
     Tenant tenant = tenantRepository.findByTenantId(tenantId).orElseThrow(
         () -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
 
-    //Account 상태를 DELETED로 변경
+    // Account 상태를 DELETED로 변경
     accountRepository.updateStatus(tenant.getAccountId(), "DELETED");
 
     tenantRepository.delete(tenantId);
+  }
+
+  @Transactional(readOnly = true)
+  public TenantProfileResponseDto getMyTenantProfile(Long accountId, String currentUserAccountId) {
+    // 권한 검증
+    if (!accountId.toString().equals(currentUserAccountId)) {
+      throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "자신의 정보만 조회할 수 있습니다.");
+    }
+
+    Tenant tenant = tenantRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    Account account = accountRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException(AccountErrorCodes.ACCOUNT_NOT_FOUND, "계정을 찾을 수 없습니다."));
+
+    return tenant.toTenantProfileResponseDto(account.getLoginId());
+  }
+
+  @Transactional
+  public TenantProfileResponseDto updateMyTenantProfile(Long accountId, UpdateTenantProfileRequestDto request, String currentUserAccountId) {
+    // 권한 검증
+    if (!accountId.toString().equals(currentUserAccountId)) {
+      throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "자신의 정보만 수정할 수 있습니다.");
+    }
+
+    Tenant tenant = tenantRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    Account account = accountRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException(AccountErrorCodes.ACCOUNT_NOT_FOUND, "계정을 찾을 수 없습니다."));
+
+    Tenant updatedTenant = tenant.updateFromRequest(request);
+    tenantRepository.update(updatedTenant);
+
+    return updatedTenant.toTenantProfileResponseDto(account.getLoginId());
+  }
+
+  @Transactional
+  public void deleteMyTenantAccount(Long accountId, String currentUserAccountId) {
+    // 권한 검증
+    if (!accountId.toString().equals(currentUserAccountId)) {
+      throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "자신의 계정만 삭제할 수 있습니다.");
+    }
+
+    Tenant tenant = tenantRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException(AccountErrorCodes.TENANT_NOT_FOUND, "테넌트를 찾을 수 없습니다."));
+
+    // Soft Delete
+    accountRepository.updateStatus(accountId, "DELETED");
+    tenantRepository.delete(tenant.getTenantId());
   }
 
   @Transactional(readOnly = true)

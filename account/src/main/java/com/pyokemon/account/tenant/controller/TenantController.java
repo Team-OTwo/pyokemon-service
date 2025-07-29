@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.account.common.annotation.AdminOnly;
 import com.pyokemon.account.common.annotation.TenantOnly;
+import com.pyokemon.account.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.account.tenant.dto.request.TenantRegisterRequestDto;
 import com.pyokemon.account.tenant.dto.request.UpdateTenantProfileRequestDto;
 import com.pyokemon.account.tenant.dto.response.TenantListResponseDto;
@@ -62,8 +63,10 @@ public class TenantController {
   @TenantOnly
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> getMyProfile() {
-    // TODO: 구현 필요
-    return ResponseEntity.ok(ResponseDto.success(null, "내 정보 조회 성공"));
+    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = Long.parseLong(currentUserAccountId);
+    TenantProfileResponseDto response = tenantService.getMyTenantProfile(accountId, currentUserAccountId);
+    return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
   }
 
   // 정보 수정
@@ -71,15 +74,19 @@ public class TenantController {
   @PutMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> updateProfile(
       @Valid @RequestBody UpdateTenantProfileRequestDto request) {
-    // TODO: 구현 필요
-    return ResponseEntity.ok(ResponseDto.success(null, "내 정보 수정 성공"));
+    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = Long.parseLong(currentUserAccountId);
+    TenantProfileResponseDto response = tenantService.updateMyTenantProfile(accountId, request, currentUserAccountId);
+    return ResponseEntity.ok(ResponseDto.success(response, "내 정보 수정 성공"));
   }
 
   // 테넌트 계정 삭제
   @TenantOnly
   @DeleteMapping("/profile")
   public ResponseEntity<ResponseDto<Void>> deleteMyAccount() {
-    // TODO: 구현 필요
+    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = Long.parseLong(currentUserAccountId);
+    tenantService.deleteMyTenantAccount(accountId, currentUserAccountId);
     return ResponseEntity.ok(ResponseDto.success("테넌트 계정 삭제 성공"));
   }
 }

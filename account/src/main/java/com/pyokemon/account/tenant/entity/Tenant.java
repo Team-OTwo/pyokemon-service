@@ -37,15 +37,11 @@ public class Tenant {
   }
 
   public Tenant updateFromRequest(UpdateTenantProfileRequestDto request) {
-    return Tenant.builder()
-        .tenantId(this.tenantId)
-        .accountId(this.accountId)
-        .name(this.name)           // 기존 값 유지
-        .corpId(this.corpId)       // 기존 값 유지
-        .city(request.getCity())
-        .street(request.getStreet())
-        .zipcode(request.getZipcode())
-        .ceo(request.getCeo())
-        .build();
+    return Tenant.builder().tenantId(this.tenantId).accountId(this.accountId).name(this.name) // 기존
+                                                                                              // 값
+                                                                                              // 유지
+        .corpId(this.corpId) // 기존 값 유지
+        .city(request.getCity()).street(request.getStreet()).zipcode(request.getZipcode())
+        .ceo(request.getCeo()).build();
   }
 }
