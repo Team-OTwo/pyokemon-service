@@ -1,0 +1,9 @@
+CREATE TABLE tb_tenent_did (
+    tenant_did_id VARCHAR(255) PRIMARY KEY,
+    tenant_id BIGINT NOT NULL,
+    did TEXT NOT NULL,
+    is_valid BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tb_tenant(tenant_id)
+); 

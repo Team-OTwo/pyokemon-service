@@ -13,13 +13,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EventScheduleService {
 
-    private final EventScheduleRepository eventScheduleRepository;
+  private final EventScheduleRepository eventScheduleRepository;
 
-    public List<EventItemResponseDTO> getTodayOpenedTickets() {
-        return eventScheduleRepository.selectTodayOpenedTickets();
-    }
+  public List<EventItemResponseDTO> getTodayOpenedTickets() {
+    return eventScheduleRepository.selectTodayOpenedTickets();
+  }
 
-    public List<EventItemResponseDTO> getTicketsToBeOpened() {
-        return eventScheduleRepository.selectTicketsToBeOpened();
-    }
+  public List<EventItemResponseDTO> getTicketsToBeOpened() {
+    return eventScheduleRepository.selectTicketsToBeOpened();
+  }
 }

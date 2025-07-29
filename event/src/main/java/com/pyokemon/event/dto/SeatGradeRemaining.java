@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SeatGradeRemaining {
-    private String seatGrade;
-    private Integer remainingSeats;
-    private int price;
+  private String seatGrade;
+  private Integer remainingSeats;
+  private int price;
 }

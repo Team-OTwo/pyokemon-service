@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.account.auth.repository.AccountRepository">
+
+    <select id="findByLoginId" resultType="Account">
+        SELECT * FROM tb_account WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findByAccountId" resultType="Account">
+        SELECT * FROM tb_account WHERE account_id = #{accountId}
+    </select>
+
+    <insert id="insert" parameterType="Account" useGeneratedKeys="true" keyProperty="accountId">
+        INSERT INTO tb_account (role, login_id, password, status)
+        VALUES (#{role}, #{loginId}, #{password}, #{status})
+    </insert>
+
+    <update id="update" parameterType="Account">
+        UPDATE tb_account 
+        SET role = #{role}, login_id = #{loginId}, password = #{password}, status = #{status}
+        WHERE account_id = #{accountId}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE tb_account SET status = #{status} WHERE account_id = #{accountId}
+    </update>
+
+    <select id="existsByLoginId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_account WHERE login_id = #{loginId}
+    </select>
+
+</mapper> 

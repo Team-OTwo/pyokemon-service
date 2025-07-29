@@ -1,0 +1,47 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /accounts
+
+spring:
+  profiles:
+    include:
+      - flyway
+      - common
+  
+  datasource:
+    url: jdbc:mysql://localhost:3305/pyokemon_account?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: pyokemon
+    password: pyokemon123
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  flyway:
+    locations: classpath:db/migration/account
+
+  # Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.pyokemon.account.auth.entity,com.pyokemon.account.user.entity,com.pyokemon.account.tenant.entity,com.pyokemon.account.admin.entity
+
+# JWT 설정
+jwt:
+  secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
+  expiresIn: 86400000  # 24시간 (밀리초)
+  mobileExpiresIn: 86400000  # 24시간 (밀리초) 

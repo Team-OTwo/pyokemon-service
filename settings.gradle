@@ -1,6 +1,6 @@
 rootProject.name = 'pyokemon-service'
 
 include 'common'
-include 'user'
 include 'event'
 include 'payment'
+include 'account'
