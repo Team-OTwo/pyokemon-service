@@ -3,47 +3,47 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.pyokemon.user.repository.UserRepository">
+<mapper namespace="com.pyokemon.user.api.repository.UserRepository">
 
     <resultMap id="userResultMap" type="User">
         <id property="id" column="id"/>
-        <result property="username" column="username"/>
+        <result property="name" column="name"/>
         <result property="email" column="email"/>
         <result property="password" column="password"/>
-        <result property="nickname" column="nickname"/>
-        <result property="status" column="status"/>
+        <result property="phone" column="phone"/>
+        <result property="birth" column="birth"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <select id="findAll" resultMap="userResultMap">
-        SELECT id, username, email, password, nickname, status, created_at, updated_at
+        SELECT id, name, email, password, phone, birth, created_at, updated_at
         FROM tb_user
         ORDER BY created_at DESC
     </select>
 
     <select id="findById" parameterType="Long" resultMap="userResultMap">
-        SELECT id, username, email, password, nickname, status, created_at, updated_at
+        SELECT id, name, email, password, phone, birth, created_at, updated_at
         FROM tb_user
         WHERE id = #{id}
     </select>
 
-    <select id="findByUsername" parameterType="String" resultMap="userResultMap">
-        SELECT id, username, email, password, nickname, status, created_at, updated_at
+    <select id="findByName" parameterType="String" resultMap="userResultMap">
+        SELECT id, name, email, password, phone, birth, created_at, updated_at
         FROM tb_user
-        WHERE username = #{username}
+        WHERE name = #{name}
     </select>
 
     <select id="findByEmail" parameterType="String" resultMap="userResultMap">
-        SELECT id, username, email, password, nickname, status, created_at, updated_at
+        SELECT id, name, email, password, phone, birth, created_at, updated_at
         FROM tb_user
         WHERE email = #{email}
     </select>
 
-    <select id="existsByUsername" parameterType="String" resultType="boolean">
+    <select id="existsByName" parameterType="String" resultType="boolean">
         SELECT COUNT(1) > 0
         FROM tb_user
-        WHERE username = #{username}
+        WHERE name = #{name}
     </select>
 
     <select id="existsByEmail" parameterType="String" resultType="boolean">
@@ -59,17 +59,17 @@
     </select>
 
     <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_user (username, email, password, nickname, status, created_at, updated_at)
-        VALUES (#{username}, #{email}, #{password}, #{nickname}, #{status}, NOW(), NOW())
+        INSERT INTO tb_user (name, email, password, phone, birth, created_at, updated_at)
+        VALUES (#{name}, #{email}, #{password}, #{phone}, #{birth}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="User">
         UPDATE tb_user
-        SET username = #{username},
+        SET name = #{name},
             email = #{email},
             password = #{password},
-            nickname = #{nickname},
-            status = #{status},
+            phone = #{phone},
+            birth = #{birth},
             updated_at = NOW()
         WHERE id = #{id}
     </update>

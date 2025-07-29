@@ -1,4 +1,4 @@
-package com.pyokemon.user.repository;
+package com.pyokemon.user.api.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,28 +6,28 @@ import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.pyokemon.user.entity.User;
+import com.pyokemon.user.api.entity.User;
 
 @Mapper
 public interface UserRepository {
 
-  List<User> findAll();
+    List<User> findAll();
 
-  Optional<User> findById(@Param("id") Long id);
+    Optional<User> findById(@Param("id") Long id);
 
-  Optional<User> findByUsername(@Param("username") String username);
+    Optional<User> findByName(@Param("name") String name);
 
-  Optional<User> findByEmail(@Param("email") String email);
+    Optional<User> findByEmail(@Param("email") String email);
 
-  boolean existsByUsername(@Param("username") String username);
+    boolean existsByName(@Param("name") String name);
 
-  boolean existsByEmail(@Param("email") String email);
+    boolean existsByEmail(@Param("email") String email);
 
-  void insert(User user);
+    boolean existsById(@Param("id") Long id);
 
-  void update(User user);
+    void insert(User user);
 
-  void deleteById(@Param("id") Long id);
+    void update(User user);
 
-  boolean existsById(@Param("id") Long id);
+    void deleteById(@Param("id") Long id);
 }
