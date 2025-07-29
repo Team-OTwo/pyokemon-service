@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.event.repository.SeatRepository">
+
+    <select id="findByVenueId" resultType="Seat" parameterType="long">
+        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+        FROM tb_seat
+        WHERE venue_id = #{param1}
+    </select>
+
+    <select id="findById" resultType="Seat" parameterType="long">
+        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+        FROM tb_seat
+        WHERE seat_id = #{param1}
+    </select>
+
+    <select id="findAll" resultType="Seat">
+        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+        FROM tb_seat
+    </select>
+
+</mapper>

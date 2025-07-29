@@ -15,12 +15,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Venue {
 
-    private Long venueId;
-    private String venueName;
-    private String city;
-    private String street;
-    private String zipcode;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long venueId;
+  private String venueName;
+  private String city;
+  private String street;
+  private String zipcode;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
 }
