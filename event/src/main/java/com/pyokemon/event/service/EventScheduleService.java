@@ -22,4 +22,8 @@ public class EventScheduleService {
   public List<EventItemResponseDTO> getTicketsToBeOpened() {
     return eventScheduleRepository.selectTicketsToBeOpened();
   }
+
+  public List<EventItemResponseDTO> getConcertsByPage(String genre, int offset, int limit) {
+    return eventScheduleRepository.selectEventList(genre, limit, offset);
+  }
 }

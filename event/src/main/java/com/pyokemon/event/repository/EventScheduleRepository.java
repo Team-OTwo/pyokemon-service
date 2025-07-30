@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.entity.EventSchedule;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface EventScheduleRepository {
@@ -19,5 +20,7 @@ public interface EventScheduleRepository {
   Optional<EventSchedule> findById(Long id);
 
   Long save(EventSchedule eventSchedule);
+
+  List<EventItemResponseDTO> selectEventList(@Param("genre") String genre, @Param("limit") int limit, @Param("offset") int offset);
 
 }
