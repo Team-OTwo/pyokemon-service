@@ -10,8 +10,12 @@
         SELECT * FROM tb_user_device WHERE user_id = #{userId}
     </select>
 
-    <select id="findByUserIdAndDeviceNumber" resultType="com.pyokemon.account.user.entity.UserDevice">
-        SELECT * FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber}
+    <select id="findByUserIdAndDeviceNumberAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
+        SELECT * FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber} AND is_valid = #{isValid}
+    </select>
+
+    <select id="existsByDeviceNumberAndIsValid" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_user_device WHERE device_number = #{deviceNumber} AND is_valid = #{isValid}
     </select>
 
     <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
