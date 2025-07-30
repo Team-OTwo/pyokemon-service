@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.account.auth.entity.Account;
+import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
 import com.pyokemon.account.tenant.dto.request.TenantRegisterRequestDto;
 import com.pyokemon.account.tenant.dto.request.UpdateTenantProfileRequestDto;
@@ -42,7 +43,7 @@ public class TenantService {
 
     String encodedPassword = passwordEncoder.encode(request.getPassword());
     Account account = Account.builder().loginId(request.getLoginId()).password(encodedPassword)
-        .role("TENANT").status("ACTIVE").build();
+        .role("TENANT").status(AccountStatus.ACTIVE).build();
 
     accountRepository.insert(account);
 
@@ -89,7 +90,7 @@ public class TenantService {
         () -> new BusinessException("테넌트를 찾을 수 없습니다.", AccountErrorCodes.TENANT_NOT_FOUND));
 
     // Account 상태를 DELETED로 변경
-    accountRepository.updateStatus(tenant.getAccountId(), "DELETED");
+    accountRepository.updateStatus(tenant.getAccountId(), AccountStatus.DELETED);
 
     tenantRepository.delete(tenantId);
   }
@@ -141,7 +142,7 @@ public class TenantService {
         () -> new BusinessException("테넌트를 찾을 수 없습니다.", AccountErrorCodes.TENANT_NOT_FOUND));
 
     // Soft Delete
-    accountRepository.updateStatus(accountId, "DELETED");
+    accountRepository.updateStatus(accountId, AccountStatus.DELETED);
     tenantRepository.delete(tenant.getTenantId());
   }
 

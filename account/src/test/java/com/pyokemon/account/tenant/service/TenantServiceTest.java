@@ -1,5 +1,6 @@
 package com.pyokemon.account.tenant.service;
 
+import static com.pyokemon.account.auth.entity.AccountStatus.DELETED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.account.auth.entity.AccountStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.pyokemon.account.auth.entity.Account;
+import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
 import com.pyokemon.account.tenant.dto.request.TenantRegisterRequestDto;
 import com.pyokemon.account.tenant.dto.request.UpdateTenantProfileRequestDto;
@@ -56,7 +59,7 @@ class TenantServiceTest {
         .zipcode("48058").ceo("김철수").build();
 
     account = Account.builder().accountId(1L).loginId("test_tenant").password("encoded_password")
-        .role("TENANT").status("ACTIVE").build();
+        .role("TENANT").status(AccountStatus.ACTIVE).build();
 
     tenant = Tenant.builder().tenantId(1L).accountId(1L).name("테스트 테넌트").corpId("1234567890")
         .city("서울시").street("강남구 테헤란로 123").zipcode("06123").ceo("홍길동").build();
@@ -161,14 +164,14 @@ class TenantServiceTest {
   void 테넌트_삭제() {
     // Given
     when(tenantRepository.findByTenantId(1L)).thenReturn(Optional.of(tenant));
-    when(accountRepository.updateStatus(1L, "DELETED")).thenReturn(1);
+    when(accountRepository.updateStatus(1L, DELETED)).thenReturn(1);
     when(tenantRepository.delete(1L)).thenReturn(1);
 
     // When
     tenantService.deleteTenant(1L);
 
     // Then
-    verify(accountRepository).updateStatus(1L, "DELETED");
+    verify(accountRepository).updateStatus(1L, DELETED);
     verify(tenantRepository).delete(1L);
   }
 
@@ -215,14 +218,14 @@ class TenantServiceTest {
   void 내_테넌트_계정_삭제() {
     // Given
     when(tenantRepository.findByAccountId(1L)).thenReturn(Optional.of(tenant));
-    when(accountRepository.updateStatus(1L, "DELETED")).thenReturn(1);
+    when(accountRepository.updateStatus(1L, DELETED)).thenReturn(1);
     when(tenantRepository.delete(1L)).thenReturn(1);
 
     // When
     tenantService.deleteMyTenantAccount(1L, "1");
 
     // Then
-    verify(accountRepository).updateStatus(1L, "DELETED");
+    verify(accountRepository).updateStatus(1L, DELETED);
     verify(tenantRepository).delete(1L);
   }
 
