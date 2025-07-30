@@ -10,7 +10,7 @@ import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.account.auth.dto.response.LoginResponseDto;
 import com.pyokemon.account.auth.dto.response.TokenResponseDto;
 import com.pyokemon.account.auth.service.AccountService;
-import com.pyokemon.account.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
