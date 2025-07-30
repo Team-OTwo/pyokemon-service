@@ -100,6 +100,7 @@ public class UserService {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
+    
     accountRepository.updateStatus(user.getAccountId(), AccountStatus.DELETED);
   }
 
@@ -108,11 +109,16 @@ public class UserService {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
+    if (userDeviceRepository.existsByDeviceNumberAndIsValid(request.getDeviceNumber(), true)) {
+      throw new RuntimeException(AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
+    }
+
     UserDevice userDevice = UserDevice.builder()
             .userId(user.getUserId())
             .deviceNumber(request.getDeviceNumber())
             .fcmToken(request.getFcmToken())
             .osType(request.getOsType())
+            .isValid(true)
             .build();
 
     userDeviceRepository.insert(userDevice);
@@ -120,9 +126,11 @@ public class UserService {
 
   @Transactional
   public void deleteUserDevice(Long userId, String deviceNumber) {
-    UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumber(userId, deviceNumber)
+    UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(userId, deviceNumber, true)
         .orElseThrow(() -> new RuntimeException(AccountErrorCodes.DEVICE_NOT_FOUND));
     
-    userDeviceRepository.delete(userDevice.getUserDeviceId());
+    userDevice.setIsValid(false);
+
+    userDeviceRepository.update(userDevice);
   }
 }

@@ -6,6 +6,10 @@
         SELECT * FROM tb_account WHERE login_id = #{loginId}
     </select>
 
+    <select id="findByLoginIdAndStatus" resultType="com.pyokemon.account.auth.entity.Account">
+        SELECT * FROM tb_account WHERE login_id = #{loginId} AND status = #{status}
+    </select>
+
     <select id="findByAccountId" resultType="com.pyokemon.account.auth.entity.Account">
         SELECT * FROM tb_account WHERE account_id = #{accountId}
     </select>
@@ -31,6 +35,10 @@
 
     <select id="existsByLoginId" resultType="boolean">
         SELECT COUNT(*) > 0 FROM tb_account WHERE login_id = #{loginId}
+    </select>
+
+    <select id="existsByLoginIdAndStatus" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_account WHERE login_id = #{loginId} AND status = #{status}
     </select>
 
 </mapper> 
