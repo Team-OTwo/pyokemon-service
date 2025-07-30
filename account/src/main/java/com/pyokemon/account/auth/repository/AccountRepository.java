@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.account.auth.entity.Account;
+import com.pyokemon.account.auth.entity.AccountStatus;
 
 @Mapper
 public interface AccountRepository {
@@ -17,7 +18,7 @@ public interface AccountRepository {
 
   int update(Account account);
 
-  int updateStatus(Long accountId, String status);
+  int updateStatus(Long accountId, AccountStatus status);
 
   boolean existsByLoginId(String loginId);
 }

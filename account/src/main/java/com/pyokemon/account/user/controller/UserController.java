@@ -33,8 +33,7 @@ public class UserController {
         .body(ResponseDto.success(response, "사용자 등록 성공"));
   }
 
-  // 사용자 계정 상세 조회
-  @UserOnly
+  // 사용자 계정 상세 조회 (사용자 본인만)
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<UserDetailDto>> getUserProfile(
     @RequestHeader("Authorization") String authHeader) {
@@ -44,8 +43,7 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success(response, "사용자 정보 조회 성공"));
   }
 
-  // 사용자 정보 수정
-  @UserOnly
+  // 사용자 정보 수정 (사용자 본인만)
   @PutMapping("/profile")
   public ResponseEntity<ResponseDto<UserDetailDto>> updateUserProfile(
       @Valid @RequestBody UpdateUserRequestDto request,
@@ -56,8 +54,7 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success(response, "사용자 정보 수정 성공"));
   }
 
-  // 사용자 계정 삭제 (탈퇴)
-  @UserOnly
+  // 사용자 계정 삭제 (탈퇴) (사용자 본인만)
   @DeleteMapping("/profile")
   public ResponseEntity<ResponseDto<Void>> deleteUser(
       @RequestHeader("Authorization") String authHeader) {
@@ -67,8 +64,7 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success("사용자 탈퇴 성공"));
   }
 
-  // 사용자 기기 등록
-  @UserOnly
+  // 사용자 기기 등록 (사용자 본인만)
   @PostMapping("/devices")
   public ResponseEntity<ResponseDto<Void>> registerUserDevice(
       @Valid @RequestBody RegisterDeviceRequestDto request,
@@ -79,8 +75,7 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success("기기 등록 성공"));
   }
 
-  // 사용자 기기 삭제
-  @UserOnly
+  // 사용자 기기 삭제 (사용자 본인만)
   @DeleteMapping("/devices/{deviceId}")
   public ResponseEntity<ResponseDto<Void>> deleteUserDevice(
       @PathVariable String deviceId,

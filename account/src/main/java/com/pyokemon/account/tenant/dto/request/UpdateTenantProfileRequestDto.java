@@ -15,12 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateTenantProfileRequestDto {
 
-  @NotBlank(message = "테넌트명은 필수입니다.")
-  private String name;
-
-  @NotBlank(message = "사업자번호는 필수입니다.")
-  private String corpId;
-
   @NotBlank(message = "시/도는 필수입니다.")
   private String city;
 
