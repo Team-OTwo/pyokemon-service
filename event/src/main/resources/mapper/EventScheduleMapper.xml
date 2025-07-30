@@ -57,7 +57,8 @@
             es.ticket_open_at,
             es.event_date,
             e.title AS title,
-            v.venue_name AS venue_name
+            v.venue_name AS venue_name,
+            e.genre
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id

@@ -13,6 +13,7 @@ public class EventItemResponseDTO {
   private Long eventScheduleId;
   private Long eventId;
   private Long venueId;
+  private String genre;
   private LocalDateTime ticketOpenAt;
   private LocalDateTime eventDate;
 
