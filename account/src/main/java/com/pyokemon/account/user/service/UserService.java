@@ -15,6 +15,7 @@ import com.pyokemon.account.user.entity.User;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
 import com.pyokemon.account.user.repository.UserRepository;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.account.auth.entity.AccountStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,21 +32,21 @@ public class UserService {
   @Transactional
   public UserDetailDto registerUser(CreateUserRequestDto request) {
 
-    if (accountRepository.existsByLoginId(request.getLoginId())) {
+    if (accountRepository.existsByLoginIdAndStatus(request.getLoginId(), AccountStatus.ACTIVE)) {
       throw new RuntimeException(AccountErrorCodes.LOGIN_ID_DUPLICATED);
     }
 
     Account account = Account.builder()
             .loginId(request.getLoginId())
             .password(passwordEncoder.encode(request.getPassword()))
-            .role(Account.Role.USER)
-            .status(Account.AccountStatus.ACTIVE)
+            .role("USER")
+            .status(AccountStatus.ACTIVE)
             .build();
 
     accountRepository.insert(account);
 
     User user = User.builder()
-            .accountId(account.get().getAccountId())
+            .accountId(account.getAccountId())
             .name(request.getName())
             .phone(request.getPhone())
             .birth(request.getBirth())
@@ -96,7 +97,10 @@ public class UserService {
 
   @Transactional
   public void deleteUser(Long userId) {
-    // TODO: 구현 필요
+    User user = userRepository.findByUserId(userId)
+        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
+
+    accountRepository.updateStatus(user.getAccountId(), AccountStatus.DELETED);
   }
 
   @Transactional
@@ -117,7 +121,7 @@ public class UserService {
   @Transactional
   public void deleteUserDevice(Long userId, String deviceNumber) {
     UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumber(userId, deviceNumber)
-        .orElseThrow(() -> new RuntimeException("사용자 기기 정보를 찾을 수 없습니다."));
+        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.DEVICE_NOT_FOUND));
     
     userDeviceRepository.delete(userDevice.getUserDeviceId());
   }
