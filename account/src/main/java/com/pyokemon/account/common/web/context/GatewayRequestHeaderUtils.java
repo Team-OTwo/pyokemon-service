@@ -1,4 +1,4 @@
-package com.pyokemon.account.web.context;
+package com.pyokemon.account.common.web.context;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -9,7 +9,7 @@ public class GatewayRequestHeaderUtils {
 
   public static String getUserIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String userId = request.getHeader("X-Auth-UserId");
+    String userId = request.getHeader("X-Auth-AccountId");
     if (userId == null || userId.isEmpty()) {
       throw new RuntimeException("User ID not found in request header");
     }
@@ -18,7 +18,7 @@ public class GatewayRequestHeaderUtils {
 
   public static String getUserRoleOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String role = request.getHeader("X-Auth-UserRole");
+    String role = request.getHeader("X-Auth-Role");
     if (role == null || role.isEmpty()) {
       throw new RuntimeException("User role not found in request header");
     }

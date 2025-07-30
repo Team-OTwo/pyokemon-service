@@ -111,7 +111,8 @@ public class TenantService {
   }
 
   @Transactional
-  public TenantProfileResponseDto updateMyTenantProfile(Long accountId, UpdateTenantProfileRequestDto request, String currentUserAccountId) {
+  public TenantProfileResponseDto updateMyTenantProfile(Long accountId,
+      UpdateTenantProfileRequestDto request, String currentUserAccountId) {
     // 권한 검증
     if (!accountId.toString().equals(currentUserAccountId)) {
       throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "자신의 정보만 수정할 수 있습니다.");

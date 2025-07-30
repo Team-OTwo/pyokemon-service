@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.account.common.annotation.AdminOnly;
 import com.pyokemon.account.common.annotation.TenantOnly;
-import com.pyokemon.account.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.account.tenant.dto.request.TenantRegisterRequestDto;
 import com.pyokemon.account.tenant.dto.request.UpdateTenantProfileRequestDto;
 import com.pyokemon.account.tenant.dto.response.TenantListResponseDto;
@@ -65,7 +65,8 @@ public class TenantController {
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> getMyProfile() {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     Long accountId = Long.parseLong(currentUserAccountId);
-    TenantProfileResponseDto response = tenantService.getMyTenantProfile(accountId, currentUserAccountId);
+    TenantProfileResponseDto response =
+        tenantService.getMyTenantProfile(accountId, currentUserAccountId);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
   }
 
@@ -76,7 +77,8 @@ public class TenantController {
       @Valid @RequestBody UpdateTenantProfileRequestDto request) {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     Long accountId = Long.parseLong(currentUserAccountId);
-    TenantProfileResponseDto response = tenantService.updateMyTenantProfile(accountId, request, currentUserAccountId);
+    TenantProfileResponseDto response =
+        tenantService.updateMyTenantProfile(accountId, request, currentUserAccountId);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 수정 성공"));
   }
 

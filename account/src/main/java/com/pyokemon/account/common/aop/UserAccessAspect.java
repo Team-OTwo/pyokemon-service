@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import com.pyokemon.account.common.annotation.UserOnly;
-import com.pyokemon.account.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 
