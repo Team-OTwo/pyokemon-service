@@ -21,14 +21,12 @@ logging:
     org.springframework.jdbc: DEBUG
   config: classpath:log4j2.yml
 
-
 mybatis:
   type-aliases-package: com.pyokemon.common.entity, com.pyokemon.event.entity,com.pyokemon.event.dto
   configuration:
     map-underscore-to-camel-case: true
     default-fetch-size: 100
     default-statement-timeout: 30
-
 
 # Springdoc OpenAPI 설정
 springdoc:
