@@ -36,7 +36,7 @@ public class AccountService {
     }
 
     Account account = accountOpt.get();
-    
+
     // 계정 상태 확인
     if (account.getStatus() == AccountStatus.DELETED) {
       throw new BusinessException("삭제된 계정입니다.", AccountErrorCodes.ACCOUNT_DELETED);
@@ -48,15 +48,13 @@ public class AccountService {
     }
 
     // JWT 토큰 생성
-    String accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
-    String refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
+    String accessToken =
+        tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
+    String refreshToken =
+        tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
 
-    return LoginResponseDto.builder()
-        .accessToken(accessToken)
-        .refreshToken(refreshToken)
-        .role(account.getRole())
-        .accountId(account.getAccountId())
-        .build();
+    return LoginResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken)
+        .role(account.getRole()).accountId(account.getAccountId()).build();
   }
 
   @Transactional
@@ -70,9 +68,7 @@ public class AccountService {
       // 새로운 액세스 토큰 생성
       String newAccessToken = tokenGenerator.generateAccessToken(accountId, role);
 
-      return TokenResponseDto.builder()
-          .accessToken(newAccessToken)
-          .build();
+      return TokenResponseDto.builder().accessToken(newAccessToken).build();
     } catch (Exception e) {
       throw new BusinessException("유효하지 않은 토큰입니다.", AccountErrorCodes.INVALID_TOKEN);
     }
