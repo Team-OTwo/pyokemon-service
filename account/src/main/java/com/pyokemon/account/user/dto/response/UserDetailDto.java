@@ -14,7 +14,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponseDto {
+public class UserDetailDto {
 
   private Long userId;
   private Long accountId;

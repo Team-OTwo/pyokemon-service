@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDeviceRequestDto {
+public class RegisterDeviceRequestDto {
 
   @NotBlank(message = "디바이스 ID는 필수입니다.")
   private String deviceNumber;
