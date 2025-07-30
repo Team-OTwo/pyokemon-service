@@ -42,6 +42,9 @@ public final class AccountErrorCodes {
   public static final String SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
   public static final String DATABASE_ERROR = "DATABASE_ERROR";
 
+  // 디바이스 에러
+  public static final String DEVICE_NOT_FOUND = "DEVICE_NOT_FOUND";
+
   private AccountErrorCodes() {
     throw new UnsupportedOperationException("상수 클래스는 인스턴스를 생성할 수 없습니다");
   }
