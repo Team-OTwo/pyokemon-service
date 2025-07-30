@@ -9,18 +9,18 @@ public class GatewayRequestHeaderUtils {
 
   public static String getUserIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String userId = request.getHeader("X-Auth-AccountId");
+    String userId = (String) request.getAttribute("X-Auth-AccountId");
     if (userId == null || userId.isEmpty()) {
-      throw new RuntimeException("User ID not found in request header");
+      throw new RuntimeException("User ID not found in request attribute");
     }
     return userId;
   }
 
   public static String getUserRoleOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String role = request.getHeader("X-Auth-Role");
+    String role = (String) request.getAttribute("X-Auth-Role");
     if (role == null || role.isEmpty()) {
-      throw new RuntimeException("User role not found in request header");
+      throw new RuntimeException("User role not found in request attribute");
     }
     return role;
   }
