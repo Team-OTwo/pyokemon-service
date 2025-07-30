@@ -44,6 +44,7 @@ public final class AccountErrorCodes {
 
   // 디바이스 에러
   public static final String DEVICE_NOT_FOUND = "DEVICE_NOT_FOUND";
+  public static final String DEVICE_ALREADY_REGISTERED = "DEVICE_ALREADY_REGISTERED";
 
   private AccountErrorCodes() {
     throw new UnsupportedOperationException("상수 클래스는 인스턴스를 생성할 수 없습니다");
