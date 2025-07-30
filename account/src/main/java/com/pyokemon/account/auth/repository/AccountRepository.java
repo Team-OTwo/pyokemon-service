@@ -13,6 +13,8 @@ public interface AccountRepository {
 
   Optional<Account> findByLoginId(String loginId);
 
+  Optional<Account> findByLoginIdAndStatus(String loginId, AccountStatus status);
+
   Optional<Account> findByAccountId(Long accountId);
 
   int insert(Account account);
@@ -24,4 +26,6 @@ public interface AccountRepository {
   int updatePassword(@Param("accountId") Long accountId, @Param("password") String password);
 
   boolean existsByLoginId(String loginId);
+
+  boolean existsByLoginIdAndStatus(String loginId, AccountStatus status);
 }
