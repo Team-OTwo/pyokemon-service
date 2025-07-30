@@ -2,28 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.tenant.repository.TenantRepository">
 
-    <select id="findByTenantId" resultType="Tenant">
+    <select id="findByTenantId" resultType="com.pyokemon.account.tenant.entity.Tenant">
         SELECT * FROM tb_tenant WHERE tenant_id = #{tenantId}
     </select>
 
-    <select id="findByAccountId" resultType="Tenant">
+    <select id="findByAccountId" resultType="com.pyokemon.account.tenant.entity.Tenant">
         SELECT * FROM tb_tenant WHERE account_id = #{accountId}
     </select>
 
-    <select id="findByCorpId" resultType="Tenant">
+    <select id="findByCorpId" resultType="com.pyokemon.account.tenant.entity.Tenant">
         SELECT * FROM tb_tenant WHERE corp_id = #{corpId}
     </select>
 
-    <select id="findAll" resultType="Tenant">
+    <select id="findAll" resultType="com.pyokemon.account.tenant.entity.Tenant">
         SELECT * FROM tb_tenant ORDER BY created_at DESC
     </select>
 
-    <insert id="insert" parameterType="Tenant" useGeneratedKeys="true" keyProperty="tenantId">
+    <insert id="insert" parameterType="com.pyokemon.account.tenant.entity.Tenant" useGeneratedKeys="true" keyProperty="tenantId">
         INSERT INTO tb_tenant (account_id, name, corp_id, city, street, zipcode, ceo)
         VALUES (#{accountId}, #{name}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo})
     </insert>
 
-    <update id="update" parameterType="Tenant">
+    <update id="update" parameterType="com.pyokemon.account.tenant.entity.Tenant">
         UPDATE tb_tenant 
         SET name = #{name}, corp_id = #{corpId}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}
         WHERE tenant_id = #{tenantId}

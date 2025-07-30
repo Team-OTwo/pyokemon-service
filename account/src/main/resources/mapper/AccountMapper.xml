@@ -2,20 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.auth.repository.AccountRepository">
 
-    <select id="findByLoginId" resultType="Account">
+    <select id="findByLoginId" resultType="com.pyokemon.account.auth.entity.Account">
         SELECT * FROM tb_account WHERE login_id = #{loginId}
     </select>
 
-    <select id="findByAccountId" resultType="Account">
+    <select id="findByAccountId" resultType="com.pyokemon.account.auth.entity.Account">
         SELECT * FROM tb_account WHERE account_id = #{accountId}
     </select>
 
-    <insert id="insert" parameterType="Account" useGeneratedKeys="true" keyProperty="accountId">
+    <insert id="insert" parameterType="com.pyokemon.account.auth.entity.Account" useGeneratedKeys="true" keyProperty="accountId">
         INSERT INTO tb_account (role, login_id, password, status)
         VALUES (#{role}, #{loginId}, #{password}, #{status})
     </insert>
 
-    <update id="update" parameterType="Account">
+    <update id="update" parameterType="com.pyokemon.account.auth.entity.Account">
         UPDATE tb_account 
         SET role = #{role}, login_id = #{loginId}, password = #{password}, status = #{status}
         WHERE account_id = #{accountId}
