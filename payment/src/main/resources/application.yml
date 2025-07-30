@@ -1,3 +1,8 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /payments
+
 spring:
   profiles:
     include:
@@ -28,15 +33,3 @@ mybatis:
     default-statement-timeout: 30
 
 
-
-# Springdoc OpenAPI 설정
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    tags-sorter: alpha
-    operations-sorter: alpha
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json 

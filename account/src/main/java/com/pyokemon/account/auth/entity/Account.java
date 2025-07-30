@@ -19,7 +19,7 @@ public class Account {
   private String role; // USER, TENANT, ADMIN
   private String loginId;
   private String password;
-  private String status; // ACTIVE, DELETED
+  private AccountStatus status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }

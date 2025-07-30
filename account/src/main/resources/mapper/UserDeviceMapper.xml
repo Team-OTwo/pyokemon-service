@@ -2,24 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.user.repository.UserDeviceRepository">
 
-    <select id="findByUserDeviceId" resultType="UserDevice">
+    <select id="findByUserDeviceId" resultType="com.pyokemon.account.user.entity.UserDevice">
         SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId}
     </select>
 
-    <select id="findByUserId" resultType="UserDevice">
+    <select id="findByUserId" resultType="com.pyokemon.account.user.entity.UserDevice">
         SELECT * FROM tb_user_device WHERE user_id = #{userId}
     </select>
 
-    <select id="findByUserIdAndDeviceNumber" resultType="UserDevice">
+    <select id="findByUserIdAndDeviceNumber" resultType="com.pyokemon.account.user.entity.UserDevice">
         SELECT * FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber}
     </select>
 
-    <insert id="insert" parameterType="UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
+    <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
         INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_valid)
         VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isValid})
     </insert>
 
-    <update id="update" parameterType="UserDevice">
+    <update id="update" parameterType="com.pyokemon.account.user.entity.UserDevice">
         UPDATE tb_user_device 
         SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_valid = #{isValid}
         WHERE user_device_id = #{userDeviceId}

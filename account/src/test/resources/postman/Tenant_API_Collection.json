@@ -1,0 +1,312 @@
+{
+	"info": {
+		"_postman_id": "pyokemon-tenant-api",
+		"name": "Pyokemon Tenant API",
+		"description": "테넌트 관련 API 컬렉션",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "테넌트 등록",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"loginId\": \"test-tenant-001\",\n  \"password\": \"password123\",\n  \"name\": \"테스트 테넌트\",\n  \"corpId\": \"123-45-67890\",\n  \"city\": \"서울시\",\n  \"street\": \"강남대로 123\",\n  \"zipcode\": \"12345\",\n  \"ceo\": \"홍길동\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants"
+					]
+				},
+				"description": "새로운 테넌트 계정을 등록합니다."
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트 목록 조회",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants"
+					]
+				},
+				"description": "전체 테넌트 목록을 조회합니다."
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트 로그인",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"loginId\": \"test-tenant-001\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				},
+				"description": "테넌트 계정으로 로그인하여 JWT 토큰을 발급받습니다."
+			},
+			"response": []
+		},
+		{
+			"name": "특정 테넌트 조회",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants/{{tenantId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants",
+						"{{tenantId}}"
+					]
+				},
+				"description": "특정 테넌트의 상세 정보를 조회합니다. (인증 필요)"
+			},
+			"response": []
+		},
+		{
+			"name": "내 프로필 조회",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants/profile",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants",
+						"profile"
+					]
+				},
+				"description": "현재 로그인한 테넌트의 프로필 정보를 조회합니다."
+			},
+			"response": []
+		},
+		{
+			"name": "프로필 수정",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"city\": \"부산시\",\n  \"street\": \"해운대로 456\",\n  \"zipcode\": \"54321\",\n  \"ceo\": \"김철수\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants/profile",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants",
+						"profile"
+					]
+				},
+				"description": "현재 로그인한 테넌트의 프로필 정보를 수정합니다."
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트 삭제 (관리자)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminAccessToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants/{{tenantId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants",
+						"{{tenantId}}"
+					]
+				},
+				"description": "관리자가 특정 테넌트를 삭제합니다. (관리자 권한 필요)"
+			},
+			"response": []
+		},
+		{
+			"name": "내 계정 삭제",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/tenants/profile",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tenants",
+						"profile"
+					]
+				},
+				"description": "현재 로그인한 테넌트의 계정을 삭제합니다."
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "서비스 상태를 확인합니다."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// 로그인 응답에서 토큰 추출",
+					"if (pm.info.requestName === \"테넌트 로그인\") {",
+					"    const response = pm.response.json();",
+					"    if (response.success && response.data) {",
+					"        pm.environment.set(\"accessToken\", response.data.accessToken);",
+					"        pm.environment.set(\"refreshToken\", response.data.refreshToken);",
+					"        pm.environment.set(\"accountId\", response.data.accountId);",
+					"        pm.environment.set(\"role\", response.data.role);",
+					"    }",
+					"}",
+					"",
+					"// 테넌트 등록 응답에서 tenantId 추출",
+					"if (pm.info.requestName === \"테넌트 등록\") {",
+					"    const response = pm.response.json();",
+					"    if (response.success && response.data) {",
+					"        pm.environment.set(\"tenantId\", response.data.tenantId);",
+					"        pm.environment.set(\"accountId\", response.data.accountId);",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081/accounts",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminAccessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tenantId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "accountId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "role",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 
