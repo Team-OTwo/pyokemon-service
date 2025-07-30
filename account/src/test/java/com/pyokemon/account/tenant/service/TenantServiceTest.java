@@ -48,42 +48,18 @@ class TenantServiceTest {
 
   @BeforeEach
   void setUp() {
-    registerRequest = TenantRegisterRequestDto.builder()
-        .loginId("test_tenant")
-        .password("password123")
-        .name("테스트 테넌트")
-        .corpId("1234567890")
-        .city("서울시")
-        .street("강남구 테헤란로 123")
-        .zipcode("06123")
-        .ceo("홍길동")
-        .build();
+    registerRequest = TenantRegisterRequestDto.builder().loginId("test_tenant")
+        .password("password123").name("테스트 테넌트").corpId("1234567890").city("서울시")
+        .street("강남구 테헤란로 123").zipcode("06123").ceo("홍길동").build();
 
-    updateRequest = UpdateTenantProfileRequestDto.builder()
-        .city("부산시")
-        .street("해운대구 센텀로 456")
-        .zipcode("48058")
-        .ceo("김철수")
-        .build();
+    updateRequest = UpdateTenantProfileRequestDto.builder().city("부산시").street("해운대구 센텀로 456")
+        .zipcode("48058").ceo("김철수").build();
 
-    account = Account.builder()
-        .accountId(1L)
-        .loginId("test_tenant")
-        .password("encoded_password")
-        .role("TENANT")
-        .status("ACTIVE")
-        .build();
+    account = Account.builder().accountId(1L).loginId("test_tenant").password("encoded_password")
+        .role("TENANT").status("ACTIVE").build();
 
-    tenant = Tenant.builder()
-        .tenantId(1L)
-        .accountId(1L)
-        .name("테스트 테넌트")
-        .corpId("1234567890")
-        .city("서울시")
-        .street("강남구 테헤란로 123")
-        .zipcode("06123")
-        .ceo("홍길동")
-        .build();
+    tenant = Tenant.builder().tenantId(1L).accountId(1L).name("테스트 테넌트").corpId("1234567890")
+        .city("서울시").street("강남구 테헤란로 123").zipcode("06123").ceo("홍길동").build();
   }
 
   @Test
@@ -214,8 +190,8 @@ class TenantServiceTest {
   @Test
   void 내_테넌트_프로필_조회_권한없음() {
     // When & Then
-    BusinessException exception = assertThrows(BusinessException.class, 
-        () -> tenantService.getMyTenantProfile(1L, "2"));
+    BusinessException exception =
+        assertThrows(BusinessException.class, () -> tenantService.getMyTenantProfile(1L, "2"));
     assertEquals("ACCESS_DENIED", exception.getErrorCode());
   }
 
