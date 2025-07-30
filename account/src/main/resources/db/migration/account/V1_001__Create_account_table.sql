@@ -1,7 +1,7 @@
 CREATE TABLE tb_account (
     account_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role ENUM('USER', 'TENANT', 'ADMIN') NOT NULL,
-    login_id VARCHAR(255) NOT NULL UNIQUE,
+    login_id VARCHAR(255) NOT NULL,
     password TEXT NOT NULL,
     status ENUM('ACTIVE', 'DELETED') DEFAULT 'ACTIVE',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
