@@ -12,14 +12,18 @@ public final class AccountErrorCodes {
 
   // 인증 관련 에러
   public static final String LOGIN_FAILED = "LOGIN_FAILED";
+  public static final String INVALID_LOGIN = "INVALID_LOGIN";
   public static final String PASSWORD_MISMATCH = "PASSWORD_MISMATCH";
   public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
   public static final String TOKEN_INVALID = "TOKEN_INVALID";
+  public static final String INVALID_TOKEN = "INVALID_TOKEN";
   public static final String ACCESS_DENIED = "ACCESS_DENIED";
   public static final String PERMISSION_DENIED = "PERMISSION_DENIED";
 
   // 중복 관련 에러
   public static final String LOGIN_ID_DUPLICATED = "LOGIN_ID_DUPLICATED";
+  public static final String DUPLICATE_LOGIN_ID = "DUPLICATE_LOGIN_ID";
+  public static final String DUPLICATE_CORP_ID = "DUPLICATE_CORP_ID";
   public static final String EMAIL_DUPLICATED = "EMAIL_DUPLICATED";
   public static final String PHONE_DUPLICATED = "PHONE_DUPLICATED";
 
@@ -29,6 +33,9 @@ public final class AccountErrorCodes {
   public static final String EMAIL_REQUIRED = "EMAIL_REQUIRED";
   public static final String NAME_REQUIRED = "NAME_REQUIRED";
   public static final String PHONE_REQUIRED = "PHONE_REQUIRED";
+
+  // 테넌트 관련 에러
+  public static final String TENANT_NOT_FOUND = "TENANT_NOT_FOUND";
 
   // 시스템 에러
   public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
