@@ -54,10 +54,9 @@ public class EventController {
   }
 
   //장르별 리스트 조회
-  @GetMapping("/eventlist")
-  public List<EventItemResponseDTO> getConcertsByPage(@RequestParam(defaultValue = "콘서트") String genre, @RequestParam(defaultValue = "1") int page) {
-    int limit = 8;
-    int offset = (page - 1) * limit;
-    return eventScheduleService.getConcertsByPage(genre, offset, limit);
+  @GetMapping
+  public List<EventItemResponseDTO> getConcertsByPage(@RequestParam(defaultValue = "콘서트") String genre, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size  ) {
+    int offset = (page - 1) * size;
+    return eventScheduleService.getConcertsByPage(genre, offset, size);
   }
 }
