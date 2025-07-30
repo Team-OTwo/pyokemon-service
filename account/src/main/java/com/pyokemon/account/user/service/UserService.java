@@ -1,6 +1,7 @@
 package com.pyokemon.account.user.service;
 
 import com.pyokemon.account.user.entity.UserDevice;
+import com.pyokemon.common.exception.BusinessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class UserService {
   public UserDetailDto registerUser(CreateUserRequestDto request) {
 
     if (accountRepository.existsByLoginIdAndStatus(request.getLoginId(), AccountStatus.ACTIVE)) {
-      throw new RuntimeException(AccountErrorCodes.LOGIN_ID_DUPLICATED);
+      throw new BusinessException("이미 존재하는 계정입니다.",AccountErrorCodes.LOGIN_ID_DUPLICATED);
     }
 
     Account account = Account.builder()
@@ -66,7 +67,7 @@ public class UserService {
   @Transactional(readOnly = true)
   public UserDetailDto getUserProfile(Long userId) {
     User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     return UserDetailDto.builder()
             .name(user.getName())
@@ -80,7 +81,7 @@ public class UserService {
   public UserDetailDto updateUserProfile(Long userId,
                                          UpdateUserRequestDto request) {
     User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     user.setName(request.getName());
     user.setPhone(request.getPhone());
@@ -98,7 +99,7 @@ public class UserService {
   @Transactional
   public void deleteUser(Long userId) {
     User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     
     accountRepository.updateStatus(user.getAccountId(), AccountStatus.DELETED);
@@ -107,10 +108,10 @@ public class UserService {
   @Transactional
   public void registerUserDevice(Long userId, RegisterDeviceRequestDto request) {
     User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.ACCOUNT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (userDeviceRepository.existsByDeviceNumberAndIsValid(request.getDeviceNumber(), true)) {
-      throw new RuntimeException(AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
+      throw new BusinessException("이미 등록된 디바이스입니다.",AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
     }
 
     UserDevice userDevice = UserDevice.builder()
@@ -127,7 +128,7 @@ public class UserService {
   @Transactional
   public void deleteUserDevice(Long userId, String deviceNumber) {
     UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(userId, deviceNumber, true)
-        .orElseThrow(() -> new RuntimeException(AccountErrorCodes.DEVICE_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("디바이스를 찾을 수 없습니다.",AccountErrorCodes.DEVICE_NOT_FOUND));
     
     userDevice.setIsValid(false);
 
