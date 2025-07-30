@@ -41,7 +41,8 @@
             es.ticket_open_at,
             es.event_date,
             e.title AS title,
-            v.venue_name AS venue_name
+            v.venue_name AS venue_name,
+            e.thumbnail_url
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
@@ -58,7 +59,8 @@
             es.event_date,
             e.title AS title,
             v.venue_name AS venue_name,
-            e.genre
+            e.genre,
+            e.thumbnail_url
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
@@ -74,7 +76,9 @@
             es.ticket_open_at,
             es.event_date,
             e.title AS title,
-            v.venue_name AS venue_name
+            v.venue_name AS venue_name,
+            e.genre,
+            e.thumbnail_url
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
@@ -83,5 +87,16 @@
             e.genre = #{genre}
             LIMIT #{limit} OFFSET #{offset}
     </select>
+
+    <select id="getTotalCountByGenre" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE
+            e.status = 'APPROVED'
+          AND e.genre = #{genre}
+    </select>
+
 
 </mapper>

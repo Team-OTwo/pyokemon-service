@@ -14,6 +14,8 @@ public class EventItemResponseDTO {
   private Long eventId;
   private Long venueId;
   private String genre;
+  private Integer total;
+  private String thumbnailUrl;
   private LocalDateTime ticketOpenAt;
   private LocalDateTime eventDate;
 
