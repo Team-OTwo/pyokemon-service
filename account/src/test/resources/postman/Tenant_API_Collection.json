@@ -14,6 +14,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminAccessToken}}"
 					}
 				],
 				"body": {
@@ -212,26 +216,7 @@
 				},
 				"description": "현재 로그인한 테넌트의 계정을 삭제합니다."
 			},
-			"response": []
-		},
-		{
-			"name": "Health Check",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/api/health",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"health"
-					]
-				},
-				"description": "서비스 상태를 확인합니다."
-			},
-			"response": []
+						"response": []
 		}
 	],
 	"event": [
