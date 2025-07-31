@@ -12,7 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pyokemon.common.dto.ResponseDto;
 
 import lombok.extern.slf4j.Slf4j;
@@ -61,26 +60,6 @@ public class GlobalExceptionHandler {
     response = ResponseDto.<Map<String, String>>builder().success(false).message("유효성 검증 실패")
         .errorCode("VALIDATION_ERROR").data(errors).build();
 
-    return ResponseEntity.badRequest().body(response);
-  }
-
-  @ExceptionHandler(InvalidFormatException.class)
-  public ResponseEntity<ResponseDto<Map<String, String>>> handleInvalidFormatException(InvalidFormatException e) {
-    log.error("Invalid format exception occurred: {}", e.getMessage(), e);
-    
-    Map<String, String> errors = new HashMap<>();
-    String fieldName = e.getPath().isEmpty() ? "unknown" : e.getPath().get(0).getFieldName();
-    String errorMessage = String.format("잘못된 형식의 데이터입니다. 입력값: '%s', 필요한 타입: %s", 
-        e.getValue(), e.getTargetType().getSimpleName());
-    errors.put(fieldName, errorMessage);
-    
-    ResponseDto<Map<String, String>> response = ResponseDto.<Map<String, String>>builder()
-        .success(false)
-        .message("데이터 형식 오류")
-        .errorCode("INVALID_FORMAT")
-        .data(errors)
-        .build();
-        
     return ResponseEntity.badRequest().body(response);
   }
 
