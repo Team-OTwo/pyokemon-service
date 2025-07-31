@@ -13,6 +13,7 @@ public final class AccountErrorCodes {
   // 인증 관련 에러
   public static final String LOGIN_FAILED = "LOGIN_FAILED";
   public static final String INVALID_LOGIN = "INVALID_LOGIN";
+  public static final String PASSWORD_MATCH = "PASSWORD_MATCH";
   public static final String PASSWORD_MISMATCH = "PASSWORD_MISMATCH";
   public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
   public static final String TOKEN_INVALID = "TOKEN_INVALID";

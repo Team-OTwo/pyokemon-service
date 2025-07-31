@@ -149,7 +149,7 @@ public class AccountService {
     // 3. 새 비밀번호가 현재 비밀번호와 같은지 확인
     if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
         log.warn("비밀번호 변경 실패: 새 비밀번호가 현재 비밀번호와 동일함 - ID: {}", accountId);
-        throw new BusinessException("새 비밀번호는 현재 비밀번호와 달라야 합니다.", AccountErrorCodes.PASSWORD_MISMATCH);
+        throw new BusinessException("새 비밀번호는 현재 비밀번호와 달라야 합니다.", AccountErrorCodes.PASSWORD_MATCH);
     }
 
     // 4. 새 비밀번호 암호화 및 저장
