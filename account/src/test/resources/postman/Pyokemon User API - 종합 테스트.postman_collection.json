@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"loginId\": \"testuser\",\n  \"password\": \"password123\",\n  \"name\": \"테스트\",\n  \"phone\": \"010-1234-5678\",\n  \"birth\": \"1990-01-01\"\n}"
+							"raw": "{\n  \"loginId\": \"testuser123\",\n  \"password\": \"password123!\",\n  \"name\": \"테스트\",\n  \"phone\": \"010-1234-5678\",\n  \"birth\": \"1990-01-01\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/users",
@@ -49,7 +49,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"loginId\": \"testuser\",\n  \"password\": \"password123\",\n  \"name\": \"테스트 사용자\",\n  \"phone\": \"010-1234-5678\",\n  \"birth\": \"1990-01-01\"\n}"
+							"raw": "{\n  \"loginId\": \"testuser\",\n  \"password\": \"password123!\",\n  \"name\": \"테스트사용자\",\n  \"phone\": \"010-1234-5678\",\n  \"birth\": \"1990-01-01\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/users",
@@ -76,7 +76,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"loginId\": \"\",\n  \"password\": \"123\",\n  \"name\": \"\",\n  \"phone\": \"invalid-phone\",\n  \"birth\": \"invalid-date\"\n}"
+							"raw": "{\n  \"loginId\": \"\",\n  \"password\": \"aaa!\",\n  \"name\": \"\",\n  \"phone\": \"invalid-phone\",\n  \"birth\": \"invalid-date\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/users",
@@ -108,7 +108,8 @@
 									"    pm.environment.set(\"token\", jsonData.data.token);",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -122,7 +123,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"loginId\": \"testuser\",\n  \"password\": \"password123\"\n}"
+							"raw": "{\n  \"loginId\": \"testuser\",\n  \"password\": \"password123!\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/login",
@@ -204,6 +205,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -247,6 +258,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer invalid-token"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -275,6 +296,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -307,6 +338,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -344,6 +385,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -376,6 +427,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -408,6 +469,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -436,6 +507,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -461,6 +542,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -491,6 +582,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-Auth-AccountId",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Role",
+								"value": "USER",
+								"type": "text"
 							}
 						],
 						"url": {
