@@ -17,7 +17,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.account.auth.secret.jwt.JwtAuthenticationFilter;
-import com.pyokemon.account.auth.secret.jwt.TokenGenerator;
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 
@@ -28,10 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final TokenGenerator tokenGenerator;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Bean
@@ -41,8 +38,7 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authz -> authz
             // 공개 API
-            .requestMatchers("/api/login", "/api/tenants", "/api/users").permitAll()
-            .requestMatchers("/api/health", "/actuator/**").permitAll()
+            .requestMatchers("/api/login", "/api/users", "/api/tenants").permitAll()
             // 관리자 전용 API
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // 테넌트 API (테넌트 본인 + 관리자)
@@ -53,7 +49,7 @@ public class SecurityConfig {
             .requestMatchers("/api/users/**").hasRole("USER")
             // 기타 모든 요청은 인증 필요
             .anyRequest().authenticated())
-        .addFilterBefore(new JwtAuthenticationFilter(tokenGenerator),
+        .addFilterBefore(new JwtAuthenticationFilter(),
             UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling(exceptionHandling -> exceptionHandling
             .authenticationEntryPoint(customAuthenticationEntryPoint())
