@@ -75,8 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // context-path를 제거한 실제 경로로 체크
     String actualPath = requestURI.replace("/account", "");
     return actualPath.equals("/api/login") || actualPath.equals("/api/tenants")
-        || actualPath.equals("/api/users") || actualPath.equals("/api/health")
-        || actualPath.startsWith("/actuator/");
+        || actualPath.equals("/api/users");
   }
 
   private String extractAccountId(HttpServletRequest request) {

@@ -42,7 +42,6 @@ public class SecurityConfig {
         .authorizeHttpRequests(authz -> authz
             // 공개 API
             .requestMatchers("/api/login", "/api/tenants", "/api/users").permitAll()
-            .requestMatchers("/api/health", "/actuator/**").permitAll()
             // 관리자 전용 API
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // 테넌트 API (테넌트 본인 + 관리자)
