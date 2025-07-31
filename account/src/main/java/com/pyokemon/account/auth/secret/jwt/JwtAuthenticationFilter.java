@@ -16,14 +16,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-  private final TokenGenerator tokenGenerator;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -31,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String requestURI = request.getRequestURI();
 
-    // 공개 API는 인증 검증을 건너뛰고 다음 필터로 진행
+    // 공개 API
     if (isPublicApi(requestURI)) {
       filterChain.doFilter(request, response);
       return;
@@ -46,11 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throw new BadCredentialsException("인증 정보가 없습니다.");
       }
 
-      // 사용자 정보를 request attribute에 설정 (기존 코드와 호환성)
       request.setAttribute("X-Auth-AccountId", accountId);
       request.setAttribute("X-Auth-Role", role);
 
-      // Spring Security 인증 객체 생성 - 권한 정보 포함
       List<SimpleGrantedAuthority> authorities = new ArrayList<>();
       authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 
@@ -72,10 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private boolean isPublicApi(String requestURI) {
-    // context-path를 제거한 실제 경로로 체크
     String actualPath = requestURI.replace("/account", "");
-    return actualPath.equals("/api/login") || actualPath.equals("/api/tenants")
-        || actualPath.equals("/api/users");
+    return actualPath.equals("/api/login") || actualPath.equals("/api/users") || actualPath.equals("/api/tenants");
   }
 
   private String extractAccountId(HttpServletRequest request) {
