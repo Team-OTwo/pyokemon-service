@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "3e69f891-cf58-456a-9aa9-01077cb82d6d",
+		"name": "event",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33007023",
+		"_collection_link": "https://blue-moon-913939.postman.co/workspace/dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=33007023"
+	},
+	"item": [
+		{
+			"name": "전체 잔여 좌석",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/events/booking/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events",
+						"booking",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "VIP 좌석 status",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "공연 상세 정보 조회",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/events/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "공연 정보 등록",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "오늘 오픈 티켓 조회",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/events/open-today",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events",
+						"open-today"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "오픈 예정 티켓 조회",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/events/to-be-opened",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events",
+						"to-be-opened"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "장르별 공연 조회",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/events/eventlist?page=1&genre=콘서트",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"events",
+						"eventlist"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "genre",
+							"value": "콘서트"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
