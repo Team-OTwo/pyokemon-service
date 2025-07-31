@@ -6,13 +6,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
@@ -57,5 +51,12 @@ public class EventController {
   public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId) {
     EventDetailResponseDTO dto = eventService.getEventDetailByEventId(eventId);
     return ResponseEntity.ok(dto);
+  }
+
+  //장르별 리스트 조회
+  @GetMapping
+  public List<EventItemResponseDTO> getConcertsByPage(@RequestParam(defaultValue = "콘서트") String genre, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size  ) {
+    int offset = (page - 1) * size;
+    return eventScheduleService.getConcertsByPage(genre, offset, size);
   }
 }

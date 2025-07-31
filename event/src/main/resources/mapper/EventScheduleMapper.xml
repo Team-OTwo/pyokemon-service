@@ -41,7 +41,8 @@
             es.ticket_open_at,
             es.event_date,
             e.title AS title,
-            v.venue_name AS venue_name
+            v.venue_name AS venue_name,
+            e.thumbnail_url
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
@@ -57,12 +58,44 @@
             es.ticket_open_at,
             es.event_date,
             e.title AS title,
-            v.venue_name AS venue_name
+            v.venue_name AS venue_name,
+            e.genre,
+            e.thumbnail_url
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE DATE(ticket_open_at) = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
             LIMIT 8
+    </select>
+
+    <select id="selectEventList" resultType="EventItemResponseDTO">
+        SELECT
+            es.event_schedule_id,
+            es.event_id,
+            es.venue_id,
+            es.ticket_open_at,
+            es.event_date,
+            e.title AS title,
+            v.venue_name AS venue_name,
+            e.genre,
+            e.thumbnail_url
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE
+            e.status = 'APPROVED' AND
+            e.genre = #{genre}
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getTotalCountByGenre" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_event_schedule es
+                 JOIN tb_event e ON es.event_id = e.event_id
+                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE
+            e.status = 'APPROVED'
+          AND e.genre = #{genre}
     </select>
 
 
