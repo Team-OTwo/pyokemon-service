@@ -25,10 +25,6 @@
         UPDATE tb_account SET status = #{status} WHERE account_id = #{accountId}
     </update>
 
-    <update id="updatePassword">
-        UPDATE tb_account SET password = #{password} WHERE account_id = #{accountId}
-    </update>
-
     <select id="existsByLoginId" resultType="boolean">
         SELECT COUNT(*) > 0 FROM tb_account WHERE login_id = #{loginId}
     </select>
