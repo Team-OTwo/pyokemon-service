@@ -10,7 +10,7 @@ spring:
       - common
   
   datasource:
-    url: jdbc:mysql://localhost:3308/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: pyokemon_event
     password: pyokemon123
