@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
 
     String requestURI = request.getRequestURI();
-    
+
     // 공개 API는 JWT 검증을 건너뛰고 다음 필터로 진행
     if (isPublicApi(requestURI)) {
       filterChain.doFilter(request, response);
@@ -70,11 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private boolean isPublicApi(String requestURI) {
-    return requestURI.equals("/accounts/api/login") ||
-           requestURI.equals("/accounts/api/tenants") ||
-           requestURI.equals("/accounts/api/users") ||
-           requestURI.equals("/accounts/api/health") ||
-           requestURI.startsWith("/accounts/actuator/");
+    return requestURI.equals("/accounts/api/login") || requestURI.equals("/accounts/api/tenants")
+        || requestURI.equals("/accounts/api/users") || requestURI.equals("/accounts/api/health")
+        || requestURI.startsWith("/accounts/actuator/");
   }
 
   private String extractToken(HttpServletRequest request) {

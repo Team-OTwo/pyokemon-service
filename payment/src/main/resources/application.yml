@@ -1,7 +1,7 @@
 server:
-  port: 8084
+  port: 8082
   servlet:
-    context-path: /payments
+    context-path: /payment
 
 spring:
   profiles:
@@ -10,7 +10,7 @@ spring:
       - common
   
   datasource:
-    url: jdbc:mysql://localhost:3309/pyokemon_payment?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/pyokemon_payment?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: pyokemon_payment
     password: pyokemon123
