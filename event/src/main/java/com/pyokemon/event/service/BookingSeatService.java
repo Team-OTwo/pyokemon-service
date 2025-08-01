@@ -1,15 +1,14 @@
 package com.pyokemon.event.service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.pyokemon.event.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.event.dto.EventScheduleSeatResponse;
-import com.pyokemon.event.dto.SeatGradeRemaining;
-import com.pyokemon.event.dto.SeatMapDetail;
 import com.pyokemon.event.entity.Booking;
 import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.entity.Seat;
@@ -36,88 +35,95 @@ public class BookingSeatService {
     this.priceRepository = priceRepository;
   }
 
+  @Transactional
+  public BookingResponseDto createBooking(BookingRequestDto requestDto, Long accountId) {
+    boolean isAlreadyBooked = bookingRepository.findByEventScheduleIdAndStatus(requestDto.getEventScheduleId(), Booking.Booked.BOOKED).stream()
+        .anyMatch(b -> b.getSeatId().equals(requestDto.getSeatId()));
+    if (isAlreadyBooked) {
+      throw new BusinessException("이미 예약된 좌석입니다.", "SEAT_ALREADY_BOOKED");
+    }
+
+    boolean isPending = bookingRepository.findByEventScheduleIdAndStatus(requestDto.getEventScheduleId(), Booking.Booked.PENDING).stream()
+        .anyMatch(b -> b.getSeatId().equals(requestDto.getSeatId()));
+    if (isPending) {
+      throw new BusinessException("이미 예약 중인 좌석입니다.", "SEAT_ALREADY_PENDING");
+    }
+
+    Booking booking = new Booking();
+    booking.setEventScheduleId(requestDto.getEventScheduleId());
+    booking.setAccountId(accountId);
+    booking.setSeatId(requestDto.getSeatId());
+    booking.setStatus(Booking.Booked.PENDING);
+    booking.setCreatedAt(LocalDateTime.now());
+    booking.setUpdatedAt(LocalDateTime.now());
+    bookingRepository.insert(booking);
+
+    return new BookingResponseDto(booking.getBookingId(), booking.getEventScheduleId());
+  }
 
   public EventScheduleSeatResponse getEventScheduleSeats(Long eventScheduleId) {
-    Long venueId = findVenueId(eventScheduleId);
-    Map<Long, Long> totalSeats = findTotalSeatsByClass(venueId);
-    Map<Long, Long> bookedSeats = findBookedSeatsCount(eventScheduleId);
-    Map<Long, Integer> priceMap = findSeatClassPriceMap(eventScheduleId);
-
-    List<SeatGradeRemaining> list = findAllSeatClasses().stream().map(sc -> {
-      int remain = totalSeats.getOrDefault(sc.getSeatClassId(), 0L).intValue()
-          - bookedSeats.getOrDefault(sc.getSeatClassId(), 0L).intValue();
-      int price = priceMap.getOrDefault(sc.getSeatClassId(), 0);
-      return new SeatGradeRemaining(sc.getClassName(), remain, price);
-    }).collect(Collectors.toList());
-
-    return new EventScheduleSeatResponse(eventScheduleId, list);
-  }
-
-  public List<SeatMapDetail> getSeatMapOnly(Long eventScheduleId) {
-    Long venueId = findVenueId(eventScheduleId);
-    List<Seat> seats = findVenueSeats(venueId);
-    Map<Long, String> classMap = findSeatClassNameMap();
-    Set<Long> bookedIds = findBookedSeatIds(eventScheduleId);
-
-    return seats.stream()
-        .map(seat -> new SeatMapDetail(seat.getSeatId(), seat.getRow(), seat.getCol(),
-            classMap.get(seat.getSeatClassId()), bookedIds.contains(seat.getSeatId())))
-        .collect(Collectors.toList());
-  }
-
-  private Long findVenueId(Long scheduleId) {
-    return eventScheduleRepository.findById(scheduleId)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid schedule: " + scheduleId))
-        .getVenueId();
-  }
-
-  private List<Seat> findVenueSeats(Long venueId) {
-    return seatRepository.findByVenueId(venueId);
-  }
-
-  private List<SeatClass> findAllSeatClasses() {
-    return seatClassRepository.findAll();
-  }
-
-  private Map<Long, String> findSeatClassNameMap() {
-    return findAllSeatClasses().stream()
-        .collect(Collectors.toMap(SeatClass::getSeatClassId, SeatClass::getClassName));
-  }
-
-  private Map<Long, Long> findTotalSeatsByClass(Long venueId) {
-    return findVenueSeats(venueId).stream()
-        .collect(Collectors.groupingBy(Seat::getSeatClassId, Collectors.counting()));
-  }
-
-  private List<Booking> findBookedSeats(Long scheduleId) {
-    return bookingRepository.findByEventScheduleIdAndStatus(scheduleId, Booking.Booked.BOOKED);
-  }
-
-  private Map<Long, Long> findBookedSeatsCount(Long scheduleId) {
-    return findBookedSeats(scheduleId).stream().map(Booking::getSeatId)
-        .map(seatRepository::findById).filter(Optional::isPresent).map(Optional::get)
-        .collect(Collectors.groupingBy(Seat::getSeatClassId, Collectors.counting()));
-  }
-
-  private Set<Long> findBookedSeatIds(Long scheduleId) {
-    return findBookedSeats(scheduleId).stream().map(Booking::getSeatId).collect(Collectors.toSet());
-  }
-
-  private Map<Long, Integer> findSeatClassPriceMap(Long eventScheduleId) {
+    Long venueId = getVenueId(eventScheduleId);
+    List<Seat> venueSeats = seatRepository.findByVenueId(venueId);
+    List<Booking> bookedBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, Booking.Booked.BOOKED);
+    List<Booking> pendingBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, Booking.Booked.PENDING);
     List<Price> prices = priceRepository.findByEventScheduleId(eventScheduleId);
-    return prices.stream().collect(Collectors.toMap(Price::getSeatClassId, Price::getPrice));
+    List<SeatClass> seatClasses = seatClassRepository.findAll();
+
+    Set<Long> bookedSeatIds = bookedBookings.stream()
+        .map(Booking::getSeatId)
+        .collect(Collectors.toSet());
+    bookedSeatIds.addAll(pendingBookings.stream()
+        .map(Booking::getSeatId)
+        .collect(Collectors.toSet()));
+
+    Map<Long, Long> totalSeatsByClass = venueSeats.stream()
+        .collect(Collectors.groupingBy(Seat::getSeatClassId, Collectors.counting()));
+
+    Map<Long, Long> bookedSeatsByClass = venueSeats.stream()
+        .filter(seat -> bookedSeatIds.contains(seat.getSeatId()))
+        .collect(Collectors.groupingBy(Seat::getSeatClassId, Collectors.counting()));
+
+    Map<Long, Integer> priceMap = prices.stream()
+        .collect(Collectors.toMap(Price::getSeatClassId, Price::getPrice));
+
+    List<SeatGradeRemaining> seatGradeList = seatClasses.stream()
+        .map(sc -> {
+          long total = totalSeatsByClass.getOrDefault(sc.getSeatClassId(), 0L);
+          long booked = bookedSeatsByClass.getOrDefault(sc.getSeatClassId(), 0L);
+          int remain = (int) (total - booked);
+          int price = priceMap.getOrDefault(sc.getSeatClassId(), 0);
+          return new SeatGradeRemaining(sc.getClassName(), remain, price);
+        })
+        .collect(Collectors.toList());
+
+    return new EventScheduleSeatResponse(eventScheduleId, seatGradeList);
   }
 
   public List<SeatMapDetail> getSeatMapOnlyByGrade(Long eventScheduleId, String seatGrade) {
-    Long venueId = findVenueId(eventScheduleId);
-    List<Seat> seats = findVenueSeats(venueId);
-    Map<Long, String> classMap = findSeatClassNameMap();
-    Set<Long> bookedIds = findBookedSeatIds(eventScheduleId);
+    Long venueId = getVenueId(eventScheduleId);
+    List<Seat> seats = seatRepository.findByVenueId(venueId);
+    List<Booking> bookedBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, Booking.Booked.BOOKED);
+    List<Booking> pendingBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, Booking.Booked.PENDING);
+    List<SeatClass> seatClasses = seatClassRepository.findAll();
+
+    Set<Long> bookedSeatIds = bookedBookings.stream()
+        .map(Booking::getSeatId)
+        .collect(Collectors.toSet());
+    bookedSeatIds.addAll(pendingBookings.stream()
+        .map(Booking::getSeatId)
+        .collect(Collectors.toSet()));
+
+    Map<Long, String> classMap = seatClasses.stream()
+        .collect(Collectors.toMap(SeatClass::getSeatClassId, SeatClass::getClassName));
 
     List<SeatMapDetail> result = seats.stream()
         .filter(seat -> seatGrade.equalsIgnoreCase(classMap.get(seat.getSeatClassId())))
-        .map(seat -> new SeatMapDetail(seat.getSeatId(), seat.getRow(), seat.getCol(),
-            classMap.get(seat.getSeatClassId()), bookedIds.contains(seat.getSeatId())))
+        .map(seat -> new SeatMapDetail(
+            seat.getSeatId(),
+            seat.getRow(),
+            seat.getCol(),
+            classMap.get(seat.getSeatClassId()),
+            bookedSeatIds.contains(seat.getSeatId())))
         .collect(Collectors.toList());
 
     if (result.isEmpty()) {
@@ -127,4 +133,9 @@ public class BookingSeatService {
     return result;
   }
 
+  private Long getVenueId(Long scheduleId) {
+    return eventScheduleRepository.findById(scheduleId)
+        .orElseThrow(() -> new BusinessException("존재하지 않는 이벤트 스케줄입니다.", "EVENT_SCHEDULE_NOT_FOUND"))
+        .getVenueId();
+  }
 }
