@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.pyokemon.event.dto.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
 import com.pyokemon.event.repository.*;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class BookingSeatService {
@@ -131,6 +134,20 @@ public class BookingSeatService {
     }
 
     return result;
+  }
+
+  @Transactional(readOnly = false)
+  @Scheduled(cron = "0 */5 * * * *")
+  public void deletePendingBookings() {
+    List<Booking> pendingBookings = bookingRepository.findByStatus(Booking.Booked.PENDING);
+
+    if (pendingBookings.isEmpty()) return;
+
+    for (Booking booking : pendingBookings) {
+      bookingRepository.delete(booking);
+      log.info("삭제된 예약(PENDING): bookingId={}, seatId={}, eventScheduleId={}",
+              booking.getBookingId(), booking.getSeatId(), booking.getEventScheduleId());
+    }
   }
 
   private Long getVenueId(Long scheduleId) {

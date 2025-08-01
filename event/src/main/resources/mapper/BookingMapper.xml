@@ -23,4 +23,12 @@
         VALUES (#{eventScheduleId}, #{accountId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt}, #{seatId})
     </insert>
 
+    <select id="findByStatus" resultType="Booking">
+        SELECT * FROM tb_booking WHERE status = #{status}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM tb_booking WHERE booking_id = #{bookingId}
+    </delete>
+
 </mapper>
