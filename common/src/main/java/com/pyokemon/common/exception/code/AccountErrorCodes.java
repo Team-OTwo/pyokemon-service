@@ -13,6 +13,7 @@ public final class AccountErrorCodes {
   // 인증 관련 에러
   public static final String LOGIN_FAILED = "LOGIN_FAILED";
   public static final String INVALID_LOGIN = "INVALID_LOGIN";
+  public static final String PASSWORD_MATCH = "PASSWORD_MATCH";
   public static final String PASSWORD_MISMATCH = "PASSWORD_MISMATCH";
   public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
   public static final String TOKEN_INVALID = "TOKEN_INVALID";
@@ -41,6 +42,10 @@ public final class AccountErrorCodes {
   public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
   public static final String SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
   public static final String DATABASE_ERROR = "DATABASE_ERROR";
+
+  // 디바이스 에러
+  public static final String DEVICE_NOT_FOUND = "DEVICE_NOT_FOUND";
+  public static final String DEVICE_ALREADY_REGISTERED = "DEVICE_ALREADY_REGISTERED";
 
   private AccountErrorCodes() {
     throw new UnsupportedOperationException("상수 클래스는 인스턴스를 생성할 수 없습니다");

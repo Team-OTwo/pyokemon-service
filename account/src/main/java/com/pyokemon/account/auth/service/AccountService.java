@@ -40,19 +40,13 @@ public class AccountService {
     log.info("로그인 시도: {}", request.getLoginId());
     
     // 계정 조회
-    Optional<Account> accountOpt = accountRepository.findByLoginId(request.getLoginId());
+    Optional<Account> accountOpt = accountRepository.findByLoginIdAndStatus(request.getLoginId(), AccountStatus.ACTIVE);
     if (accountOpt.isEmpty()) {
       log.warn("로그인 실패: 계정을 찾을 수 없음 - {}", request.getLoginId());
-      throw new BusinessException("로그인 ID 또는 비밀번호가 올바르지 않습니다.", AccountErrorCodes.INVALID_LOGIN);
+      throw new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
     }
 
     Account account = accountOpt.get();
-
-    // 계정 상태 확인
-    if (account.getStatus() == AccountStatus.DELETED) {
-      log.warn("로그인 실패: 삭제된 계정 - {}", request.getLoginId());
-      throw new BusinessException("삭제된 계정입니다.", AccountErrorCodes.ACCOUNT_DELETED);
-    }
 
     // 비밀번호 확인
     if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
@@ -155,7 +149,7 @@ public class AccountService {
     // 3. 새 비밀번호가 현재 비밀번호와 같은지 확인
     if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
         log.warn("비밀번호 변경 실패: 새 비밀번호가 현재 비밀번호와 동일함 - ID: {}", accountId);
-        throw new BusinessException("새 비밀번호는 현재 비밀번호와 달라야 합니다.", AccountErrorCodes.PASSWORD_MISMATCH);
+        throw new BusinessException("새 비밀번호는 현재 비밀번호와 달라야 합니다.", AccountErrorCodes.PASSWORD_MATCH);
     }
 
     // 4. 새 비밀번호 암호화 및 저장
