@@ -66,7 +66,12 @@ subprojects {
 task installGitHooks(type: Copy) {
     from file("${rootProject.projectDir}/githook/pre-commit")
     into file("${rootProject.projectDir}/.git/hooks")
-    filePermissions.set(0755) // Make the hook executable
+    fileMode 0755 // Make the hook executable
+    
+    // CI 환경에서는 실행하지 않음
+    onlyIf {
+        !System.getenv('CI') && !System.getenv('GITHUB_ACTIONS')
+    }
 }
 
 // Root project build also depends on spotlessApply and installGitHooks
