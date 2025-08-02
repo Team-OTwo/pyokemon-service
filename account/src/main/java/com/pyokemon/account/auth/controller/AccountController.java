@@ -1,5 +1,7 @@
 package com.pyokemon.account.auth.controller;
 
+import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
+import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,13 @@ public class AccountController {
   public ResponseEntity<ResponseDto<LoginResponseDto>> login(
       @Valid @RequestBody LoginRequestDto request) {
     LoginResponseDto response = accountService.login(request);
+    return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
+  }
+
+  @PostMapping("login/app")
+  public ResponseEntity<ResponseDto<AppLoginResponseDto>> appLogin(
+          @Valid @RequestBody AppLoginRequestDto request) {
+    AppLoginResponseDto response = accountService.appLogin(request);
     return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
   }
 

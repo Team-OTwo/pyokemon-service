@@ -4,6 +4,11 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.Optional;
 
+import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
+import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
+import com.pyokemon.account.user.entity.User;
+import com.pyokemon.account.user.repository.UserDeviceRepository;
+import com.pyokemon.account.user.repository.UserRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountService {
 
   private final AccountRepository accountRepository;
+  private final UserRepository userRepository;
+  private final UserDeviceRepository userDeviceRepository;
   private final PasswordEncoder passwordEncoder;
   private final TokenGenerator tokenGenerator;
   private final RedisTemplate<String, String> redisTemplate;
@@ -68,6 +75,61 @@ public class AccountService {
         .role(account.getRole())
         .accountId(account.getAccountId())
         .build();
+  }
+
+  @Transactional
+  public AppLoginResponseDto appLogin(AppLoginRequestDto request) {
+    log.info("로그인 시도: {}", request.getLoginId());
+
+    // 계정 조회
+    Optional<Account> accountOpt = accountRepository.findByLoginIdAndStatus(request.getLoginId(), AccountStatus.ACTIVE);
+    if (accountOpt.isEmpty()) {
+      log.warn("로그인 실패: 계정을 찾을 수 없음 - {}", request.getLoginId());
+      throw new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
+    }
+
+    Account account = accountOpt.get();
+
+    // 비밀번호 확인
+    if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+      log.warn("로그인 실패: 비밀번호 불일치 - {}", request.getLoginId());
+      throw new BusinessException("로그인 ID 또는 비밀번호가 올바르지 않습니다.", AccountErrorCodes.INVALID_LOGIN);
+    }
+
+    String role = account.getRole();
+    String deviceStatus = "REGISTERED";
+
+    if (role.equals("USER")){
+      Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
+
+      if (userOpt.isEmpty()){
+        throw new BusinessException("사용자 계정을 찾을 수 없습니다.", AccountErrorCodes.USER_NOT_FOUND);
+      }
+
+      User user = userOpt.get();
+
+      if (!userDeviceRepository.existsByUserId(user.getUserId())){
+        deviceStatus = "NOT_REGISTERED";
+      } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(), request.getDevice_number(), true)){
+        deviceStatus = "MISMATCHED";
+      }
+    }
+
+    // JWT 토큰 생성
+    String accessToken =
+            tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
+    String refreshToken =
+            tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
+
+    log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
+
+    return AppLoginResponseDto.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .role(account.getRole())
+            .accountId(account.getAccountId())
+            .deviceStatus(deviceStatus)
+            .build();
   }
 
   @Transactional

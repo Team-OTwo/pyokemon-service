@@ -38,7 +38,7 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authz -> authz
             // 공개 API
-            .requestMatchers("/api/login", "/api/users", "/api/tenants").permitAll()
+            .requestMatchers("/api/login", "/api/users", "/api/tenants", "/api/login/app").permitAll()
             // 관리자 전용 API
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // 테넌트 API (테넌트 본인 + 관리자)

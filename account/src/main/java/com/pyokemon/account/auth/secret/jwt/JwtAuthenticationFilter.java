@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private boolean isPublicApi(String requestURI) {
     String actualPath = requestURI.replace("/account", "");
-    return actualPath.equals("/api/login") || actualPath.equals("/api/users") || actualPath.equals("/api/tenants");
+    return actualPath.equals("/api/login") || actualPath.equals("/api/login/app") || actualPath.equals("/api/users") || actualPath.equals("/api/tenants");
   }
 
   private String extractAccountId(HttpServletRequest request) {
