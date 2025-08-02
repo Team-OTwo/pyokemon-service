@@ -3,11 +3,10 @@ package com.pyokemon.event.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.pyokemon.event.dto.BookingRequestDto;
+import com.pyokemon.event.dto.BookingResponseDto;
 import com.pyokemon.event.dto.EventScheduleSeatResponse;
 import com.pyokemon.event.dto.SeatMapDetail;
 import com.pyokemon.event.service.BookingSeatService;
@@ -41,4 +40,11 @@ public class BookingController {
     return ResponseEntity.ok(seatMap);
   }
 
+  @PostMapping("/booking")
+  public ResponseEntity<BookingResponseDto> createBooking(
+      @RequestBody BookingRequestDto bookingRequestDto,
+      @RequestHeader("X-Auth-AccountId") Long accountId) {
+    BookingResponseDto response = bookingSeatService.createBooking(bookingRequestDto, accountId);
+    return ResponseEntity.ok(response);
+  }
 }

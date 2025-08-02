@@ -6,16 +6,36 @@
 <mapper namespace="com.pyokemon.event.repository.BookingRepository">
 
     <select id="findByEventScheduleIdAndStatus" resultType="Booking">
-        SELECT booking_id, event_schedule_id, user_id, payment_id, status, created_at, updated_at, seat_id
+        SELECT booking_id, event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id
         FROM tb_booking
         WHERE event_schedule_id = #{param1}
               AND status = #{param2}
     </select>
 
+    <select id="findByEventScheduleIdAndAccountId" resultType="Booking">
+        SELECT booking_id, event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id
+        FROM tb_booking
+        WHERE event_schedule_id = #{param1}
+              AND account_id = #{param2}
+    </select>
+
     <select id="findById" resultType="Booking">
-        SELECT booking_id, event_schedule_id, user_id, payment_id, status, created_at, updated_at, seat_id
+        SELECT booking_id, event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id
         FROM tb_booking
         WHERE booking_id = #{param1}
     </select>
+
+    <insert id="insert" parameterType="Booking" useGeneratedKeys="true" keyProperty="bookingId">
+        INSERT INTO tb_booking (event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id)
+        VALUES (#{eventScheduleId}, #{accountId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt}, #{seatId})
+    </insert>
+
+    <select id="findByStatus" resultType="Booking">
+        SELECT * FROM tb_booking WHERE status = #{status}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM tb_booking WHERE booking_id = #{bookingId}
+    </delete>
 
 </mapper>
