@@ -31,12 +31,18 @@ jobs:
         with:
           gradle-version: 8.5
 
-      - name: Build with Gradle
+      - name: Build with Gradle (installGitHooks 제외)
         run: |
           # Gradle 버전 확인
           gradle --version
-          # installGitHooks 태스크 제외하고 빌드
-          gradle build -x test -x installGitHooks
+          # build 대신 assemble 태스크를 실행하여 installGitHooks 의존성 우회
+          gradle :account:assemble -x test
+
+      - name: Check build output
+        run: |
+          echo "빌드된 JAR 파일 확인:"
+          find . -name "*.jar"
+          ls -la account/build/libs/
 
       - name: Deploy to Synology NAS
         uses: appleboy/scp-action@master
@@ -45,9 +51,9 @@ jobs:
           username: ${{ secrets.NAS_USER }}
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
+          source: "account/build/libs/account-0.0.1.jar"
           target: "/volume1/docker/pyokemon/account-service"
-          strip_components: 2
+          strip_components: 3
 
       - name: Restart Service
         uses: appleboy/ssh-action@master
@@ -85,7 +91,7 @@ jobs:
             export PATH=$PATH:/usr/bin:/usr/local/java/jdk-21.0.5+11/bin/java
             export JAVA_HOME=$(dirname $(dirname $JAVA_PATH))
             
-            # 애플리케이션 실행!!
+            # 애플리케이션 실행
             nohup $JAVA_PATH -jar account-0.0.1.jar > app.log 2>&1 &
             echo $! > app.pid
             echo "배포 완료 (PID: $(cat app.pid))"
