@@ -25,40 +25,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'gradle'
-          
-      - name: Check if Gradle Wrapper exists
-        run: |
-          echo "Checking Gradle Wrapper files..."
-          ls -la
-          ls -la gradle || echo "gradle dir not found"
-          ls -la gradle/wrapper || echo "wrapper dir not found"
-          if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "gradle-wrapper.jar exists"
-          else
-            echo "gradle-wrapper.jar not found"
-            mkdir -p gradle/wrapper
-            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/master/gradle/wrapper/gradle-wrapper.jar
-            # 기존 properties 파일을 7.6.3 버전으로 생성합니다
-            echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-            echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-            echo "distributionUrl=https\://services.gradle.org/distributions/gradle-7.6.3-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
-            echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
-            echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          fi
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-           
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.6.3
 
       - name: Build with Gradle
         run: |
-          # Gradle 7.6.3 버전 명시적 사용
-          ./gradlew --version
+          # Gradle 버전 확인
+          gradle --version
           # installGitHooks 태스크 제외하고 빌드
-          ./gradlew build -x test -x installGitHooks
+          gradle build -x test -x installGitHooks
 
       - name: Deploy to Synology NAS
         uses: appleboy/scp-action@master
