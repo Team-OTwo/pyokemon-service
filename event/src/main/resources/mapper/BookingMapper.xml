@@ -12,6 +12,13 @@
               AND status = #{param2}
     </select>
 
+    <select id="findByEventScheduleIdAndAccountId" resultType="Booking">
+        SELECT booking_id, event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id
+        FROM tb_booking
+        WHERE event_schedule_id = #{param1}
+              AND account_id = #{param2}
+    </select>
+
     <select id="findById" resultType="Booking">
         SELECT booking_id, event_schedule_id, account_id, payment_id, status, created_at, updated_at, seat_id
         FROM tb_booking
