@@ -117,16 +117,16 @@ public class AccountService {
 
     // JWT 토큰 생성
     String accessToken =
-            tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
+            tokenGenerator.generateAccessToken(account.getAccountId(), role);
     String refreshToken =
-            tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
+            tokenGenerator.generateRefreshToken(account.getAccountId(), role);
 
-    log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
+    log.info("로그인 성공: {} (역할: {})", request.getLoginId(), role);
 
     return AppLoginResponseDto.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
-            .role(account.getRole())
+            .role(role)
             .accountId(account.getAccountId())
             .deviceStatus(deviceStatus)
             .build();
