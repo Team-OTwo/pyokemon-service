@@ -62,24 +62,35 @@ subprojects {
     build.dependsOn spotlessApply
 }
 
-// Task to install git hooks
-task installGitHooks(type: Copy) {
-    from file("${rootProject.projectDir}/githook/pre-commit")
-    into file("${rootProject.projectDir}/.git/hooks")
-    
-    // CI 환경에서는 실행하지 않음
-    onlyIf {
-        !System.getenv('CI') && !System.getenv('GITHUB_ACTIONS')
+// CI 환경인지 확인
+def isCiEnvironment = System.getenv('CI') != null || System.getenv('GITHUB_ACTIONS') != null
+
+// Task to install git hooks - 환경에 따라 다르게 구현
+if (isCiEnvironment) {
+    // CI 환경에서는 빈 태스크만 생성
+    task installGitHooks {
+        doFirst {
+            println "CI 환경에서는 Git hooks 설치를 건너뜁니다."
+        }
     }
-    
-    // Gradle 버전에 따라 적절한 API 사용
-    doFirst {
-        try {
-            filePermissions.set(0755)
-        } catch (Exception e) {
-            // 이전 버전 Gradle에서는 fileMode 사용
-            if (!System.getenv('CI') && !System.getenv('GITHUB_ACTIONS')) {
-                fileMode = 0755
+} else {
+    // 로컬 환경에서는 실제 hook 설치
+    task installGitHooks(type: Copy) {
+        from file("${rootProject.projectDir}/githook/pre-commit")
+        into file("${rootProject.projectDir}/.git/hooks")
+        
+        // 파일 모드 설정을 제거하고 doLast에서 쉘 명령으로 권한 설정
+        doLast {
+            def hookFile = new File("${rootProject.projectDir}/.git/hooks/pre-commit")
+            if (hookFile.exists()) {
+                exec {
+                    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+                        commandLine 'cmd', '/c', "attrib +x ${hookFile.absolutePath}"
+                    } else {
+                        commandLine 'chmod', '+x', hookFile.absolutePath
+                    }
+                }
+                println "Git hook 권한 설정 완료: ${hookFile.absolutePath}"
             }
         }
     }
