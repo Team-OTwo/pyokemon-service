@@ -34,7 +34,7 @@ public class AccountController {
     return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
   }
 
-  @PostMapping("login/app")
+  @PostMapping("/app/login")
   public ResponseEntity<ResponseDto<AppLoginResponseDto>> appLogin(
           @Valid @RequestBody AppLoginRequestDto request) {
     AppLoginResponseDto response = accountService.appLogin(request);
