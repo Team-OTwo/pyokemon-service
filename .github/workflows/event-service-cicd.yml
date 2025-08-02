@@ -85,7 +85,7 @@ jobs:
             export PATH=$PATH:/usr/bin:/usr/local/java/jdk-21.0.5+11/bin/java
             export JAVA_HOME=$(dirname $(dirname $JAVA_PATH))
             
-            # 애플리케이션 실행
+            # 애플리케이션 실행!!
             nohup $JAVA_PATH -jar event-0.0.1.jar > app.log 2>&1 &
             echo $! > app.pid
             echo "배포 완료 (PID: $(cat app.pid))"
