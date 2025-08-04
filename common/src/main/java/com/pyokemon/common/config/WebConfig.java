@@ -9,8 +9,10 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**").allowedOriginPatterns("*")
-        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*")
+    registry.addMapping("/**")
+        .allowedOrigins("https://pyokemon.synology.me", "http://localhost:5173","http://localhost:6080" )
+        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedHeaders("*")
         .allowCredentials(true);
   }
 }
