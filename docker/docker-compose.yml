@@ -43,7 +43,7 @@ services:
     container_name: pyokemon-payment-mysql
     environment:
       MYSQL_DATABASE: pyokemon_payment
-      MYSQL_USER: pyokemon_payment
+      MYSQL_USER: pyokemon
       MYSQL_PASSWORD: pyokemon123
       MYSQL_ROOT_PASSWORD: root_password
     ports:
