@@ -35,6 +35,20 @@ spring:
           max-idle: 8
           min-idle: 0
 
+# ACA-Py 설정
+acapy:
+  booking:
+    base-url: http://localhost:8002  # pyokemon-booking-ACA-Py
+    api-key: your-booking-api-key
+    wallet-id: booking-wallet
+  mediator:
+    base-url: http://localhost:8001  # pyokemon-mediator-ACA-Py  
+    api-key: your-mediator-api-key
+    wallet-id: mediator-wallet
+  webhook:
+    base-url: http://localhost:8084/did/webhooks
+    topic-prefix: /topic/
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pyokemon.did.entity 
