@@ -29,11 +29,23 @@ public class EventScheduleService {
     int total = eventScheduleRepository.getTotalCountByGenre(genre);
 
     for (EventItemResponseDTO event : events) {
-      event.setTotal(total); // 👈 각 아이템에 total 주입
+      event.setTotal(total);
     }
 
     return events;
   }
 
+  public List<EventItemResponseDTO> getEventSearch(String keyword, int offset, int limit,
+      String genre) {
+    List<EventItemResponseDTO> events =
+        eventScheduleRepository.selectEventSearchList(keyword, limit, offset, genre);
+    int total = eventScheduleRepository.getSearchTotalCount(keyword, genre);
+
+    for (EventItemResponseDTO event : events) {
+      event.setTotal(total);
+    }
+
+    return events;
+  }
 
 }

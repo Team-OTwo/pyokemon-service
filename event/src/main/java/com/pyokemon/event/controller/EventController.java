@@ -61,4 +61,13 @@ public class EventController {
     int offset = (page - 1) * size;
     return eventScheduleService.getConcertsByPage(genre, offset, size);
   }
+
+  // 검색
+  @GetMapping("/keyword")
+  public List<EventItemResponseDTO> getEventSearch(@RequestParam String keyword,
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "9") int size,
+      @RequestParam(defaultValue = "전체") String genre) {
+    int offset = (page - 1) * size;
+    return eventScheduleService.getEventSearch(keyword, offset, size, genre);
+  }
 }
