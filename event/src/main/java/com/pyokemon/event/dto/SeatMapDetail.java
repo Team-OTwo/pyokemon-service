@@ -16,8 +16,4 @@ public class SeatMapDetail {
   public boolean isBooked() {
     return isBooked;
   }
-
-  public void setBooked(boolean booked) {
-    isBooked = booked;
-  }
 }
