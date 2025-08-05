@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3e69f891-cf58-456a-9aa9-01077cb82d6d",
 		"name": "event",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33007023",
 		"_collection_link": "https://blue-moon-913939.postman.co/workspace/My-Workspace~dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=33007023"
 	},
@@ -12,7 +12,21 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8081/event/api/events/booking/1"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/booking/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"booking",
+						"1"
+					]
+				}
 			},
 			"response": []
 		},
@@ -29,7 +43,20 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8081/event/api/events/1"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"1"
+					]
+				}
 			},
 			"response": []
 		},
@@ -53,7 +80,19 @@
 						}
 					}
 				},
-				"url": "http://localhost:8081/event/api/events"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events"
+					]
+				}
 			},
 			"response": []
 		},
@@ -75,7 +114,20 @@
 					"mode": "raw",
 					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
 				},
-				"url": "http://localhost:8081/event/api/events/open-today"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/open-today",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"open-today"
+					]
+				}
 			},
 			"response": []
 		},
@@ -97,7 +149,20 @@
 					"mode": "raw",
 					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
 				},
-				"url": "http://localhost:8081/event/api/events/to-be-opened"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/to-be-opened",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"to-be-opened"
+					]
+				}
 			},
 			"response": []
 		},
@@ -174,7 +239,20 @@
 					"mode": "raw",
 					"raw": "{\r\n  \"eventScheduleId\": 1,\r\n  \"seatId\": 97\r\n}"
 				},
-				"url": "http://localhost:8081/event/api/events/booking"
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/booking",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"booking"
+					]
+				}
 			},
 			"response": []
 		}
