@@ -2,6 +2,8 @@ package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.event.entity.SavedEvent;
+import com.pyokemon.event.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,10 +16,6 @@ import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
-import com.pyokemon.event.repository.EventRepository;
-import com.pyokemon.event.repository.EventScheduleRepository;
-import com.pyokemon.event.repository.PriceRepository;
-import com.pyokemon.event.repository.VenueRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +28,7 @@ public class EventService {
   private final EventScheduleRepository eventScheduleRepository;
   private final VenueRepository venueRepository;
   private final PriceRepository priceRepository;
+  private final SavedEventRepository savedEventRepository;
 
 
   public EventDetailResponseDTO getEventDetailByEventId(Long eventId) {
@@ -118,6 +117,14 @@ public class EventService {
 
   private Long savePrice(Price price) {
     return priceRepository.save(price);
+  }
 
+  @Transactional
+  public Long saveEvent(Long eventId, Long accountId){
+    SavedEvent savedEvent = new SavedEvent();
+    savedEvent.setEventId(eventId);
+    savedEvent.setAccountId(accountId);
+
+    return savedEventRepository.save(savedEvent);
   }
 }

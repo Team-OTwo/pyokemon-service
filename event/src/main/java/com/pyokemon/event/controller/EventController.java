@@ -23,42 +23,49 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventController {
-  private final EventService eventService;
-  private final EventScheduleService eventScheduleService;
+    private final EventService eventService;
+    private final EventScheduleService eventScheduleService;
 
-  // 이벤트 등록
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public ResponseDto<EventResponseDto> registerEvent(
-      @Valid @RequestBody EventRegisterDto eventRegisterDto) {
-    EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
-    return ResponseDto.success(registeredEvent, "Event registered successfully");
-  }
+    // 이벤트 등록
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto<EventResponseDto> registerEvent(
+            @Valid @RequestBody EventRegisterDto eventRegisterDto) {
+        EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
+        return ResponseDto.success(registeredEvent, "Event registered successfully");
+    }
 
-  // 오늘 오픈 티켓
-  @GetMapping("/open-today")
-  public List<EventItemResponseDTO> getOpenTicketsToday() {
-    return eventScheduleService.getTodayOpenedTickets();
-  }
+    // 오늘 오픈 티켓
+    @GetMapping("/open-today")
+    public List<EventItemResponseDTO> getOpenTicketsToday() {
+        return eventScheduleService.getTodayOpenedTickets();
+    }
 
-  // 오픈 예정 티켓
-  @GetMapping("/to-be-opened")
-  public List<EventItemResponseDTO> getOpenTicketsToBeOpened() {
-    return eventScheduleService.getTicketsToBeOpened();
-  }
+    // 오픈 예정 티켓
+    @GetMapping("/to-be-opened")
+    public List<EventItemResponseDTO> getOpenTicketsToBeOpened() {
+        return eventScheduleService.getTicketsToBeOpened();
+    }
 
-  @GetMapping("/{eventId}")
-  public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId) {
-    EventDetailResponseDTO dto = eventService.getEventDetailByEventId(eventId);
-    return ResponseEntity.ok(dto);
-  }
+    // 공연 상세 조회
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId) {
+        EventDetailResponseDTO dto = eventService.getEventDetailByEventId(eventId);
+        return ResponseEntity.ok(dto);
+    }
 
-  // 장르별 리스트 조회
-  @GetMapping
-  public List<EventItemResponseDTO> getConcertsByPage(
-      @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "9") int size) {
-    int offset = (page - 1) * size;
-    return eventScheduleService.getConcertsByPage(genre, offset, size);
-  }
+    // 장르별 리스트 조회
+    @GetMapping
+    public List<EventItemResponseDTO> getConcertsByPage(
+            @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        int offset = (page - 1) * size;
+        return eventScheduleService.getConcertsByPage(genre, offset, size);
+    }
+
+    @PostMapping("/save/{eventId}")
+    public ResponseEntity<Long> saveEvent(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) {
+        Long savedEventId = eventService.saveEvent(eventId, accountId);
+        return ResponseEntity.ok(savedEventId);
+    }
 }
