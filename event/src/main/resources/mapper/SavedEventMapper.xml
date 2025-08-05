@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.event.repository.SavedEventRepository">
+
+<!--    <select id="saveEvent" resultType="SavedEvent">-->
+<!--        SELECT *-->
+<!--        FROM tb_saved_event-->
+<!--        WHERE event_schedule_id = #{eventScheduleId}-->
+<!--    </select>-->
+
+    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="savedEventId" keyColumn="saved_event_id">
+        INSERT INTO tb_saved_event (
+        saved_event_id,
+        event_id,
+        account_id,
+        created_at,
+        updated_at
+        ) VALUES (
+        #{savedEventId},
+        #{eventId},
+        #{accountId},
+        #{createdAt},
+        #{updatedAt}
+        )
+
+    </insert>
+
+</mapper>
+
