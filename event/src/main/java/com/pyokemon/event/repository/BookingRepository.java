@@ -9,4 +9,8 @@ import com.pyokemon.event.entity.Booking;
 @Mapper
 public interface BookingRepository {
   List<Booking> findByEventScheduleIdAndStatus(Long eventScheduleId, Booking.Booked status);
+  List<Booking> findByEventScheduleIdAndAccountId(Long eventScheduleId, Long accountId);
+  void insert(Booking booking);
+  List<Booking> findByStatus(Booking.Booked status);
+  void delete(Booking booking);
 }
