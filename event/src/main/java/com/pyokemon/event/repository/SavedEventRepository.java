@@ -6,4 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SavedEventRepository {
     Long save(SavedEvent savedEvent);
+    Long delete(Long accountId, Long eventId);
+    boolean existsByAccountIdAndEventId(Long accountId, Long eventId);
 }

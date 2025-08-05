@@ -6,28 +6,36 @@
 
 <mapper namespace="com.pyokemon.event.repository.SavedEventRepository">
 
-<!--    <select id="saveEvent" resultType="SavedEvent">-->
-<!--        SELECT *-->
-<!--        FROM tb_saved_event-->
-<!--        WHERE event_schedule_id = #{eventScheduleId}-->
-<!--    </select>-->
 
-    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="savedEventId" keyColumn="saved_event_id">
+    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="savedEventId"
+            keyColumn="saved_event_id">
         INSERT INTO tb_saved_event (
-        saved_event_id,
         event_id,
         account_id,
         created_at,
         updated_at
         ) VALUES (
-        #{savedEventId},
         #{eventId},
         #{accountId},
         #{createdAt},
         #{updatedAt}
         )
-
     </insert>
+
+    <delete id="delete" parameterType="SavedEvent">
+        DELETE FROM tb_saved_event
+        WHERE account_id = #{accountId}
+            AND event_id = #{eventId}
+
+    </delete>
+
+    <select id="existsByAccountIdAndEventId" resultType="boolean">
+        SELECT
+        EXISTS(SELECT 1
+        FROM tb_saved_event
+        WHERE account_id=#{accountId}
+        AND event_id=#{eventId})
+    </select>
 
 </mapper>
 
