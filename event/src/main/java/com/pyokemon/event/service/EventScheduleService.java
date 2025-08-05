@@ -24,7 +24,8 @@ public class EventScheduleService {
   }
 
   public List<EventItemResponseDTO> getConcertsByPage(String genre, int offset, int limit) {
-    List<EventItemResponseDTO> events = eventScheduleRepository.selectEventList(genre, limit, offset);
+    List<EventItemResponseDTO> events =
+        eventScheduleRepository.selectEventList(genre, limit, offset);
     int total = eventScheduleRepository.getTotalCountByGenre(genre);
 
     for (EventItemResponseDTO event : events) {
