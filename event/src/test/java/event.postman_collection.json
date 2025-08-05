@@ -3,8 +3,8 @@
 		"_postman_id": "3e69f891-cf58-456a-9aa9-01077cb82d6d",
 		"name": "event",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33007023",
-		"_collection_link": "https://blue-moon-913939.postman.co/workspace/My-Workspace~dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=33007023"
+		"_exporter_id": "47176954",
+		"_collection_link": "https://blue-moon-913939.postman.co/workspace/My-Workspace~dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=47176954"
 	},
 	"item": [
 		{
@@ -185,7 +185,7 @@
 					"raw": "{\r\n    \"tenantId\": 1,\r\n    \"title\": \"BTS 콘서트\",\r\n    \"ageLimit\": 12,\r\n    \"description\": \"BTS의 공연.\",\r\n    \"genre\": \"콘서트\",\r\n    \"thumbnailUrl\": \"\",\r\n    \"schedules\": [\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-01T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"venueId\": 1,\r\n            \"ticketOpenAt\": \"2026-01-01T10:00:00\",\r\n            \"eventDate\": \"2026-02-02T19:00:00\",\r\n            \"prices\": [\r\n                {\r\n                    \"seatClassId\": 1,\r\n                    \"price\": 150000\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8081/event/api/events?page=1&genre=콘서트&size=8",
+					"raw": "http://localhost:8081/event/api/events?page=1&genre=콘서트&size=9",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -207,7 +207,7 @@
 						},
 						{
 							"key": "size",
-							"value": "8"
+							"value": "9"
 						}
 					]
 				}
@@ -251,6 +251,125 @@
 						"api",
 						"events",
 						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "공연 검색",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/keyword?keyword=BTS&page=1&size=9&genre=전체",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"keyword"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "BTS"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "9"
+						},
+						{
+							"key": "genre",
+							"value": "전체"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "공연 정보 수정",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"eventId\": 1,\r\n  \"title\": \"수정된 공연 제목\",\r\n  \"ageLimit\": 12,\r\n  \"description\": \"수정된 공연 설명\",\r\n  \"genre\": \"뮤지컬\",\r\n  \"thumbnailUrl\": \"\",\r\n  \"status\": \"PENDING\",\r\n  \"schedules\": [\r\n    {\r\n      \"eventScheduleId\": 1,\r\n      \"venueId\": 1,\r\n      \"ticketOpenAt\": \"2025-08-15T10:00:00\",\r\n      \"eventDate\": \"2025-09-15T19:00:00\",\r\n      \"prices\": [\r\n        {\r\n          \"priceId\": 1,\r\n          \"seatClassId\": 1,\r\n          \"price\": 80000\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트별 등록 공연 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "관심 공연 등록, 삭제",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Auth-AccountId",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Auth-Role",
+						"value": "USER",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/save/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"save",
+						"1"
 					]
 				}
 			},
