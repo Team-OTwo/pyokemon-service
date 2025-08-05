@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class EventItemResponseDTO {
   private Long eventScheduleId;
   private Long eventId;

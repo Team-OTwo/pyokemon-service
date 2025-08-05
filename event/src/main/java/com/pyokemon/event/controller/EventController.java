@@ -13,9 +13,14 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
+import com.pyokemon.event.dto.EventScheduleDto;
+import com.pyokemon.event.dto.TenantEventListDto;
+import com.pyokemon.event.dto.EventUpdateDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
+
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +38,16 @@ public class EventController {
       @Valid @RequestBody EventRegisterDto eventRegisterDto) {
     EventResponseDto registeredEvent = eventService.registerEvent(eventRegisterDto);
     return ResponseDto.success(registeredEvent, "Event registered successfully");
+  }
+
+  // 이벤트 수정
+  @PutMapping("/{eventId}")
+  public ResponseDto<EventResponseDto> updateEvent(
+      @PathVariable Long eventId,
+      @Valid @RequestBody EventUpdateDto eventUpdateDto) {
+    eventUpdateDto.setEventId(eventId);
+    EventResponseDto updatedEvent = eventService.updateEvent(eventUpdateDto);
+    return ResponseDto.success(updatedEvent, "Event updated successfully");
   }
 
   // 오늘 오픈 티켓
@@ -70,4 +85,28 @@ public class EventController {
     int offset = (page - 1) * size;
     return eventScheduleService.getEventSearch(keyword, offset, size, genre);
   }
+  // 계정별 공연 목록 조회
+  @GetMapping("/my-events")
+  public ResponseDto<List<EventResponseDto>> getMyEvents(@RequestParam Long account_id) {
+    List<EventResponseDto> myEvents = eventService.getEventsByAccountId(account_id);
+    return ResponseDto.success(myEvents, "My events retrieved successfully");
+  }
+
+  // 테넌트별 공연 목록 조회 (테넌트 웹용)
+  @GetMapping("/tenant")
+  public ResponseDto<List<TenantEventListDto>> getTenantEventList(@RequestParam Long account_id) {
+    List<TenantEventListDto> events = eventService.getTenantEventListByAccountId(account_id);
+    return ResponseDto.success(events, "Tenant events retrieved successfully for account_id: " + account_id);
+  }
+
+                // 일정 등록 (기존 공연에 일정 추가)
+              @PostMapping("/{eventId}/schedules")
+              @ResponseStatus(HttpStatus.CREATED)
+              public ResponseDto<String> registerEventSchedule(
+                  @PathVariable Long eventId,
+                  @Valid @RequestBody EventScheduleDto eventScheduleDto) {
+                eventScheduleDto.setEventId(eventId);
+                eventScheduleService.registerEventSchedule(eventScheduleDto);
+                return ResponseDto.success("Event schedule registered successfully", "Event schedule registered successfully");
+              }
 }

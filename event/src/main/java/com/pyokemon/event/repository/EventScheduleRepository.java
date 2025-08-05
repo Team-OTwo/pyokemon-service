@@ -19,7 +19,7 @@ public interface EventScheduleRepository {
 
   Optional<EventSchedule> findById(Long id);
 
-  Long save(EventSchedule eventSchedule);
+  int save(EventSchedule eventSchedule);
 
   List<EventItemResponseDTO> selectEventList(@Param("genre") String genre,
       @Param("limit") int limit, @Param("offset") int offset);
@@ -30,5 +30,8 @@ public interface EventScheduleRepository {
       @Param("limit") int limit, @Param("offset") int offset, @Param("genre") String genre);
 
   int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
+  int updateEventSchedule(EventSchedule eventSchedule);
+
+  // For debugging
 
 }

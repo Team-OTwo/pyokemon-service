@@ -25,30 +25,42 @@
         </selectKey>
     </insert>
 
-
-    <select id="findById" resultType="EventSchedule" parameterType="long">
-        SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
-        FROM tb_event_schedule
-        WHERE event_schedule_id = #{param1}
-    </select>
+    
 
 
-    <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
-        SELECT
-            es.event_schedule_id,
-            es.event_id,
-            es.venue_id,
-            es.ticket_open_at,
-            es.event_date,
-            e.title AS title,
-            v.venue_name AS venue_name,
-            e.thumbnail_url
-        FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
-        WHERE DATE(es.ticket_open_at) = CURDATE()
-        LIMIT 9
-    </select>
+         <select id="findById" resultType="EventSchedule" parameterType="long">
+         SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
+         FROM tb_event_schedule
+         WHERE event_schedule_id = #{param1}
+     </select>
+
+     <update id="updateEventSchedule" parameterType="EventSchedule">
+         UPDATE tb_event_schedule SET
+             venue_id = #{venueId},
+             ticket_open_at = #{ticketOpenAt},
+             event_date = #{eventDate},
+             updated_at = #{updatedAt}
+         WHERE event_schedule_id = #{eventScheduleId}
+     </update>
+
+
+         <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
+         SELECT
+             es.event_schedule_id,
+             es.event_id,
+             es.venue_id,
+             es.ticket_open_at,
+             es.event_date,
+             e.title AS title,
+             v.venue_name AS venue_name,
+             e.genre,
+             e.thumbnail_url
+         FROM tb_event_schedule es
+                  JOIN tb_event e ON es.event_id = e.event_id
+                  JOIN tb_venue v ON es.venue_id = v.venue_id
+         WHERE DATE(es.ticket_open_at) = CURDATE()
+         LIMIT 9
+     </select>
 
     <select id="selectTicketsToBeOpened" resultType="EventItemResponseDTO">
         SELECT
@@ -78,7 +90,8 @@
             e.title AS title,
             v.venue_name AS venue_name,
             e.genre,
-            e.thumbnail_url
+            e.thumbnail_url,
+            e.status
         FROM tb_event_schedule es
                  JOIN tb_event e ON es.event_id = e.event_id
                  JOIN tb_venue v ON es.venue_id = v.venue_id
@@ -87,6 +100,7 @@
         <if test="genre != null and genre != '전체'">
             AND e.genre = #{genre}
         </if>
+            e.genre = #{genre}
             LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -136,6 +150,7 @@
              e.genre = #{genre} AND
         </if>
             e.status = 'APPROVED'
+            e.genre = #{genre}
     </select>
 
 
