@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,6 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
 
@@ -49,8 +49,8 @@ public class EventController {
 
     // 공연 상세 조회
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId) {
-        EventDetailResponseDTO dto = eventService.getEventDetailByEventId(eventId);
+    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) throws NotFoundException {
+        EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
         return ResponseEntity.ok(dto);
     }
 

@@ -42,7 +42,14 @@
         es.event_schedule_id,
         es.ticket_open_at,
         es.event_date,
-        v.venue_name
+        v.venue_name,
+        CASE
+        WHEN EXISTS (
+        SELECT 1 FROM tb_saved_event se
+        WHERE se.account_id = #{account_id} AND se.event_id = e.event_id
+        ) THEN TRUE
+        ELSE FALSE
+        END AS is_saved
         FROM tb_event e
         JOIN tb_event_schedule es ON es.event_id = e.event_id
         JOIN tb_venue v ON es.venue_id = v.venue_id
