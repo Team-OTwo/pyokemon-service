@@ -55,6 +55,7 @@ public class UserService {
             .name(request.getName())
             .phone(request.getPhone())
             .birth(request.getBirth())
+            .isVerified(false)
             .build();
 
     userRepository.insert(user);
