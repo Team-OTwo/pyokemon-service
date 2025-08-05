@@ -37,6 +37,10 @@ public class UserService {
       throw new BusinessException("이미 존재하는 계정입니다.",AccountErrorCodes.LOGIN_ID_DUPLICATED);
     }
 
+    if (!request.getPassword().equals(request.getPasswordCheck())) {
+      throw new BusinessException("비밀번호가 일치하지 않습니다.",AccountErrorCodes.PASSWORD_MISMATCH);
+    }
+
     Account account = Account.builder()
             .loginId(request.getLoginId())
             .password(passwordEncoder.encode(request.getPassword()))
@@ -60,6 +64,27 @@ public class UserService {
             .name(request.getName())
             .phone(request.getPhone())
             .birth(request.getBirth())
+            .build();
+  }
+
+  @Transactional(readOnly = true)
+  public UserDetailDto verifyUser(Long userId) {
+    User user = userRepository.findByUserId(userId)
+        .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
+
+    if (user.getIsVerified()) {
+      throw new BusinessException("이미 본인 인증이 완료되었습니다.",AccountErrorCodes.USER_ALREADY_VERIFIED);
+    }
+
+    user.setIsVerified(true);
+    userRepository.update(user);
+
+    return UserDetailDto.builder()
+            .userId(userId)
+            .name(user.getName())
+            .phone(user.getPhone())
+            .birth(user.getBirth())
+            .isVerified(true)
             .build();
   }
 

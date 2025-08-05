@@ -15,6 +15,9 @@ import com.pyokemon.account.user.service.UserService;
 import com.pyokemon.common.dto.ResponseDto;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,6 +34,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResponseDto.success(response, "사용자 등록 성공"));
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
+        String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+        Long userId = Long.parseLong(currentUserAccountId);
+        UserDetailDto response = userService.verifyUser(userId);
+        return ResponseEntity.ok(ResponseDto.success(response, "본인 인증 성공"));
+    }
+    
 
     // 사용자 계정 상세 조회 (사용자 본인만)
     @GetMapping("/profile")

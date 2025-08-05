@@ -40,6 +40,7 @@ public final class AccountErrorCodes {
 
   // 유저 관련 에러
   public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+  public static final String USER_ALREADY_VERIFIED = "USER_ALREADY_VERIFIED";
 
   // 시스템 에러
   public static final String INTERNAL_ERROR = "INTERNAL_ERROR";

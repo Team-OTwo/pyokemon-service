@@ -21,6 +21,7 @@ public class User {
   private String name;
   private String phone;
   private LocalDate birth;
+  private Boolean isVerified;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }
