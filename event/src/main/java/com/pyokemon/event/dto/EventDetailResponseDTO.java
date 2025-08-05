@@ -23,4 +23,6 @@ public class EventDetailResponseDTO {
 
   // venue
   private String venueName;
+
+  private boolean isSaved;
 }
