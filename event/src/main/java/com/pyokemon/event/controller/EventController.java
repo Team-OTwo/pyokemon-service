@@ -64,8 +64,9 @@ public class EventController {
     }
 
     @PostMapping("/save/{eventId}")
-    public ResponseEntity<Long> saveEvent(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) {
-        Long savedEventId = eventService.saveEvent(eventId, accountId);
-        return ResponseEntity.ok(savedEventId);
+    public ResponseEntity<String> saveEvent(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) {
+        return ResponseEntity.ok(eventService.saveEvent(accountId, eventId));
+
     }
+
 }
