@@ -1,18 +1,17 @@
 package com.pyokemon.event.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventScheduleDto;
+import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.entity.EventSchedule;
+import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
-import com.pyokemon.event.entity.Price;
-import com.pyokemon.event.dto.PriceDto;
-
-import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 
@@ -73,25 +72,16 @@ public class EventScheduleService {
   }
 
   private EventSchedule mapToEventSchedule(EventScheduleDto dto) {
-    EventSchedule eventSchedule = EventSchedule.builder()
-        .eventId(dto.getEventId())
-        .venueId(dto.getVenueId())
-        .ticketOpenAt(dto.getTicketOpenAt())
-        .eventDate(dto.getEventDate())
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
+    EventSchedule eventSchedule = EventSchedule.builder().eventId(dto.getEventId())
+        .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
+        .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
     return eventSchedule;
   }
 
   private Price mapToPrice(PriceDto dto) {
-    return Price.builder()
-        .eventScheduleId(dto.getEventScheduleId())
-        .seatClassId(dto.getSeatClassId())
-        .price(dto.getPrice())
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
+    return Price.builder().eventScheduleId(dto.getEventScheduleId())
+        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now()).build();
   }
 
 }

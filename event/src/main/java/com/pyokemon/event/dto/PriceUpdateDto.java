@@ -16,12 +16,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PriceUpdateDto {
 
-    private Long priceId;
+  private Long priceId;
 
-    @NotNull(message = "Seat class ID is required")
-    private Long seatClassId;
+  @NotNull(message = "Seat class ID is required")
+  private Long seatClassId;
 
-    @NotNull(message = "Price is required")
-    @Min(value = 0, message = "Price cannot be negative")
-    private Integer price;
-} 
+  @NotNull(message = "Price is required")
+  @Min(value = 0, message = "Price cannot be negative")
+  private Integer price;
+}

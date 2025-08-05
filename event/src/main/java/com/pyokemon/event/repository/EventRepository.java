@@ -11,9 +11,9 @@ import com.pyokemon.event.entity.Event;
 @Mapper
 public interface EventRepository {
   List<Event> findByTenantId(Long tenantId);
-  
+
   List<Event> findByAccountId(Long accountId);
-  
+
   List<TenantEventListDto> findTenantEventListByAccountId(Long accountId);
 
   List<Event> findByStatus(Event.EventStatus status);

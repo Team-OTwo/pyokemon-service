@@ -24,27 +24,27 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EventUpdateDto {
 
-    @NotNull(message = "Event ID is required")
-    private Long eventId;
+  @NotNull(message = "Event ID is required")
+  private Long eventId;
 
-    @NotBlank(message = "Title is required")
-    @Size(max = 100, message = "Title must be less than 100 characters")
-    private String title;
+  @NotBlank(message = "Title is required")
+  @Size(max = 100, message = "Title must be less than 100 characters")
+  private String title;
 
-    @NotNull(message = "Age limit is required")
-    @Min(value = 0, message = "Age limit cannot be negative")
-    private Long ageLimit;
+  @NotNull(message = "Age limit is required")
+  @Min(value = 0, message = "Age limit cannot be negative")
+  private Long ageLimit;
 
-    @NotBlank(message = "Description is required")
-    private String description;
+  @NotBlank(message = "Description is required")
+  private String description;
 
-    @NotBlank(message = "Genre is required")
-    private String genre;
+  @NotBlank(message = "Genre is required")
+  private String genre;
 
-    private String thumbnailUrl;
+  private String thumbnailUrl;
 
-    private EventStatus status;
+  private EventStatus status;
 
-    @Valid
-    private List<EventScheduleUpdateDto> schedules;
-} 
+  @Valid
+  private List<EventScheduleUpdateDto> schedules;
+}

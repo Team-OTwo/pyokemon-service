@@ -14,13 +14,11 @@ import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
 import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.dto.EventUpdateDto;
+import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
-
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,8 +40,7 @@ public class EventController {
 
   // 이벤트 수정
   @PutMapping("/{eventId}")
-  public ResponseDto<EventResponseDto> updateEvent(
-      @PathVariable Long eventId,
+  public ResponseDto<EventResponseDto> updateEvent(@PathVariable Long eventId,
       @Valid @RequestBody EventUpdateDto eventUpdateDto) {
     eventUpdateDto.setEventId(eventId);
     EventResponseDto updatedEvent = eventService.updateEvent(eventUpdateDto);
@@ -71,8 +68,8 @@ public class EventController {
   // 장르별 리스트 조회
   @GetMapping
   public List<EventItemResponseDTO> getConcertsByPage(
-      @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "9") int size) {
+      @RequestParam(defaultValue = "콘서트") String genre, @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "8") int size) {
     int offset = (page - 1) * size;
     return eventScheduleService.getConcertsByPage(genre, offset, size);
   }
@@ -96,17 +93,18 @@ public class EventController {
   @GetMapping("/tenant")
   public ResponseDto<List<TenantEventListDto>> getTenantEventList(@RequestParam Long account_id) {
     List<TenantEventListDto> events = eventService.getTenantEventListByAccountId(account_id);
-    return ResponseDto.success(events, "Tenant events retrieved successfully for account_id: " + account_id);
+    return ResponseDto.success(events,
+        "Tenant events retrieved successfully for account_id: " + account_id);
   }
 
-                // 일정 등록 (기존 공연에 일정 추가)
-              @PostMapping("/{eventId}/schedules")
-              @ResponseStatus(HttpStatus.CREATED)
-              public ResponseDto<String> registerEventSchedule(
-                  @PathVariable Long eventId,
-                  @Valid @RequestBody EventScheduleDto eventScheduleDto) {
-                eventScheduleDto.setEventId(eventId);
-                eventScheduleService.registerEventSchedule(eventScheduleDto);
-                return ResponseDto.success("Event schedule registered successfully", "Event schedule registered successfully");
-              }
+  // 일정 등록 (기존 공연에 일정 추가)
+  @PostMapping("/{eventId}/schedules")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseDto<String> registerEventSchedule(@PathVariable Long eventId,
+      @Valid @RequestBody EventScheduleDto eventScheduleDto) {
+    eventScheduleDto.setEventId(eventId);
+    eventScheduleService.registerEventSchedule(eventScheduleDto);
+    return ResponseDto.success("Event schedule registered successfully",
+        "Event schedule registered successfully");
+  }
 }

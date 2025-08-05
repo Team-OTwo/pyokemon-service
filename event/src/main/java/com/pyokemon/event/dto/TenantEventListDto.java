@@ -22,4 +22,4 @@ public class TenantEventListDto {
   private LocalDateTime eventDate;
   private String venueName;
   private EventStatus status;
-} 
+}
