@@ -4,12 +4,15 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.entity.SavedEvent;
 import com.pyokemon.event.repository.EventRepository;
 import com.pyokemon.event.repository.SavedEventRepository;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -24,8 +27,50 @@ class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
 
+
     @Test
-    void getEventDetailByEventId() {
+    void 공연상세정보조회_비회원() {
+        // given
+        Long eventId = 1L;
+        Long accountId = 1L; // 비회원 테스트
+
+        EventDetailResponseDTO mockDto = EventDetailResponseDTO.builder()
+                .eventId(eventId)
+                .title("테스트 공연")
+                .ageLimit(15L)
+                .description("공연 설명입니다")
+                .genre("뮤지컬")
+                .thumbnailUrl("http://image.url")
+                .eventScheduleId(100L)
+                .ticketOpenAt(LocalDateTime.of(2025, 8, 10, 10, 0))
+                .eventDate(LocalDateTime.of(2025, 8, 15, 19, 30))
+                .venueName("서울아트센터")
+                .isSaved(false)
+                .build();
+
+        when(eventRepository.findEventDetailByEventId(eventId)).thenReturn(mockDto);
+
+        // when
+        EventDetailResponseDTO result = null;
+        try {
+            result = eventService.getEventDetail(eventId, accountId);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // then
+        assertNotNull(result);
+        assertEquals(mockDto.getEventId(), result.getEventId());
+        assertEquals(mockDto.getTitle(), result.getTitle());
+        assertEquals(mockDto.getAgeLimit(), result.getAgeLimit());
+        assertEquals(mockDto.getDescription(), result.getDescription());
+        assertEquals(mockDto.getGenre(), result.getGenre());
+        assertEquals(mockDto.getThumbnailUrl(), result.getThumbnailUrl());
+        assertEquals(mockDto.getEventScheduleId(), result.getEventScheduleId());
+        assertEquals(mockDto.getTicketOpenAt(), result.getTicketOpenAt());
+        assertEquals(mockDto.getEventDate(), result.getEventDate());
+        assertEquals(mockDto.getVenueName(), result.getVenueName());
+        assertFalse(result.isSaved());
     }
 
     @Test
