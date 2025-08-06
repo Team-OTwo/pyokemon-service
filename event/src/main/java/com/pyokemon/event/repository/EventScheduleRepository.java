@@ -31,7 +31,5 @@ public interface EventScheduleRepository {
 
   int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
   int updateEventSchedule(EventSchedule eventSchedule);
-
-  // For debugging
-
+  
 }
