@@ -26,10 +26,18 @@
             #{createdAt},
             #{updatedAt}
         )
-        <selectKey resultType="long" keyProperty="priceId" order="AFTER">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
-    </insert>
-  
+                 <selectKey resultType="long" keyProperty="priceId" order="AFTER">
+             SELECT LAST_INSERT_ID()
+         </selectKey>
+     </insert>
+
+     <update id="updatePrice" parameterType="Price">
+         UPDATE tb_price SET
+             seat_class_id = #{seatClassId},
+             price = #{price},
+             updated_at = #{updatedAt}
+         WHERE price_id = #{priceId}
+     </update>
+     
 </mapper> 
 

@@ -17,7 +17,7 @@ public class EventMapper {
 
   public Event toEntity(EventRegisterDto dto) {
     dto.setStatus(Event.EventStatus.PENDING);
-    return Event.builder().tenantId(dto.getTenantId()).title(dto.getTitle())
+    return Event.builder().accountId(dto.getAccountId()).title(dto.getTitle())
         .ageLimit(dto.getAgeLimit()).description(dto.getDescription()).genre(dto.getGenre())
         .thumbnailUrl(dto.getThumbnailUrl()).status(dto.getStatus()).createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now()).build();
@@ -36,9 +36,17 @@ public class EventMapper {
   }
 
   public EventResponseDto toResponseDto(Event event) {
-    return EventResponseDto.builder().eventId(event.getEventId()).tenantId(event.getTenantId())
-        .title(event.getTitle()).ageLimit(event.getAgeLimit()).description(event.getDescription())
-        .genre(event.getGenre()).thumbnailUrl(event.getThumbnailUrl()).status(event.getStatus())
-        .createdAt(event.getCreatedAt()).updatedAt(event.getUpdatedAt()).build();
+    EventResponseDto responseDto = new EventResponseDto();
+    responseDto.setEventId(event.getEventId());
+    responseDto.setAccountId(event.getAccountId());
+    responseDto.setTitle(event.getTitle());
+    responseDto.setAgeLimit(event.getAgeLimit());
+    responseDto.setDescription(event.getDescription());
+    responseDto.setGenre(event.getGenre());
+    responseDto.setThumbnailUrl(event.getThumbnailUrl());
+    responseDto.setStatus(event.getStatus());
+    responseDto.setCreatedAt(event.getCreatedAt());
+    responseDto.setUpdatedAt(event.getUpdatedAt());
+    return responseDto;
   }
 }

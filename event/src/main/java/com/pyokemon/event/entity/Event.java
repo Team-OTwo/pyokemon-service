@@ -16,7 +16,7 @@ import lombok.Setter;
 public class Event {
 
   private Long eventId;
-  private Long tenantId;
+  private Long accountId;
   private String title;
   private Long ageLimit;
   private String description;

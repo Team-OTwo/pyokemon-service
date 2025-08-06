@@ -15,15 +15,12 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventResponseDto {
+public class TenantEventListDto {
   private Long eventId;
-  private Long accountId;
-  private String title;
-  private Long ageLimit;
-  private String description;
-  private String genre;
+  private Long eventScheduleId;
   private String thumbnailUrl;
+  private String title;
+  private LocalDateTime eventDate;
+  private String venueName;
   private EventStatus status;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 }

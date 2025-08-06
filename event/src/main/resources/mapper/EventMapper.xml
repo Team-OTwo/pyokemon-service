@@ -1,53 +1,198 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
-    <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
+
+    <resultMap id="EventResultMap" type="com.pyokemon.event.entity.Event">
+        <id column="event_id" property="eventId"/>
+        <result column="account_id" property="accountId"/>
+        <result column="title" property="title"/>
+        <result column="age_limit" property="ageLimit"/>
+        <result column="description" property="description"/>
+        <result column="genre" property="genre"/>
+        <result column="thumbnail_url" property="thumbnailUrl"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findById" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE event_id = #{eventId}
+    </select>
+
+    <select id="findByTenantId" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE account_id = #{tenantId}
+    </select>
+
+    <select id="findByAccountId" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE account_id = #{accountId}
+    </select>
+
+    <select id="findTenantEventListByAccountId" resultType="com.pyokemon.event.dto.TenantEventListDto">
+        SELECT 
+            e.event_id as eventId,
+            es.event_schedule_id as eventScheduleId,
+            e.thumbnail_url as thumbnailUrl,
+            e.title,
+            es.event_date as eventDate,
+            v.venue_name as venueName,
+            e.status
+        FROM tb_event e
+        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
+        WHERE e.account_id = #{accountId}
+        ORDER BY es.event_date ASC
+    </select>
+
+    <select id="findByStatus" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE status = #{status}
+    </select>
+
+    <select id="findByGenre" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE genre = #{genre}
+    </select>
+
+    <select id="findByTitleContainingIgnoreCase" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE LOWER(title) LIKE LOWER(CONCAT('%', #{title}, '%'))
+    </select>
+
+    <select id="findByAgeLimit" resultMap="EventResultMap">
+        SELECT * FROM tb_event WHERE age_limit = #{ageLimit}
+    </select>
+
+    <insert id="save" parameterType="com.pyokemon.event.entity.Event" useGeneratedKeys="true" keyProperty="eventId">
         INSERT INTO tb_event (
-            tenant_id,
-            title,
-            age_limit,
-            description,
-            genre,
-            thumbnail_url,
-            status,
-            created_at,
-            updated_at
+            account_id, title, age_limit, description, genre, 
+            thumbnail_url, status, created_at, updated_at
         ) VALUES (
-            #{tenantId},
-            #{title},
-            #{ageLimit},
-            #{description},
-            #{genre},
-            #{thumbnailUrl},
-            #{status},
-            #{createdAt},
-            #{updatedAt}
+            #{accountId}, #{title}, #{ageLimit}, #{description}, #{genre}, 
+            #{thumbnailUrl}, #{status}, #{createdAt}, #{updatedAt}
         )
         <selectKey resultType="long" keyProperty="eventId" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
 
-    <select id="findEventDetailByEventId" resultType="EventDetailResponseDTO">
-        SELECT
-        e.event_id,
-        e.title,
-        e.age_limit,
-        e.description,
-        e.genre,
-        e.thumbnail_url,
-        es.event_schedule_id,
-        es.ticket_open_at,
-        es.event_date,
-        v.venue_name
-        FROM tb_event e
-        JOIN tb_event_schedule es ON es.event_id = e.event_id
-        JOIN tb_venue v ON es.venue_id = v.venue_id
+    <update id="updateEvent" parameterType="com.pyokemon.event.entity.Event">
+        UPDATE tb_event SET
+            title = #{title},
+            age_limit = #{ageLimit},
+            description = #{description},
+            genre = #{genre},
+            thumbnail_url = #{thumbnailUrl},
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE event_id = #{eventId}
+    </update>
 
-        WHERE e.event_id = #{event_id}
+    <select id="findEventDetailByEventId" resultType="com.pyokemon.event.dto.EventDetailResponseDTO">
+        SELECT 
+            e.event_id as eventId,
+            e.account_id as accountId,
+            e.title,
+            e.age_limit as ageLimit,
+            e.description,
+            e.genre,
+            e.thumbnail_url as thumbnailUrl,
+            e.status,
+            e.created_at as createdAt,
+            e.updated_at as updatedAt
+        FROM tb_event e
+        WHERE e.event_id = #{eventId}
+    </select>
+
+    <resultMap id="TenantEventDetailResultMap" type="com.pyokemon.event.dto.TenantEventDetailResponseDTO">
+        <id column="event_id" property="eventId"/>
+        <result column="title" property="title"/>
+        <result column="age_limit" property="ageLimit"/>
+        <result column="description" property="description"/>
+        <result column="genre" property="genre"/>
+        <result column="thumbnail_url" property="thumbnailUrl"/>
+        <result column="status" property="status"/>
+        <result column="event_schedule_id" property="eventScheduleId"/>
+        <result column="ticket_open_at" property="ticketOpenAt"/>
+        <result column="event_date" property="eventDate"/>
+        <result column="venue_name" property="venueName"/>
+        <collection property="prices" ofType="com.pyokemon.event.dto.TenantEventDetailResponseDTO$PriceInfo">
+            <id column="price_id" property="priceId"/>
+            <result column="seat_class_id" property="seatClassId"/>
+            <result column="class_name" property="className"/>
+            <result column="price" property="price"/>
+        </collection>
+    </resultMap>
+
+    <select id="findTenantEventDetailByEventId" resultMap="TenantEventDetailResultMap">
+        SELECT 
+            e.event_id,
+            e.title,
+            e.age_limit,
+            e.description,
+            e.genre,
+            e.thumbnail_url,
+            e.status,
+            es.event_schedule_id,
+            es.ticket_open_at,
+            es.event_date,
+            v.venue_name,
+            p.price_id,
+            p.seat_class_id,
+            sc.class_name,
+            p.price
+        FROM tb_event e
+        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
+        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id
+        LEFT JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        WHERE e.event_id = #{eventId}
+        ORDER BY sc.priority ASC
+    </select>
+
+    <resultMap id="TenantBookingDetailResultMap" type="com.pyokemon.event.dto.TenantBookingDetailResponseDTO">
+        <id column="event_id" property="eventId"/>
+        <result column="title" property="title"/>
+        <result column="genre" property="genre"/>
+        <result column="status" property="status"/>
+        <result column="event_schedule_id" property="eventScheduleId"/>
+        <result column="ticket_open_at" property="ticketOpenAt"/>
+        <result column="event_date" property="eventDate"/>
+        <result column="venue_name" property="venueName"/>
+        <collection property="bookingStatus" ofType="com.pyokemon.event.dto.TenantBookingDetailResponseDTO$BookingStatusInfo">
+            <result column="seat_class_id" property="seatClassId"/>
+            <result column="class_name" property="className"/>
+            <result column="total_seats" property="totalSeats"/>
+            <result column="booked_seats" property="bookedSeats"/>
+            <result column="available_seats" property="availableSeats"/>
+            <result column="price" property="price"/>
+            <result column="booking_rate" property="bookingRate"/>
+        </collection>
+    </resultMap>
+
+    <select id="findTenantBookingDetailByEventScheduleId" resultMap="TenantBookingDetailResultMap">
+        SELECT 
+            e.event_id,
+            e.title,
+            e.genre,
+            e.status,
+            es.event_schedule_id,
+            es.ticket_open_at,
+            es.event_date,
+            v.venue_name,
+            sc.seat_class_id,
+            sc.class_name,
+            COUNT(s.seat_id) as total_seats,
+            COUNT(CASE WHEN b.booking_id IS NOT NULL THEN 1 END) as booked_seats,
+            COUNT(CASE WHEN b.booking_id IS NULL THEN 1 END) as available_seats,
+            p.price,
+            ROUND(COUNT(CASE WHEN b.booking_id IS NOT NULL THEN 1 END) * 100.0 / COUNT(s.seat_id), 2) as booking_rate
+        FROM tb_event e
+        JOIN tb_event_schedule es ON e.event_id = es.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_seat s ON v.venue_id = s.venue_id
+        JOIN tb_seat_class sc ON s.seat_class_id = sc.seat_class_id
+        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id AND sc.seat_class_id = p.seat_class_id
+        LEFT JOIN tb_booking b ON es.event_schedule_id = b.event_schedule_id AND s.seat_id = b.seat_id AND b.status = 'BOOKED'
+        WHERE es.event_schedule_id = #{eventScheduleId}
+        GROUP BY sc.seat_class_id, sc.class_name, p.price
+        ORDER BY sc.priority ASC
     </select>
 
 </mapper>
