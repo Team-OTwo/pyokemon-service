@@ -41,6 +41,9 @@ public class EventService {
         if (accountId != null) {
             boolean isSaved = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
             dto.setSaved(isSaved);
+        }else{
+            // 비회원이면 관심공연 isSaved 다 false로 설정
+            dto.setSaved(false);
         }
         return dto;
     }

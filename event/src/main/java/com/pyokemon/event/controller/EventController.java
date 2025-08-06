@@ -49,7 +49,7 @@ public class EventController {
 
     // 공연 상세 조회
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) throws NotFoundException {
+    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId, @RequestHeader(value = "X-Auth-AccountId", required = false) Long accountId) throws NotFoundException {
         EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
         return ResponseEntity.ok(dto);
     }
