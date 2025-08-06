@@ -38,8 +38,8 @@ public class UserController {
     @PostMapping("/verify")
     public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        UserDetailDto response = userService.verifyUser(userId);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        UserDetailDto response = userService.verifyUser(accountId);
         return ResponseEntity.ok(ResponseDto.success(response, "본인 인증 성공"));
     }
     
@@ -48,8 +48,8 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<ResponseDto<UserDetailDto>> getUserProfile() {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        UserDetailDto response = userService.getUserProfile(userId);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        UserDetailDto response = userService.getUserProfile(accountId);
         return ResponseEntity.ok(ResponseDto.success(response, "사용자 정보 조회 성공"));
     }
 
@@ -59,8 +59,8 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequestDto request
             ) {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        UserDetailDto response = userService.updateUserProfile(userId, request);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        UserDetailDto response = userService.updateUserProfile(accountId, request);
         return ResponseEntity.ok(ResponseDto.success(response, "사용자 정보 수정 성공"));
     }
 
@@ -68,8 +68,8 @@ public class UserController {
     @DeleteMapping("/profile")
     public ResponseEntity<ResponseDto<Void>> deleteUser() {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        userService.deleteUser(userId);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        userService.deleteUser(accountId);
         return ResponseEntity.ok(ResponseDto.success("사용자 탈퇴 성공"));
     }
 
@@ -79,8 +79,8 @@ public class UserController {
             @Valid @RequestBody RegisterDeviceRequestDto request
             ) {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        userService.registerUserDevice(userId, request);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        userService.registerUserDevice(accountId, request);
         return ResponseEntity.ok(ResponseDto.success("기기 등록 성공"));
     }
 
@@ -90,8 +90,8 @@ public class UserController {
             @PathVariable String deviceId
             ) {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        Long userId = Long.parseLong(currentUserAccountId);
-        userService.deleteUserDevice(userId, deviceId);
+        Long accountId = Long.parseLong(currentUserAccountId);
+        userService.deleteUserDevice(accountId, deviceId);
         return ResponseEntity.ok(ResponseDto.success("기기 삭제 성공"));
     }
 }

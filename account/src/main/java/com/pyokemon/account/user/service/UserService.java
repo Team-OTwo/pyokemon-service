@@ -20,6 +20,8 @@ import com.pyokemon.account.auth.entity.AccountStatus;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -69,8 +71,8 @@ public class UserService {
   }
 
   @Transactional
-  public UserDetailDto verifyUser(Long userId) {
-    User user = userRepository.findByAccountId(userId)
+  public UserDetailDto verifyUser(Long accountId) {
+    User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (user.getIsVerified()) {
@@ -82,7 +84,6 @@ public class UserService {
     userRepository.update(user);
 
     return UserDetailDto.builder()
-            .userId(userId)
             .name(user.getName())
             .phone(user.getPhone())
             .birth(user.getBirth())
@@ -92,8 +93,8 @@ public class UserService {
 
   // 사용자 정보 조회
   @Transactional(readOnly = true)
-  public UserDetailDto getUserProfile(Long userId) {
-    User user = userRepository.findByAccountId(userId)
+  public UserDetailDto getUserProfile(Long accountId) {
+    User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     return UserDetailDto.builder()
@@ -105,9 +106,9 @@ public class UserService {
 
   // 사용자 정보 수정
   @Transactional
-  public UserDetailDto updateUserProfile(Long userId,
+  public UserDetailDto updateUserProfile(Long accountId,
                                          UpdateUserRequestDto request) {
-    User user = userRepository.findByAccountId(userId)
+    User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     user.setName(request.getName());
@@ -124,8 +125,8 @@ public class UserService {
   }
 
   @Transactional
-  public void deleteUser(Long userId) {
-    User user = userRepository.findByAccountId(userId)
+  public void deleteUser(Long accountId) {
+    User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     
@@ -133,8 +134,8 @@ public class UserService {
   }
 
   @Transactional
-  public void registerUserDevice(Long userId, RegisterDeviceRequestDto request) {
-    User user = userRepository.findByAccountId(userId)
+  public void registerUserDevice(Long accountId, RegisterDeviceRequestDto request) {
+    User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (userDeviceRepository.existsByDeviceNumberAndIsValid(request.getDeviceNumber(), true)) {
@@ -153,8 +154,14 @@ public class UserService {
   }
 
   @Transactional
-  public void deleteUserDevice(Long userId, String deviceNumber) {
-    UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(userId, deviceNumber, true)
+  public void deleteUserDevice(Long accountId, String deviceNumber) {
+    Optional<User> userOpt = userRepository.findByAccountId(accountId);
+    if (userOpt.isEmpty()){
+      throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
+    }
+    User user = userOpt.get();
+
+    UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(user.getUserId(), deviceNumber, true)
         .orElseThrow(() -> new BusinessException("디바이스를 찾을 수 없습니다.",AccountErrorCodes.DEVICE_NOT_FOUND));
     
     userDevice.setIsValid(false);
