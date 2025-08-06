@@ -1,7 +1,9 @@
 package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.pyokemon.event.dto.*;
 import com.pyokemon.event.entity.SavedEvent;
 import com.pyokemon.event.repository.*;
 import org.apache.ibatis.javassist.NotFoundException;
@@ -9,11 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.event.dto.EventDetailResponseDTO;
-import com.pyokemon.event.dto.EventRegisterDto;
-import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -41,7 +38,7 @@ public class EventService {
         if (accountId != null) {
             boolean isSaved = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
             dto.setSaved(isSaved);
-        }else{
+        } else {
             // 비회원이면 관심공연 isSaved 다 false로 설정
             dto.setSaved(false);
         }
@@ -154,6 +151,17 @@ public class EventService {
             savedEventRepository.save(savedEvent);
             return "관심 공연으로 등록되었습니다";
         }
+    }
+
+    public List<EventItemResponseDTO> getSavedEvents(Long accountId, int offset, int limit) {
+        List<EventItemResponseDTO> events = savedEventRepository.findByAccountId(accountId, offset, limit);
+        int total = savedEventRepository.countTotalEventsByAccountId(accountId);
+
+        for (EventItemResponseDTO event : events) {
+            event.setTotal(total);
+        }
+
+        return events;
     }
 
 }

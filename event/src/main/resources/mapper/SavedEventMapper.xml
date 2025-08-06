@@ -33,5 +33,16 @@
         AND event_id=#{eventId})
     </select>
 
+    <select id="findByAccountId" resultType="EventItemResponseDTO">
+        SELECT se.event_id, e.title, es.event_date, es.event_schedule_id, e.thumbnail_url
+        FROM tb_saved_event se JOIN tb_event e ON se.event_id = e.event_id JOIN tb_event_schedule es ON e.event_id = es.event_id
+        WHERE se.account_id = #{accountId}
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countTotalEventsByAccountId" resultType="int">
+        SELECT COUNT(*) FROM tb_saved_event se WHERE se.account_id = #{accountId}
+    </select>
+
 </mapper>
 

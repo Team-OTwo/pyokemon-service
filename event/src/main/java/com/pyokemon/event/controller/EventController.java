@@ -2,6 +2,8 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.AccountErrorCodes;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -67,6 +69,17 @@ public class EventController {
     @PostMapping("/save/{eventId}")
     public ResponseEntity<String> saveEvent(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) {
         return ResponseEntity.ok(eventService.saveSavedEvent(accountId, eventId));
+    }
+
+    @GetMapping("/saved-events")
+    public List<EventItemResponseDTO> getSavedEvents(@RequestHeader("X-Auth-AccountId") Long accountId, @RequestParam(defaultValue = "1") int page,
+                                                     @RequestParam(defaultValue = "9") int size) {
+        if(accountId == null){
+            throw new BusinessException("로그인이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
+        }
+
+        int offset = (page - 1) * size;
+        return eventService.getSavedEvents(accountId, offset, size);
     }
 
 }
