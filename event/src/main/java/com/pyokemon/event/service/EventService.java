@@ -10,6 +10,7 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
+import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventScheduleUpdateDto;
 import com.pyokemon.event.dto.EventUpdateDto;
@@ -39,6 +40,10 @@ public class EventService {
 
   public EventDetailResponseDTO getEventDetailByEventId(Long eventId) {
     return eventRepository.findEventDetailByEventId(eventId);
+  }
+
+  public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
+    return eventRepository.findTenantEventDetailByEventId(eventId);
   }
 
   public List<EventResponseDto> getEventsByAccountId(Long accountId) {

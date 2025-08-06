@@ -13,6 +13,7 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
+import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventUpdateDto;
 import com.pyokemon.event.dto.TenantEventListDto;
@@ -96,6 +97,15 @@ public class EventController {
     return ResponseDto.success(events,
         "Tenant events retrieved successfully for account_id: " + account_id);
   }
+
+  // 테넌트용 이벤트 상세조회 (가격 정보 포함)
+  @GetMapping("/tenant/{eventId}/detail")
+  public ResponseDto<TenantEventDetailResponseDTO> getTenantEventDetail(@PathVariable Long eventId) {
+    TenantEventDetailResponseDTO eventDetail = eventService.getTenantEventDetailByEventId(eventId);
+    return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
+  }
+
+
 
   // 일정 등록 (기존 공연에 일정 추가)
   @PostMapping("/{eventId}/schedules")

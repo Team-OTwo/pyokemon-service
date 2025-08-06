@@ -99,4 +99,50 @@
         WHERE e.event_id = #{eventId}
     </select>
 
+    <resultMap id="TenantEventDetailResultMap" type="com.pyokemon.event.dto.TenantEventDetailResponseDTO">
+        <id column="event_id" property="eventId"/>
+        <result column="title" property="title"/>
+        <result column="age_limit" property="ageLimit"/>
+        <result column="description" property="description"/>
+        <result column="genre" property="genre"/>
+        <result column="thumbnail_url" property="thumbnailUrl"/>
+        <result column="status" property="status"/>
+        <result column="event_schedule_id" property="eventScheduleId"/>
+        <result column="ticket_open_at" property="ticketOpenAt"/>
+        <result column="event_date" property="eventDate"/>
+        <result column="venue_name" property="venueName"/>
+        <collection property="prices" ofType="com.pyokemon.event.dto.TenantEventDetailResponseDTO$PriceInfo">
+            <id column="price_id" property="priceId"/>
+            <result column="seat_class_id" property="seatClassId"/>
+            <result column="class_name" property="className"/>
+            <result column="price" property="price"/>
+        </collection>
+    </resultMap>
+
+    <select id="findTenantEventDetailByEventId" resultMap="TenantEventDetailResultMap">
+        SELECT 
+            e.event_id,
+            e.title,
+            e.age_limit,
+            e.description,
+            e.genre,
+            e.thumbnail_url,
+            e.status,
+            es.event_schedule_id,
+            es.ticket_open_at,
+            es.event_date,
+            v.venue_name,
+            p.price_id,
+            p.seat_class_id,
+            sc.class_name,
+            p.price
+        FROM tb_event e
+        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
+        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id
+        LEFT JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        WHERE e.event_id = #{eventId}
+        ORDER BY sc.priority ASC
+    </select>
+
 </mapper>
