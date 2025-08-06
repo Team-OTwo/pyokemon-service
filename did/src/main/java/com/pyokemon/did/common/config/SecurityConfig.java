@@ -16,9 +16,8 @@ public class SecurityConfig {
     http.csrf(csrf -> csrf.disable())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/health", "/actuator/**").permitAll()
-            .anyRequest().authenticated());
-
+        .authorizeHttpRequests(auth -> auth
+            .anyRequest().permitAll());  // 개발용: 모든 요청 허용
     return http.build();
   }
 }

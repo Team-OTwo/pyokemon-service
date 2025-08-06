@@ -11,6 +11,11 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.flywaydb:flyway-core:9.22.3'
     implementation 'org.flywaydb:flyway-mysql:9.22.3'
+
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
