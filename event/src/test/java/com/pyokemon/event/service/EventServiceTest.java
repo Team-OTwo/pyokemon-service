@@ -29,7 +29,7 @@ class EventServiceTest {
     }
 
     @Test
-    void saveEvent() {
+    void saveSavedEvent() {
         // given
         Long eventId = 1L;
         Long accountId = 1L;
@@ -39,7 +39,7 @@ class EventServiceTest {
         when(savedEventRepository.existsByAccountIdAndEventId(accountId, eventId)).thenReturn(false);
 
         // when
-        String result = eventService.saveEvent(eventId, accountId);
+        String result = eventService.saveSavedEvent(eventId, accountId);
 
         // then
         ArgumentCaptor<SavedEvent> captor = ArgumentCaptor.forClass(SavedEvent.class);
@@ -52,14 +52,14 @@ class EventServiceTest {
 
 
     @Test
-    void saveEvent_존재하지_않는_공연일_경우() {
+    void saveSavedEvent_존재하지_않는_공연일_경우() {
         // given
         Long accountId = 1L;
         Long eventId = 100L;
         given(eventRepository.findEventDetailByEventId(eventId)).willReturn(null);
 
         // when
-        String result = eventService.saveEvent(accountId, eventId);
+        String result = eventService.saveSavedEvent(accountId, eventId);
 
         // then
         assertEquals("존재하지 않는 공연입니다", result);
@@ -69,7 +69,7 @@ class EventServiceTest {
 
 
     @Test
-    void saveEvent_이미_관심공연일_경우_삭제() {
+    void saveSavedEvent_이미_관심공연일_경우_삭제() {
         // given
         Long accountId = 1L;
         Long eventId = 1L;
@@ -79,7 +79,7 @@ class EventServiceTest {
         given(savedEventRepository.existsByAccountIdAndEventId(accountId, eventId)).willReturn(true);
 
         // when
-        String result = eventService.saveEvent(accountId, eventId);
+        String result = eventService.saveSavedEvent(accountId, eventId);
 
         // then
         assertEquals("관심 공연에서 삭제되었습니다", result);

@@ -63,10 +63,10 @@ public class EventController {
         return eventScheduleService.getConcertsByPage(genre, offset, size);
     }
 
+    // 관심 공연 등록, 취소
     @PostMapping("/save/{eventId}")
     public ResponseEntity<String> saveEvent(@PathVariable Long eventId, @RequestHeader("X-Auth-AccountId") Long accountId) {
-        return ResponseEntity.ok(eventService.saveEvent(accountId, eventId));
-
+        return ResponseEntity.ok(eventService.saveSavedEvent(accountId, eventId));
     }
 
 }

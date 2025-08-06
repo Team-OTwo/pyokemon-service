@@ -132,18 +132,20 @@ public class EventService {
         return priceRepository.save(price);
     }
 
+    // 관심공연 등록
     @Transactional
-    public String saveEvent(Long accountId, Long eventId) {
+    public String saveSavedEvent(Long accountId, Long eventId) {
         Object event = eventRepository.findEventDetailByEventId(eventId);
         if (event == null) {
             return "존재하지 않는 공연입니다";
         }
+
+        // 이미 관심 공연인지 확인
         boolean exists = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
 
         SavedEvent savedEvent = new SavedEvent();
         savedEvent.setEventId(eventId);
         savedEvent.setAccountId(accountId);
-
 
         if (exists) {
             savedEventRepository.delete(accountId, eventId);

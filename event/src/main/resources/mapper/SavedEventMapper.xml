@@ -11,14 +11,10 @@
             keyColumn="saved_event_id">
         INSERT INTO tb_saved_event (
         event_id,
-        account_id,
-        created_at,
-        updated_at
+        account_id
         ) VALUES (
         #{eventId},
-        #{accountId},
-        #{createdAt},
-        #{updatedAt}
+        #{accountId}
         )
     </insert>
 
