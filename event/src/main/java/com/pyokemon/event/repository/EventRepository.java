@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event;
@@ -25,7 +26,7 @@ public interface EventRepository {
 
   List<Event> findByAgeLimit(Long ageLimit);
 
-  int save(Event event);
+  Long save(Event event);
 
   EventDetailResponseDTO findEventDetailByEventId(Long eventId);
 
@@ -34,4 +35,6 @@ public interface EventRepository {
   Event findById(Long eventId);
 
   int updateEvent(Event event);
+
+  TenantBookingDetailResponseDTO findTenantBookingDetailByEventScheduleId(Long eventScheduleId);
 }

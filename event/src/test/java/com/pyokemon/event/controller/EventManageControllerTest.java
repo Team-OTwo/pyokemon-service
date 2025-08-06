@@ -22,6 +22,7 @@ import com.pyokemon.event.dto.EventResponseDto;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventUpdateDto;
 import com.pyokemon.event.dto.PriceDto;
+import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event.EventStatus;
@@ -55,9 +56,14 @@ class TenantEventManagementControllerTest {
   @DisplayName("TenantEventListTest - 테넌트별 공연 목록 조회 API 테스트")
   void getTenantEventList_Success() throws Exception {
     // given
-    TenantEventListDto mockEvent = TenantEventListDto.builder().eventId(validEventId)
-        .title("테스트 공연").eventDate(LocalDateTime.now().plusDays(30)).venueName("테스트 공연장")
-        .status("APPROVED").build();
+    TenantEventListDto mockEvent = TenantEventListDto.builder()
+        .eventId(validEventId)
+        .eventScheduleId(1L)
+        .title("테스트 공연")
+        .eventDate(LocalDateTime.now().plusDays(30))
+        .venueName("테스트 공연장")
+        .status("APPROVED")
+        .build();
 
     when(eventService.getTenantEventListByAccountId(validAccountId)).thenReturn(List.of(mockEvent));
 
@@ -65,6 +71,7 @@ class TenantEventManagementControllerTest {
     mockMvc.perform(get("/api/events/tenant").param("account_id", validAccountId.toString()))
         .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
         .andExpect(jsonPath("$.data[0].eventId").value(1))
+        .andExpect(jsonPath("$.data[0].eventScheduleId").value(1))
         .andExpect(jsonPath("$.data[0].title").value("테스트 공연"))
         .andExpect(jsonPath("$.data[0].venueName").value("테스트 공연장"))
         .andExpect(jsonPath("$.data[0].status").value("APPROVED"));
@@ -159,5 +166,59 @@ class TenantEventManagementControllerTest {
         .andExpect(jsonPath("$.message").value("Event updated successfully"));
 
     verify(eventService).updateEvent(any(EventUpdateDto.class));
+  }
+
+  @Test
+  @DisplayName("TenantBookingDetailTest - 테넌트별 예매 현황 조회 API 테스트")
+  void getTenantBookingDetail_Success() throws Exception {
+    // given
+    Long eventScheduleId = 1L;
+    TenantBookingDetailResponseDTO mockBookingDetail = TenantBookingDetailResponseDTO.builder()
+        .eventId(validEventId)
+        .title("테스트 공연")
+        .genre("콘서트")
+        .status("APPROVED")
+        .eventScheduleId(eventScheduleId)
+        .ticketOpenAt(LocalDateTime.now().plusDays(7))
+        .eventDate(LocalDateTime.now().plusDays(30))
+        .venueName("테스트 공연장")
+        .bookingStatus(List.of(
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
+                .seatClassId(1L)
+                .className("VIP")
+                .totalSeats(100)
+                .bookedSeats(30)
+                .availableSeats(70)
+                .price(150000)
+                .bookingRate(30.0)
+                .build(),
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
+                .seatClassId(2L)
+                .className("R석")
+                .totalSeats(200)
+                .bookedSeats(80)
+                .availableSeats(120)
+                .price(100000)
+                .bookingRate(40.0)
+                .build()
+        ))
+        .build();
+
+    when(eventService.getTenantBookingDetailByEventScheduleId(eventScheduleId))
+        .thenReturn(mockBookingDetail);
+
+    // when & then
+    mockMvc.perform(get("/api/events/tenant/booking/{eventScheduleId}/detail", eventScheduleId))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.data.eventId").value(1))
+        .andExpect(jsonPath("$.data.title").value("테스트 공연"))
+        .andExpect(jsonPath("$.data.venueName").value("테스트 공연장"))
+        .andExpect(jsonPath("$.data.bookingStatus[0].className").value("VIP"))
+        .andExpect(jsonPath("$.data.bookingStatus[0].totalSeats").value(100))
+        .andExpect(jsonPath("$.data.bookingStatus[0].bookedSeats").value(30))
+        .andExpect(jsonPath("$.data.bookingStatus[0].availableSeats").value(70))
+        .andExpect(jsonPath("$.data.bookingStatus[0].bookingRate").value(30.0));
+
+    verify(eventService).getTenantBookingDetailByEventScheduleId(eventScheduleId);
   }
 }

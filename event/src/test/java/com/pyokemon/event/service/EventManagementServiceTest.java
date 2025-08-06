@@ -20,6 +20,7 @@ import com.pyokemon.event.dto.EventResponseDto;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventUpdateDto;
 import com.pyokemon.event.dto.PriceDto;
+import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event;
@@ -56,13 +57,18 @@ class TenantEventManagementServiceTest {
     // 테스트 설정
   }
 
-  @Test
-  @DisplayName("TenantEventListTest - 테넌트별 공연 목록 조회 성공")
-  void getTenantEventListByAccountId_Success() {
-    // given
-    TenantEventListDto mockEvent = TenantEventListDto.builder().eventId(validEventId)
-        .title("테스트 공연").eventDate(LocalDateTime.now().plusDays(30)).venueName("테스트 공연장")
-        .status("APPROVED").build();
+      @Test
+    @DisplayName("TenantEventListTest - 테넌트별 공연 목록 조회 성공")
+    void getTenantEventListByAccountId_Success() {
+        // given
+        TenantEventListDto mockEvent = TenantEventListDto.builder()
+            .eventId(validEventId)
+            .eventScheduleId(1L)
+            .title("테스트 공연")
+            .eventDate(LocalDateTime.now().plusDays(30))
+            .venueName("테스트 공연장")
+            .status("APPROVED")
+            .build();
 
     when(eventRepository.findTenantEventListByAccountId(validAccountId))
         .thenReturn(List.of(mockEvent));
@@ -70,13 +76,14 @@ class TenantEventManagementServiceTest {
     // when
     List<TenantEventListDto> result = eventService.getTenantEventListByAccountId(validAccountId);
 
-    // then
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals("테스트 공연", result.get(0).getTitle());
-    assertEquals("테스트 공연장", result.get(0).getVenueName());
-    assertEquals("APPROVED", result.get(0).getStatus());
-    verify(eventRepository).findTenantEventListByAccountId(validAccountId);
+            // then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("테스트 공연", result.get(0).getTitle());
+        assertEquals("테스트 공연장", result.get(0).getVenueName());
+        assertEquals("APPROVED", result.get(0).getStatus());
+        assertEquals(1L, result.get(0).getEventScheduleId());
+        verify(eventRepository).findTenantEventListByAccountId(validAccountId);
   }
 
   @Test
@@ -170,5 +177,60 @@ class TenantEventManagementServiceTest {
     assertEquals(EventStatus.APPROVED, result.getStatus());
     verify(eventRepository).findById(validEventId);
     verify(eventRepository).updateEvent(any(Event.class));
+  }
+
+  @Test
+  @DisplayName("TenantBookingDetailTest - 테넌트별 예매 현황 조회 성공")
+  void getTenantBookingDetailByEventScheduleId_Success() {
+    // given
+    Long eventScheduleId = 1L;
+    TenantBookingDetailResponseDTO mockBookingDetail = TenantBookingDetailResponseDTO.builder()
+        .eventId(validEventId)
+        .title("테스트 공연")
+        .genre("콘서트")
+        .status("APPROVED")
+        .eventScheduleId(eventScheduleId)
+        .ticketOpenAt(LocalDateTime.now().plusDays(7))
+        .eventDate(LocalDateTime.now().plusDays(30))
+        .venueName("테스트 공연장")
+        .bookingStatus(List.of(
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
+                .seatClassId(1L)
+                .className("VIP")
+                .totalSeats(100)
+                .bookedSeats(30)
+                .availableSeats(70)
+                .price(150000)
+                .bookingRate(30.0)
+                .build(),
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
+                .seatClassId(2L)
+                .className("R석")
+                .totalSeats(200)
+                .bookedSeats(80)
+                .availableSeats(120)
+                .price(100000)
+                .bookingRate(40.0)
+                .build()
+        ))
+        .build();
+
+    when(eventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
+        .thenReturn(mockBookingDetail);
+
+    // when
+    TenantBookingDetailResponseDTO result = eventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
+
+    // then
+    assertNotNull(result);
+    assertEquals("테스트 공연", result.getTitle());
+    assertEquals("테스트 공연장", result.getVenueName());
+    assertEquals(2, result.getBookingStatus().size());
+    assertEquals("VIP", result.getBookingStatus().get(0).getClassName());
+    assertEquals(100, result.getBookingStatus().get(0).getTotalSeats());
+    assertEquals(30, result.getBookingStatus().get(0).getBookedSeats());
+    assertEquals(70, result.getBookingStatus().get(0).getAvailableSeats());
+    assertEquals(30.0, result.getBookingStatus().get(0).getBookingRate());
+    verify(eventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
   }
 }

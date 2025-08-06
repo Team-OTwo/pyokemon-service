@@ -13,6 +13,7 @@ import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
+import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventUpdateDto;
@@ -69,8 +70,8 @@ public class EventController {
   // 장르별 리스트 조회
   @GetMapping
   public List<EventItemResponseDTO> getConcertsByPage(
-      @RequestParam(defaultValue = "콘서트") String genre, @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "8") int size) {
+      @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "9") int size) {
     int offset = (page - 1) * size;
     return eventScheduleService.getConcertsByPage(genre, offset, size);
   }
@@ -103,6 +104,13 @@ public class EventController {
   public ResponseDto<TenantEventDetailResponseDTO> getTenantEventDetail(@PathVariable Long eventId) {
     TenantEventDetailResponseDTO eventDetail = eventService.getTenantEventDetailByEventId(eventId);
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
+  }
+
+  // 테넌트용 예매 현황 조회 (event_schedule_id 기반)
+  @GetMapping("/tenant/booking/{eventScheduleId}/detail")
+  public ResponseDto<TenantBookingDetailResponseDTO> getTenantBookingDetail(@PathVariable Long eventScheduleId) {
+    TenantBookingDetailResponseDTO bookingDetail = eventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
+    return ResponseDto.success(bookingDetail, "Tenant booking detail retrieved successfully");
   }
 
 

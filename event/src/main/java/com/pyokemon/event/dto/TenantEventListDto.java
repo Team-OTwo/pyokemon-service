@@ -17,6 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TenantEventListDto {
   private Long eventId;
+  private Long eventScheduleId;
   private String thumbnailUrl;
   private String title;
   private LocalDateTime eventDate;
