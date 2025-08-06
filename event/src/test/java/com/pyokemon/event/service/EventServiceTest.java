@@ -1,6 +1,7 @@
 package com.pyokemon.event.service;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.entity.SavedEvent;
 import com.pyokemon.event.repository.EventRepository;
 import com.pyokemon.event.repository.SavedEventRepository;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -131,4 +133,40 @@ class EventServiceTest {
         verify(savedEventRepository).delete(accountId, eventId);
         verify(savedEventRepository, never()).save(any());
     }
+
+    @Test
+    void getSavedEvents(){
+        // given
+        Long accountId = 1L;
+        int offset = 0;
+        int limit = 9;
+
+        EventItemResponseDTO event1 = new EventItemResponseDTO();
+        event1.setEventId(1L);
+        event1.setTitle("콘서트 A");
+
+        EventItemResponseDTO event2 = new EventItemResponseDTO();
+        event2.setEventId(2L);
+        event2.setTitle("콘서트 B");
+
+        List<EventItemResponseDTO> mockEventList = List.of(event1, event2);
+        int mockTotalCount = 15;
+
+        when(savedEventRepository.findByAccountId(accountId, offset, limit)).thenReturn(mockEventList);
+        when(savedEventRepository.countTotalEventsByAccountId(accountId)).thenReturn(mockTotalCount);
+
+        // when
+        List<EventItemResponseDTO> result = eventService.getSavedEvents(accountId, offset, limit);
+
+        // then
+        assertEquals(2, result.size());
+        assertEquals("콘서트 A", result.get(0).getTitle());
+        assertEquals("콘서트 B", result.get(1).getTitle());
+        assertEquals(mockTotalCount, result.get(0).getTotal());
+        assertEquals(mockTotalCount, result.get(1).getTotal());
+
+        verify(savedEventRepository, times(1)).findByAccountId(accountId, offset, limit);
+        verify(savedEventRepository, times(1)).countTotalEventsByAccountId(accountId);
+    }
+
 }
