@@ -150,7 +150,6 @@
              e.genre = #{genre} AND
         </if>
             e.status = 'APPROVED'
-            e.genre = #{genre}
     </select>
 
 
