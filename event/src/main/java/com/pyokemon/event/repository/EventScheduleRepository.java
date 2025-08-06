@@ -19,7 +19,7 @@ public interface EventScheduleRepository {
 
   Optional<EventSchedule> findById(Long id);
 
-  int save(EventSchedule eventSchedule);
+  Long save(EventSchedule eventSchedule);
 
   List<EventItemResponseDTO> selectEventList(@Param("genre") String genre,
       @Param("limit") int limit, @Param("offset") int offset);
