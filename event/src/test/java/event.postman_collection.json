@@ -374,6 +374,47 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "테넌트 공연 상세 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "관심 공연 조회",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Auth-AccountId",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Auth-Role",
+						"value": "USER",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/saved-events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"saved-events"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
