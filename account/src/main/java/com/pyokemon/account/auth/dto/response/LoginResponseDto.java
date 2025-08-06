@@ -17,4 +17,5 @@ public class LoginResponseDto {
   private String refreshToken;
   private String role;
   private Long accountId;
+  private Boolean isVerified;
 }

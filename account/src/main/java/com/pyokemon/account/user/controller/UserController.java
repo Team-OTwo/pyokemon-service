@@ -35,7 +35,7 @@ public class UserController {
                 .body(ResponseDto.success(response, "사용자 등록 성공"));
     }
 
-    @GetMapping("/verify")
+    @PostMapping("/verify")
     public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
         String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
         Long userId = Long.parseLong(currentUserAccountId);

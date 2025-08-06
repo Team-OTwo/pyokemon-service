@@ -68,9 +68,9 @@ public class UserService {
             .build();
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public UserDetailDto verifyUser(Long userId) {
-    User user = userRepository.findByUserId(userId)
+    User user = userRepository.findByAccountId(userId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (user.getIsVerified()) {
@@ -78,6 +78,7 @@ public class UserService {
     }
 
     user.setIsVerified(true);
+
     userRepository.update(user);
 
     return UserDetailDto.builder()
@@ -92,7 +93,7 @@ public class UserService {
   // 사용자 정보 조회
   @Transactional(readOnly = true)
   public UserDetailDto getUserProfile(Long userId) {
-    User user = userRepository.findByUserId(userId)
+    User user = userRepository.findByAccountId(userId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     return UserDetailDto.builder()
@@ -106,7 +107,7 @@ public class UserService {
   @Transactional
   public UserDetailDto updateUserProfile(Long userId,
                                          UpdateUserRequestDto request) {
-    User user = userRepository.findByUserId(userId)
+    User user = userRepository.findByAccountId(userId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     user.setName(request.getName());
@@ -124,7 +125,7 @@ public class UserService {
 
   @Transactional
   public void deleteUser(Long userId) {
-    User user = userRepository.findByUserId(userId)
+    User user = userRepository.findByAccountId(userId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     
@@ -133,7 +134,7 @@ public class UserService {
 
   @Transactional
   public void registerUserDevice(Long userId, RegisterDeviceRequestDto request) {
-    User user = userRepository.findByUserId(userId)
+    User user = userRepository.findByAccountId(userId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (userDeviceRepository.existsByDeviceNumberAndIsValid(request.getDeviceNumber(), true)) {
