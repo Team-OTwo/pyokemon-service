@@ -17,6 +17,7 @@
         SELECT seat_id
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
+        AND status IN ('PENDING', 'BOOKED')
     </select>
 
     <select id="findByAccountId" resultMap="BookingResultMap">
