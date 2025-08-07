@@ -1,2 +1,3 @@
-datasource:
-  url: jdbc:mysql://pyokemon-event-mysql:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring:
+  datasource:
+    url: jdbc:mysql://pyokemon-event-mysql:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true

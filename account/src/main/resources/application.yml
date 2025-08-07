@@ -46,4 +46,10 @@ jwt:
   expiresIn: 1800000  # 30분 (밀리초) - Access Token
   mobileExpiresIn: 604800000  # 7일 (밀리초) - Refresh Token
 
-
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml
