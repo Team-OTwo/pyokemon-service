@@ -2,7 +2,7 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY build/libs/payment-0.0.1.jar app.jar
+COPY payment/build/libs/payment-0.0.1.jar app.jar
 
 ENV SPRING_PROFILES_ACTIVE=dev
 
