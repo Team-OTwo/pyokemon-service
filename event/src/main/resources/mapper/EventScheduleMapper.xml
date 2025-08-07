@@ -133,7 +133,7 @@
         WHERE
             REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
         <if test="genre != null and genre != '전체'">
-             e.genre = #{genre} AND
+             
         </if>
             e.status = 'APPROVED'
     </select>

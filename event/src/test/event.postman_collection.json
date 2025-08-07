@@ -332,6 +332,44 @@
 				}
 			},
 			"response": []
+		},
+
+		{
+			"name": "특정 계정 월간 공연 요약 조회",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/tenant/monthly-summary?account_id=1&year=2025&month=8",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"tenant",
+						"monthly-summary"
+					],
+					"query": [
+						{
+							"key": "account_id",
+							"value": "1"
+						},
+						{
+							"key": "year",
+							"value": "2025"
+						},
+						{
+							"key": "month",
+							"value": "8"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
