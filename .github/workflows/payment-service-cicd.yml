@@ -1,61 +1,47 @@
-name: Account Service CI/CD
+name: Synology NAS에 Docker 이미지 배포 (GHCR 사용)
 
 on:
   push:
     branches: [ develop ]
-    paths:
-      - 'payment/**'
-      - 'common/**'
-      - '.github/workflows/payment-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'payment/**'
-      - 'common/**'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: 코드 체크아웃
         uses: actions/checkout@v2
 
-      - name: Set up JDK 21
+      - name: JDK 21 설정
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+      - name: gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: Gradle로 빌드
+        run: ./gradlew build -x test
+
+      - name: Docker Buildx 설정
+        uses: docker/setup-buildx-action@v2
+
+      - name: GitHub Container Registry 로그인
+        uses: docker/login-action@v2
         with:
-          gradle-version: 8.5
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build with Gradle (installGitHooks 제외)
-        run: |
-          # Gradle 버전 확인
-          gradle --version
-          # build 대신 assemble 태스크를 실행하여 installGitHooks 의존성 우회
-          gradle :payment:assemble -x test
-
-      - name: Check build output
-        run: |
-          echo "빌드된 JAR 파일 확인:"
-          find . -name "*.jar"
-          ls -la payment/build/libs/
-
-      - name: Deploy to Synology NAS
-        uses: appleboy/scp-action@master
+      - name: Docker 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v4
         with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          port: ${{ secrets.NAS_SSH_PORT }}
-          key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          source: "payment/build/libs/payment-0.0.1.jar"
-          target: "/volume1/docker/pyokemon/payment-service"
-          strip_components: 3
+          context: .
+          push: true
+          tags: ghcr.io/team-otwo/pyokemon-payment-service/payment-service:latest
 
-      - name: Restart Service
+      - name: Synology NAS에 배포
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
@@ -63,35 +49,38 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
-            cd /volume1/docker/pyokemon/payment-service
+            # PATH 환경변수 설정 추가
+            export PATH=$PATH:/usr/local/bin
             
-            # 이전 프로세스 종료
-            if [ -f "app.pid" ]; then
-              echo "이전 PID 파일 발견"
-              PID=$(cat app.pid)
-              if ps -p $PID > /dev/null 2>&1; then
-                echo "프로세스 $PID 종료 시도"
-                kill $PID && echo "프로세스 종료 성공" || echo "프로세스 종료 실패"
-                sleep 5
-              else
-                echo "프로세스가 이미 종료됨"
-              fi
-              rm -f app.pid
-            else
-              echo "PID 파일 없음, 계속 진행"
+            # 대상 디렉토리 생성
+            mkdir -p /volume1/docker/pyokemon/payment-service/logs
+
+            # GitHub Container Registry 로그인
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # pyokemon-network 확인 및 생성
+            if ! docker network ls | grep -q pyokemon-network; then
+              echo "pyokemon-network 생성"
+              docker network create --driver bridge pyokemon-network
             fi
-            
-            # 애플리케이션 실행 및 PID 저장
-            echo "애플리케이션 시작"
-            # Java 경로 확인
-            JAVA_PATH=$(which java || echo "/usr/local/java/jdk-21.0.5+11/bin/java")
-            echo "사용할 Java 경로: $JAVA_PATH"
-            
-            # 환경 변수 설정
-            export PATH=$PATH:/usr/bin:/usr/local/java/jdk-21.0.5+11/bin/java
-            export JAVA_HOME=$(dirname $(dirname $JAVA_PATH))
-            
-            # 애플리케이션 실행
-            nohup $JAVA_PATH -jar payment-0.0.1.jar > app.log 2>&1 &
-            echo $! > app.pid
-            echo "배포 완료 (PID: $(cat app.pid))"
+
+            # Docker 이미지 풀
+            echo "최신 Docker 이미지 다운로드"
+            docker pull ghcr.io/team-otwo/pyokemon-payment-service/payment-service:latest
+
+            # 기존 컨테이너 중지 및 삭제
+            echo "기존 컨테이너 정리"
+            docker stop payment-service || true
+            docker rm payment-service || true
+
+            # 새 컨테이너 실행
+            echo "새 컨테이너 실행"
+            docker run -d \
+              --name payment-service \
+              --restart unless-stopped \
+              -e SPRING_PROFILES_ACTIVE=dev \
+              -v /volume1/docker/pyokemon/payment-service/logs:/app/logs \
+              --network pyokemon-network \
+              ghcr.io/team-otwo/pyokemon-payment-service/payment-service:latest
+
+            echo "배포 완료"
