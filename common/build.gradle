@@ -28,7 +28,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     //prometheus 의존성
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation('org.springframework.boot:spring-boot-starter-actuator') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
+    }
     implementation 'io.micrometer:micrometer-registry-prometheus'
     
     // Database
