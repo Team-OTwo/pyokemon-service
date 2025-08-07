@@ -1,22 +1,17 @@
 package com.pyokemon.account.auth.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDto {
+public class AppLoginResponseDto {
 
   private String accessToken;
   private String refreshToken;
-  private String userName;
   private String role;
   private Long accountId;
-  private Boolean isVerified;
+  private String deviceStatus;
 }
