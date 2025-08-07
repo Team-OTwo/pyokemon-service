@@ -1,4 +1,4 @@
-package com.pyokemon.booking.entity;
+package com.pyokemon.payment.entity;
 
 import java.time.LocalDateTime;
 

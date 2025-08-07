@@ -1,14 +1,14 @@
-package com.pyokemon.booking;
+package com.pyokemon.payment;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
-@MapperScan("com.pyokemon.booking.repository")
-public class BookingApplication {
+@MapperScan("com.pyokemon.payment.repository")
+public class PaymentApplication {
   public static void main(String[] args) {
 
-    SpringApplication.run(BookingApplication.class, args);
+    SpringApplication.run(PaymentApplication.class, args);
   }
 }
