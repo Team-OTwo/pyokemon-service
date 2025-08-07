@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
+//import org.springframework.security.access.AccessDeniedException;
+//import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,22 +29,22 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(response);
   }
 
-  @ExceptionHandler(AuthenticationException.class)
-  public ResponseEntity<ResponseDto<Void>> handleAuthenticationException(
-      AuthenticationException e) {
-    log.error("Authentication exception occurred: {}", e.getMessage(), e);
-
-    ResponseDto<Void> response = ResponseDto.error("인증이 필요합니다.", "ACCESS_DENIED");
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-  }
-
-  @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<ResponseDto<Void>> handleAccessDeniedException(AccessDeniedException e) {
-    log.error("Access denied exception occurred: {}", e.getMessage(), e);
-
-    ResponseDto<Void> response = ResponseDto.error("접근 권한이 없습니다.", "PERMISSION_DENIED");
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-  }
+//  @ExceptionHandler(AuthenticationException.class)
+//  public ResponseEntity<ResponseDto<Void>> handleAuthenticationException(
+//      AuthenticationException e) {
+//    log.error("Authentication exception occurred: {}", e.getMessage(), e);
+//
+//    ResponseDto<Void> response = ResponseDto.error("인증이 필요합니다.", "ACCESS_DENIED");
+//    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//  }
+//
+//  @ExceptionHandler(AccessDeniedException.class)
+//  public ResponseEntity<ResponseDto<Void>> handleAccessDeniedException(AccessDeniedException e) {
+//    log.error("Access denied exception occurred: {}", e.getMessage(), e);
+//
+//    ResponseDto<Void> response = ResponseDto.error("접근 권한이 없습니다.", "PERMISSION_DENIED");
+//    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+//  }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ResponseDto<Map<String, String>>> handleValidationException(
