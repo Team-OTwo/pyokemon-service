@@ -3,6 +3,15 @@ name: Synology NAS에 Docker 이미지 배포 (GHCR 사용)
 on:
   push:
     branches: [ develop ]
+    paths:
+      - 'payment/**'
+      - 'common/**'
+      - '.github/workflows/payment-service-cicd.yml'
+  pull_request:
+    branches: [ develop ]
+    paths:
+      - 'payment/**'
+      - 'common/**'
 
 jobs:
   build-and-deploy:
@@ -38,6 +47,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ./payment/Dockerfile
           push: true
           tags: ghcr.io/team-otwo/pyokemon-payment-service/payment-service:latest
 
