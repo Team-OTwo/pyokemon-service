@@ -26,5 +26,10 @@ public interface EventScheduleRepository {
 
   int getTotalCountByGenre(@Param("genre") String genre);
 
+  List<EventItemResponseDTO> selectEventSearchList(@Param("keyword") String keyword,
+      @Param("limit") int limit, @Param("offset") int offset, @Param("genre") String genre);
 
+  int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
+  int updateEventSchedule(EventSchedule eventSchedule);
+  
 }

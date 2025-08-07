@@ -13,7 +13,7 @@
             created_at,
             updated_at
         FROM tb_venue 
-        WHERE venue_id = #{venueId}
+        WHERE venue_id = #{id}
     </select>
     
 </mapper> 

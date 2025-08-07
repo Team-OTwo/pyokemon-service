@@ -9,11 +9,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           new UsernamePasswordAuthenticationToken(accountId, null, authorities);
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
-      
+
     } catch (AuthenticationException e) {
       // Spring Security 예외는 그대로 던져서 AuthenticationEntryPoint에서 처리
       throw e;
@@ -67,7 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private boolean isPublicApi(String requestURI) {
     String actualPath = requestURI.replace("/account", "");
-    return actualPath.equals("/api/login") || actualPath.equals("/api/users") || actualPath.equals("/api/tenants");
+    return actualPath.equals("/api/login") || actualPath.equals("/api/users")
+        || actualPath.equals("/api/tenants");
   }
 
   private String extractAccountId(HttpServletRequest request) {

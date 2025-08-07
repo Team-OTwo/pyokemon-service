@@ -26,8 +26,8 @@ public class EventRegisterDto {
 
   private Long eventId;
 
-  @NotNull(message = "Tenant ID is required")
-  private Long tenantId;
+  // @NotNull(message = "Account ID is required") // 임시로 주석 처리 (account 서비스 완료 전까지)
+  private Long accountId;
 
   @NotBlank(message = "Title is required")
   @Size(max = 100, message = "Title must be less than 100 characters")

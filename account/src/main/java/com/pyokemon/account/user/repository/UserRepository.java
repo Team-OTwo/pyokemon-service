@@ -3,9 +3,9 @@ package com.pyokemon.account.user.repository;
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.pyokemon.account.user.entity.User;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserRepository {

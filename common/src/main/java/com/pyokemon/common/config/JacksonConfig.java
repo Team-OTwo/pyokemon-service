@@ -35,12 +35,12 @@ public class JacksonConfig {
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
       String dateStr = p.getText();
-      
+
       // 빈 문자열이나 "invalid-date" 같은 특수 값 처리
       if (dateStr == null || dateStr.isEmpty() || "invalid-date".equals(dateStr)) {
         return null; // 또는 기본값 반환
       }
-      
+
       try {
         return LocalDate.parse(dateStr, FORMATTER);
       } catch (DateTimeParseException e) {
@@ -67,7 +67,7 @@ public class JacksonConfig {
     // Java 8 시간 API 지원
     mapper.registerModule(new JavaTimeModule());
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    
+
     // 커스텀 LocalDate 역직렬화기 등록
     SimpleModule module = new SimpleModule();
     module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
