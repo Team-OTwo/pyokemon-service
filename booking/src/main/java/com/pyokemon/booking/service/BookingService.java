@@ -46,65 +46,55 @@ public class BookingService {
     
     @Transactional
     public BookingResponse createOrUpdateBooking(BookingRequest request, Long accountId) {
-        List<Booking> userBookings = bookingRepository.findAllByEventScheduleIdAndAccountId(
+        Optional<Booking> activeBooking = bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(
                 request.getEventScheduleId(), 
                 accountId
         );
-
-        Optional<Booking> activeBooking = userBookings.stream()
-                .filter(booking -> booking.getStatus() == Booking.Booked.PENDING || booking.getStatus() == Booking.Booked.BOOKED)
-                .findFirst();
         
         if (activeBooking.isPresent()) {
             Booking userBooking = activeBooking.get();
             
-            if (userBooking.getStatus() == Booking.Booked.PENDING) {
-                if (!userBooking.getSeatId().equals(request.getSeatId())) {
+            if (userBooking.getSeatId().equals(request.getSeatId())) {
+                userBooking.setStatus(Booking.Booked.CANCELLED);
+                userBooking.setUpdatedAt(LocalDateTime.now());
+                bookingRepository.update(userBooking);
+                return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
+            } else {
+                if (userBooking.getStatus() == Booking.Booked.PENDING) {
                     throw new BusinessException("결제중인 내역이 있습니다.", "PAYMENT_IN_PROGRESS");
                 } else {
-                    userBooking.setStatus(Booking.Booked.CANCELLED);
-                    userBooking.setUpdatedAt(LocalDateTime.now());
-                    bookingRepository.update(userBooking);
-                    return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
-                }
-                
-            } else if (userBooking.getStatus() == Booking.Booked.BOOKED) {
-                if (!userBooking.getSeatId().equals(request.getSeatId())) {
                     throw new BusinessException("1인 1매만 가능합니다.", "BOOKING_ONE_PER_EVENT");
-                } else {
-                    userBooking.setStatus(Booking.Booked.CANCELLED);
-                    userBooking.setUpdatedAt(LocalDateTime.now());
-                    bookingRepository.update(userBooking);
-                    return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
                 }
             }
         } else {
-            Optional<Booking> existingSeatBooking = bookingRepository.findByEventScheduleIdAndSeatId(
-                    request.getEventScheduleId(), 
-                    request.getSeatId()
-            );
-            
-            if (existingSeatBooking.isPresent()) {
-                Booking seatBooking = existingSeatBooking.get();
-                if (!seatBooking.getAccountId().equals(accountId) && seatBooking.getStatus() != Booking.Booked.CANCELLED) {
-                    throw new BusinessException("이미 예약된 좌석입니다.", "SEAT_ALREADY_BOOKED");
-                }
-            }
-            
-            Booking newBooking = Booking.builder()
-                    .eventScheduleId(request.getEventScheduleId())
-                    .seatId(request.getSeatId())
-                    .accountId(accountId)
-                    .paymentId(null)
-                    .status(Booking.Booked.PENDING)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            
-            bookingRepository.save(newBooking);
-            return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
+            return createNewBooking(request, accountId);
+        }
+    }
+    
+    private BookingResponse createNewBooking(BookingRequest request, Long accountId) {
+        List<Booking> existingSeatBookings = bookingRepository.findAllByEventScheduleIdAndSeatId(
+                request.getEventScheduleId(), 
+                request.getSeatId()
+        );
+        
+        boolean hasActiveBooking = existingSeatBookings.stream()
+                .anyMatch(booking -> booking.getStatus() == Booking.Booked.PENDING || booking.getStatus() == Booking.Booked.BOOKED);
+        
+        if (hasActiveBooking) {
+            throw new BusinessException("이미 예약된 좌석입니다.", "SEAT_ALREADY_BOOKED");
         }
         
-        throw new BusinessException("예상치 못한 오류가 발생했습니다.", "UNEXPECTED_ERROR");
+        Booking newBooking = Booking.builder()
+                .eventScheduleId(request.getEventScheduleId())
+                .seatId(request.getSeatId())
+                .accountId(accountId)
+                .paymentId(null)
+                .status(Booking.Booked.PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        
+        bookingRepository.save(newBooking);
+        return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
     }
 }
