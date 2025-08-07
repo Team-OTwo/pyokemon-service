@@ -14,7 +14,8 @@ public interface UserDeviceRepository {
 
   List<UserDevice> findByUserId(Long userId);
 
-  Optional<UserDevice> findByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber, boolean isValid);
+  Optional<UserDevice> findByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber,
+      boolean isValid);
 
   boolean existsByUserId(Long userId);
 

@@ -1,27 +1,28 @@
 package com.pyokemon.account.common.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.account.auth.secret.jwt.JwtAuthenticationFilter;
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -49,8 +50,7 @@ public class SecurityConfig {
             .requestMatchers("/api/users/**").hasRole("USER")
             // 기타 모든 요청은 인증 필요
             .anyRequest().authenticated())
-        .addFilterBefore(new JwtAuthenticationFilter(),
-            UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling(exceptionHandling -> exceptionHandling
             .authenticationEntryPoint(customAuthenticationEntryPoint())
             .accessDeniedHandler(customAccessDeniedHandler()));
@@ -65,7 +65,8 @@ public class SecurityConfig {
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       response.setCharacterEncoding("UTF-8");
 
-      ResponseDto<Void> errorResponse = ResponseDto.error("인증이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
+      ResponseDto<Void> errorResponse =
+          ResponseDto.error("인증이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
       String jsonResponse = objectMapper.writeValueAsString(errorResponse);
       response.getWriter().write(jsonResponse);
     };
@@ -78,7 +79,8 @@ public class SecurityConfig {
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       response.setCharacterEncoding("UTF-8");
 
-      ResponseDto<Void> errorResponse = ResponseDto.error("접근 권한이 없습니다.", AccountErrorCodes.PERMISSION_DENIED);
+      ResponseDto<Void> errorResponse =
+          ResponseDto.error("접근 권한이 없습니다.", AccountErrorCodes.PERMISSION_DENIED);
       String jsonResponse = objectMapper.writeValueAsString(errorResponse);
       response.getWriter().write(jsonResponse);
     };

@@ -1,22 +1,22 @@
 package com.pyokemon.account.user.service;
 
-import com.pyokemon.account.user.entity.UserDevice;
-import com.pyokemon.common.exception.BusinessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.account.auth.entity.Account;
+import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
-import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
-import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
+import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
+import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
 import com.pyokemon.account.user.entity.User;
+import com.pyokemon.account.user.entity.UserDevice;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
 import com.pyokemon.account.user.repository.UserRepository;
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
-import com.pyokemon.account.auth.entity.AccountStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class UserService {
   public UserDetailDto registerUser(CreateUserRequestDto request) {
 
     if (accountRepository.existsByLoginIdAndStatus(request.getLoginId(), AccountStatus.ACTIVE)) {
-      throw new BusinessException("이미 존재하는 계정입니다.",AccountErrorCodes.LOGIN_ID_DUPLICATED);
+      throw new BusinessException("이미 존재하는 계정입니다.", AccountErrorCodes.LOGIN_ID_DUPLICATED);
     }
 
     if (!request.getPassword().equals(request.getPasswordCheck())) {
@@ -62,12 +62,8 @@ public class UserService {
 
     userRepository.insert(user);
 
-    return UserDetailDto.builder()
-            .loginId(request.getLoginId())
-            .name(request.getName())
-            .phone(request.getPhone())
-            .birth(request.getBirth())
-            .build();
+    return UserDetailDto.builder().loginId(request.getLoginId()).name(request.getName())
+        .phone(request.getPhone()).birth(request.getBirth()).build();
   }
 
   @Transactional
@@ -97,11 +93,8 @@ public class UserService {
     User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
-    return UserDetailDto.builder()
-            .name(user.getName())
-            .phone(user.getPhone())
-            .birth(user.getBirth())
-            .build();
+    return UserDetailDto.builder().name(user.getName()).phone(user.getPhone())
+        .birth(user.getBirth()).build();
   }
 
   // 사용자 정보 수정
@@ -117,11 +110,8 @@ public class UserService {
 
     userRepository.update(user);
 
-    return UserDetailDto.builder()
-            .name(user.getName())
-            .phone(user.getPhone())
-            .birth(user.getBirth())
-            .build();
+    return UserDetailDto.builder().name(user.getName()).phone(user.getPhone())
+        .birth(user.getBirth()).build();
   }
 
   @Transactional
@@ -129,7 +119,6 @@ public class UserService {
     User user = userRepository.findByAccountId(accountId)
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
-    
     accountRepository.updateStatus(user.getAccountId(), AccountStatus.DELETED);
   }
 
@@ -139,16 +128,12 @@ public class UserService {
         .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다.",AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (userDeviceRepository.existsByDeviceNumberAndIsValid(request.getDeviceNumber(), true)) {
-      throw new BusinessException("이미 등록된 디바이스입니다.",AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
+      throw new BusinessException("이미 등록된 디바이스입니다.", AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
     }
 
-    UserDevice userDevice = UserDevice.builder()
-            .userId(user.getUserId())
-            .deviceNumber(request.getDeviceNumber())
-            .fcmToken(request.getFcmToken())
-            .osType(request.getOsType())
-            .isValid(true)
-            .build();
+    UserDevice userDevice =
+        UserDevice.builder().userId(user.getUserId()).deviceNumber(request.getDeviceNumber())
+            .fcmToken(request.getFcmToken()).osType(request.getOsType()).isValid(true).build();
 
     userDeviceRepository.insert(userDevice);
   }

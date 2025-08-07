@@ -1,15 +1,15 @@
 package com.pyokemon.account.user.controller;
 
-import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
-import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
+import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
+import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
+import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
 import com.pyokemon.account.user.service.UserService;
 import com.pyokemon.common.dto.ResponseDto;
@@ -24,16 +24,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    // 사용자 계정 생성
-    @PostMapping
-    public ResponseEntity<ResponseDto<UserDetailDto>> registerUser(
-            @Valid @RequestBody CreateUserRequestDto request) {
-        UserDetailDto response = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResponseDto.success(response, "사용자 등록 성공"));
-    }
+  // 사용자 계정 생성
+  @PostMapping
+  public ResponseEntity<ResponseDto<UserDetailDto>> registerUser(
+      @Valid @RequestBody CreateUserRequestDto request) {
+    UserDetailDto response = userService.registerUser(request);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ResponseDto.success(response, "사용자 등록 성공"));
+  }
 
     @PostMapping("/verify")
     public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
