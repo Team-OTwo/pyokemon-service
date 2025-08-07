@@ -1,4 +1,4 @@
-package com.pyokemon.payment;
+package com.pyokemon.booking;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
