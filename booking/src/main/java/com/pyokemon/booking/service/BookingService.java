@@ -9,6 +9,8 @@ import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookingService {
@@ -96,5 +99,23 @@ public class BookingService {
         
         bookingRepository.save(newBooking);
         return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
+    }
+    
+    @Transactional(readOnly = false)
+    @Scheduled(cron = "0 */5 * * * *")
+    public void deletePendingBookings() {
+        try {
+            List<Booking> pendingBookings = bookingRepository.findPendingBookings();
+
+            for (Booking booking : pendingBookings) {
+                try {
+                    bookingRepository.delete(booking.getBookingId());
+                } catch (Exception e) {
+                    log.error("예약 삭제 중 오류 발생: bookingId={}", booking.getBookingId(), e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
+        }
     }
 }
