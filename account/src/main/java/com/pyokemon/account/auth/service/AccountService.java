@@ -81,6 +81,7 @@ public class AccountService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .role(account.getRole())
+                .userName(user.getName())
                 .accountId(account.getAccountId())
                 .isVerified(user.getIsVerified())
                 .build();
