@@ -195,4 +195,36 @@
         ORDER BY sc.priority ASC
     </select>
 
+    <select id="findMonthlyEventsByAccountId" resultType="com.pyokemon.event.dto.MonthlyEventDTO">
+        SELECT 
+            e.title,
+            v.venue_name as venueName,
+            es.event_date as eventDate,
+            COUNT(b.booking_id) as ticketCount
+        FROM tb_event e
+        JOIN tb_event_schedule es ON e.event_id = es.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
+        LEFT JOIN tb_booking b ON es.event_schedule_id = b.event_schedule_id AND b.status = 'BOOKED'
+        WHERE e.account_id = #{accountId}
+          AND e.status = 'APPROVED'
+          AND es.event_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY e.event_id, es.event_schedule_id, e.title, v.venue_name, es.event_date
+        ORDER BY es.event_date ASC
+    </select>
+
+    <select id="findMonthlySummaryByAccountId" resultType="com.pyokemon.event.dto.MonthlySummaryDTO">
+        SELECT 
+            COALESCE(SUM(p.price), 0) as totalRevenue,
+            COUNT(DISTINCT CASE WHEN es.event_date >= NOW() THEN es.event_schedule_id END) as activeEventCount,
+            COUNT(b.booking_id) as totalTicketsSold
+        FROM tb_event e
+        JOIN tb_event_schedule es ON e.event_id = es.event_id
+        LEFT JOIN tb_booking b ON es.event_schedule_id = b.event_schedule_id AND b.status = 'BOOKED'
+        LEFT JOIN tb_seat s ON b.seat_id = s.seat_id
+        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id AND s.seat_class_id = p.seat_class_id
+        WHERE e.account_id = #{accountId}
+          AND e.status = 'APPROVED'
+          AND es.event_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
 </mapper>
