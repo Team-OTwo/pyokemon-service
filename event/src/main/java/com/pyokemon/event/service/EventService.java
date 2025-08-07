@@ -2,10 +2,12 @@ package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import com.pyokemon.event.dto.*;
+import com.pyokemon.event.entity.SavedEvent;
+import com.pyokemon.event.repository.*;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventRegisterDto;
@@ -21,10 +23,6 @@ import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
-import com.pyokemon.event.repository.EventRepository;
-import com.pyokemon.event.repository.EventScheduleRepository;
-import com.pyokemon.event.repository.PriceRepository;
-import com.pyokemon.event.repository.VenueRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,10 +35,22 @@ public class EventService {
   private final EventScheduleRepository eventScheduleRepository;
   private final VenueRepository venueRepository;
   private final PriceRepository priceRepository;
+  private final SavedEventRepository savedEventRepository;
 
+  public EventDetailResponseDTO getEventDetail(Long eventId, Long accountId) throws NotFoundException {
+    EventDetailResponseDTO dto = eventRepository.findEventDetailByEventId(eventId);
+    if (dto == null) {
+      throw new NotFoundException("해당 공연을 찾을 수 없습니다.");
+    }
 
-  public EventDetailResponseDTO getEventDetailByEventId(Long eventId) {
-    return eventRepository.findEventDetailByEventId(eventId);
+    if (accountId != null) {
+      boolean isSaved = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
+      dto.setSaved(isSaved);
+    } else {
+      // 비회원이면 관심공연 isSaved 다 false로 설정
+      dto.setSaved(false);
+    }
+    return dto;
   }
 
   public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
@@ -232,6 +242,12 @@ public class EventService {
     return venueRepository.findById(venueId).isPresent();
   }
 
+  private Price mapToPrice(PriceDto dto) {
+    return Price.builder().eventScheduleId(dto.getEventScheduleId())
+        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now()).build();
+  }
+
   private Event mapToEvent(EventRegisterDto dto) {
     return Event.builder().accountId(dto.getAccountId()).title(dto.getTitle())
         .ageLimit(dto.getAgeLimit()).description(dto.getDescription()).genre(dto.getGenre())
@@ -239,21 +255,16 @@ public class EventService {
         .updatedAt(LocalDateTime.now()).build();
   }
 
-  private EventSchedule mapToEventSchedule(EventScheduleDto dto, Long eventId) {
-    System.out.println("mapToEventSchedule - dto.getEventId(): " + dto.getEventId()
-        + ", passed eventId: " + eventId);
-    EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId).venueId(dto.getVenueId())
-        .ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
-    System.out
-        .println("mapToEventSchedule - built eventSchedule.eventId: " + eventSchedule.getEventId());
-    return eventSchedule;
+  private Long saveEvent(Event event) {
+    return eventRepository.save(event);
   }
 
-  private Price mapToPrice(PriceDto dto) {
-    return Price.builder().eventScheduleId(dto.getEventScheduleId())
-        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+  private Long saveEventSchedule(EventSchedule eventSchedule) {
+    return eventScheduleRepository.save(eventSchedule);
+  }
+
+  private Long savePrice(Price price) {
+    return priceRepository.save(price);
   }
 
   private EventResponseDto mapToEventResponseDto(Event event) {
@@ -271,22 +282,40 @@ public class EventService {
     return responseDto;
   }
 
-  private Long saveEvent(Event event) {
-    // save() 메서드는 영향받은 행의 수(1)를 반환
-    eventRepository.save(event);
-    // event 객체에는 생성된 ID가 설정되어 있음
-    return event.getEventId();
+  // 관심공연 등록
+  @Transactional
+  public String saveSavedEvent(Long accountId, Long eventId) {
+    Object event = eventRepository.findEventDetailByEventId(eventId);
+    if (event == null) {
+      return "존재하지 않는 공연입니다";
+    }
+
+    // 이미 관심 공연인지 확인
+    boolean exists = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
+
+    SavedEvent savedEvent = new SavedEvent();
+    savedEvent.setEventId(eventId);
+    savedEvent.setAccountId(accountId);
+
+    if (exists) {
+      savedEventRepository.delete(accountId, eventId);
+      return "관심 공연에서 삭제되었습니다";
+    } else {
+      savedEventRepository.save(savedEvent);
+      return "관심 공연으로 등록되었습니다";
+    }
   }
 
-  private Long saveEventSchedule(EventSchedule eventSchedule) {
-    // save() 메서드는 영향받은 행의 수(1)를 반환
-    eventScheduleRepository.save(eventSchedule);
-    // eventSchedule 객체에는 생성된 ID가 설정되어 있음
-    return eventSchedule.getEventScheduleId();
+  // 관심 공연 조회
+  public List<EventItemResponseDTO> getSavedEvents(Long accountId, int offset, int limit) {
+    List<EventItemResponseDTO> events = savedEventRepository.findByAccountId(accountId, offset, limit);
+    int total = savedEventRepository.countTotalEventsByAccountId(accountId);
+
+    for (EventItemResponseDTO event : events) {
+      event.setTotal(total);
+    }
+
+    return events;
   }
 
-  private Long savePrice(Price price) {
-    return priceRepository.save(price);
-
-  }
 }
