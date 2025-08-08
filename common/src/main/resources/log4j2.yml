@@ -23,7 +23,7 @@ Configuration:
         fileName: "${log-path}/${service-name}.log"
         filePattern: "${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.log"
         JSONLayout:
-          compact: false
+          compact: true
           eventEol: true
           properties: true
           stacktraceAsString: true
