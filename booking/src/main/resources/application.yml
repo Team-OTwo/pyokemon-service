@@ -27,4 +27,10 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
-
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml
