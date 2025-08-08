@@ -1,7 +1,7 @@
-package com.pyokemon.did.controller;
+package com.pyokemon.did.api.backend;
 
 import com.pyokemon.did.dto.request.CreateWalletRequestDto;
-import com.pyokemon.did.service.WalletService;
+import com.pyokemon.did.service.WalletMetadataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-@RequestMapping("/multitenancy/wallet")
+@RequestMapping("/backend/wallet")
 @AllArgsConstructor
-public class WalletController {
+public class WalletMetadataController {
 
-    private final WalletService walletService;
+    private final WalletMetadataService walletService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<String> createWallet(
      @RequestBody @Valid CreateWalletRequestDto requestDto
     ) {
