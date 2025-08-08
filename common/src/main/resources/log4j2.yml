@@ -20,8 +20,8 @@ Configuration:
     
     RollingFile:
       - name: JsonFile
-        fileName: "${log-path}/${service-name}.json"
-        filePattern: "${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.json"
+        fileName: "${log-path}/${service-name}.log"
+        filePattern: "${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.log"
         JSONLayout:
           compact: false
           eventEol: true
@@ -39,7 +39,7 @@ Configuration:
             basePath: "${log-path}"
             maxDepth: 1
             IfFileName:
-              glob: "${service-name}-*.json"
+              glob: "${service-name}-*.log"
             IfLastModified:
               age: "30d"
   
