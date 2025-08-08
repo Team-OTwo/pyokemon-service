@@ -1,8 +1,7 @@
-package com.pyokemon.did.controller;
+package com.pyokemon.did.api.open;
 
 import com.pyokemon.did.remote.tenant.dto.response.CreateTenantInvitationResponse;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

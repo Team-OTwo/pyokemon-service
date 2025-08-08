@@ -1,19 +1,27 @@
 package com.pyokemon.did.remote.tenant.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.domain.WalletMetadata;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
+/**
+ * ACA-PY에서 지갑 생성 응답
+ */
 public record CreateWalletResponse(
-    @JsonProperty("created_at")
-    LocalDateTime createdAt,
-    @JsonProperty("updated_at")
-    LocalDateTime updatedAt,
     @JsonProperty("wallet_id")
     String walletId,
-    @JsonProperty("key_management_mode")
-    String keyManagementMode,
-    Map<String, Object> settings,
     String token
-) {} 
+) {
+    /**
+     * 응답을 WalletMetadata 엔티티로 변환
+     *
+     * @param tenantId 테넌트 식별자
+     * @return 새 WalletMetadata 엔티티
+     */
+    public WalletMetadata toEntity(Long tenantId) {
+        return WalletMetadata.builder()
+                .key(walletId)
+                .token(token)
+                .tenantId(tenantId)
+                .build();
+    }
+}

@@ -1,0 +1,29 @@
+{
+	"info": {
+		"_postman_id": "99b5c9f6-3fed-4ba8-a46e-524c4115f6b3",
+		"name": "pyokemon-DID",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "43713016",
+		"_collection_link": "https://jun-2005676.postman.co/workspace/Jun's-Workspace~fa60e619-10af-410b-8871-083fbe531a05/collection/43713016-99b5c9f6-3fed-4ba8-a46e-524c4115f6b3?action=share&source=collection_link&creator=43713016"
+	},
+	"item": [
+		{
+			"name": "테넌트 지갑 생성",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tenant_id\": \"34\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8084/did/backend/wallet"
+			},
+			"response": []
+		}
+	]
+}

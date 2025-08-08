@@ -1,0 +1,8 @@
+CREATE TABLE tb_wallet_metadata (
+    wallet_metadata_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    wallet_key VARCHAR(255) NOT NULL,
+    tenant_id BIGINT(255) NOT NULL,
+    tenant_token VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

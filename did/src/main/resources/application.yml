@@ -6,6 +6,7 @@ server:
 spring:
   profiles:
     include:
+      - flyway
       - common
   
   datasource:
@@ -53,4 +54,3 @@ acapy:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.pyokemon.did.entity 
