@@ -9,8 +9,9 @@ import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import com.pyokemon.account.user.entity.User;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
 import com.pyokemon.account.user.repository.UserRepository;
+import com.pyokemon.common.util.PasswordUtil;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,8 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final UserDeviceRepository userDeviceRepository;
-    private final PasswordEncoder passwordEncoder;
+    // private final PasswordEncoder passwordEncoder;
+    private final PasswordUtil passwordUtil;
     private final TokenGenerator tokenGenerator;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -56,7 +58,7 @@ public class AccountService {
         Account account = accountOpt.get();
 
         // 비밀번호 확인
-        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+        if (!passwordUtil.matches(request.getPassword(), account.getPassword())) {
             log.warn("로그인 실패: 비밀번호 불일치 - {}", request.getLoginId());
             throw new BusinessException("로그인 ID 또는 비밀번호가 올바르지 않습니다.", AccountErrorCodes.INVALID_LOGIN);
         }
@@ -101,7 +103,7 @@ public class AccountService {
         Account account = accountOpt.get();
 
         // 비밀번호 확인
-        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+        if (!passwordUtil.matches(request.getPassword(), account.getPassword())) {
             log.warn("로그인 실패: 비밀번호 불일치 - {}", request.getLoginId());
             throw new BusinessException("로그인 ID 또는 비밀번호가 올바르지 않습니다.", AccountErrorCodes.INVALID_LOGIN);
         }
@@ -213,19 +215,19 @@ public class AccountService {
                 });
 
         // 2. 현재 비밀번호 확인
-        if (!passwordEncoder.matches(request.getCurrentPassword(), account.getPassword())) {
+        if (!passwordUtil.matches(request.getCurrentPassword(), account.getPassword())) {
             log.warn("비밀번호 변경 실패: 현재 비밀번호 불일치 - ID: {}", accountId);
             throw new BusinessException("현재 비밀번호가 일치하지 않습니다.", AccountErrorCodes.PASSWORD_MISMATCH);
         }
 
         // 3. 새 비밀번호가 현재 비밀번호와 같은지 확인
-        if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
+        if (passwordUtil.matches(request.getNewPassword(), account.getPassword())) {
             log.warn("비밀번호 변경 실패: 새 비밀번호가 현재 비밀번호와 동일함 - ID: {}", accountId);
             throw new BusinessException("새 비밀번호는 현재 비밀번호와 달라야 합니다.", AccountErrorCodes.PASSWORD_MATCH);
         }
 
         // 4. 새 비밀번호 암호화 및 저장
-        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+        String encodedNewPassword = passwordUtil.encode(request.getNewPassword());
         account.setPassword(encodedNewPassword);
 
         // 5. 저장

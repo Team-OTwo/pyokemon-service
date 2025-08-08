@@ -1,6 +1,7 @@
 package com.pyokemon.account.user.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+import com.pyokemon.common.util.PasswordUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,8 @@ public class UserService {
   private final UserRepository userRepository;
   private final AccountRepository accountRepository;
   private final UserDeviceRepository userDeviceRepository;
-  private final PasswordEncoder passwordEncoder;
+  // private final PasswordEncoder passwordEncoder;
+  private final PasswordUtil passwordUtil;
 
   // 계정 생성
   @Transactional
@@ -45,7 +47,7 @@ public class UserService {
 
     Account account = Account.builder()
             .loginId(request.getLoginId())
-            .password(passwordEncoder.encode(request.getPassword()))
+            .password(passwordUtil.encode(request.getPassword()))
             .role("USER")
             .status(AccountStatus.ACTIVE)
             .build();

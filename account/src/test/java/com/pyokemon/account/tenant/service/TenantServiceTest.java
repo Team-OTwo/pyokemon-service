@@ -15,7 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+import com.pyokemon.common.util.PasswordUtil;
 
 import com.pyokemon.account.auth.entity.Account;
 import com.pyokemon.account.auth.entity.AccountStatus;
@@ -38,7 +39,8 @@ class TenantServiceTest {
   private AccountRepository accountRepository;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
+  // private PasswordEncoder passwordEncoder;
+  private PasswordUtil passwordUtil;
 
   @InjectMocks
   private TenantService tenantService;
@@ -69,7 +71,7 @@ class TenantServiceTest {
     // Given
     when(accountRepository.findByLoginId(registerRequest.getLoginId())).thenReturn(Optional.empty());
     when(tenantRepository.findByCorpId(registerRequest.getCorpId())).thenReturn(Optional.empty());
-    when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded_password");
+    when(passwordUtil.encode(registerRequest.getPassword())).thenReturn("encoded_password");
     when(accountRepository.insert(any(Account.class))).thenReturn(1);
     when(tenantRepository.insert(any(Tenant.class))).thenReturn(1);
 
@@ -84,7 +86,7 @@ class TenantServiceTest {
     
     verify(accountRepository).findByLoginId(registerRequest.getLoginId());
     verify(tenantRepository).findByCorpId(registerRequest.getCorpId());
-    verify(passwordEncoder).encode(registerRequest.getPassword());
+    verify(passwordUtil).encode(registerRequest.getPassword());
     verify(accountRepository).insert(any(Account.class));
     verify(tenantRepository).insert(any(Tenant.class));
   }
