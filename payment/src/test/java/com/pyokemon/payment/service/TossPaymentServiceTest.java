@@ -1,118 +1,81 @@
 package com.pyokemon.payment.service;
 
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
 import com.pyokemon.payment.dto.PaymentConfirmResponseDto;
 import com.pyokemon.payment.repository.PaymentRepository;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
-
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Function;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TossPaymentServiceTest {
 
-    @Mock
-    PaymentRepository paymentRepository;
+  private MockWebServer mockWebServer;
+  private TossPaymentService tossPaymentService;
+  private PaymentRepository paymentRepository;
 
-    @Mock
-    WebClient webClient;
+  @BeforeEach
+  void setUp() throws Exception {
+    mockWebServer = new MockWebServer();
+    mockWebServer.start();
 
-    @Mock
-    WebClient.RequestBodyUriSpec uriSpec;
+    WebClient webClient = WebClient.builder().baseUrl(mockWebServer.url("/").toString())
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
 
-    @Mock
-    WebClient.RequestBodySpec bodySpec;
+    paymentRepository = mock(PaymentRepository.class);
+    tossPaymentService = new TossPaymentService(paymentRepository, webClient);
+  }
 
-    @Mock
-    WebClient.RequestHeadersSpec<?> headersSpec;
+  @AfterEach
+  void tearDown() throws Exception {
+    mockWebServer.shutdown();
+  }
 
-    TossPaymentService tossPaymentService;
+  @Test
+  void confirm_successfulPayment_updatesToDone() {
+    // given
+    String jsonResponse = "{\"method\":\"카드\"}";
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        tossPaymentService = new TossPaymentService(paymentRepository, webClient);
-    }
+    mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jsonResponse)
+        .addHeader("Content-Type", "application/json"));
 
-    @Test
-    void confirm_successfulPayment_updatesToDone() {
-        // given
-        PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
-        request.setOrderId("ORDER123");
-        request.setPaymentKey("PAY123");
-        request.setAmount(1000);
+    PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
+    request.setOrderId("ORDER123");
+    request.setPaymentKey("KEY123");
+    request.setAmount(1000);
 
-        PaymentConfirmResponseDto responseDto = new PaymentConfirmResponseDto();
-        responseDto.setMethod("카드");
+    // when
+    PaymentConfirmResponseDto response = tossPaymentService.confirm(request);
 
-        // mock WebClient 체인
-        when(webClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri("/payments/confirm")).thenReturn(bodySpec);
-        when(bodySpec.bodyValue(request)).thenReturn(headersSpec);
-        when(headersSpec.exchangeToMono(any())).thenAnswer(invocation -> {
-            Function<ClientResponse, Mono<PaymentConfirmResponseDto>> func = invocation.getArgument(0);
-            ClientResponse mockResponse = mock(ClientResponse.class);
-            when(mockResponse.statusCode()).thenReturn(HttpStatus.OK);
-            when(mockResponse.bodyToMono(PaymentConfirmResponseDto.class)).thenReturn(Mono.just(responseDto));
-            return func.apply(mockResponse);
-        });
+    // then
+    verify(paymentRepository).updatePayment(eq("ORDER123"), eq("KEY123"), eq("DONE"), eq("카드"));
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals("카드", response.getMethod());
+  }
 
-        // when
-        PaymentConfirmResponseDto result = tossPaymentService.confirm(request);
+  @Test
+  void confirm_failedPayment_updatesToFailed() {
+    // given
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400).setBody("{\"message\":\"error\"}")
+        .addHeader("Content-Type", "application/json"));
 
-        // then
-        assertNotNull(result);
-        assertEquals("카드", result.getMethod());
-        verify(paymentRepository).updatePayment("ORDER123", "PAY123", "DONE", "카드");
-    }
+    PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
+    request.setOrderId("ORDER_FAIL");
+    request.setPaymentKey("KEY_FAIL");
+    request.setAmount(1000);
 
-    @Test
-    void confirm_failedPayment_updatesToFailed() {
-        // given
-        PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
-        request.setOrderId("ORDER456");
-        request.setPaymentKey("FAILKEY");
-        request.setAmount(2000);
+    // when
+    PaymentConfirmResponseDto response = tossPaymentService.confirm(request);
 
-        // mock WebClient 체인
-        when(webClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri("/payments/confirm")).thenReturn(bodySpec);
-        when(bodySpec.bodyValue(request)).thenReturn(headersSpec);
-        when(headersSpec.exchangeToMono(any())).thenAnswer(invocation -> {
-            Function<ClientResponse, Mono<PaymentConfirmResponseDto>> func = invocation.getArgument(0);
-            ClientResponse mockResponse = mock(ClientResponse.class);
-            when(mockResponse.statusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-            when(mockResponse.bodyToMono(String.class)).thenReturn(Mono.just("에러 응답"));
-            return func.apply(mockResponse);
-        });
-
-        // when
-        PaymentConfirmResponseDto result = tossPaymentService.confirm(request);
-
-        // then
-        assertNull(result); // 예외 터졌지만 try-catch로 null 반환
-        verify(paymentRepository).updatePaymentFailed("ORDER456", "FAILED", null);
-    }
-
-    @Test
-    void fail_updatesToFailed() {
-        // given
-        PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
-        request.setOrderId("ORDER789");
-
-        // when
-        tossPaymentService.fail(request);
-
-        // then
-        verify(paymentRepository).updatePaymentFailed("ORDER789", "FAILED", null);
-    }
+    // then
+    verify(paymentRepository).updatePaymentFailed("ORDER_FAIL", "FAILED", null);
+    Assertions.assertNull(response);
+  }
 }

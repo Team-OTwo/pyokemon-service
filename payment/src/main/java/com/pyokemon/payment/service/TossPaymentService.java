@@ -22,8 +22,8 @@ public class TossPaymentService {
   public PaymentConfirmResponseDto confirm(PaymentConfirmRequestDto request) {
     PaymentConfirmResponseDto dto = null;
     try {
-      dto =
-              tossWebClient.post().uri("/payments/confirm").bodyValue(request).exchangeToMono(response -> {
+      dto = tossWebClient.post().uri("/payments/confirm").bodyValue(request)
+          .exchangeToMono(response -> {
             if (response.statusCode().isError()) {
               return response.bodyToMono(String.class)
                   .doOnNext(error -> System.out.println("에러: " + error))

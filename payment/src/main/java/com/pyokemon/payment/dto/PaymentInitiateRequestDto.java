@@ -11,10 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentInitiateRequestDto {
-    private Long paymentId;
-    private Long bookingId;
-    private String orderId;
-    private int amount;
-    private String method;
-    private Long accountId;
+  private Long paymentId;
+  private Long bookingId;
+  private String orderId;
+  private int amount;
+  private String method;
+  private Long accountId;
 }

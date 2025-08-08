@@ -6,11 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {
-    "com.pyokemon.account", 
-    "com.pyokemon.common",
-    "com.pyokemon.common.exception"
-})
+@ComponentScan(
+    basePackages = {"com.pyokemon.account", "com.pyokemon.common", "com.pyokemon.common.exception"})
 @MapperScan({"com.pyokemon.account.auth.repository", "com.pyokemon.account.tenant.repository",
     "com.pyokemon.account.user.repository", "com.pyokemon.account.admin.repository"})
 public class AccountApplication {
