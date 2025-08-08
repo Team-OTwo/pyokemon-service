@@ -2,7 +2,7 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY event/build/libs/did-0.0.1.jar app.jar
+COPY did/build/libs/did-0.0.1.jar app.jar
 
 ENV SPRING_PROFILES_ACTIVE=dev
 
