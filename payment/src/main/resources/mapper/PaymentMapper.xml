@@ -5,16 +5,24 @@
 
 <mapper namespace="com.pyokemon.payment.repository.PaymentRepository">
 
-    <resultMap id="paymentResultMap" type="Payment">
-        <id property="id" column="id"/>
-        <result property="booking_id" column="booking_id"/>
-        <result property="user_id" column="user_id"/>
-        <result property="payment_key" column="payment_key"/>
-        <result property="method" column="method"/>
-        <result property="total_price" column="total_price"/>
-        <result property="status" column="status"/>
-        <result property="createdAt" column="createdAt"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
+    <insert id="insertInitiatePayment" parameterType="com.pyokemon.payment.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO tb_payment (
+            booking_id, order_id, amount, method, status, account_id
+        ) VALUES (
+                     #{bookingId}, #{orderId}, #{amount}, #{method}, #{status}, #{accountId}
+                 )
+    </insert>
 
-</mapper> 
+    <update id="updatePayment" parameterType="com.pyokemon.payment.dto.PaymentConfirmRequestDto">
+        UPDATE tb_payment
+        SET payment_key = #{paymentKey}, status = #{status}, method = #{method}, created_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updatePaymentFailed">
+        UPDATE tb_payment
+        SET status = #{status}, updated_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+</mapper>
