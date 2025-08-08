@@ -1,39 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.pyokemon.booking.repository.BookingRepository">
 
-    <resultMap id="BookingResultMap" type="com.pyokemon.booking.entity.Booking">
-        <id column="booking_id" property="bookingId"/>
-        <result column="event_schedule_id" property="eventScheduleId"/>
-        <result column="seat_id" property="seatId"/>
-        <result column="account_id" property="accountId"/>
-        <result column="payment_id" property="paymentId"/>
-        <result column="status" property="status"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="updated_at" property="updatedAt"/>
-    </resultMap>
-
-    <select id="findSeatIdsByEventScheduleId" resultType="java.lang.Long">
+    <select id="findSeatIdsByEventScheduleId" resultType="long">
         SELECT seat_id
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
         AND status IN ('PENDING', 'BOOKED')
     </select>
 
-    <select id="findByAccountId" resultMap="BookingResultMap">
+    <select id="findByAccountId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
     </select>
 
-    <select id="findAllByEventScheduleIdAndSeatId" resultMap="BookingResultMap">
+    <select id="findAllByEventScheduleIdAndSeatId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId} AND seat_id = #{seatId}
         ORDER BY created_at DESC
     </select>
 
-    <select id="findActiveBookingByEventScheduleIdAndAccountId" resultMap="BookingResultMap">
+    <select id="findActiveBookingByEventScheduleIdAndAccountId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId} AND account_id = #{accountId}
@@ -41,18 +33,18 @@
         LIMIT 1
     </select>
 
-    <select id="findPendingBookings" resultMap="BookingResultMap">
+    <select id="findPendingBookings" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE status = 'PENDING'
     </select>
 
-    <insert id="save" parameterType="com.pyokemon.booking.entity.Booking" useGeneratedKeys="true" keyProperty="bookingId">
+    <insert id="save" parameterType="Booking" useGeneratedKeys="true" keyProperty="bookingId">
         INSERT INTO tb_booking (event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at)
         VALUES (#{eventScheduleId}, #{seatId}, #{accountId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt})
     </insert>
 
-    <update id="update" parameterType="com.pyokemon.booking.entity.Booking">
+    <update id="update" parameterType="Booking">
         UPDATE tb_booking
         SET status = #{status}, updated_at = #{updatedAt}
         WHERE booking_id = #{bookingId}
