@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.event.repository.SavedEventRepository">
+
+
+    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="savedEventId"
+            keyColumn="saved_event_id">
+        INSERT INTO tb_saved_event (
+        event_id,
+        account_id
+        ) VALUES (
+        #{eventId},
+        #{accountId}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="SavedEvent">
+        DELETE FROM tb_saved_event
+        WHERE account_id = #{accountId}
+            AND event_id = #{eventId}
+
+    </delete>
+
+    <select id="existsByAccountIdAndEventId" resultType="boolean">
+        SELECT
+        EXISTS(SELECT 1
+        FROM tb_saved_event
+        WHERE account_id=#{accountId}
+        AND event_id=#{eventId})
+    </select>
+
+    <select id="findByAccountId" resultType="EventItemResponseDTO">
+        SELECT se.event_id, e.title, es.event_date, es.event_schedule_id, e.thumbnail_url
+        FROM tb_saved_event se JOIN tb_event e ON se.event_id = e.event_id JOIN tb_event_schedule es ON e.event_id = es.event_id
+        WHERE se.account_id = #{accountId}
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countTotalEventsByAccountId" resultType="int">
+        SELECT COUNT(*) FROM tb_saved_event se WHERE se.account_id = #{accountId}
+    </select>
+
+</mapper>
+

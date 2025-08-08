@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.did.domain.repository.WalletMetadataRepository">
+
+    <!-- WalletMetadata용 ResultMap 정의 -->
+    <resultMap id="walletMetadataMap" type="com.pyokemon.did.domain.WalletMetadata">
+        <id property="id" column="wallet_metadata_id"/>
+        <result property="key" column="wallet_key"/>
+        <result property="token" column="tenant_token"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+
+
+    <insert id="save" parameterType="com.pyokemon.did.domain.WalletMetadata" useGeneratedKeys="true" keyProperty="id" keyColumn="wallet_metadata_id">
+        INSERT INTO tb_wallet_metadata (wallet_key, tenant_token, tenant_id)
+        VALUES (#{key}, #{token}, #{tenantId})
+    </insert>
+
+    <select id="findById" resultMap="walletMetadataMap">
+        SELECT wallet_metadata_id, wallet_key, tenant_token, tenant_id FROM tb_wallet_metadata WHERE wallet_metadata_id = #{id}
+    </select>
+
+    <select id="existsByTenantId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_wallet_metadata WHERE tenant_id = #{tenantId}
+    </select>
+
+    <select id="findByTenantId" resultMap="walletMetadataMap">
+        SELECT wallet_metadata_id, wallet_key, tenant_token, tenant_id FROM tb_wallet_metadata WHERE tenant_id = #{tenantId}
+    </select>
+</mapper>
