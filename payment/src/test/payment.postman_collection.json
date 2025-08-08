@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "c04169a3-d438-4037-b39e-a36fdf7288b3",
+		"name": "payment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30993736"
+	},
+	"item": [
+		{
+			"name": "결제 임시 저장",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"bookingId\":\"1\",\r\n  \"orderId\": \"ORDER_17230112111123456\",\r\n  \"amount\": 15000,\r\n  \"method\": \"카드\",\r\n  \"accountId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/payment/api/payments/initiate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"payment",
+						"api",
+						"payments",
+						"initiate"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
