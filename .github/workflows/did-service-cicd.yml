@@ -89,6 +89,8 @@ jobs:
               --name did-service \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
+              -e LOG_PATH=/app/logs \
+              -e SERVICE_NAME=did-service \
               -v /volume1/docker/pyokemon/did-service/logs:/app/logs \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-did-service/did-service:latest

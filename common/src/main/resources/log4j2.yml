@@ -5,6 +5,10 @@ Configuration:
     Property:
       - name: log-pattern
         value: "[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [%X{spanId}] - %highlight{%msg%n}"
+      - name: log-path
+        value: "${env:LOG_PATH:-/app/logs}"
+      - name: service-name
+        value: "${env:SERVICE_NAME:-unknown-service}"
   
   Appenders:
     Console:
@@ -13,12 +17,39 @@ Configuration:
       PatternLayout:
         Pattern: ${log-pattern}
         disableAnsi: false
+    
+    RollingFile:
+      - name: JsonFile
+        fileName: "${log-path}/${service-name}.json"
+        filePattern: "${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.json"
+        JSONLayout:
+          compact: false
+          eventEol: true
+          properties: true
+          stacktraceAsString: true
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: "10MB"
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: "${log-path}"
+            maxDepth: 1
+            IfFileName:
+              glob: "${service-name}-*.json"
+            IfLastModified:
+              age: "30d"
   
   Loggers:
     Root:
       level: INFO
       AppenderRef:
         - ref: Console
+        - ref: JsonFile
+          level: INFO
     Logger:
       - name: com.pyokemon
         level: DEBUG

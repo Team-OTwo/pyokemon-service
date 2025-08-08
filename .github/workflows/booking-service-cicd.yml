@@ -89,6 +89,8 @@ jobs:
               --name booking-service \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
+              -e LOG_PATH=/app/logs \
+              -e SERVICE_NAME=booking-service \
               -v /volume1/docker/pyokemon/booking-service/logs:/app/logs \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-booking-service/booking-service:latest

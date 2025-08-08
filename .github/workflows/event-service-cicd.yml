@@ -89,6 +89,8 @@ jobs:
               --name event-service \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
+              -e LOG_PATH=/app/logs \
+              -e SERVICE_NAME=event-service \
               -v /volume1/docker/pyokemon/event-service/logs:/app/logs \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-event-service/event-service:latest

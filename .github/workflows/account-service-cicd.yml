@@ -89,6 +89,8 @@ jobs:
               --name account-service \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
+              -e LOG_PATH=/app/logs \
+              -e SERVICE_NAME=account-service \
               -v /volume1/docker/pyokemon/account-service/logs:/app/logs \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-account-service/account-service:latest
