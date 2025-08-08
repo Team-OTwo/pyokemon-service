@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthlySummaryDTO {
-    private int totalRevenue;
-    private int activeEventCount;
-    private int totalTicketsSold;
-} 
+  private int totalRevenue;
+  private int activeEventCount;
+  private int totalTicketsSold;
+}

@@ -6,7 +6,7 @@
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
     <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
         INSERT INTO tb_event (
-            tenant_id,
+            account_id,
             title,
             age_limit,
             description,
@@ -16,7 +16,7 @@
             created_at,
             updated_at
         ) VALUES (
-            #{tenantId},
+            #{accountId},
             #{title},
             #{ageLimit},
             #{description},
