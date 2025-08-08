@@ -17,10 +17,10 @@ public class Payment {
 
   private Long payment_id;
   private Long booking_id;
-  private Long user_id;
+  private Long account_id;
   private String payment_key;
   private String method;
-  private Long total_price;
+  private Long total_amount;
   private PaymentStatus status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
