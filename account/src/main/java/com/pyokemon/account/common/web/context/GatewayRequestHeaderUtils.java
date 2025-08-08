@@ -12,7 +12,7 @@ public class GatewayRequestHeaderUtils {
 
   public static String getUserIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String accountId = (String) request.getAttribute("X-Auth-AccountId");
+    String accountId = request.getHeader("X-Auth-AccountId");
     if (accountId == null || accountId.isEmpty()) {
       throw new BusinessException("사용자 인증 정보가 없습니다.", AccountErrorCodes.ACCESS_DENIED);
     }
@@ -21,7 +21,7 @@ public class GatewayRequestHeaderUtils {
 
   public static String getUserRoleOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String role = (String) request.getAttribute("X-Auth-Role");
+    String role = request.getHeader("X-Auth-Role");
     if (role == null || role.isEmpty()) {
       throw new BusinessException("사용자 권한 정보가 없습니다.", AccountErrorCodes.ACCESS_DENIED);
     }
