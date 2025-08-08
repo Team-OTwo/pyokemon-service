@@ -45,3 +45,11 @@ jwt:
   secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
   expiresIn: 1800000  # 30분 (밀리초) - Access Token
   mobileExpiresIn: 604800000  # 7일 (밀리초) - Refresh Token
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml
