@@ -3,8 +3,8 @@
 		"_postman_id": "3e69f891-cf58-456a-9aa9-01077cb82d6d",
 		"name": "event",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "47330978",
-		"_collection_link": "https://blue-moon-913939.postman.co/workspace/My-Workspace~dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=47330978"
+		"_exporter_id": "47176954",
+		"_collection_link": "https://blue-moon-913939.postman.co/workspace/My-Workspace~dca11d37-d81a-4ae3-8828-fbd92d9f37f6/collection/33007023-3e69f891-cf58-456a-9aa9-01077cb82d6d?action=share&source=collection_link&creator=47176954"
 	},
 	"item": [
 		{
@@ -328,6 +328,89 @@
 						"api",
 						"events",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트별 등록 공연 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "관심 공연 등록, 삭제",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Auth-AccountId",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Auth-Role",
+						"value": "USER",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/save/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"save",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "테넌트 공연 상세 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "관심 공연 조회",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Auth-AccountId",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Auth-Role",
+						"value": "USER",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/saved-events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"saved-events"
 					]
 				}
 			},

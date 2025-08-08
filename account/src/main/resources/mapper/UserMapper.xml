@@ -11,13 +11,13 @@
     </select>
 
     <insert id="insert" parameterType="com.pyokemon.account.user.entity.User" useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO tb_user (account_id, name, phone, birth)
-        VALUES (#{accountId}, #{name}, #{phone}, #{birth})
+        INSERT INTO tb_user (account_id, name, phone, birth, is_verified)
+        VALUES (#{accountId}, #{name}, #{phone}, #{birth}, #{isVerified})
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.user.entity.User">
         UPDATE tb_user 
-        SET name = #{name}, phone = #{phone}, birth = #{birth}
+        SET name = #{name}, phone = #{phone}, birth = #{birth}, is_verified = #{isVerified}
         WHERE user_id = #{userId}
     </update>
 

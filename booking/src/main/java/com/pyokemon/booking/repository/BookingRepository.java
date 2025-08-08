@@ -1,6 +1,5 @@
 package com.pyokemon.booking.repository;
 
-
 import com.pyokemon.booking.entity.Booking;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

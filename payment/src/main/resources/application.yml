@@ -33,3 +33,10 @@ mybatis:
     default-statement-timeout: 30
 
 
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml

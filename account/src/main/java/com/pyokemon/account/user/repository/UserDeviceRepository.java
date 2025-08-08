@@ -17,7 +17,11 @@ public interface UserDeviceRepository {
   Optional<UserDevice> findByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber,
       boolean isValid);
 
+  boolean existsByUserId(Long userId);
+
   boolean existsByDeviceNumberAndIsValid(String deviceNumber, boolean isValid);
+
+  boolean existsByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber, boolean isValid);
 
   int insert(UserDevice userDevice);
 

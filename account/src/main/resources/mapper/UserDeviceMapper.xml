@@ -18,6 +18,14 @@
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE device_number = #{deviceNumber} AND is_valid = #{isValid}
     </select>
 
+    <select id="existsByUserIdAndDeviceNumberAndIsValid" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber} AND is_valid = #{isValid}
+    </select>
+
+    <select id="existsByUserId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId}
+    </select>
+
     <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
         INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_valid)
         VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isValid})
