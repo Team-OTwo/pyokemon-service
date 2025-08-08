@@ -29,6 +29,7 @@ import com.pyokemon.event.entity.Venue;
 import com.pyokemon.event.repository.EventRepository;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
+import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.repository.VenueRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +37,9 @@ class TenantEventManagementServiceTest {
 
   @Mock
   private EventRepository eventRepository;
+
+  @Mock
+  private TenantEventRepository tenantEventRepository;
 
   @Mock
   private EventScheduleRepository eventScheduleRepository;
@@ -67,10 +71,10 @@ class TenantEventManagementServiceTest {
             .title("테스트 공연")
             .eventDate(LocalDateTime.now().plusDays(30))
             .venueName("테스트 공연장")
-            .status("APPROVED")
-            .build();
+                    .status(EventStatus.APPROVED)
+        .build();
 
-    when(eventRepository.findTenantEventListByAccountId(validAccountId))
+    when(tenantEventRepository.findTenantEventListByAccountId(validAccountId))
         .thenReturn(List.of(mockEvent));
 
     // when
@@ -81,9 +85,9 @@ class TenantEventManagementServiceTest {
         assertEquals(1, result.size());
         assertEquals("테스트 공연", result.get(0).getTitle());
         assertEquals("테스트 공연장", result.get(0).getVenueName());
-        assertEquals("APPROVED", result.get(0).getStatus());
+        assertEquals(EventStatus.APPROVED, result.get(0).getStatus());
         assertEquals(1L, result.get(0).getEventScheduleId());
-        verify(eventRepository).findTenantEventListByAccountId(validAccountId);
+        verify(tenantEventRepository).findTenantEventListByAccountId(validAccountId);
   }
 
   @Test
@@ -102,7 +106,7 @@ class TenantEventManagementServiceTest {
                     .className("R석").price(100000).build()))
             .build();
 
-    when(eventRepository.findTenantEventDetailByEventId(validEventId)).thenReturn(mockDetail);
+    when(tenantEventRepository.findTenantEventDetailByEventId(validEventId)).thenReturn(mockDetail);
 
     // when
     TenantEventDetailResponseDTO result = eventService.getTenantEventDetailByEventId(validEventId);
@@ -116,7 +120,7 @@ class TenantEventManagementServiceTest {
     assertEquals(150000, result.getPrices().get(0).getPrice());
     assertEquals("R석", result.getPrices().get(1).getClassName());
     assertEquals(100000, result.getPrices().get(1).getPrice());
-    verify(eventRepository).findTenantEventDetailByEventId(validEventId);
+    verify(tenantEventRepository).findTenantEventDetailByEventId(validEventId);
   }
 
   @Test
@@ -138,12 +142,12 @@ class TenantEventManagementServiceTest {
         .title("새로운 공연").status(EventStatus.PENDING).build();
 
     when(venueRepository.findById(1L)).thenReturn(java.util.Optional.of(new Venue()));
-    when(eventRepository.save(any(Event.class))).thenReturn(1);
-    when(eventScheduleRepository.save(any())).thenReturn(1);
+    when(eventRepository.save(any(Event.class))).thenReturn(1L);
+    when(eventScheduleRepository.save(any())).thenReturn(1L);
     when(priceRepository.save(any())).thenReturn(1L);
 
     // when
-    EventResponseDto result = eventService.registerEvent(registerDto);
+    EventResponseDto result = eventService.registerEvent(registerDto, validAccountId);
 
     // then
     assertNotNull(result);
@@ -215,7 +219,7 @@ class TenantEventManagementServiceTest {
         ))
         .build();
 
-    when(eventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
+    when(tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
         .thenReturn(mockBookingDetail);
 
     // when
@@ -231,6 +235,6 @@ class TenantEventManagementServiceTest {
     assertEquals(30, result.getBookingStatus().get(0).getBookedSeats());
     assertEquals(70, result.getBookingStatus().get(0).getAvailableSeats());
     assertEquals(30.0, result.getBookingStatus().get(0).getBookingRate());
-    verify(eventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
+    verify(tenantEventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
   }
 }

@@ -27,6 +27,7 @@ import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.repository.EventRepository;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
+import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.repository.VenueRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final TenantEventRepository tenantEventRepository;
     private final EventScheduleRepository eventScheduleRepository;
     private final VenueRepository venueRepository;
     private final PriceRepository priceRepository;
@@ -46,12 +48,12 @@ public class EventService {
     }
 
     public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
-        return eventRepository.findTenantEventDetailByEventId(eventId);
+        return tenantEventRepository.findTenantEventDetailByEventId(eventId);
     }
 
     public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(
             Long eventScheduleId) {
-        return eventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
+        return tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
     }
 
     public List<EventResponseDto> getEventsByAccountId(Long accountId) {
@@ -60,7 +62,7 @@ public class EventService {
     }
 
     public List<TenantEventListDto> getTenantEventListByAccountId(Long accountId) {
-        return eventRepository.findTenantEventListByAccountId(accountId);
+        return tenantEventRepository.findTenantEventListByAccountId(accountId);
     }
 
     public MonthlyEventSummaryResponse getMonthlyEventSummary(Long accountId, int year, int month) {
@@ -69,8 +71,8 @@ public class EventService {
         String endDate = String.format("%04d-%02d-%02d 23:59:59", year, month,
                 java.time.YearMonth.of(year, month).lengthOfMonth());
 
-        List<MonthlyEventDTO> events = eventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
-        MonthlySummaryDTO summary = eventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
+        List<MonthlyEventDTO> events = tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
+        MonthlySummaryDTO summary = tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
 
         return MonthlyEventSummaryResponse.builder().events(events).summary(summary).build();
     }
