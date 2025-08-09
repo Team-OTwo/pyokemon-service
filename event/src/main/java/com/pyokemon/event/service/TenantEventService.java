@@ -45,7 +45,8 @@ public class TenantEventService {
         return tenantEventRepository.findTenantEventDetailByEventId(eventId);
     }
 
-    public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(Long eventScheduleId) {
+    public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(
+            Long eventScheduleId) {
         return tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
     }
 
@@ -59,8 +60,10 @@ public class TenantEventService {
         String endDate = String.format("%04d-%02d-%02d 23:59:59", year, month,
                 java.time.YearMonth.of(year, month).lengthOfMonth());
 
-        List<MonthlyEventDTO> events = tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
-        MonthlySummaryDTO summary = tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
+        List<MonthlyEventDTO> events =
+                tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
+        MonthlySummaryDTO summary =
+                tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
 
         return MonthlyEventSummaryResponse.builder().events(events).summary(summary).build();
     }
@@ -125,10 +128,10 @@ public class TenantEventService {
                 scheduleDto.setEventId(eventId);
 
                 // EventSchedule 생성 시 eventId를 직접 전달
-                EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
-                        .venueId(scheduleDto.getVenueId()).ticketOpenAt(scheduleDto.getTicketOpenAt())
-                        .eventDate(scheduleDto.getEventDate()).createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now()).build();
+                EventSchedule eventSchedule =
+                        EventSchedule.builder().eventId(eventId).venueId(scheduleDto.getVenueId())
+                                .ticketOpenAt(scheduleDto.getTicketOpenAt()).eventDate(scheduleDto.getEventDate())
+                                .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
 
                 Long eventScheduleId = saveEventSchedule(eventSchedule);
 
@@ -149,7 +152,7 @@ public class TenantEventService {
     @Transactional
     public String registerEventSchedule(Long eventId, EventScheduleDto eventScheduleDto) {
         eventScheduleDto.setEventId(eventId);
-        
+
         // EventSchedule 생성 시 eventId를 직접 전달
         EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
                 .venueId(eventScheduleDto.getVenueId()).ticketOpenAt(eventScheduleDto.getTicketOpenAt())

@@ -2,6 +2,8 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +18,6 @@ import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.service.TenantEventService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -47,7 +48,8 @@ public class TenantEventController {
     @GetMapping("/{eventId}/detail")
     public ResponseDto<TenantEventDetailResponseDTO> getTenantEventDetail(
             @PathVariable Long eventId) {
-        TenantEventDetailResponseDTO eventDetail = tenantEventService.getTenantEventDetailByEventId(eventId);
+        TenantEventDetailResponseDTO eventDetail =
+                tenantEventService.getTenantEventDetailByEventId(eventId);
         return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
     }
 
@@ -65,14 +67,15 @@ public class TenantEventController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<EventResponseDto> registerEvent(
             @Valid @RequestBody EventRegisterDto eventRegisterDto) {
-        EventResponseDto registeredEvent = tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
+        EventResponseDto registeredEvent =
+                tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
         return ResponseDto.success(registeredEvent, "Event registered successfully");
     }
 
     // 이벤트 수정 (테넌트용)
     @PutMapping("/{eventId}")
     public ResponseDto<EventResponseDto> updateEvent(@PathVariable Long eventId,
-            @Valid @RequestBody EventUpdateDto eventUpdateDto) {
+                                                     @Valid @RequestBody EventUpdateDto eventUpdateDto) {
         eventUpdateDto.setEventId(eventId);
         EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
         return ResponseDto.success(updatedEvent, "Event updated successfully");
@@ -82,8 +85,8 @@ public class TenantEventController {
     @PostMapping("/{eventId}/schedules")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<String> registerEventSchedule(@PathVariable Long eventId,
-            @Valid @RequestBody EventScheduleDto eventScheduleDto) {
+                                                     @Valid @RequestBody EventScheduleDto eventScheduleDto) {
         String result = tenantEventService.registerEventSchedule(eventId, eventScheduleDto);
         return ResponseDto.success(result, "Event schedule registered successfully");
     }
-} 
+}
