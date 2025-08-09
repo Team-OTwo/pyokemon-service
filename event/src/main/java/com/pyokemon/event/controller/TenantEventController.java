@@ -64,8 +64,8 @@ public class TenantEventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<EventResponseDto> registerEvent(
-            @Valid @RequestBody EventRegisterDto eventRegisterDto, @RequestParam Long accountId) {
-        EventResponseDto registeredEvent = tenantEventService.registerEvent(eventRegisterDto, accountId);
+            @Valid @RequestBody EventRegisterDto eventRegisterDto) {
+        EventResponseDto registeredEvent = tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
         return ResponseDto.success(registeredEvent, "Event registered successfully");
     }
 
