@@ -3,11 +3,11 @@ package com.pyokemon.did.service;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.domain.WalletMetadata;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.ProvisionWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.dto.request.ProvisionWalletRequest;
 import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
 import com.pyokemon.did.remote.tenant.TenantAcapyClient;
-import com.pyokemon.did.service.impl.WalletServiceImpl;
+import com.pyokemon.did.service.impl.WalletMetadataServiceImpl;
 import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WalletServiceTest {
+class WalletMetadataServiceTest {
 
     @Mock
     private WalletMetadataRepository walletMetadataRepository;
@@ -32,7 +32,7 @@ class WalletServiceTest {
     private TenantAcapyClient tenantAcapyClient;
 
     @InjectMocks
-    private WalletServiceImpl walletService;
+    private WalletMetadataServiceImpl walletService;
 
     private final Long TENANT_ID = 1L;
     private final ProvisionWalletRequest request = new ProvisionWalletRequest(TENANT_ID);

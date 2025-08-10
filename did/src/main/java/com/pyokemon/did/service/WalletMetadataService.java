@@ -1,11 +1,11 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.dto.request.ProvisionWalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.ProvisionWalletRequest;
 
 /**
  * 지갑 관리 작업을 위한 서비스 인터페이스
  */
-public interface WalletService {
+public interface WalletMetadataService {
     
     /**
      * 지정된 테넌트를 위한 지갑 프로비저닝 및 메타데이터 등록

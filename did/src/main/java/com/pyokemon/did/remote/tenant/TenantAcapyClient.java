@@ -1,8 +1,9 @@
 package com.pyokemon.did.remote.tenant;
 
-import com.pyokemon.did.remote.tenant.dto.request.CreateTenantInvitationRequest;
+
 import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.tenant.dto.response.CreateTenantInvitationResponse;
+import com.pyokemon.did.remote.tenant.dto.request.OobInvitationRequest.CreateOobInvitationRequest;
+import com.pyokemon.did.remote.tenant.dto.response.OobInvitationResponse.CreateOobInvitationResponse;
 import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,9 +20,9 @@ public interface TenantAcapyClient {
     @PostMapping(value="/multitenancy/wallet")
     public CreateWalletResponse createWallet(@RequestBody CreateWalletRequest request);
 
-    @PostMapping(value="/out-of-band/create-invitation?auto_accept=true&create_unique_did=true&multi_use=false")
-    public CreateTenantInvitationResponse createInvitation(
+    @PostMapping(value="/out-of-band/create-invitation?auto_accept=true&create_unique_did=true&multi_use=true")
+    public CreateOobInvitationResponse createInvitation(
         @RequestHeader("Authorization") String authorization,
-        @RequestBody CreateTenantInvitationRequest request
+        @RequestBody CreateOobInvitationRequest request
     );
 }

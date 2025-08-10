@@ -3,12 +3,12 @@ package com.pyokemon.did.service.impl;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.domain.WalletMetadata;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.ProvisionWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.dto.request.ProvisionWalletRequest;
 import com.pyokemon.did.remote.tenant.TenantAcapyClient;
 import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
 import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
-import com.pyokemon.did.service.WalletService;
+import com.pyokemon.did.service.WalletMetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WalletServiceImpl implements WalletService {
+public class WalletMetadataServiceImpl implements WalletMetadataService {
     private final WalletMetadataRepository walletMetadataRepository;
     private final TenantAcapyClient tenantAcapyClient;
 
