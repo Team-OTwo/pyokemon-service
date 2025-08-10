@@ -2,7 +2,6 @@ package com.pyokemon.did.service.impl;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.WalletMetadata;
 import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.CreateWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
 import com.pyokemon.did.remote.tenant.RemoteTenantAcaPyService;
@@ -48,10 +47,9 @@ public class WalletMetadataServiceImpl implements WalletMetadataService {
             );
 
             // 지갑 메타데이터 저장
-            WalletMetadata walletMetadata = walletResponse.toEntity(tenantId);
-            log.info("테넌트 ID: {}, 지갑 ID: {}로 지갑이 생성되었습니다", tenantId, walletMetadata.getKey());
+            walletMetadataRepository.save(walletResponse.toEntity(tenantId));
+            log.info("테넌트 ID: {} 지갑이 생성되었습니다", tenantId);
 
-            walletMetadataRepository.save(walletMetadata);
         } catch (Exception e) {
             log.error("지갑 프로비저닝 중 오류 발생: {}", e.getMessage(), e);
             throw new BusinessException("지갑 생성에 실패했습니다.", DidErrorCodes.WALLET_CREATION_FAILED, e);

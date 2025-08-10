@@ -2,8 +2,6 @@ package com.pyokemon.did.service.impl;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.EventInvitation;
-
 import com.pyokemon.did.domain.WalletMetadata;
 import com.pyokemon.did.domain.dto.request.EventInvitationRequest.CreateEventInvitationRequest;
 import com.pyokemon.did.domain.repository.EventInvitationRepository;
@@ -72,14 +70,7 @@ public class EventInvitationServiceImpl implements EventInvitationService {
                 request.getEventId(), request.getTenantId(), invitationResponse.getOobId());
                 
             // 이벤트 초대장 정보 저장
-            EventInvitation eventInvitation = EventInvitation.builder()
-                    .eventId(request.getEventId())
-                    .tenantId(request.getTenantId())
-                    .invitationUrl(invitationResponse.getInvitationUrl())
-                    .oobId(invitationResponse.getOobId())
-                    .build();
-                
-            eventInvitationRepository.save(eventInvitation);
+            eventInvitationRepository.save(invitationResponse.toEntity(request.getEventId(), request.getTenantId()));
         } catch (BusinessException e) {
             // 이미 정의된 비즈니스 예외는 그대로 전파
             throw e;

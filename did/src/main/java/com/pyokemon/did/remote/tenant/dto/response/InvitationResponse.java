@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.tenant.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.domain.EventInvitation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,6 +57,15 @@ public class InvitationResponse {
 
         @JsonProperty("invitation_url")
         private String invitationUrl;
+
+        public EventInvitation toEntity(Long eventId, Long tenantId) {
+            return EventInvitation.builder()
+                    .eventId(eventId)
+                    .tenantId(tenantId)
+                    .invitationUrl(invitationUrl)
+                    .oobId(oobId)
+                    .build();
+        }
     }
     
     /**
