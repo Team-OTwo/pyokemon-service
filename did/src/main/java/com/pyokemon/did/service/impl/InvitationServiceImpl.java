@@ -1,5 +1,11 @@
 package com.pyokemon.did.service.impl;
 
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.DidErrorCodes;
+import com.pyokemon.did.domain.EventInvitation;
+import com.pyokemon.did.domain.repository.EventInvitationRepository;
+import com.pyokemon.did.dto.request.EventInvitationRequest;
+import com.pyokemon.did.dto.response.EventInvitationResponse;
 import com.pyokemon.did.remote.mediator.MediatorAcapyClient;
 import com.pyokemon.did.remote.mediator.dto.request.CreateMediatorInvitationRequest;
 import com.pyokemon.did.remote.mediator.dto.response.CreateMediatorInvitationResponse;
@@ -24,6 +30,7 @@ public class InvitationServiceImpl implements InvitationService {
 
     private final MediatorAcapyClient mediatorAcapyClient;
     private final TenantAcapyClient tenantAcapyClient;
+    private final EventInvitationRepository eventInvitationRepository;
     
     @Value("${acapy.wallet.key}")
     private String walletKey;

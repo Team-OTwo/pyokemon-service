@@ -1,5 +1,7 @@
 package com.pyokemon.did.service;
 
+import com.pyokemon.did.dto.request.EventInvitationRequest;
+import com.pyokemon.did.dto.response.EventInvitationResponse;
 import com.pyokemon.did.remote.mediator.dto.response.CreateMediatorInvitationResponse;
 import com.pyokemon.did.remote.tenant.dto.response.CreateTenantInvitationResponse;
 
@@ -21,4 +23,5 @@ public interface InvitationService {
      * @return 테넌트 초대장 응답
      */
     CreateTenantInvitationResponse getTenantInvitation();
+
 }
