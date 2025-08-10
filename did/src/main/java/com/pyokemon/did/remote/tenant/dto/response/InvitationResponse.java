@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * ACA-PY OOB(Out of Band) 초대장 응답을 위한 DTO 그룹
  */
-public class OobInvitationResponse {
+public class InvitationResponse {
 
     /**
      * 초대장 상세 정보 DTO
@@ -42,7 +42,7 @@ public class OobInvitationResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateOobInvitationResponse {
+    public static class AcaPyCreateInvitationResponse {
         private String state;
         private boolean trace;
 

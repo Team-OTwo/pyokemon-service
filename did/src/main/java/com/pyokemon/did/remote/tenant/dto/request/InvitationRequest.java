@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * ACA-PY에 OOB(Out of Band) 초대장 생성을 요청하기 위한 DTO 그룹
  */
-public class OobInvitationRequest {
+public class InvitationRequest {
 
     /**
      * OOB 초대장 생성 요청 DTO
@@ -20,7 +20,7 @@ public class OobInvitationRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateOobInvitationRequest {
+    public static class AcaPyCreateInvitationRequest {
         private List<String> accept;
         
         private String alias;
@@ -50,8 +50,8 @@ public class OobInvitationRequest {
          * @param eventId 이벤트 식별자
          * @return 생성된 초대장 요청 객체
          */
-        public static CreateOobInvitationRequest generate(Long eventId) {
-            return CreateOobInvitationRequest.builder()
+        public static AcaPyCreateInvitationRequest generate(Long eventId) {
+            return AcaPyCreateInvitationRequest.builder()
                     .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19"))
                     .alias("invitation:" + eventId)
                     .goal("To create OOB invitation with event_id: " + eventId)

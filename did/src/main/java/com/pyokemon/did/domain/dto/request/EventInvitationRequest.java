@@ -19,7 +19,7 @@ public class EventInvitationRequest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ProvisionEventInvitationRequest {
+    public static class CreateEventInvitationRequest {
         @NotNull
         private Long tenantId;
         

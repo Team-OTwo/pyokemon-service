@@ -3,11 +3,11 @@ package com.pyokemon.did.service.impl;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.domain.WalletMetadata;
-import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.ProvisionWalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.CreateWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.remote.tenant.TenantAcapyClient;
-import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
+import com.pyokemon.did.remote.tenant.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.tenant.dto.request.WalletRequest.AcaPyCreateWalletRequest;
+import com.pyokemon.did.remote.tenant.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import com.pyokemon.did.service.WalletMetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WalletMetadataServiceImpl implements WalletMetadataService {
     private final WalletMetadataRepository walletMetadataRepository;
-    private final TenantAcapyClient tenantAcapyClient;
+    private final RemoteTenantAcaPyService remoteTenantAcaPyService;
 
     @Value("${acapy.wallet.key}")
     private String walletKey;
@@ -33,7 +33,7 @@ public class WalletMetadataServiceImpl implements WalletMetadataService {
      */
     @Override
     @Transactional
-    public void provisionWallet(ProvisionWalletRequest request) {
+    public void createWallet(CreateWalletRequest request) {
         Long tenantId = request.getTenantId();
         
         // 이 테넌트에 대한 지갑이 이미 존재하는지 확인
@@ -43,8 +43,8 @@ public class WalletMetadataServiceImpl implements WalletMetadataService {
 
         try {
             // ACA-PY 클라이언트를 통해 지갑 생성
-            CreateWalletResponse walletResponse = tenantAcapyClient.createWallet(
-                CreateWalletRequest.create(tenantId, walletKey)
+            AcaPyCreateWalletResponse walletResponse = remoteTenantAcaPyService.acaPyCreateWallet(
+                    AcaPyCreateWalletRequest.generate(tenantId, walletKey)
             );
 
             // 지갑 메타데이터 저장

@@ -9,7 +9,7 @@ public class WalletMetadataRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ProvisionWalletRequest {
+    public static class CreateWalletRequest {
         @NotNull
         @JsonProperty("tenant_id")
         private Long tenantId;

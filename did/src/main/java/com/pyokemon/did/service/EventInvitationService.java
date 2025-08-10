@@ -1,6 +1,6 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.domain.dto.request.EventInvitationRequest.ProvisionEventInvitationRequest;
+import com.pyokemon.did.domain.dto.request.EventInvitationRequest.CreateEventInvitationRequest;
 import com.pyokemon.did.remote.mediator.dto.response.CreateMediatorInvitationResponse;
 
 public interface EventInvitationService {
@@ -12,6 +12,6 @@ public interface EventInvitationService {
      */
     CreateMediatorInvitationResponse getMediatorInvitation();
 
-    void provisionEventInvitation(ProvisionEventInvitationRequest request);
+    void createEventInvitation(CreateEventInvitationRequest request);
 
 }

@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.did.remote.mediator.dto.response.CreateMediatorInvitationResponse;
-import com.pyokemon.did.service.EventInvitationService;
 
 import lombok.extern.slf4j.Slf4j;
 

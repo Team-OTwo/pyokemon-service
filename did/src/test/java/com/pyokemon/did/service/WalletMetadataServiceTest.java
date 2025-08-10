@@ -3,12 +3,12 @@ package com.pyokemon.did.service;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.domain.WalletMetadata;
-import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.ProvisionWalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.CreateWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.tenant.TenantAcapyClient;
+import com.pyokemon.did.remote.tenant.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.tenant.dto.request.WalletRequest.AcaPyCreateWalletRequest;
+import com.pyokemon.did.remote.tenant.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import com.pyokemon.did.service.impl.WalletMetadataServiceImpl;
-import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,13 +29,13 @@ class WalletMetadataServiceTest {
     private WalletMetadataRepository walletMetadataRepository;
 
     @Mock
-    private TenantAcapyClient tenantAcapyClient;
+    private RemoteTenantAcaPyService remoteTenantAcaPyService;
 
     @InjectMocks
     private WalletMetadataServiceImpl walletService;
 
     private final Long TENANT_ID = 1L;
-    private final ProvisionWalletRequest request = new ProvisionWalletRequest(TENANT_ID);
+    private final CreateWalletRequest request = new CreateWalletRequest(TENANT_ID);
     @BeforeEach
     void setUp() {
         String WALLET_KEY = "test-wallet-key";
@@ -43,55 +43,55 @@ class WalletMetadataServiceTest {
     }
 
     @Test
-    @DisplayName("지갑 프로비저닝 성공 테스트")
-    void provisionWallet_Success() {
+    @DisplayName("지갑 생성 성공 테스트")
+    void createWallet_Success() {
         // Given
         String TOKEN = "test-token";
         String WALLET_ID = "test-wallet-id";
-        CreateWalletResponse walletResponse = new CreateWalletResponse(WALLET_ID, TOKEN);
+        AcaPyCreateWalletResponse walletResponse = new AcaPyCreateWalletResponse(WALLET_ID, TOKEN);
         
         when(walletMetadataRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
-        when(tenantAcapyClient.createWallet(any(CreateWalletRequest.class))).thenReturn(walletResponse);
+        when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         when(walletMetadataRepository.save(any(WalletMetadata.class))).thenReturn(1);
 
         // When
-        walletService.provisionWallet(request);
+        walletService.createWallet(request);
 
         // Then
         verify(walletMetadataRepository).existsByTenantId(TENANT_ID);
-        verify(tenantAcapyClient).createWallet(any(CreateWalletRequest.class));
+        verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(walletMetadataRepository).save(any(WalletMetadata.class));
     }
 
     @Test
     @DisplayName("지갑이 이미 존재하는 경우 예외 발생 테스트")
-    void provisionWallet_WalletAlreadyExists() {
+    void createWallet_WalletAlreadyExists() {
         // Given
         when(walletMetadataRepository.existsByTenantId(TENANT_ID)).thenReturn(true);
 
         // When & Then
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            walletService.provisionWallet(request);
+            walletService.createWallet(request);
         });
 
         assertEquals(DidErrorCodes.WALLET_ALREADY_EXISTS, exception.getErrorCode());
         verify(walletMetadataRepository).existsByTenantId(TENANT_ID);
-        verify(tenantAcapyClient, never()).createWallet(any(CreateWalletRequest.class));
+        verify(remoteTenantAcaPyService, never()).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(walletMetadataRepository, never()).save(any(WalletMetadata.class));
     }
 
     @Test
     @DisplayName("ACA-PY 클라이언트 예외 처리 테스트")
-    void provisionWallet_AcapyClientException() {
+    void createWallet_AcaPyClientException() {
         // Given
         RuntimeException acapyException = new RuntimeException("ACA-PY 클라이언트 오류");
         
         when(walletMetadataRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
-        when(tenantAcapyClient.createWallet(any(CreateWalletRequest.class))).thenThrow(acapyException);
+        when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenThrow(acapyException);
 
         // When & Then
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            walletService.provisionWallet(request);
+            walletService.createWallet(request);
         });
 
         // 예외 검증
@@ -100,7 +100,7 @@ class WalletMetadataServiceTest {
         assertEquals(acapyException, exception.getCause());
 
         verify(walletMetadataRepository).existsByTenantId(TENANT_ID);
-        verify(tenantAcapyClient).createWallet(any(CreateWalletRequest.class));
+        verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(walletMetadataRepository, never()).save(any(WalletMetadata.class));
     }
 }
