@@ -4,10 +4,7 @@ CREATE TABLE tb_price (
         seat_class_id BIGINT NOT NULL,
         price INT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        CONSTRAINT fk_price_seat_class FOREIGN KEY (seat_class_id) REFERENCES tb_seat_class(seat_class_id),
-        CONSTRAINT fk_price_event_schedule FOREIGN KEY (event_schedule_id) REFERENCES tb_event_schedule (event_schedule_id)
-
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

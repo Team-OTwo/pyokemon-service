@@ -6,9 +6,7 @@ CREATE TABLE tb_seat (
     `row` VARCHAR(10) NOT NULL,
     col VARCHAR(10) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_seat_venue FOREIGN KEY (venue_id) REFERENCES tb_venue(venue_id),
-    CONSTRAINT fk_seat_class FOREIGN KEY (seat_class_id) REFERENCES tb_seat_class(seat_class_id)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

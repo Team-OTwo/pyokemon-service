@@ -1,7 +1,7 @@
 -- tb_event 테이블 생성
 CREATE TABLE tb_event (
     event_id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    tenant_id       BIGINT NOT NULL,
+    account_id      BIGINT NOT NULL,
     title           VARCHAR(255) NOT NULL,
     age_limit       BIGINT,
     description     TEXT,

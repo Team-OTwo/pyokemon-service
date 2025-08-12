@@ -6,9 +6,7 @@ CREATE TABLE tb_booking (
             payment_id BIGINT,
             status ENUM('PENDING', 'BOOKED', 'CANCELLED') DEFAULT 'PENDING',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            CONSTRAINT fk_booking_schedule FOREIGN KEY (event_schedule_id) REFERENCES tb_event_schedule(event_schedule_id),
-            CONSTRAINT fk_booking_seat FOREIGN KEY (seat_id) REFERENCES tb_seat(seat_id)
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
