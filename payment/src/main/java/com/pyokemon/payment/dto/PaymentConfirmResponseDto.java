@@ -14,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class PaymentConfirmResponseDto {
   private Long paymentId;
+  private Long bookingId;
   private String orderId;
   private String paymentKey;
   private String method;

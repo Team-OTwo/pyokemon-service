@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PaymentKafkaDto {
   private Long paymentId;
+  private Long bookingId;
   private String orderId;
   private String status;
 }

@@ -24,6 +24,7 @@ public class TossPaymentService {
 
   public PaymentConfirmResponseDto confirm(PaymentConfirmRequestDto request) {
     PaymentConfirmResponseDto dto = null;
+    boolean markedDone = false;
     try {
       dto = tossWebClient.post().uri("/payments/confirm").bodyValue(request)
           .exchangeToMono(response -> {
@@ -35,16 +36,22 @@ public class TossPaymentService {
             return response.bodyToMono(PaymentConfirmResponseDto.class);
           }).block();
 
-      paymentRepository.updatePayment(request.getOrderId(), request.getPaymentKey(), "DONE",
+      paymentRepository.updatePayment(
+              request.getOrderId(),
+              request.getPaymentKey(),
+              "DONE",
           dto.getMethod()
 
       );
       PaymentKafkaDto kafkaDto =
-          new PaymentKafkaDto(dto.getPaymentId(), dto.getOrderId(), dto.getStatus());
+          new PaymentKafkaDto(dto.getPaymentId(),dto.getBookingId(), dto.getOrderId(), dto.getStatus());
       kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
+      markedDone = true;
 
     } catch (Exception e) {
-      paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
+      if(!markedDone) {
+        paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
+      }
     }
     return dto;
   }
