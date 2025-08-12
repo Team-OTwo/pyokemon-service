@@ -67,7 +67,7 @@ public class AccountService {
         String refreshToken =
                 tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
 
-        if (account.getRole().equals("USER")) {
+        if ("USER".equals(account.getRole())) {
         log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
 
         Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
