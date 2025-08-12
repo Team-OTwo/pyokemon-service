@@ -10,7 +10,3 @@ CREATE TABLE tb_booking (
 
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE INDEX idx_booking_schedule_id ON tb_booking(event_schedule_id);
-CREATE INDEX idx_booking_seat_id ON tb_booking(seat_id);
-CREATE INDEX idx_booking_user_id ON tb_booking(account_id);

@@ -7,7 +7,3 @@ CREATE TABLE tb_price (
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-CREATE INDEX idx_price_schedule_id ON tb_price(event_schedule_id);
-CREATE INDEX idx_price_seat_class_id ON tb_price(seat_class_id);
