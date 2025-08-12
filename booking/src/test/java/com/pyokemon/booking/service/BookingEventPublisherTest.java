@@ -46,54 +46,42 @@ class BookingEventPublisherTest {
 
     @Test
     void publishBookingStatusUpdate_Booked_ShouldPublishEvent() throws Exception {
-        // Given
-        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"payment_id\":300,\"status\":\"BOOKED\",\"message\":\"예매가 완료되었습니다\"}";
+        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"BOOKED\"}";
         when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
 
-        // When
         bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-        // Then
         verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
     }
 
     @Test
     void publishBookingStatusUpdate_Canceled_ShouldPublishEvent() throws Exception {
-        // Given
         testBooking.setStatus(Booking.Booked.CANCELED);
-        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"payment_id\":300,\"status\":\"CANCELED\",\"message\":\"예매가 취소되었습니다\"}";
+        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"CANCELED\"}";
         when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
 
-        // When
         bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-        // Then
         verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
     }
 
     @Test
     void publishBookingStatusUpdate_Failed_ShouldPublishEvent() throws Exception {
-        // Given
         testBooking.setStatus(Booking.Booked.FAILED);
-        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"payment_id\":300,\"status\":\"FAILED\",\"message\":\"예매에 실패했습니다\"}";
+        String expectedMessage = "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"FAILED\"}";
         when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
 
-        // When
         bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-        // Then
         verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
     }
 
     @Test
     void publishBookingStatusUpdate_Pending_ShouldNotPublishEvent() throws Exception {
-        // Given
         testBooking.setStatus(Booking.Booked.PENDING);
 
-        // When
         bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-        // Then
         verify(kafkaTemplate, never()).send(any(), any());
     }
 }
