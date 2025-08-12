@@ -43,7 +43,7 @@ public class AccountService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public LoginResponseDto login(LoginRequestDto request, String role) {
+    public LoginResponseDto login(LoginRequestDto request) {
         log.info("로그인 시도: {}", request.getLoginId());
 
         // 계정 조회
@@ -67,7 +67,7 @@ public class AccountService {
         String refreshToken =
                 tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
 
-        if (role.equals("USER")) {
+        if (account.getRole().equals("USER")) {
         log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
 
         Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
