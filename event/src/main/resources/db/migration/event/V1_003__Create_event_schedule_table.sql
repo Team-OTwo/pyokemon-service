@@ -6,9 +6,5 @@ CREATE TABLE tb_event_schedule (
     ticket_open_at DATETIME,
     event_date DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    INDEX idx_event_schedule_event_id (event_id),
-    INDEX idx_event_schedule_venue_id (venue_id),
-    INDEX idx_event_schedule_event_date (event_date)
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

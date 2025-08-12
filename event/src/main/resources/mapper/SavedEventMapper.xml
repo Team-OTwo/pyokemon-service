@@ -37,6 +37,7 @@
         SELECT se.event_id, e.title, es.event_date, es.event_schedule_id, e.thumbnail_url
         FROM tb_saved_event se JOIN tb_event e ON se.event_id = e.event_id JOIN tb_event_schedule es ON e.event_id = es.event_id
         WHERE se.account_id = #{accountId}
+        ORDER BY se.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
