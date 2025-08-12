@@ -15,7 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+import com.pyokemon.common.util.PasswordUtil;
 
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
@@ -36,7 +37,8 @@ public class AccountServiceTest {
   private AccountRepository accountRepository;
 
   @Mock
-  private PasswordEncoder passwordEncoder;
+  // private PasswordEncoder passwordEncoder;
+  private PasswordUtil passwordUtil;
 
   @Mock
   private TokenGenerator tokenGenerator;
@@ -72,8 +74,8 @@ public class AccountServiceTest {
     request.setPassword("password123");
 
     // Mock 설정
-    when(accountRepository.findByLoginId("test@example.com")).thenReturn(Optional.of(testAccount));
-    when(passwordEncoder.matches("password123", "encodedPassword")).thenReturn(true);
+    when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE)).thenReturn(Optional.of(testAccount));
+    when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
     when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("access-token");
     when(tokenGenerator.generateRefreshToken(1L, "USER")).thenReturn("refresh-token");
 
@@ -88,8 +90,8 @@ public class AccountServiceTest {
     assertEquals(1L, response.getAccountId());
 
     // Mock 메소드가 호출되었는지 검증
-    verify(accountRepository).findByLoginId("test@example.com");
-    verify(passwordEncoder).matches("password123", "encodedPassword");
+    verify(accountRepository).findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE);
+    verify(passwordUtil).matches("password123", "encodedPassword");
     verify(tokenGenerator).generateAccessToken(1L, "USER");
     verify(tokenGenerator).generateRefreshToken(1L, "USER");
   }
@@ -108,7 +110,7 @@ public class AccountServiceTest {
     assertThrows(BusinessException.class, () -> accountService.login(request));
 
     verify(accountRepository).findByLoginId("nonexistent@example.com");
-    verifyNoInteractions(passwordEncoder);
+    verifyNoInteractions(passwordUtil);
     verifyNoInteractions(tokenGenerator);
   }
 
@@ -121,13 +123,13 @@ public class AccountServiceTest {
     request.setPassword("wrongPassword");
 
     when(accountRepository.findByLoginId("test@example.com")).thenReturn(Optional.of(testAccount));
-    when(passwordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
+    when(passwordUtil.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
     // when & then
     assertThrows(BusinessException.class, () -> accountService.login(request));
 
     verify(accountRepository).findByLoginId("test@example.com");
-    verify(passwordEncoder).matches("wrongPassword", "encodedPassword");
+    verify(passwordUtil).matches("wrongPassword", "encodedPassword");
     verifyNoInteractions(tokenGenerator);
   }
 
@@ -146,7 +148,7 @@ public class AccountServiceTest {
     assertThrows(BusinessException.class, () -> accountService.login(request));
 
     verify(accountRepository).findByLoginId("test@example.com");
-    verifyNoInteractions(passwordEncoder);
+    verifyNoInteractions(passwordUtil);
     verifyNoInteractions(tokenGenerator);
   }
 
@@ -334,9 +336,9 @@ public class AccountServiceTest {
     request.setNewPassword("newPassword123");
 
     when(accountRepository.findByAccountId(accountId)).thenReturn(Optional.of(testAccount));
-    when(passwordEncoder.matches("oldPassword", "encodedPassword")).thenReturn(true);
-    when(passwordEncoder.matches("newPassword123", "encodedPassword")).thenReturn(false);
-    when(passwordEncoder.encode("newPassword123")).thenReturn("newEncodedPassword");
+    when(passwordUtil.matches("oldPassword", "encodedPassword")).thenReturn(true);
+    when(passwordUtil.matches("newPassword123", "encodedPassword")).thenReturn(false);
+    when(passwordUtil.encode("newPassword123")).thenReturn("newEncodedPassword");
     when(accountRepository.update(any(Account.class))).thenReturn(1);
 
     // when
@@ -344,9 +346,9 @@ public class AccountServiceTest {
 
     // then
     verify(accountRepository).findByAccountId(accountId);
-    verify(passwordEncoder).matches("oldPassword", "encodedPassword");
-    verify(passwordEncoder).matches("newPassword123", "encodedPassword");
-    verify(passwordEncoder).encode("newPassword123");
+    verify(passwordUtil).matches("oldPassword", "encodedPassword");
+    verify(passwordUtil).matches("newPassword123", "encodedPassword");
+    verify(passwordUtil).encode("newPassword123");
     verify(accountRepository).update(any(Account.class));
   }
 
@@ -365,7 +367,7 @@ public class AccountServiceTest {
     assertThrows(BusinessException.class, () -> accountService.changePassword(accountId, request));
 
     verify(accountRepository).findByAccountId(accountId);
-    verifyNoInteractions(passwordEncoder);
+    verifyNoInteractions(passwordUtil);
   }
 
   @Test
@@ -378,13 +380,13 @@ public class AccountServiceTest {
     request.setNewPassword("newPassword123");
 
     when(accountRepository.findByAccountId(accountId)).thenReturn(Optional.of(testAccount));
-    when(passwordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
+    when(passwordUtil.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
     // when & then
     assertThrows(BusinessException.class, () -> accountService.changePassword(accountId, request));
 
     verify(accountRepository).findByAccountId(accountId);
-    verify(passwordEncoder).matches("wrongPassword", "encodedPassword");
+    verify(passwordUtil).matches("wrongPassword", "encodedPassword");
   }
 
   @Test
@@ -397,13 +399,13 @@ public class AccountServiceTest {
     request.setNewPassword("oldPassword");
 
     when(accountRepository.findByAccountId(accountId)).thenReturn(Optional.of(testAccount));
-    when(passwordEncoder.matches("oldPassword", "encodedPassword")).thenReturn(true);
+    when(passwordUtil.matches("oldPassword", "encodedPassword")).thenReturn(true);
 
     // when & then
     assertThrows(BusinessException.class, () -> accountService.changePassword(accountId, request));
 
     verify(accountRepository).findByAccountId(accountId);
-    verify(passwordEncoder, times(2)).matches("oldPassword", "encodedPassword");
+    verify(passwordUtil, times(2)).matches("oldPassword", "encodedPassword");
   }
 
   // ========== 계정 삭제 테스트 ==========

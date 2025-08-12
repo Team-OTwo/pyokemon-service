@@ -1,17 +1,12 @@
 package com.pyokemon.event.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
-import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.SavedEvent;
 import com.pyokemon.event.repository.*;
 import com.pyokemon.event.repository.EventRepository;
@@ -24,26 +19,14 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final EventScheduleRepository eventScheduleRepository;
-    private final VenueRepository venueRepository;
-    private final PriceRepository priceRepository;
     private final SavedEventRepository savedEventRepository;
 
     // 공연 상세 조회
     public EventDetailResponseDTO getEventDetail(Long eventId, Long accountId)
             throws NotFoundException {
-        EventDetailResponseDTO dto = eventRepository.findEventDetailByEventId(eventId);
-        if (dto == null) {
-            throw new NotFoundException("해당 공연을 찾을 수 없습니다.");
-        }
-
-        if (accountId != null) {
-            boolean isSaved = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
-            dto.setSaved(isSaved);
-        } else {
-            // 비회원이면 관심공연 isSaved 다 false로 설정
-            dto.setSaved(false);
-        }
+        EventDetailResponseDTO dto = findEventDetailOrThrow(eventId);
+        dto.setSeatPrice(findSeatPrices(dto.getEventScheduleId()));
+        dto.setSaved(checkIfSaved(eventId, accountId));
         return dto;
     }
 
@@ -82,5 +65,25 @@ public class EventService {
         }
 
         return events;
+    }
+
+
+    private EventDetailResponseDTO findEventDetailOrThrow(Long eventId) throws NotFoundException {
+        EventDetailResponseDTO dto = eventRepository.findEventDetailByEventId(eventId);
+        if (dto == null) {
+            throw new NotFoundException("해당 공연을 찾을 수 없습니다.");
+        }
+        return dto;
+    }
+
+    private List<SeatPriceResponseDto> findSeatPrices(Long eventScheduleId) {
+        return eventRepository.findSeatPriceByEventScheduleId(eventScheduleId);
+    }
+
+    private boolean checkIfSaved(Long eventId, Long accountId) {
+        if (accountId == null) {
+            return false;
+        }
+        return savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
     }
 }

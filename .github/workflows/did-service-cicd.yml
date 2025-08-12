@@ -4,15 +4,15 @@ on:
   push:
     branches: [ develop ]
     paths:
-      - 'event/**'
+      - 'did/**'
       - 'common/**'
-      - '.github/workflows/event-service-cicd.yml'
+      - '.github/workflows/did-service-cicd.yml'
   pull_request:
     branches: [ develop ]
     paths:
-      - 'event/**'
+      - 'did/**'
       - 'common/**'
-
+      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -47,9 +47,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./event/Dockerfile
+          file: ./did/Dockerfile
           push: true
-          tags: ghcr.io/team-otwo/pyokemon-event-service/event-service:latest
+          tags: ghcr.io/team-otwo/pyokemon-did-service/did-service:latest
 
       - name: Synology NAS에 배포
         uses: appleboy/ssh-action@master
@@ -63,7 +63,7 @@ jobs:
             export PATH=$PATH:/usr/local/bin
             
             # 대상 디렉토리 생성
-            mkdir -p /volume1/docker/pyokemon/event-service/logs
+            mkdir -p /volume1/docker/pyokemon/did-service/logs
 
             # GitHub Container Registry 로그인
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -76,23 +76,23 @@ jobs:
 
             # Docker 이미지 풀
             echo "최신 Docker 이미지 다운로드"
-            docker pull ghcr.io/team-otwo/pyokemon-event-service/event-service:latest
+            docker pull ghcr.io/team-otwo/pyokemon-did-service/did-service:latest
 
             # 기존 컨테이너 중지 및 삭제
             echo "기존 컨테이너 정리"
-            docker stop event-service || true
-            docker rm event-service || true
+            docker stop did-service || true
+            docker rm did-service || true
 
             # 새 컨테이너 실행
             echo "새 컨테이너 실행"
             docker run -d \
-              --name event-service \
+              --name did-service \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
               -e LOG_PATH=/app/logs \
-              -e SERVICE_NAME=event-service \
-              -v /volume1/docker/pyokemon/event-service/logs:/app/logs \
+              -e SERVICE_NAME=did-service \
+              -v /volume1/docker/pyokemon/did-service/logs:/app/logs \
               --network pyokemon-network \
-              ghcr.io/team-otwo/pyokemon-event-service/event-service:latest
+              ghcr.io/team-otwo/pyokemon-did-service/did-service:latest
 
             echo "배포 완료"

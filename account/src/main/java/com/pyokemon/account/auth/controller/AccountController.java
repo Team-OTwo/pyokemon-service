@@ -29,7 +29,11 @@ public class AccountController {
   // 통합 로그인
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<LoginResponseDto>> login(
+<<<<<<< HEAD
           @Valid @RequestBody LoginRequestDto request) {
+=======
+      @Valid @RequestBody LoginRequestDto request) {
+>>>>>>> 1459cbe393a517c6eae7b4c3101f64b9ee8deef8
     LoginResponseDto response = accountService.login(request);
     return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
   }

@@ -2,13 +2,12 @@ package com.pyokemon.did.service.impl;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.WalletMetadata;
+import com.pyokemon.did.domain.dto.request.WalletMetadataRequest.CreateWalletRequest;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.dto.request.ProvisionWalletRequest;
-import com.pyokemon.did.remote.tenant.TenantAcapyClient;
-import com.pyokemon.did.remote.tenant.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.tenant.dto.response.CreateWalletResponse;
-import com.pyokemon.did.service.WalletService;
+import com.pyokemon.did.remote.tenant.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.tenant.dto.request.WalletRequest.AcaPyCreateWalletRequest;
+import com.pyokemon.did.remote.tenant.dto.response.WalletResponse.AcaPyCreateWalletResponse;
+import com.pyokemon.did.service.WalletMetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WalletServiceImpl implements WalletService {
+public class WalletMetadataServiceImpl implements WalletMetadataService {
     private final WalletMetadataRepository walletMetadataRepository;
-    private final TenantAcapyClient tenantAcapyClient;
+    private final RemoteTenantAcaPyService remoteTenantAcaPyService;
 
     @Value("${acapy.wallet.key}")
     private String walletKey;
@@ -33,7 +32,7 @@ public class WalletServiceImpl implements WalletService {
      */
     @Override
     @Transactional
-    public void provisionWallet(ProvisionWalletRequest request) {
+    public void createWallet(CreateWalletRequest request) {
         Long tenantId = request.getTenantId();
         
         // 이 테넌트에 대한 지갑이 이미 존재하는지 확인
@@ -43,15 +42,14 @@ public class WalletServiceImpl implements WalletService {
 
         try {
             // ACA-PY 클라이언트를 통해 지갑 생성
-            CreateWalletResponse walletResponse = tenantAcapyClient.createWallet(
-                CreateWalletRequest.create(tenantId, walletKey)
+            AcaPyCreateWalletResponse walletResponse = remoteTenantAcaPyService.acaPyCreateWallet(
+                    AcaPyCreateWalletRequest.generate(tenantId, walletKey)
             );
 
             // 지갑 메타데이터 저장
-            WalletMetadata walletMetadata = walletResponse.toEntity(tenantId);
-            log.info("테넌트 ID: {}, 지갑 ID: {}로 지갑이 생성되었습니다", tenantId, walletMetadata.getKey());
+            walletMetadataRepository.save(walletResponse.toEntity(tenantId));
+            log.info("테넌트 ID: {} 지갑이 생성되었습니다", tenantId);
 
-            walletMetadataRepository.save(walletMetadata);
         } catch (Exception e) {
             log.error("지갑 프로비저닝 중 오류 발생: {}", e.getMessage(), e);
             throw new BusinessException("지갑 생성에 실패했습니다.", DidErrorCodes.WALLET_CREATION_FAILED, e);
