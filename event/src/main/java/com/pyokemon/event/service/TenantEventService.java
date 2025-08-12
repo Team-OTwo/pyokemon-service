@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
@@ -40,6 +41,7 @@ public class TenantEventService {
     private final EventScheduleRepository eventScheduleRepository;
     private final VenueRepository venueRepository;
     private final PriceRepository priceRepository;
+    private final ObjectMapper objectMapper;
 
     public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
         return tenantEventRepository.findTenantEventDetailByEventId(eventId);
@@ -181,11 +183,27 @@ public class TenantEventService {
             return null;
         }
 
-        // TenantEventDetailResponseDTO를 Event 엔티티로 변환
-        return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
-                .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
-                .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
-                .status(Event.EventStatus.valueOf(eventDetail.getStatus())).build();
+        try {
+            // DTO -> Entity
+            Event event = objectMapper.convertValue(eventDetail, Event.class);
+            
+            // status enum 변환 필요
+            if (eventDetail.getStatus() != null) {
+                event.setStatus(Event.EventStatus.valueOf(eventDetail.getStatus()));
+            }
+            
+            return event;
+        } catch (IllegalArgumentException e) {
+            return Event.builder()
+                    .eventId(eventDetail.getEventId())
+                    .title(eventDetail.getTitle())
+                    .ageLimit(eventDetail.getAgeLimit())
+                    .description(eventDetail.getDescription())
+                    .genre(eventDetail.getGenre())
+                    .thumbnailUrl(eventDetail.getThumbnailUrl())
+                    .status(Event.EventStatus.valueOf(eventDetail.getStatus()))
+                    .build();
+        }
     }
 
     private void updateEventInfo(Event event, EventUpdateDto updateDto) {
