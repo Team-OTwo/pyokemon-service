@@ -37,6 +37,9 @@ public class EventService {
             throw new NotFoundException("해당 공연을 찾을 수 없습니다.");
         }
 
+        List<SeatPriceResponseDto> seatPrice = eventRepository.findSeatPriceByEventScheduleId(dto.getEventScheduleId());
+        dto.setSeatPrice(seatPrice);
+
         if (accountId != null) {
             boolean isSaved = savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
             dto.setSaved(isSaved);
