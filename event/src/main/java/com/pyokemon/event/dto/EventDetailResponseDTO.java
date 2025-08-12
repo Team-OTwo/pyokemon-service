@@ -1,6 +1,7 @@
 package com.pyokemon.event.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,6 @@ public class EventDetailResponseDTO {
   // venue
   private String venueName;
   private boolean isSaved;
+
+  private List<SeatPriceResponseDto> seatPrice;
 }
