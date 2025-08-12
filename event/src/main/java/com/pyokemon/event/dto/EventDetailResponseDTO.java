@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class EventDetailResponseDTO {
   // event
   private Long eventId;
+  private Long accountId;
   private String title;
   private Long ageLimit;
   private String description;

@@ -42,7 +42,8 @@
         es.event_schedule_id,
         es.ticket_open_at,
         es.event_date,
-        v.venue_name
+        v.venue_name,
+        e.account_id
         FROM tb_event e
         JOIN tb_event_schedule es ON es.event_id = e.event_id
         JOIN tb_venue v ON es.venue_id = v.venue_id
