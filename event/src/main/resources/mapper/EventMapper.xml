@@ -6,25 +6,25 @@
 <mapper namespace="com.pyokemon.event.repository.EventRepository">
     <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
         INSERT INTO tb_event (
-            account_id,
-            title,
-            age_limit,
-            description,
-            genre,
-            thumbnail_url,
-            status,
-            created_at,
-            updated_at
+        account_id,
+        title,
+        age_limit,
+        description,
+        genre,
+        thumbnail_url,
+        status,
+        created_at,
+        updated_at
         ) VALUES (
-            #{accountId},
-            #{title},
-            #{ageLimit},
-            #{description},
-            #{genre},
-            #{thumbnailUrl},
-            #{status},
-            #{createdAt},
-            #{updatedAt}
+        #{accountId},
+        #{title},
+        #{ageLimit},
+        #{description},
+        #{genre},
+        #{thumbnailUrl},
+        #{status},
+        #{createdAt},
+        #{updatedAt}
         )
         <selectKey resultType="long" keyProperty="eventId" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -48,6 +48,13 @@
         JOIN tb_venue v ON es.venue_id = v.venue_id
 
         WHERE e.event_id = #{event_id}
+    </select>
+
+    <select id="findSeatPriceByEventScheduleId" resultType="SeatPriceResponseDto">
+        SELECT class_name, price
+        FROM tb_price p JOIN tb_seat_class sc
+        ON p.seat_class_id = sc.seat_class_id
+        WHERE event_schedule_id = #{eventScheduleId};
     </select>
 
 </mapper>
