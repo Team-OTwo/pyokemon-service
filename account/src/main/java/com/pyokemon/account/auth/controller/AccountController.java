@@ -29,8 +29,8 @@ public class AccountController {
   // 통합 로그인
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<LoginResponseDto>> login(
-      @Valid @RequestBody LoginRequestDto request, @RequestHeader(value = "X-Auth-Role") String role) {
-    LoginResponseDto response = accountService.login(request, role);
+      @Valid @RequestBody LoginRequestDto request) {
+    LoginResponseDto response = accountService.login(request);
     return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
   }
 
