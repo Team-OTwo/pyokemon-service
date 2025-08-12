@@ -1,4 +1,4 @@
-package com.pyokemon.booking.dto;
+package com.pyokemon.booking.dto.kafka;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -15,10 +15,7 @@ public class PaymentEventDto {
     
     @JsonProperty("booking_id")
     private Long bookingId;
-    
-    @JsonProperty("order_id")
-    private String orderId;
-    
+
     @JsonProperty("status")
     private String status;
 }

@@ -1,7 +1,7 @@
 package com.pyokemon.booking.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.booking.dto.PaymentEventDto;
+import com.pyokemon.booking.dto.kafka.PaymentEventDto;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.service.BookingService;
 import lombok.RequiredArgsConstructor;

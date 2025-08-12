@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class BookingService {
     
     private final BookingRepository bookingRepository;
+    private final BookingEventPublisher bookingEventPublisher;
     
     public EventScheduleIdResponse getSeatIdsByEventScheduleId(Long eventScheduleId) {
         try {
@@ -92,6 +93,9 @@ public class BookingService {
                     userBooking.setStatus(Booking.Booked.CANCELED);
                     userBooking.setUpdatedAt(LocalDateTime.now());
                     bookingRepository.update(userBooking);
+                    
+                    bookingEventPublisher.publishBookingStatusUpdate(userBooking);
+                    
                     return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
                 } else {
                     if (userBooking.getStatus() == Booking.Booked.PENDING) {
@@ -179,14 +183,12 @@ public class BookingService {
             Booking booking = bookingOpt.get();
             booking.setStatus(status);
             booking.setUpdatedAt(LocalDateTime.now());
-            
             bookingRepository.update(booking);
-            
-            log.info("Updated booking {} status to {}", bookingId, status);
+        
+            bookingEventPublisher.publishBookingStatusUpdate(booking);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("예약 상태 업데이트 중 오류 발생: bookingId={}, status={}", bookingId, status, e);
             throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
         }
     }
@@ -210,14 +212,12 @@ public class BookingService {
             booking.setStatus(status);
             booking.setPaymentId(paymentId);
             booking.setUpdatedAt(LocalDateTime.now());
-            
             bookingRepository.update(booking);
-            
-            log.info("Updated booking {} status to {} and paymentId to {}", bookingId, status, paymentId);
+
+            bookingEventPublisher.publishBookingStatusUpdate(booking);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("예약 상태 및 결제 ID 업데이트 중 오류 발생: bookingId={}, status={}, paymentId={}", bookingId, status, paymentId, e);
             throw new BusinessException("예약 상태 및 결제 ID를 업데이트할 수 없습니다.", "BOOKING_STATUS_PAYMENT_UPDATE_ERROR");
         }
     }
