@@ -26,7 +26,7 @@ public class Payment {
   private LocalDateTime updatedAt;
 
   public enum PaymentStatus {
-    READY, IN_PROGRESS, WAITING_FOR_DEPOSIT, DONE, CANCELED, PARTIAL_CANCELED, ABORTED, EXPIRED
+    READY, DONE, CANCELED, FAILED
   }
 
 }
