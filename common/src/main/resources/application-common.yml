@@ -52,3 +52,16 @@ management:
     metrics:
       export:
         enabled: true
+
+# dev 프로필 설정
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+# dev 환경에서 로그 환경 변수 설정
+logging:
+  level:
+    com.pyokemon: DEBUG
+  config: classpath:log4j2.yml

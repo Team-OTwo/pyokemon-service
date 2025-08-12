@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:mysql://pyokemon-did-mysql:3306/pyokemon_did?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+# ACA-Py 설정
+acapy:
+  tenant:
+    base-url: http://pyokemon-booking-aca-py-issuer-1:8002  # pyokemon-booking-ACA-Py
+    api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일
+    wallet-id: tenant-wallet
+  mediator:
+    base-url: http://pyokemon-mediator-aca-py-mediator-1:8001  # pyokemon-mediator-ACA-Py (admin port)
+    api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일
+    wallet-id: mediator-wallet
+  wallet:
+    key: MySecretKey123  # Wallet 생성용 키
+  webhook:
+    base-url: http://pyokemon-did-service:8084/did/webhooks
+    topic-prefix: /topic/

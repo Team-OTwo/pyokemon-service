@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    url: jdbc:mysql://pyokemon-booking-mysql:3306/pyokemon_booking?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true

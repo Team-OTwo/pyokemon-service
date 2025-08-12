@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+import com.pyokemon.common.util.PasswordUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,8 @@ public class TenantService {
 
   private final TenantRepository tenantRepository;
   private final AccountRepository accountRepository;
-  private final PasswordEncoder passwordEncoder;
+  // private final PasswordEncoder passwordEncoder;
+  private final PasswordUtil passwordUtil;
 
   @Transactional
   public TenantProfileResponseDto registerTenant(TenantRegisterRequestDto request) {
@@ -41,7 +43,7 @@ public class TenantService {
       throw new BusinessException("이미 등록된 사업자번호입니다.", AccountErrorCodes.DUPLICATE_CORP_ID);
     }
 
-    String encodedPassword = passwordEncoder.encode(request.getPassword());
+    String encodedPassword = passwordUtil.encode(request.getPassword());
     Account account = Account.builder().loginId(request.getLoginId()).password(encodedPassword)
         .role("TENANT").status(AccountStatus.ACTIVE).build();
 
