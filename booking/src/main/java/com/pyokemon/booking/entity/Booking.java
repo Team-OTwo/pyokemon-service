@@ -14,12 +14,13 @@ public class Booking {
   private Long eventScheduleId;
   private Long seatId;
   private Long accountId;
+  private Long tenantId;
   private Long paymentId;
   private Booked status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
   public enum Booked {
-    PENDING, BOOKED, CANCELLED
+    PENDING, BOOKED, CANCELED, FAILED
   }
 }

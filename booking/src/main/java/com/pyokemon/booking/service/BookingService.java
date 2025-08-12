@@ -89,7 +89,7 @@ public class BookingService {
                 Booking userBooking = activeBooking.get();
                 
                 if (userBooking.getSeatId().equals(request.getSeatId())) {
-                    userBooking.setStatus(Booking.Booked.CANCELLED);
+                    userBooking.setStatus(Booking.Booked.CANCELED);
                     userBooking.setUpdatedAt(LocalDateTime.now());
                     bookingRepository.update(userBooking);
                     return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
@@ -158,6 +158,67 @@ public class BookingService {
             }
         } catch (Exception e) {
             log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
+        }
+    }
+    
+    @Transactional
+    public void updateBookingStatus(Long bookingId, Booking.Booked status) {
+        try {
+            if (bookingId == null) {
+                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+            }
+            if (status == null) {
+                throw new BusinessException("상태가 필요합니다.", "INVALID_STATUS");
+            }
+            
+            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+            if (bookingOpt.isEmpty()) {
+                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
+            }
+            
+            Booking booking = bookingOpt.get();
+            booking.setStatus(status);
+            booking.setUpdatedAt(LocalDateTime.now());
+            
+            bookingRepository.update(booking);
+            
+            log.info("Updated booking {} status to {}", bookingId, status);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("예약 상태 업데이트 중 오류 발생: bookingId={}, status={}", bookingId, status, e);
+            throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
+        }
+    }
+    
+    @Transactional
+    public void updateBookingStatusAndPaymentId(Long bookingId, Booking.Booked status, Long paymentId) {
+        try {
+            if (bookingId == null) {
+                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+            }
+            if (status == null) {
+                throw new BusinessException("상태가 필요합니다.", "INVALID_STATUS");
+            }
+            
+            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+            if (bookingOpt.isEmpty()) {
+                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
+            }
+            
+            Booking booking = bookingOpt.get();
+            booking.setStatus(status);
+            booking.setPaymentId(paymentId);
+            booking.setUpdatedAt(LocalDateTime.now());
+            
+            bookingRepository.update(booking);
+            
+            log.info("Updated booking {} status to {} and paymentId to {}", bookingId, status, paymentId);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("예약 상태 및 결제 ID 업데이트 중 오류 발생: bookingId={}, status={}, paymentId={}", bookingId, status, paymentId, e);
+            throw new BusinessException("예약 상태 및 결제 ID를 업데이트할 수 없습니다.", "BOOKING_STATUS_PAYMENT_UPDATE_ERROR");
         }
     }
 }

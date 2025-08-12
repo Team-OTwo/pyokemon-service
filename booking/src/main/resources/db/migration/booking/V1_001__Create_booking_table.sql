@@ -4,7 +4,7 @@ CREATE TABLE tb_booking (
     seat_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,
     payment_id BIGINT,
-    status ENUM('PENDING', 'BOOKED', 'CANCELLED') DEFAULT 'PENDING',
+    status ENUM('PENDING', 'BOOKED', 'CANCELED', 'FAILED') DEFAULT 'PENDING',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_event_schedule_id (event_schedule_id),

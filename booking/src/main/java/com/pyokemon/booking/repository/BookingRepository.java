@@ -14,6 +14,7 @@ public interface BookingRepository {
     List<Booking> findByAccountId(@Param("accountId") Long accountId);
     List<Booking> findAllByEventScheduleIdAndSeatId(@Param("eventScheduleId") Long eventScheduleId, @Param("seatId") Long seatId);
     Optional<Booking> findActiveBookingByEventScheduleIdAndAccountId(@Param("eventScheduleId") Long eventScheduleId, @Param("accountId") Long accountId);
+    Optional<Booking> findById(@Param("bookingId") Long bookingId);
     List<Booking> findPendingBookings();
     
     void save(Booking booking);
