@@ -15,18 +15,18 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Payment {
 
-  private Long payment_id;
-  private Long booking_id;
-  private Long user_id;
-  private String payment_key;
+  private Long paymentId;
+  private Long bookingId;
+  private Long accountId;
+  private String paymentKey;
   private String method;
-  private Long total_price;
+  private Long amount;
   private PaymentStatus status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
   public enum PaymentStatus {
-    READY, IN_PROGRESS, WAITING_FOR_DEPOSIT, DONE, CANCELED, PARTIAL_CANCELED, ABORTED, EXPIRED
+    READY, DONE, CANCELED, FAILED
   }
 
 }
