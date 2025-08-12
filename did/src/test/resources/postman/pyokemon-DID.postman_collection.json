@@ -21,7 +21,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:8084/did/backend/wallet"
+				"url": "http://localhost:8084/did/backend/provision/wallet"
 			},
 			"response": []
 		}
