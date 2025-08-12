@@ -23,7 +23,7 @@ public class PaymentEventListener {
             PaymentEventDto paymentEvent = objectMapper.readValue(message, PaymentEventDto.class);
             Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
                 
-            bookingService.updateBookingStatusAndPaymentId(paymentEvent.getBookingId(), newStatus, paymentEvent.getPaymentId());
+            bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus, paymentEvent.getPaymentId());
         } catch (Exception e) {
             log.error("Error processing payment status update message: {}", message, e);
         }

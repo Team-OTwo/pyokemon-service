@@ -35,7 +35,7 @@ class PaymentEventListenerTest {
 
         paymentEventListener.handlePaymentStatusUpdate(message);
 
-        verify(bookingService).updateBookingStatusAndPaymentId(eq(1L), eq(Booking.Booked.BOOKED), eq(1L));
+        verify(bookingService).updateBookingStatus(eq(1L), eq(Booking.Booked.BOOKED), eq(1L));
     }
 
     @Test
@@ -47,7 +47,7 @@ class PaymentEventListenerTest {
 
         paymentEventListener.handlePaymentStatusUpdate(message);
 
-        verify(bookingService).updateBookingStatusAndPaymentId(eq(1L), eq(Booking.Booked.CANCELED), eq(2L));
+        verify(bookingService).updateBookingStatus(eq(1L), eq(Booking.Booked.CANCELED), eq(2L));
     }
 
     @Test
@@ -59,7 +59,7 @@ class PaymentEventListenerTest {
 
         paymentEventListener.handlePaymentStatusUpdate(message);
 
-        verify(bookingService).updateBookingStatusAndPaymentId(eq(1L), eq(Booking.Booked.FAILED), eq(3L));
+        verify(bookingService).updateBookingStatus(eq(1L), eq(Booking.Booked.FAILED), eq(3L));
     }
 
     @Test
@@ -71,6 +71,6 @@ class PaymentEventListenerTest {
 
         paymentEventListener.handlePaymentStatusUpdate(message);
 
-        verify(bookingService).updateBookingStatusAndPaymentId(eq(1L), eq(Booking.Booked.FAILED), eq(5L));
+        verify(bookingService).updateBookingStatus(eq(1L), eq(Booking.Booked.FAILED), eq(5L));
     }
 }

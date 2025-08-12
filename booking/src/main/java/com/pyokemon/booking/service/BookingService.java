@@ -90,11 +90,7 @@ public class BookingService {
                 Booking userBooking = activeBooking.get();
                 
                 if (userBooking.getSeatId().equals(request.getSeatId())) {
-                    userBooking.setStatus(Booking.Booked.CANCELED);
-                    userBooking.setUpdatedAt(LocalDateTime.now());
-                    bookingRepository.update(userBooking);
-                    
-                    bookingEventPublisher.publishBookingStatusUpdate(userBooking);
+                    updateBookingStatus(userBooking.getBookingId(), Booking.Booked.CANCELED, null);
                     
                     return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
                 } else {
@@ -166,7 +162,7 @@ public class BookingService {
     }
     
     @Transactional
-    public void updateBookingStatus(Long bookingId, Booking.Booked status) {
+    public void updateBookingStatus(Long bookingId, Booking.Booked status, Long paymentId) {
         try {
             if (bookingId == null) {
                 throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
@@ -182,35 +178,9 @@ public class BookingService {
             
             Booking booking = bookingOpt.get();
             booking.setStatus(status);
-            booking.setUpdatedAt(LocalDateTime.now());
-            bookingRepository.update(booking);
-        
-            bookingEventPublisher.publishBookingStatusUpdate(booking);
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
-        }
-    }
-    
-    @Transactional
-    public void updateBookingStatusAndPaymentId(Long bookingId, Booking.Booked status, Long paymentId) {
-        try {
-            if (bookingId == null) {
-                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+            if (paymentId != null) {
+                booking.setPaymentId(paymentId);
             }
-            if (status == null) {
-                throw new BusinessException("상태가 필요합니다.", "INVALID_STATUS");
-            }
-            
-            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
-            if (bookingOpt.isEmpty()) {
-                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
-            }
-            
-            Booking booking = bookingOpt.get();
-            booking.setStatus(status);
-            booking.setPaymentId(paymentId);
             booking.setUpdatedAt(LocalDateTime.now());
             bookingRepository.update(booking);
 
@@ -218,7 +188,7 @@ public class BookingService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("예약 상태 및 결제 ID를 업데이트할 수 없습니다.", "BOOKING_STATUS_PAYMENT_UPDATE_ERROR");
+            throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
         }
     }
 }
