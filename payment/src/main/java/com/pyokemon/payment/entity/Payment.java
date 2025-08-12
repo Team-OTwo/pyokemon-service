@@ -15,12 +15,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Payment {
 
-  private Long payment_id;
-  private Long booking_id;
-  private Long account_id;
-  private String payment_key;
+  private Long paymentId;
+  private Long bookingId;
+  private Long accountId;
+  private String paymentKey;
   private String method;
-  private Long total_amount;
+  private Long amount;
   private PaymentStatus status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;

@@ -36,28 +36,37 @@ public class TossPaymentService {
             return response.bodyToMono(PaymentConfirmResponseDto.class);
           }).block();
 
-      paymentRepository.updatePayment(
-              request.getOrderId(),
-              request.getPaymentKey(),
-              "DONE",
+      paymentRepository.updatePayment(request.getOrderId(), request.getPaymentKey(), "DONE",
           dto.getMethod()
 
       );
+      var p = paymentRepository.selectByOrderId(request.getOrderId());
       PaymentKafkaDto kafkaDto =
-          new PaymentKafkaDto(dto.getPaymentId(),dto.getBookingId(), dto.getOrderId(), dto.getStatus());
+          new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
       kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
       markedDone = true;
+      return dto;
 
     } catch (Exception e) {
-      if(!markedDone) {
+      if (!markedDone) {
         paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
+        var p = paymentRepository.selectByOrderId(request.getOrderId());
+        PaymentKafkaDto kafkaDto =
+            new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
+        kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
       }
+      throw e;
     }
-    return dto;
+
   }
 
   public void fail(PaymentConfirmRequestDto request) {
     paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
+
+    var p = paymentRepository.selectByOrderId(request.getOrderId());
+    PaymentKafkaDto kafkaDto =
+        new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
+    kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
   }
 
 }

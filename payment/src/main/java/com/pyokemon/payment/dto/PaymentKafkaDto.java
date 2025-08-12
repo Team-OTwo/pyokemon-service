@@ -1,6 +1,8 @@
 package com.pyokemon.payment.dto;
 
 
+import com.pyokemon.payment.entity.Payment;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,5 @@ import lombok.Setter;
 public class PaymentKafkaDto {
   private Long paymentId;
   private Long bookingId;
-  private String orderId;
-  private String status;
+  Payment.PaymentStatus status;
 }

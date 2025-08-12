@@ -11,9 +11,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KafkaMessageProducer {
 
-  private final KafkaTemplate<String, PaymentKafkaDto> kafkaTemplate;
+  private final KafkaTemplate<Long, PaymentKafkaDto> kafkaTemplate;
 
   public void sendPaymentConfirmed(PaymentKafkaDto dto) {
-    kafkaTemplate.send("payment.save", dto.getOrderId(), dto);
+    kafkaTemplate.send("payment-status-updated", dto.getPaymentId(), dto);
   }
 }

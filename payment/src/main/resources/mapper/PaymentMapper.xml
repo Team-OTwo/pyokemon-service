@@ -25,4 +25,11 @@
         WHERE order_id = #{orderId}
     </update>
 
+    <select id="selectByOrderId" parameterType="string" resultType="Payment">
+        SELECT payment_id, booking_id, payment_key, status
+        FROM tb_payment
+        WHERE order_id = #{orderId}
+    </select>
+
+
 </mapper>
