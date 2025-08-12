@@ -174,7 +174,18 @@ public class TenantEventService {
     }
 
     private Event findEventById(Long eventId) {
-        return eventRepository.findById(eventId);
+        // tenantEventRepository를 사용하여 Event 정보 조회
+        TenantEventDetailResponseDTO eventDetail =
+                tenantEventRepository.findTenantEventDetailByEventId(eventId);
+        if (eventDetail == null) {
+            return null;
+        }
+
+        // TenantEventDetailResponseDTO를 Event 엔티티로 변환
+        return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
+                .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
+                .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
+                .status(Event.EventStatus.valueOf(eventDetail.getStatus())).build();
     }
 
     private void updateEventInfo(Event event, EventUpdateDto updateDto) {
@@ -188,8 +199,8 @@ public class TenantEventService {
         }
         event.setUpdatedAt(LocalDateTime.now());
 
-        // 이벤트 정보 저장
-        eventRepository.updateEvent(event);
+        // 이벤트 정보 저장 - tenantEventRepository 사용
+        tenantEventRepository.updateEvent(event);
     }
 
     private void updateEventSchedules(Long eventId, List<EventScheduleUpdateDto> scheduleDtos) {
@@ -292,7 +303,7 @@ public class TenantEventService {
     }
 
     private Long saveEvent(Event event) {
-        eventRepository.save(event);
+        tenantEventRepository.save(event);
         return event.getEventId();
     }
 

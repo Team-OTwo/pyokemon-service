@@ -4,22 +4,28 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.pyokemon.event.dto.MonthlyEventDTO;
+import com.pyokemon.event.dto.MonthlySummaryDTO;
 import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
 import com.pyokemon.event.dto.TenantEventListDto;
-import com.pyokemon.event.dto.MonthlyEventDTO;
-import com.pyokemon.event.dto.MonthlySummaryDTO;
+import com.pyokemon.event.entity.Event;
 
 @Mapper
 public interface TenantEventRepository {
-    
-    List<TenantEventListDto> findTenantEventListByAccountId(Long accountId);
 
-    TenantEventDetailResponseDTO findTenantEventDetailByEventId(Long eventId);
+  List<TenantEventListDto> findTenantEventListByAccountId(Long accountId);
 
-    TenantBookingDetailResponseDTO findTenantBookingDetailByEventScheduleId(Long eventScheduleId);
+  TenantEventDetailResponseDTO findTenantEventDetailByEventId(Long eventId);
 
-    List<MonthlyEventDTO> findMonthlyEventsByAccountId(Long accountId, String startDate, String endDate);
+  TenantBookingDetailResponseDTO findTenantBookingDetailByEventScheduleId(Long eventScheduleId);
 
-    MonthlySummaryDTO findMonthlySummaryByAccountId(Long accountId, String startDate, String endDate);
-} 
+  List<MonthlyEventDTO> findMonthlyEventsByAccountId(Long accountId, String startDate,
+      String endDate);
+
+  MonthlySummaryDTO findMonthlySummaryByAccountId(Long accountId, String startDate, String endDate);
+
+  int updateEvent(Event event);
+
+  Long save(Event event);
+}
