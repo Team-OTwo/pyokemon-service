@@ -6,6 +6,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
 import com.pyokemon.payment.dto.PaymentConfirmResponseDto;
+import com.pyokemon.payment.dto.PaymentKafkaDto;
+import com.pyokemon.payment.producer.KafkaMessageProducer;
 import com.pyokemon.payment.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class TossPaymentService {
   private final PaymentRepository paymentRepository;
 
   private final WebClient tossWebClient;
+  private final KafkaMessageProducer kafkaMessageProducer;
 
   public PaymentConfirmResponseDto confirm(PaymentConfirmRequestDto request) {
     PaymentConfirmResponseDto dto = null;
@@ -36,6 +39,10 @@ public class TossPaymentService {
           dto.getMethod()
 
       );
+      PaymentKafkaDto kafkaDto =
+          new PaymentKafkaDto(dto.getPaymentId(), dto.getOrderId(), dto.getStatus());
+      kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
+
     } catch (Exception e) {
       paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
     }

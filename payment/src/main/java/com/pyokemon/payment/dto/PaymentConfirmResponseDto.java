@@ -13,6 +13,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentConfirmResponseDto {
+  private Long paymentId;
+  private String orderId;
   private String paymentKey;
   private String method;
   private int amount;

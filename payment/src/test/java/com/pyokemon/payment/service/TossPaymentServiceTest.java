@@ -1,81 +1,102 @@
 package com.pyokemon.payment.service;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
 import com.pyokemon.payment.dto.PaymentConfirmResponseDto;
+import com.pyokemon.payment.dto.PaymentKafkaDto;
+import com.pyokemon.payment.producer.KafkaMessageProducer;
 import com.pyokemon.payment.repository.PaymentRepository;
 
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import reactor.core.publisher.Mono;
 
 class TossPaymentServiceTest {
 
-  private MockWebServer mockWebServer;
-  private TossPaymentService tossPaymentService;
+  @Mock
   private PaymentRepository paymentRepository;
 
+  @Mock
+  private KafkaMessageProducer kafkaMessageProducer;
+
+  @Mock
+  private WebClient tossWebClient;
+
+  @Mock
+  private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+  @Mock
+  private WebClient.RequestBodySpec requestBodySpec;
+
+  @Mock
+  private WebClient.RequestHeadersSpec requestHeadersSpec;
+
+  @Mock
+  private WebClient.ResponseSpec responseSpec;
+
+  @InjectMocks
+  private TossPaymentService tossPaymentService;
+
   @BeforeEach
-  void setUp() throws Exception {
-    mockWebServer = new MockWebServer();
-    mockWebServer.start();
-
-    WebClient webClient = WebClient.builder().baseUrl(mockWebServer.url("/").toString())
-        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
-
-    paymentRepository = mock(PaymentRepository.class);
-    tossPaymentService = new TossPaymentService(paymentRepository, webClient);
-  }
-
-  @AfterEach
-  void tearDown() throws Exception {
-    mockWebServer.shutdown();
+  void setUp() {
+    MockitoAnnotations.openMocks(this);
   }
 
   @Test
-  void confirm_successfulPayment_updatesToDone() {
+  void confirm_success() {
     // given
-    String jsonResponse = "{\"method\":\"카드\"}";
-
-    mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jsonResponse)
-        .addHeader("Content-Type", "application/json"));
-
     PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
-    request.setOrderId("ORDER123");
-    request.setPaymentKey("KEY123");
-    request.setAmount(1000);
+    request.setOrderId("order-123");
+    request.setPaymentKey("pay-key-123");
+
+    PaymentConfirmResponseDto responseDto = new PaymentConfirmResponseDto();
+    responseDto.setMethod("카드");
+    responseDto.setPaymentId(100L);
+    responseDto.setStatus("DONE");
+
+    // WebClient mock 체인
+    when(tossWebClient.post()).thenReturn(requestBodyUriSpec);
+    when(requestBodyUriSpec.uri("/payments/confirm")).thenReturn(requestBodySpec);
+    when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+    when(requestHeadersSpec.exchangeToMono(any())).thenAnswer(invocation -> {
+      var func = invocation.getArgument(0);
+      return (Mono<PaymentConfirmResponseDto>) Mono.just(responseDto);
+    });
 
     // when
-    PaymentConfirmResponseDto response = tossPaymentService.confirm(request);
+    PaymentConfirmResponseDto result = tossPaymentService.confirm(request);
 
     // then
-    verify(paymentRepository).updatePayment(eq("ORDER123"), eq("KEY123"), eq("DONE"), eq("카드"));
-    Assertions.assertNotNull(response);
-    Assertions.assertEquals("카드", response.getMethod());
+    verify(paymentRepository).updatePayment(eq("order-123"), eq("pay-key-123"), eq("DONE"),
+        eq("카드"));
+    verify(kafkaMessageProducer).sendPaymentConfirmed(any(PaymentKafkaDto.class));
+    verifyNoMoreInteractions(paymentRepository, kafkaMessageProducer);
+
+    // 결과 값 검증
+    assert result != null;
+    assert result.getMethod().equals("카드");
   }
 
   @Test
-  void confirm_failedPayment_updatesToFailed() {
+  void confirm_fail() {
     // given
-    mockWebServer.enqueue(new MockResponse().setResponseCode(400).setBody("{\"message\":\"error\"}")
-        .addHeader("Content-Type", "application/json"));
-
     PaymentConfirmRequestDto request = new PaymentConfirmRequestDto();
-    request.setOrderId("ORDER_FAIL");
-    request.setPaymentKey("KEY_FAIL");
-    request.setAmount(1000);
+    request.setOrderId("order-123");
+    request.setPaymentKey("pay-key-123");
+
+    // WebClient mock에서 예외 발생
+    when(tossWebClient.post()).thenThrow(new RuntimeException("Toss API Error"));
 
     // when
-    PaymentConfirmResponseDto response = tossPaymentService.confirm(request);
+    tossPaymentService.confirm(request);
 
     // then
-    verify(paymentRepository).updatePaymentFailed("ORDER_FAIL", "FAILED", null);
-    Assertions.assertNull(response);
+    verify(paymentRepository).updatePaymentFailed(eq("order-123"), eq("FAILED"), isNull());
+    verifyNoInteractions(kafkaMessageProducer);
   }
 }
