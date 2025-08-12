@@ -30,10 +30,14 @@ public class AccountController {
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<LoginResponseDto>> login(
 <<<<<<< HEAD
+<<<<<<< HEAD
           @Valid @RequestBody LoginRequestDto request) {
 =======
       @Valid @RequestBody LoginRequestDto request) {
 >>>>>>> 1459cbe393a517c6eae7b4c3101f64b9ee8deef8
+=======
+      @Valid @RequestBody LoginRequestDto request) {
+>>>>>>> d8b52c57338c4dfb14e6b6f1a763584c859b2491
     LoginResponseDto response = accountService.login(request);
     return ResponseEntity.ok(ResponseDto.success(response, "로그인 성공"));
   }

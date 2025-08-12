@@ -68,12 +68,16 @@ public class AccountService {
                 tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
         String refreshToken =
                 tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
+<<<<<<< HEAD
 
 <<<<<<< HEAD
         if ("USER".equals(account.getRole())) {
 =======
         if (account.getRole().equals("USER")) {
 >>>>>>> 1459cbe393a517c6eae7b4c3101f64b9ee8deef8
+=======
+        if (account.getRole().equals("USER")) {
+>>>>>>> d8b52c57338c4dfb14e6b6f1a763584c859b2491
         log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
 
         Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
