@@ -19,21 +19,32 @@ public class PaymentEventListener {
 
   private final BookingService bookingService;
 
-  @KafkaListener(topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).PAYMENT_STATUS_UPDATED}", 
-               groupId = "${spring.application.name}")
+  @KafkaListener(
+      topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).PAYMENT_STATUS_UPDATED}",
+      groupId = "${spring.application.name}")
   public void handlePaymentStatusUpdate(PaymentEventDto paymentEvent, Acknowledgment ack) {
     try {
       log.info("Received payment event: {}", paymentEvent);
-      
-      Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
-      bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus,
-          paymentEvent.getPaymentId());
-          
+
+      // 비즈니스 로직 처리는 별도의 메서드로 분리
+      processPaymentEvent(paymentEvent);
+
       ack.acknowledge();
     } catch (Exception e) {
-      log.error("Error processing payment status update: paymentId={}, bookingId={}", 
+      log.error("Error processing payment status update: paymentId={}, bookingId={}",
           paymentEvent.getPaymentId(), paymentEvent.getBookingId(), e);
     }
+  }
+
+  /**
+   * 결제 이벤트 처리 로직 (테스트 가능하도록 분리됨)
+   * 
+   * @param paymentEvent 처리할 결제 이벤트
+   */
+  public void processPaymentEvent(PaymentEventDto paymentEvent) {
+    Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
+    bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus,
+        paymentEvent.getPaymentId());
   }
 
   private Booking.Booked mapPaymentStatusToBookingStatus(String paymentStatus) {

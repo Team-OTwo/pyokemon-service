@@ -19,16 +19,13 @@ public class BookingEventPublisher {
 
   public void publishBookingStatusUpdate(Booking booking) {
     try {
-      BookingEventDto event = BookingEventDto.builder()
-          .bookingId(booking.getBookingId())
-          .eventScheduleId(booking.getEventScheduleId())
-          .accountId(booking.getAccountId())
-          .status(booking.getStatus().name())
-          .build();
+      BookingEventDto event = BookingEventDto.builder().bookingId(booking.getBookingId())
+          .eventScheduleId(booking.getEventScheduleId()).accountId(booking.getAccountId())
+          .status(booking.getStatus().name()).build();
 
       kafkaTemplate.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED, booking.getBookingId(), event);
 
-      log.info("Published booking status update event: bookingId={}, status={}", 
+      log.info("Published booking status update event: bookingId={}, status={}",
           booking.getBookingId(), booking.getStatus().name());
     } catch (Exception e) {
       log.error("Failed to publish booking status update event for booking: {}",

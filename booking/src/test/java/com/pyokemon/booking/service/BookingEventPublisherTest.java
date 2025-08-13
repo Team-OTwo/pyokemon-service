@@ -14,18 +14,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.booking.dto.kafka.BookingEventDto;
 import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.common.kafka.KafkaTopicConstants;
 
 @ExtendWith(MockitoExtension.class)
 class BookingEventPublisherTest {
 
   @Mock
-  private KafkaTemplate<String, String> kafkaTemplate;
-
-  @Mock
-  private ObjectMapper objectMapper;
+  private KafkaTemplate<Long, Object> kafkaTemplate;
 
   @InjectMocks
   private BookingEventPublisher bookingEventPublisher;
@@ -40,46 +37,39 @@ class BookingEventPublisherTest {
   }
 
   @Test
-  void publishBookingStatusUpdate_Booked_ShouldPublishEvent() throws Exception {
-    String expectedMessage =
-        "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"BOOKED\"}";
-    when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
-
+  void publishBookingStatusUpdate_Booked_ShouldPublishEvent() {
     bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-    verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
+    verify(kafkaTemplate).send(eq(KafkaTopicConstants.BOOKING_STATUS_UPDATED),
+        eq(testBooking.getBookingId()), any(BookingEventDto.class));
   }
 
   @Test
-  void publishBookingStatusUpdate_Canceled_ShouldPublishEvent() throws Exception {
+  void publishBookingStatusUpdate_Canceled_ShouldPublishEvent() {
     testBooking.setStatus(Booking.Booked.CANCELED);
-    String expectedMessage =
-        "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"CANCELED\"}";
-    when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
 
     bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-    verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
+    verify(kafkaTemplate).send(eq(KafkaTopicConstants.BOOKING_STATUS_UPDATED),
+        eq(testBooking.getBookingId()), any(BookingEventDto.class));
   }
 
   @Test
-  void publishBookingStatusUpdate_Failed_ShouldPublishEvent() throws Exception {
+  void publishBookingStatusUpdate_Failed_ShouldPublishEvent() {
     testBooking.setStatus(Booking.Booked.FAILED);
-    String expectedMessage =
-        "{\"booking_id\":1,\"event_schedule_id\":100,\"account_id\":200,\"status\":\"FAILED\"}";
-    when(objectMapper.writeValueAsString(any(BookingEventDto.class))).thenReturn(expectedMessage);
 
     bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-    verify(kafkaTemplate).send(eq("booking-status-updated"), eq(expectedMessage));
+    verify(kafkaTemplate).send(eq(KafkaTopicConstants.BOOKING_STATUS_UPDATED),
+        eq(testBooking.getBookingId()), any(BookingEventDto.class));
   }
 
   @Test
-  void publishBookingStatusUpdate_Pending_ShouldNotPublishEvent() throws Exception {
+  void publishBookingStatusUpdate_Pending_ShouldNotPublishEvent() {
     testBooking.setStatus(Booking.Booked.PENDING);
 
     bookingEventPublisher.publishBookingStatusUpdate(testBooking);
 
-    verify(kafkaTemplate, never()).send(any(), any());
+    verify(kafkaTemplate, never()).send(any(), any(), any());
   }
 }
