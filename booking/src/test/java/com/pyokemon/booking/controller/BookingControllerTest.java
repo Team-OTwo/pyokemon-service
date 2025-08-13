@@ -1,5 +1,14 @@
 package com.pyokemon.booking.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
@@ -10,6 +19,10 @@ import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.service.BookingService;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.GlobalExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,71 +34,54 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
 
-    @Mock
-    private BookingService bookingService;
+  @Mock
+  private BookingService bookingService;
 
-    @InjectMocks
-    private BookingController bookingController;
+  @InjectMocks
+  private BookingController bookingController;
 
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
+  private MockMvc mockMvc;
+  private ObjectMapper objectMapper;
 
-    private Long validAccountId;
-    private Long validEventScheduleId;
-    private Long validSeatId;
-    private BookingRequest validRequest;
+  private Long validAccountId;
+  private Long validEventScheduleId;
+  private Long validSeatId;
+  private BookingRequest validRequest;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(bookingController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
-        objectMapper = new ObjectMapper();
+  @BeforeEach
+  void setUp() {
+    mockMvc = MockMvcBuilders.standaloneSetup(bookingController)
+        .setControllerAdvice(new GlobalExceptionHandler()).build();
+    objectMapper = new ObjectMapper();
 
-        validAccountId = 1L;
-        validEventScheduleId = 1L;
-        validSeatId = 1L;
+    validAccountId = 1L;
+    validEventScheduleId = 1L;
+    validSeatId = 1L;
 
-        validRequest = new BookingRequest();
-        validRequest.setEventScheduleId(validEventScheduleId);
-        validRequest.setSeatId(validSeatId);
-    }
+    validRequest = new BookingRequest();
+    validRequest.setEventScheduleId(validEventScheduleId);
+    validRequest.setSeatId(validSeatId);
+  }
 
-    @Test
-    @DisplayName("좌석 ID 조회 성공")
-    void getSeatIdsByEventScheduleId_Success() throws Exception {
-        List<Long> expectedSeatIds = Arrays.asList(1L, 2L, 3L);
-        EventScheduleIdResponse expectedResponse = new EventScheduleIdResponse(expectedSeatIds);
-        
-        when(bookingService.getSeatIdsByEventScheduleId(validEventScheduleId))
-                .thenReturn(expectedResponse);
+  @Test
+  @DisplayName("좌석 ID 조회 성공")
+  void getSeatIdsByEventScheduleId_Success() throws Exception {
+    List<Long> expectedSeatIds = Arrays.asList(1L, 2L, 3L);
+    EventScheduleIdResponse expectedResponse = new EventScheduleIdResponse(expectedSeatIds);
 
-        mockMvc.perform(get("/api/bookings/{eventScheduleId}", validEventScheduleId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.seatIds").isArray())
-                .andExpect(jsonPath("$.seatIds[0]").value(1))
-                .andExpect(jsonPath("$.seatIds[1]").value(2))
-                .andExpect(jsonPath("$.seatIds[2]").value(3));
-    }
+    when(bookingService.getSeatIdsByEventScheduleId(validEventScheduleId))
+        .thenReturn(expectedResponse);
 
-    @Test
+    mockMvc.perform(get("/api/bookings/{eventScheduleId}", validEventScheduleId))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.seatIds").isArray()).andExpect(jsonPath("$.seatIds[0]").value(1))
+        .andExpect(jsonPath("$.seatIds[1]").value(2)).andExpect(jsonPath("$.seatIds[2]").value(3));
+  }
+
+  @Test
     @DisplayName("좌석 ID 조회 - 잘못된 eventScheduleId")
     void getSeatIdsByEventScheduleId_InvalidEventScheduleId() throws Exception {
         when(bookingService.getSeatIdsByEventScheduleId(0L))
@@ -97,28 +93,24 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("INVALID_EVENT_SCHEDULE_ID"));
     }
 
-    @Test
-    @DisplayName("계정별 예약 조회 성공")
-    void getBookingsByAccountId_Success() throws Exception {
-        List<BookingInfo> bookingInfos = Arrays.asList(
-                new BookingInfo(1L, null, Booking.Booked.PENDING, 1L, LocalDateTime.now()),
-                new BookingInfo(1L, null, Booking.Booked.BOOKED, 2L, LocalDateTime.now())
-        );
-        AccountIdResponse expectedResponse = new AccountIdResponse(validAccountId, bookingInfos);
-        
-        when(bookingService.getBookingsByAccountId(validAccountId))
-                .thenReturn(expectedResponse);
+  @Test
+  @DisplayName("계정별 예약 조회 성공")
+  void getBookingsByAccountId_Success() throws Exception {
+    List<BookingInfo> bookingInfos =
+        Arrays.asList(new BookingInfo(1L, null, Booking.Booked.PENDING, 1L, LocalDateTime.now()),
+            new BookingInfo(1L, null, Booking.Booked.BOOKED, 2L, LocalDateTime.now()));
+    AccountIdResponse expectedResponse = new AccountIdResponse(validAccountId, bookingInfos);
 
-        mockMvc.perform(get("/api/bookings/account")
-                        .header("X-Auth-AccountId", validAccountId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.accountId").value(validAccountId))
-                .andExpect(jsonPath("$.bookings").isArray())
-                .andExpect(jsonPath("$.bookings.length()").value(2));
-    }
+    when(bookingService.getBookingsByAccountId(validAccountId)).thenReturn(expectedResponse);
 
-    @Test
+    mockMvc.perform(get("/api/bookings/account").header("X-Auth-AccountId", validAccountId))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.accountId").value(validAccountId))
+        .andExpect(jsonPath("$.bookings").isArray())
+        .andExpect(jsonPath("$.bookings.length()").value(2));
+  }
+
+  @Test
     @DisplayName("계정별 예약 조회 - 잘못된 accountId")
     void getBookingsByAccountId_InvalidAccountId() throws Exception {
         when(bookingService.getBookingsByAccountId(0L))

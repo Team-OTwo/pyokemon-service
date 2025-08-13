@@ -14,8 +14,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthlyEventDTO {
-    private String title;
-    private String venueName;
-    private LocalDateTime eventDate;
-    private int ticketCount;
-} 
+  private String title;
+  private String venueName;
+  private LocalDateTime eventDate;
+  private int ticketCount;
+}

@@ -10,6 +10,18 @@ import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,19 +30,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-
+  
     @Mock
     private BookingRepository bookingRepository;
 
@@ -54,7 +57,6 @@ class BookingServiceTest {
         validRequest.setEventScheduleId(validEventScheduleId);
         validRequest.setSeatId(validSeatId);
 
-        // ValidBooking 테스트용 데이터
         validBookingRequest = ValidBookingRequest.builder()
                 .userId(398413L)
                 .bookings(Arrays.asList(12312341L, 12431231L, 141231L))
@@ -174,7 +176,10 @@ class BookingServiceTest {
         assertEquals("BOOKING_ONE_PER_EVENT", exception.getErrorCode());
     }
 
-    @Test
+    assertEquals("BOOKING_ONE_PER_EVENT", exception.getErrorCode());
+  }
+
+  @Test
     @DisplayName("이미 예약된 좌석 예약 시도")
     void createBooking_AlreadyBookedSeat() {
         when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
@@ -273,10 +278,27 @@ class BookingServiceTest {
         );
         when(bookingRepository.findPendingBookings()).thenReturn(pendingBookings);
 
-        bookingService.deletePendingBookings();
+  @Test
+  @DisplayName("예약 생성 - null accountId")
+  void createOrUpdateBooking_NullAccountId() {
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      bookingService.createOrUpdateBooking(validRequest, null);
+    });
 
-        verify(bookingRepository, times(2)).delete(anyLong());
-    }
+    assertEquals("INVALID_ACCOUNT_ID", exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("PENDING 예약 삭제 성공")
+  void deletePendingBookings_Success() {
+    List<Booking> pendingBookings = Arrays.asList(createBooking(1L, Booking.Booked.PENDING),
+        createBooking(2L, Booking.Booked.PENDING));
+    when(bookingRepository.findPendingBookings()).thenReturn(pendingBookings);
+
+    bookingService.deletePendingBookings();
+
+    verify(bookingRepository, times(2)).delete(anyLong());
+  }
 
     @Test
     @DisplayName("PENDING 예약 삭제 - 빈 리스트")

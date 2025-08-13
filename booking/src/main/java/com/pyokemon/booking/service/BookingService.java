@@ -1,5 +1,14 @@
 package com.pyokemon.booking.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.request.ValidBookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
@@ -11,16 +20,9 @@ import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -211,36 +213,5 @@ public class BookingService {
             log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
         }
     }
-    
-    // kafka -> 예약 상태 업데이트
-    @Transactional
-    public void updateBookingStatus(Long bookingId, Booking.Booked status, Long paymentId) {
-        try {
-            if (bookingId == null) {
-                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
-            }
-            if (status == null) {
-                throw new BusinessException("상태가 필요합니다.", "INVALID_STATUS");
-            }
-            
-            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
-            if (bookingOpt.isEmpty()) {
-                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
-            }
-            
-            Booking booking = bookingOpt.get();
-            booking.setStatus(status);
-            if (paymentId != null) {
-                booking.setPaymentId(paymentId);
-            }
-            booking.setUpdatedAt(LocalDateTime.now());
-            bookingRepository.update(booking);
-
-            bookingEventPublisher.publishBookingStatusUpdate(booking);
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
-        }
-    }
+  }
 }

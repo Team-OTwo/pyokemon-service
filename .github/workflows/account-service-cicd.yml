@@ -7,12 +7,7 @@ on:
       - 'account/**'
       - 'common/**'
       - '.github/workflows/account-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'account/**'
-      - 'common/**'
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

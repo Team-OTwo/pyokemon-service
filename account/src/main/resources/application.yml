@@ -4,6 +4,8 @@ server:
     context-path: /account
 
 spring:
+  application:
+    name: account-service
   profiles:
     include:
       - flyway

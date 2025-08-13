@@ -4,6 +4,8 @@ server:
     context-path: /booking
 
 spring:
+  application:
+    name: booking-service
   profiles:
     include:
       - flyway
@@ -25,15 +27,8 @@ spring:
     locations: classpath:db/migration/booking
 
   kafka:
-    bootstrap-servers: localhost:9092
     consumer:
       group-id: booking-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

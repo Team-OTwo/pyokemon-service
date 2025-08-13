@@ -7,11 +7,6 @@ on:
       - 'event/**'
       - 'common/**'
       - '.github/workflows/event-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'event/**'
-      - 'common/**'
 
 jobs:
   build-and-deploy:

@@ -4,6 +4,8 @@ server:
     context-path: /payment
 
 spring:
+  application:
+    name: payment-service
   profiles:
     include:
       - flyway
@@ -24,6 +26,10 @@ spring:
   flyway:
     locations: classpath:db/migration/payment
 
+  kafka:
+    consumer:
+      group-id: ${spring.application.name}
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pyokemon.payment.entity
@@ -31,6 +37,9 @@ mybatis:
     map-underscore-to-camel-case: true
     default-fetch-size: 100
     default-statement-timeout: 30
+
+toss:
+  toss-secret-key: 
 
 
 ---
