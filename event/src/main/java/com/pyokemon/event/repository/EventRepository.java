@@ -3,6 +3,7 @@ package com.pyokemon.event.repository;
 import java.util.List;
 
 import com.pyokemon.event.dto.SeatPriceResponseDto;
+import com.pyokemon.event.dto.bff.BffEventDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;
@@ -31,4 +32,10 @@ public interface EventRepository {
     int updateEvent(Event event);
 
     List<SeatPriceResponseDto> findSeatPriceByEventScheduleId(Long eventScheduleId);
+
+
+
+    // bff
+    BffEventDto findBffEventById(Long eventId);
+
 }

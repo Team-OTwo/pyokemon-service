@@ -1,6 +1,8 @@
 package com.pyokemon.event.service;
 
 import java.util.List;
+
+import com.pyokemon.event.dto.bff.BffEventDto;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,5 +87,12 @@ public class EventService {
             return false;
         }
         return savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
+    }
+
+
+
+    // bff getEvent
+    public BffEventDto getBffEvent(Long eventId){
+        return eventRepository.findBffEventById(eventId);
     }
 }

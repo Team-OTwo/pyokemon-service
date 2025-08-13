@@ -2,6 +2,7 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import com.pyokemon.event.dto.bff.BffEventDto;
 import com.pyokemon.event.dto.bff.BffEventScheduleDto;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -87,8 +88,14 @@ public class EventController {
 
 
     // bff getEventSchedule
-    @GetMapping("/event-schedules/{eventScheduleId}")
-    public BffEventScheduleDto getEventSchedule(@PathVariable Long eventScheduleId){
-        return eventScheduleService.getEventSchedule(eventScheduleId);
+    @GetMapping("/bff/event-schedules/{eventScheduleId}")
+    public BffEventScheduleDto getBffEventSchedule(@PathVariable Long eventScheduleId){
+        return eventScheduleService.getBffEventSchedule(eventScheduleId);
+    }
+
+    // bff getBffEvent
+    @GetMapping("/bff/{eventId}")
+    public BffEventDto getBffEvent(@PathVariable Long eventId){
+        return eventService.getBffEvent(eventId);
     }
 }

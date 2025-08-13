@@ -89,7 +89,7 @@ public class EventScheduleService {
 
 
   // bff getEventSchedule
-  public BffEventScheduleDto getEventSchedule(Long eventScheduleId){
+  public BffEventScheduleDto getBffEventSchedule(Long eventScheduleId){
     return eventScheduleRepository.findBffEventScheduleById(eventScheduleId);
   }
 
