@@ -4,21 +4,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pyokemon.event.repository.EventScheduleRepository">
-    <insert id="save" parameterType="EventSchedule" useGeneratedKeys="true" keyProperty="eventScheduleId" keyColumn="event_schedule_id">
+    <insert id="save" parameterType="EventSchedule" useGeneratedKeys="true" keyProperty="eventScheduleId"
+            keyColumn="event_schedule_id">
         INSERT INTO tb_event_schedule (
-            event_id,
-            venue_id,
-            ticket_open_at,
-            event_date,
-            created_at,
-            updated_at
+        event_id,
+        venue_id,
+        ticket_open_at,
+        event_date,
+        created_at,
+        updated_at
         ) VALUES (
-            #{eventId},
-            #{venueId},
-            #{ticketOpenAt},
-            #{eventDate},
-            #{createdAt},
-            #{updatedAt}
+        #{eventId},
+        #{venueId},
+        #{ticketOpenAt},
+        #{eventDate},
+        #{createdAt},
+        #{updatedAt}
         )
         <selectKey resultType="long" keyProperty="eventScheduleId" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -35,68 +36,68 @@
 
     <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
         SELECT
-            es.event_schedule_id,
-            es.event_id,
-            es.venue_id,
-            es.ticket_open_at,
-            es.event_date,
-            e.title AS title,
-            v.venue_name AS venue_name,
-            e.thumbnail_url
+        es.event_schedule_id,
+        es.event_id,
+        es.venue_id,
+        es.ticket_open_at,
+        es.event_date,
+        e.title AS title,
+        v.venue_name AS venue_name,
+        e.thumbnail_url
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE DATE(es.ticket_open_at) = CURDATE()
         LIMIT 9
     </select>
 
     <select id="selectTicketsToBeOpened" resultType="EventItemResponseDTO">
         SELECT
-            es.event_schedule_id,
-            es.event_id,
-            es.venue_id,
-            es.ticket_open_at,
-            es.event_date,
-            e.title AS title,
-            v.venue_name AS venue_name,
-            e.genre,
-            e.thumbnail_url
+        es.event_schedule_id,
+        es.event_id,
+        es.venue_id,
+        es.ticket_open_at,
+        es.event_date,
+        e.title AS title,
+        v.venue_name AS venue_name,
+        e.genre,
+        e.thumbnail_url
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE DATE(ticket_open_at) = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
-            LIMIT 6
+        LIMIT 6
     </select>
 
     <select id="selectEventList" resultType="EventItemResponseDTO">
         SELECT
-            es.event_schedule_id,
-            es.event_id,
-            es.venue_id,
-            es.ticket_open_at,
-            es.event_date,
-            e.title AS title,
-            v.venue_name AS venue_name,
-            e.genre,
-            e.thumbnail_url
+        es.event_schedule_id,
+        es.event_id,
+        es.venue_id,
+        es.ticket_open_at,
+        es.event_date,
+        e.title AS title,
+        v.venue_name AS venue_name,
+        e.genre,
+        e.thumbnail_url
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE
-            e.status = 'APPROVED'
+        e.status = 'APPROVED'
         <if test="genre != null and genre != '전체'">
             AND e.genre = #{genre}
         </if>
-            LIMIT #{limit} OFFSET #{offset}
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getTotalCountByGenre" resultType="int">
         SELECT COUNT(*)
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE
-            e.status = 'APPROVED'
+        e.status = 'APPROVED'
         <if test="genre != null and genre != '전체'">
             AND e.genre = #{genre}
         </if>
@@ -104,38 +105,46 @@
 
     <select id="selectEventSearchList" resultType="EventItemResponseDTO">
         SELECT
-            es.event_schedule_id,
-            es.event_id,
-            es.venue_id,
-            es.ticket_open_at,
-            es.event_date,
-            e.title AS title,
-            v.venue_name AS venue_name,
-            e.genre,
-            e.thumbnail_url
+        es.event_schedule_id,
+        es.event_id,
+        es.venue_id,
+        es.ticket_open_at,
+        es.event_date,
+        e.title AS title,
+        v.venue_name AS venue_name,
+        e.genre,
+        e.thumbnail_url
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE
-            REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
+        REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
         <if test="genre != null and genre != '전체'">
             e.genre = #{genre} AND
         </if>
-            e.status = 'APPROVED'
-            LIMIT #{limit} OFFSET #{offset}
+        e.status = 'APPROVED'
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getSearchTotalCount" resultType="int">
         SELECT COUNT(*)
         FROM tb_event_schedule es
-                 JOIN tb_event e ON es.event_id = e.event_id
-                 JOIN tb_venue v ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE
-            REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
+        REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
         <if test="genre != null and genre != '전체'">
-             
+
         </if>
-            e.status = 'APPROVED'
+        e.status = 'APPROVED'
+    </select>
+
+
+    <!--    bff-->
+    <select id="findBffEventScheduleById" resultType="BffEventScheduleDto">
+        SELECT event_schedule_id as id, event_id, venue_id, event_date
+        FROM tb_event_schedule
+        WHERE event_schedule_id = #{eventScheduleId}
     </select>
 
 

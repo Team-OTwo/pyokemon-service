@@ -2,10 +2,9 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
-import jakarta.validation.Valid;
+import com.pyokemon.event.dto.bff.BffEventScheduleDto;
 
 import org.apache.ibatis.javassist.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,5 +81,14 @@ public class EventController {
                                                      @RequestParam(defaultValue = "전체") String genre) {
         int offset = (page - 1) * size;
         return eventScheduleService.getEventSearch(keyword, offset, size, genre);
+    }
+
+
+
+
+    // bff getEventSchedule
+    @GetMapping("/event-schedules/{eventScheduleId}")
+    public BffEventScheduleDto getEventSchedule(@PathVariable Long eventScheduleId){
+        return eventScheduleService.getEventSchedule(eventScheduleId);
     }
 }
