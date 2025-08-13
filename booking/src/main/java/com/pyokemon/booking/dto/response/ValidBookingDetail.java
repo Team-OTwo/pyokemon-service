@@ -13,6 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ValidBookingDetail {
     private Long bookingId;
-    private Long eventId;
+    private Long eventScheduleId;
     private Long tenantId;
 }
