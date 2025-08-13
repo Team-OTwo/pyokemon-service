@@ -1,9 +1,11 @@
 package com.pyokemon.booking.controller;
 
 import com.pyokemon.booking.dto.request.BookingRequest;
+import com.pyokemon.booking.dto.request.ValidBookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +38,12 @@ public class BookingController {
             @RequestHeader("X-Auth-AccountId") Long accountId) {
         BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
         return ResponseEntity.ok(booking);
+    }
+    
+    @PostMapping("/validate")
+    public ResponseEntity<ValidBookingResponse> validateBookings(
+            @RequestBody ValidBookingRequest request) {
+        ValidBookingResponse response = bookingService.validateBookings(request);
+        return ResponseEntity.ok(response);
     }
 }

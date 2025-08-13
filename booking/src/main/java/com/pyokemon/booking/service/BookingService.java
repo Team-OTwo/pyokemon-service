@@ -1,10 +1,13 @@
 package com.pyokemon.booking.service;
 
 import com.pyokemon.booking.dto.request.BookingRequest;
+import com.pyokemon.booking.dto.request.ValidBookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingInfo;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.dto.response.ValidBookingDetail;
+import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
@@ -65,6 +68,28 @@ public class BookingService {
             throw e;
         } catch (Exception e) {
             throw new BusinessException("예약 정보를 조회할 수 없습니다.", "BOOKING_QUERY_ERROR");
+        }
+    }
+    
+    public ValidBookingResponse validateBookings(ValidBookingRequest request) {
+        try {
+            if (request.getUserId() == null) {
+                throw new BusinessException("사용자 ID가 필요합니다.", "INVALID_USER_ID");
+            }
+            if (request.getBookings() == null || request.getBookings().isEmpty()) {
+                throw new BusinessException("예약 ID 목록이 필요합니다.", "INVALID_BOOKING_IDS");
+            }
+            
+            List<ValidBookingDetail> validBookings = 
+                bookingRepository.findValidBookingsWithEventInfo(request.getBookings(), request.getUserId());
+            
+            return ValidBookingResponse.builder()
+                    .bookings(validBookings)
+                    .build();
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessException("예약 검증을 처리할 수 없습니다.", "BOOKING_VALIDATION_ERROR");
         }
     }
     
