@@ -64,6 +64,46 @@
         ORDER BY sc.priority ASC
     </select>
 
+    <update id="updateEvent" parameterType="Event">
+        UPDATE tb_event 
+        SET 
+            title = #{title},
+            age_limit = #{ageLimit},
+            description = #{description},
+            genre = #{genre},
+            thumbnail_url = #{thumbnailUrl},
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE event_id = #{eventId}
+    </update>
+
+    <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="eventId" keyColumn="event_id">
+        INSERT INTO tb_event (
+            account_id,
+            title,
+            age_limit,
+            description,
+            genre,
+            thumbnail_url,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{accountId},
+            #{title},
+            #{ageLimit},
+            #{description},
+            #{genre},
+            #{thumbnailUrl},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+        <selectKey resultType="long" keyProperty="eventId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
     <resultMap id="TenantBookingDetailResultMap" type="com.pyokemon.event.dto.TenantBookingDetailResponseDTO">
         <id column="event_id" property="eventId"/>
         <result column="title" property="title"/>

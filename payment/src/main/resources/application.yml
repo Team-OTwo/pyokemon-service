@@ -24,6 +24,26 @@ spring:
   flyway:
     locations: classpath:db/migration/payment
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      ack-mode: manual_immediate
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: latest
+      max-poll-records: 10
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false  # 헤더의 타입 정보 무시
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false  # 타입
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pyokemon.payment.entity
@@ -31,6 +51,9 @@ mybatis:
     map-underscore-to-camel-case: true
     default-fetch-size: 100
     default-statement-timeout: 30
+
+toss:
+  toss-secret-key: 
 
 
 ---

@@ -26,6 +26,15 @@
         </selectKey>
     </insert>
 
+    <update id="updateEventSchedule" parameterType="EventSchedule">
+        UPDATE tb_event_schedule
+        SET
+            venue_id = #{venueId},
+            ticket_open_at = #{ticketOpenAt},
+            event_date = #{eventDate},
+            updated_at = #{updatedAt}
+        WHERE event_schedule_id = #{eventScheduleId}
+    </update>
 
     <select id="findById" resultType="EventSchedule" parameterType="long">
         SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
