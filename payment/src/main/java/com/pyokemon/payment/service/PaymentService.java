@@ -19,13 +19,14 @@ public class PaymentService {
   final PaymentRepository paymentRepository;
 
   public void reserve(PaymentInitiateRequestDto request) {
-    PaymentDto dto = new PaymentDto();
-    dto.setBookingId(request.getBookingId());
-    dto.setOrderId(request.getOrderId());
-    dto.setAmount(request.getAmount());
-    dto.setMethod(request.getMethod());
-    dto.setStatus("READY");
-    dto.setAccountId(request.getAccountId());
+    PaymentDto dto = PaymentDto.builder()
+      .bookingId(request.getBookingId())
+      .orderId(request.getOrderId())
+      .amount(request.getAmount())
+      .method(request.getMethod())
+      .status("READY")
+      .accountId(request.getAccountId())
+            .build();
 
     paymentRepository.insertInitiatePayment(dto);
 
