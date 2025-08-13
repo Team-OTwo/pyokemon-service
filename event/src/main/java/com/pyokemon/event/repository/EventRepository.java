@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.dto.bff.BffEventDto;
+import com.pyokemon.event.dto.bff.BffVenueDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;

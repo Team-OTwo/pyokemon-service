@@ -3,6 +3,7 @@ package com.pyokemon.event.service;
 import java.util.List;
 
 import com.pyokemon.event.dto.bff.BffEventDto;
+import com.pyokemon.event.dto.bff.BffVenueDto;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final VenueRepository venueRepository;
     private final SavedEventRepository savedEventRepository;
 
     // 공연 상세 조회
@@ -94,5 +96,10 @@ public class EventService {
     // bff getEvent
     public BffEventDto getBffEvent(Long eventId){
         return eventRepository.findBffEventById(eventId);
+    }
+
+    // bff venue
+    public BffVenueDto getBffVenue(Long venueId){
+        return venueRepository.findBffVenueById(venueId);
     }
 }
