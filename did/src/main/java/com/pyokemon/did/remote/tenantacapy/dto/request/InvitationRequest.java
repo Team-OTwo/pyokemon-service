@@ -1,4 +1,4 @@
-package com.pyokemon.did.remote.tenant.dto.request;
+package com.pyokemon.did.remote.tenantacapy.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -13,14 +13,12 @@ import java.util.List;
  */
 public class InvitationRequest {
 
-    /**
-     * OOB 초대장 생성 요청 DTO
-     */
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AcaPyCreateInvitationRequest {
+    public static class AcaPyCreateTenantInvitationRequest {
         private List<String> accept;
         
         private String alias;
@@ -44,20 +42,15 @@ public class InvitationRequest {
         @JsonProperty("use_public_did")
         private Boolean usePublicDid;
 
-        /**
-         * 초대장 요청 객체를 생성하는 팩토리 메서드
-         *
-         * @param eventId 이벤트 식별자
-         * @return 생성된 초대장 요청 객체
-         */
-        public static AcaPyCreateInvitationRequest generate(Long eventId) {
-            return AcaPyCreateInvitationRequest.builder()
+
+        public static AcaPyCreateTenantInvitationRequest of(Long tenantId) {
+            return AcaPyCreateTenantInvitationRequest.builder()
                     .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19"))
-                    .alias("invitation:" + eventId)
-                    .goal("To create OOB invitation with event_id: " + eventId)
+                    .alias("invitation:" + tenantId)
+                    .goal("To create OOB invitation with event_id: " + tenantId)
                     .goal_code("issue-vc")
-                    .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.0"))
-                    .myLabel("invitation:" + eventId)
+                    .handshakeProtocols(List.of("https://didcomm.org/connections/1.0"))
+                    .myLabel("invitation:" + tenantId)
                     .protocolVersion("1.1")
                     .useDidMethod("did:peer:2")
                     .usePublicDid(false)
@@ -65,9 +58,7 @@ public class InvitationRequest {
         }
     }
     
-    /**
-     * OOB 초대장 조회 요청 DTO
-     */
+
     @Data
     @Builder
     @NoArgsConstructor

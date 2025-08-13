@@ -1,7 +1,6 @@
-package com.pyokemon.did.remote.tenant.dto.response;
+package com.pyokemon.did.remote.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pyokemon.did.domain.EventInvitation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +13,7 @@ import java.util.List;
  */
 public class InvitationResponse {
 
-    /**
-     * 초대장 상세 정보 DTO
-     */
+
     @Data
     @Builder
     @AllArgsConstructor
@@ -33,12 +30,9 @@ public class InvitationResponse {
         @JsonProperty("handshake_protocols")
         private List<String> handshakeProtocols;
         
-        private List<String> services;
+        private List<Object> services;
     }
 
-    /**
-     * OOB 초대장 생성 응답 DTO
-     */
     @Data
     @Builder
     @AllArgsConstructor
@@ -57,20 +51,9 @@ public class InvitationResponse {
 
         @JsonProperty("invitation_url")
         private String invitationUrl;
-
-        public EventInvitation toEntity(Long eventId, Long tenantId) {
-            return EventInvitation.builder()
-                    .eventId(eventId)
-                    .tenantId(tenantId)
-                    .invitationUrl(invitationUrl)
-                    .oobId(oobId)
-                    .build();
-        }
     }
     
-    /**
-     * OOB 초대장 조회 응답 DTO
-     */
+
     @Data
     @Builder
     @AllArgsConstructor

@@ -7,10 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 이벤트 초대장 관련 요청 DTO 그룹
  */
-public class EventInvitationRequest {
+public class TenantInvitationRequest {
     
     /**
      * 이벤트 초대장 프로비저닝 요청 DTO
@@ -19,11 +21,13 @@ public class EventInvitationRequest {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateEventInvitationRequest {
+    public static class CreateTenantInvitationRequest {
         @NotNull
-        private Long tenantId;
+        private Long userId;
         
         @NotNull
-        private Long eventId;
+        private String deviceId;
+
+        private List<Long> tenantIds;
     }
 }

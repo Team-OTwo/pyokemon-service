@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.did.domain.repository.ConnectionMetadataRepository">
+
+    <!-- ConnectionMetadata용 ResultMap 정의 -->
+    <resultMap id="connectionMetadataMap" type="com.pyokemon.did.domain.ConnectionMetadata">
+        <id property="id" column="connection_metadata_id"/>
+        <result property="connId" column="conn_id"/>
+        <result property="inviMsgId" column="invi_msg_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.pyokemon.did.domain.ConnectionMetadata" useGeneratedKeys="true" keyProperty="id" keyColumn="connection_metadata_id">
+        INSERT INTO tb_connection_metadata (conn_id, invi_msg_id, user_id, tenant_id, device_id, status)
+        VALUES (#{connId}, #{inviMsgId}, #{userId}, #{tenantId}, #{deviceId}, #{status})
+    </insert>
+
+    <select id="findById" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE connection_metadata_id = #{id}
+    </select>
+
+    <select id="findByConnId" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE conn_id = #{connId}
+    </select>
+
+    <select id="findByUserId" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+
+
+    <select id="findByStatus" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByTenantId" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE tenant_id = #{tenantId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByUserIdAndTenantId" resultMap="connectionMetadataMap">
+        SELECT 
+            connection_metadata_id, conn_id, invi_msg_id, user_id, tenant_id, device_id, status, created_at, updated_at
+        FROM tb_connection_metadata 
+        WHERE user_id = #{userId} AND tenant_id = #{tenantId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE tb_connection_metadata 
+        SET status = #{status}, updated_at = CURRENT_TIMESTAMP
+        WHERE conn_id = #{connId}
+    </update>
+
+    <select id="existsByConnId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_connection_metadata WHERE conn_id = #{connId}
+    </select>
+
+    <delete id="deleteByConnId">
+        DELETE FROM tb_connection_metadata WHERE conn_id = #{connId}
+    </delete>
+
+</mapper> 

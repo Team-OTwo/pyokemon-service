@@ -14,4 +14,13 @@ public interface WalletMetadataService {
      * @throws com.pyokemon.common.exception.BusinessException 지갑이 이미 존재하거나 생성에 실패한 경우
      */
     void createWallet(CreateWalletRequest request);
+    
+    /**
+     * 테넌트 ID로 Wallet metadata 조회
+     *
+     * @param tenantId 테넌트 ID
+     * @return WalletMetadata 객체
+     * @throws com.pyokemon.common.exception.BusinessException Wallet metadata를 찾을 수 없는 경우
+     */
+    com.pyokemon.did.domain.WalletMetadata getWalletMetadata(Long tenantId);
 }

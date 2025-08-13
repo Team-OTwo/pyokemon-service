@@ -2,16 +2,14 @@ package com.pyokemon.did.service;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.EventInvitation;
 import com.pyokemon.did.domain.WalletMetadata;
 import com.pyokemon.did.domain.dto.request.EventInvitationRequest.CreateEventInvitationRequest;
-import com.pyokemon.did.domain.repository.EventInvitationRepository;
 import com.pyokemon.did.domain.repository.WalletMetadataRepository;
-import com.pyokemon.did.remote.tenant.RemoteTenantAcaPyService;
-import com.pyokemon.did.remote.tenant.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
-import com.pyokemon.did.remote.tenant.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
-import com.pyokemon.did.remote.tenant.dto.response.InvitationResponse.Invitation;
-import com.pyokemon.did.service.impl.EventInvitationServiceImpl;
+import com.pyokemon.did.remote.tenantacapy.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.tenantacapy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
+import com.pyokemon.did.remote.common.InvitationResponse.AcaPyCreateInvitationResponse;
+import com.pyokemon.did.remote.common.InvitationResponse.Invitation;
+import com.pyokemon.did.service.impl.TenantInvitationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,7 @@ public class EventInvitationServiceTest {
     private EventInvitationRepository eventInvitationRepository;
 
     @InjectMocks
-    private EventInvitationServiceImpl eventInvitationService;
+    private TenantInvitationServiceImpl eventInvitationService;
 
     private static final Long TENANT_ID = 1L;
     private static final Long EVENT_ID = 100L;

@@ -36,11 +36,24 @@ spring:
           max-idle: 8
           min-idle: 0
 
+# 로그 레벨 설정
+logging:
+  level:
+    com.pyokemon.did: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+    org.springframework.transaction: DEBUG
+    org.springframework.web: DEBUG
+    feign: DEBUG
+
+# Booking 서비스 설정
+booking:
+  service:
+    base-url: http://localhost:8088/booking
+
 # ACA-Py 설정
 acapy:
   tenant:
     base-url: http://localhost:8002  # pyokemon-booking-ACA-Py
-    api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일
     wallet-id: tenant-wallet
   mediator:
     base-url: http://localhost:8001  # pyokemon-mediator-ACA-Py (admin port)

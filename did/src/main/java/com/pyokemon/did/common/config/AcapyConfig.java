@@ -12,17 +12,19 @@ public class AcapyConfig {
     private Tenant tenant;
     private Mediator mediator;
     private Webhook webhook;
+    private Wallet wallet;
 
     @Data
     public static class Tenant {
         //Booking ACA-Py 서비스 URL
         private String baseUrl;
-        private String apiKey;
+        private String walletId;
     }
     
     @Data
     public static class Mediator {
         private String baseUrl;
+        private String walletId;
     }
 
     @Data
@@ -33,4 +35,8 @@ public class AcapyConfig {
         private String topicPrefix;
     }
 
+    @Data
+    public static class Wallet {
+        private String key;
+    }
 }

@@ -29,15 +29,15 @@ public class WebhookConfig {
     public static class WebhookEventHandler {
 
         /**
-         * Connection 상태 변경 이벤트 처리
+         * ConnectionMetadata 상태 변경 이벤트 처리
          * - ACA-Py에서 연결 상태가 변경될 때 호출
-         * - Connection.status = ACTIVE 처리
+         * - ConnectionMetadata.status = ACTIVE 처리
          *
          * @param eventData ACA-Py로부터 받은 이벤트 데이터 (JSON)
          */
         public void handleConnectionEvent(String eventData) {
-            // TODO: Connection.status = ACTIVE 처리 로직 구현
-            System.out.println("Connection event received: " + eventData);
+            // TODO: ConnectionMetadata.status = ACTIVE 처리 로직 구현
+            System.out.println("ConnectionMetadata event received: " + eventData);
         }
 
         /**
