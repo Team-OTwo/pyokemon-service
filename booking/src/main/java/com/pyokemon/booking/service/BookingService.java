@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class BookingService {
     
     private final BookingRepository bookingRepository;
+    private final BookingEventPublisher bookingEventPublisher;
     
     public EventScheduleIdResponse getSeatIdsByEventScheduleId(Long eventScheduleId) {
         try {
@@ -89,9 +90,8 @@ public class BookingService {
                 Booking userBooking = activeBooking.get();
                 
                 if (userBooking.getSeatId().equals(request.getSeatId())) {
-                    userBooking.setStatus(Booking.Booked.CANCELLED);
-                    userBooking.setUpdatedAt(LocalDateTime.now());
-                    bookingRepository.update(userBooking);
+                    updateBookingStatus(userBooking.getBookingId(), Booking.Booked.CANCELED, null);
+                    
                     return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
                 } else {
                     if (userBooking.getStatus() == Booking.Booked.PENDING) {
@@ -158,6 +158,37 @@ public class BookingService {
             }
         } catch (Exception e) {
             log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
+        }
+    }
+    
+    @Transactional
+    public void updateBookingStatus(Long bookingId, Booking.Booked status, Long paymentId) {
+        try {
+            if (bookingId == null) {
+                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+            }
+            if (status == null) {
+                throw new BusinessException("상태가 필요합니다.", "INVALID_STATUS");
+            }
+            
+            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+            if (bookingOpt.isEmpty()) {
+                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
+            }
+            
+            Booking booking = bookingOpt.get();
+            booking.setStatus(status);
+            if (paymentId != null) {
+                booking.setPaymentId(paymentId);
+            }
+            booking.setUpdatedAt(LocalDateTime.now());
+            bookingRepository.update(booking);
+
+            bookingEventPublisher.publishBookingStatusUpdate(booking);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
         }
     }
 }

@@ -33,6 +33,12 @@
         LIMIT 1
     </select>
 
+    <select id="findById" resultType="Booking">
+        SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
+        FROM tb_booking
+        WHERE booking_id = #{bookingId}
+    </select>
+
     <select id="findPendingBookings" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
         FROM tb_booking
@@ -46,7 +52,7 @@
 
     <update id="update" parameterType="Booking">
         UPDATE tb_booking
-        SET status = #{status}, updated_at = #{updatedAt}
+        SET status = #{status}, payment_id = #{paymentId}, updated_at = #{updatedAt}
         WHERE booking_id = #{bookingId}
     </update>
 
