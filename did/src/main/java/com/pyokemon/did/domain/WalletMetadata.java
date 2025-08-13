@@ -1,6 +1,7 @@
 package com.pyokemon.did.domain;
 
 import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.*;
 
 @Getter
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletMetadata extends BaseEntity {
-    private String key;
-    private String token;
-    private Long tenantId;
+  private String key;
+  private String token;
+  private Long tenantId;
 }

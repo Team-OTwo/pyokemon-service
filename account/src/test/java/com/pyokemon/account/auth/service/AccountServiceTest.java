@@ -15,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-// import org.springframework.security.crypto.password.PasswordEncoder;
-import com.pyokemon.common.util.PasswordUtil;
 
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
@@ -27,6 +25,7 @@ import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
 import com.pyokemon.account.auth.secret.jwt.TokenGenerator;
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.util.PasswordUtil;
 
 import io.jsonwebtoken.Claims;
 
@@ -74,7 +73,8 @@ public class AccountServiceTest {
     request.setPassword("password123");
 
     // Mock 설정
-    when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE)).thenReturn(Optional.of(testAccount));
+    when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE))
+        .thenReturn(Optional.of(testAccount));
     when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
     when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("access-token");
     when(tokenGenerator.generateRefreshToken(1L, "USER")).thenReturn("refresh-token");

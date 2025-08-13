@@ -56,14 +56,9 @@ class TenantEventManagementControllerTest {
   @DisplayName("TenantEventListTest - 테넌트별 공연 목록 조회 API 테스트")
   void getTenantEventList_Success() throws Exception {
     // given
-    TenantEventListDto mockEvent = TenantEventListDto.builder()
-        .eventId(validEventId)
-        .eventScheduleId(1L)
-        .title("테스트 공연")
-        .eventDate(LocalDateTime.now().plusDays(30))
-        .venueName("테스트 공연장")
-        .status("APPROVED")
-        .build();
+    TenantEventListDto mockEvent = TenantEventListDto.builder().eventId(validEventId)
+        .eventScheduleId(1L).title("테스트 공연").eventDate(LocalDateTime.now().plusDays(30))
+        .venueName("테스트 공연장").status("APPROVED").build();
 
     when(eventService.getTenantEventListByAccountId(validAccountId)).thenReturn(List.of(mockEvent));
 
@@ -174,34 +169,16 @@ class TenantEventManagementControllerTest {
     // given
     Long eventScheduleId = 1L;
     TenantBookingDetailResponseDTO mockBookingDetail = TenantBookingDetailResponseDTO.builder()
-        .eventId(validEventId)
-        .title("테스트 공연")
-        .genre("콘서트")
-        .status("APPROVED")
-        .eventScheduleId(eventScheduleId)
-        .ticketOpenAt(LocalDateTime.now().plusDays(7))
-        .eventDate(LocalDateTime.now().plusDays(30))
-        .venueName("테스트 공연장")
+        .eventId(validEventId).title("테스트 공연").genre("콘서트").status("APPROVED")
+        .eventScheduleId(eventScheduleId).ticketOpenAt(LocalDateTime.now().plusDays(7))
+        .eventDate(LocalDateTime.now().plusDays(30)).venueName("테스트 공연장")
         .bookingStatus(List.of(
-            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
-                .seatClassId(1L)
-                .className("VIP")
-                .totalSeats(100)
-                .bookedSeats(30)
-                .availableSeats(70)
-                .price(150000)
-                .bookingRate(30.0)
-                .build(),
-            TenantBookingDetailResponseDTO.BookingStatusInfo.builder()
-                .seatClassId(2L)
-                .className("R석")
-                .totalSeats(200)
-                .bookedSeats(80)
-                .availableSeats(120)
-                .price(100000)
-                .bookingRate(40.0)
-                .build()
-        ))
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder().seatClassId(1L)
+                .className("VIP").totalSeats(100).bookedSeats(30).availableSeats(70).price(150000)
+                .bookingRate(30.0).build(),
+            TenantBookingDetailResponseDTO.BookingStatusInfo.builder().seatClassId(2L)
+                .className("R석").totalSeats(200).bookedSeats(80).availableSeats(120).price(100000)
+                .bookingRate(40.0).build()))
         .build();
 
     when(eventService.getTenantBookingDetailByEventScheduleId(eventScheduleId))

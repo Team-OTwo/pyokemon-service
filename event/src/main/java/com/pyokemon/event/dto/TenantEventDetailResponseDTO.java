@@ -13,34 +13,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantEventDetailResponseDTO {
-    // event 정보
-    private Long eventId;
-    private String title;
-    private Long ageLimit;
-    private String description;
-    private String genre;
-    private String thumbnailUrl;
-    private String status;
+  // event 정보
+  private Long eventId;
+  private String title;
+  private Long ageLimit;
+  private String description;
+  private String genre;
+  private String thumbnailUrl;
+  private String status;
 
-    // event schedule 정보
-    private Long eventScheduleId;
-    private LocalDateTime ticketOpenAt;
-    private LocalDateTime eventDate;
+  // event schedule 정보
+  private Long eventScheduleId;
+  private LocalDateTime ticketOpenAt;
+  private LocalDateTime eventDate;
 
-    // venue 정보
-    private String venueName;
+  // venue 정보
+  private String venueName;
 
-    // 가격 정보
-    private List<PriceInfo> prices;
+  // 가격 정보
+  private List<PriceInfo> prices;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PriceInfo {
-        private Long priceId;
-        private Long seatClassId;
-        private String className;
-        private Integer price;
-    }
-} 
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class PriceInfo {
+    private Long priceId;
+    private Long seatClassId;
+    private String className;
+    private Integer price;
+  }
+}
