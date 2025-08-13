@@ -1,9 +1,12 @@
 package com.pyokemon.booking.service;
 
 import com.pyokemon.booking.dto.request.BookingRequest;
+import com.pyokemon.booking.dto.request.ValidBookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.dto.response.ValidBookingDetail;
+import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
@@ -38,6 +41,8 @@ class BookingServiceTest {
     private Long validAccountId;
     private Long validEventScheduleId;
     private Long validSeatId;
+    private ValidBookingRequest validBookingRequest;
+    private List<ValidBookingDetail> mockBookingDetails;
 
     @BeforeEach
     void setUp() {
@@ -48,6 +53,25 @@ class BookingServiceTest {
         validRequest = new BookingRequest();
         validRequest.setEventScheduleId(validEventScheduleId);
         validRequest.setSeatId(validSeatId);
+
+        // ValidBooking 테스트용 데이터
+        validBookingRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(Arrays.asList(12312341L, 12431231L, 141231L))
+                .build();
+
+        mockBookingDetails = Arrays.asList(
+                ValidBookingDetail.builder()
+                        .bookingId(12312341L)
+                        .eventScheduleId(101L)
+                        .tenantId(201L)
+                        .build(),
+                ValidBookingDetail.builder()
+                        .bookingId(12431231L)
+                        .eventScheduleId(102L)
+                        .tenantId(202L)
+                        .build()
+        );
     }
 
     @Test
@@ -237,6 +261,85 @@ class BookingServiceTest {
         bookingService.deletePendingBookings();
 
         verify(bookingRepository, never()).delete(anyLong());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - 성공")
+    void validateBookings_Success() {
+        when(bookingRepository.findValidBookingsWithEventInfo(
+                eq(validBookingRequest.getBookings()), 
+                eq(validBookingRequest.getUserId())))
+                .thenReturn(mockBookingDetails);
+
+        ValidBookingResponse response = bookingService.validateBookings(validBookingRequest);
+
+        assertNotNull(response);
+        assertEquals(2, response.getBookings().size());
+        assertEquals(12312341L, response.getBookings().get(0).getBookingId());
+        assertEquals(101L, response.getBookings().get(0).getEventScheduleId());
+        assertEquals(201L, response.getBookings().get(0).getTenantId());
+        verify(bookingRepository).findValidBookingsWithEventInfo(
+                validBookingRequest.getBookings(), 
+                validBookingRequest.getUserId());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - 빈 결과")
+    void validateBookings_EmptyResult() {
+        when(bookingRepository.findValidBookingsWithEventInfo(
+                eq(validBookingRequest.getBookings()), 
+                eq(validBookingRequest.getUserId())))
+                .thenReturn(Collections.emptyList());
+
+        ValidBookingResponse response = bookingService.validateBookings(validBookingRequest);
+
+        assertNotNull(response);
+        assertTrue(response.getBookings().isEmpty());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - userId가 null인 경우")
+    void validateBookings_UserIdNull() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(null)
+                .bookings(Arrays.asList(12312341L, 12431231L))
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_USER_ID", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - bookings가 null인 경우")
+    void validateBookings_BookingsNull() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(null)
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_BOOKING_IDS", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - bookings가 빈 리스트인 경우")
+    void validateBookings_BookingsEmpty() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(Collections.emptyList())
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_BOOKING_IDS", exception.getErrorCode());
     }
 
     private Booking createBooking(Long seatId, Booking.Booked status) {
