@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
@@ -40,6 +41,7 @@ public class TenantEventService {
     private final EventScheduleRepository eventScheduleRepository;
     private final VenueRepository venueRepository;
     private final PriceRepository priceRepository;
+    private final ObjectMapper objectMapper;
 
     public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
         return tenantEventRepository.findTenantEventDetailByEventId(eventId);
@@ -174,7 +176,34 @@ public class TenantEventService {
     }
 
     private Event findEventById(Long eventId) {
-        return eventRepository.findById(eventId);
+        // tenantEventRepository를 사용하여 Event 정보 조회
+        TenantEventDetailResponseDTO eventDetail =
+                tenantEventRepository.findTenantEventDetailByEventId(eventId);
+        if (eventDetail == null) {
+            return null;
+        }
+
+        try {
+            // DTO -> Entity
+            Event event = objectMapper.convertValue(eventDetail, Event.class);
+            
+            // status enum 변환 필요
+            if (eventDetail.getStatus() != null) {
+                event.setStatus(Event.EventStatus.valueOf(eventDetail.getStatus()));
+            }
+            
+            return event;
+        } catch (IllegalArgumentException e) {
+            return Event.builder()
+                    .eventId(eventDetail.getEventId())
+                    .title(eventDetail.getTitle())
+                    .ageLimit(eventDetail.getAgeLimit())
+                    .description(eventDetail.getDescription())
+                    .genre(eventDetail.getGenre())
+                    .thumbnailUrl(eventDetail.getThumbnailUrl())
+                    .status(Event.EventStatus.valueOf(eventDetail.getStatus()))
+                    .build();
+        }
     }
 
     private void updateEventInfo(Event event, EventUpdateDto updateDto) {
@@ -188,8 +217,8 @@ public class TenantEventService {
         }
         event.setUpdatedAt(LocalDateTime.now());
 
-        // 이벤트 정보 저장
-        eventRepository.updateEvent(event);
+        // 이벤트 정보 저장 - tenantEventRepository 사용
+        tenantEventRepository.updateEvent(event);
     }
 
     private void updateEventSchedules(Long eventId, List<EventScheduleUpdateDto> scheduleDtos) {
@@ -292,7 +321,7 @@ public class TenantEventService {
     }
 
     private Long saveEvent(Event event) {
-        eventRepository.save(event);
+        tenantEventRepository.save(event);
         return event.getEventId();
     }
 
