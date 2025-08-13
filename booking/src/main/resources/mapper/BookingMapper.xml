@@ -45,6 +45,21 @@
         WHERE status = 'PENDING'
     </select>
 
+    <select id="findValidBookingsWithEventInfo" resultType="com.pyokemon.booking.dto.response.ValidBookingDetail">
+        SELECT 
+            b.booking_id as bookingId,
+            es.event_id as eventId,
+            b.tenant_id as tenantId
+        FROM tb_booking b
+        INNER JOIN tb_event_schedule es ON b.event_schedule_id = es.event_schedule_id
+        WHERE b.account_id = #{accountId}
+        AND b.status = 'BOOKED'
+        AND b.booking_id IN
+        <foreach collection="bookingIds" item="bookingId" open="(" separator="," close=")">
+            #{bookingId}
+        </foreach>
+    </select>
+
     <insert id="save" parameterType="Booking" useGeneratedKeys="true" keyProperty="bookingId">
         INSERT INTO tb_booking (event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at)
         VALUES (#{eventScheduleId}, #{seatId}, #{accountId}, #{tenantId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt})

@@ -1,5 +1,6 @@
 package com.pyokemon.booking.repository;
 
+import com.pyokemon.booking.dto.response.ValidBookingDetail;
 import com.pyokemon.booking.entity.Booking;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,6 +17,7 @@ public interface BookingRepository {
     Optional<Booking> findActiveBookingByEventScheduleIdAndAccountId(@Param("eventScheduleId") Long eventScheduleId, @Param("accountId") Long accountId);
     Optional<Booking> findById(@Param("bookingId") Long bookingId);
     List<Booking> findPendingBookings();
+    List<ValidBookingDetail> findValidBookingsWithEventInfo(@Param("bookingIds") List<Long> bookingIds, @Param("accountId") Long accountId);
     
     void save(Booking booking);
     void update(Booking booking);
