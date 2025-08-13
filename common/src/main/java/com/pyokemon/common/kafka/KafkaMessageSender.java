@@ -28,12 +28,11 @@ public class KafkaMessageSender {
    */
   public <T> void send(String topic, Long id, T message) {
     CompletableFuture<SendResult<Long, Object>> future = kafkaTemplate.send(topic, id, message);
-    future.whenComplete((result, ex) -> {
-      if (ex == null) {
-        log.info("메시지 전송 성공: 토픽={}, 키={}, 메시지={}", topic, id, message);
-      } else {
-        log.error("메시지 전송 실패: 토픽={}, 키={}, 메시지={}, 예외={}", topic, id, message, ex.getMessage());
-      }
+    future.thenAccept(result -> {
+      log.info("메시지 전송 성공: 토픽={}, 키={}, 메시지={}", topic, id, message);
+    }).exceptionally(ex -> {
+      log.error("메시지 전송 실패: 토픽={}, 키={}, 메시지={}, 예외={}", topic, id, message, ex.getMessage());
+      return null;
     });
   }
 
@@ -45,12 +44,11 @@ public class KafkaMessageSender {
    */
   public <T> void send(String topic, T message) {
     CompletableFuture<SendResult<Long, Object>> future = kafkaTemplate.send(topic, message);
-    future.whenComplete((result, ex) -> {
-      if (ex == null) {
-        log.info("메시지 전송 성공: 토픽={}, 메시지={}", topic, message);
-      } else {
-        log.error("메시지 전송 실패: 토픽={}, 메시지={}, 예외={}", topic, message, ex.getMessage());
-      }
+    future.thenAccept(result -> {
+      log.info("메시지 전송 성공: 토픽={}, 메시지={}", topic, message);
+    }).exceptionally(ex -> {
+      log.error("메시지 전송 실패: 토픽={}, 메시지={}, 예외={}", topic, message, ex.getMessage());
+      return null;
     });
   }
 }

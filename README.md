@@ -396,27 +396,6 @@ public void sendEvent() {
 }
 ```
 
-### Kafka Consumer 구현
-```java
-@Component
-@RequiredArgsConstructor
-public class ExampleConsumer {
-    private final SomeService someService;
-    
-    @KafkaListener(topics = "topic-name", groupId = "${spring.application.name}")
-    public void consume(ConsumerRecord<Long, SomeDto> record, Acknowledgment ack) {
-        try {
-            SomeDto message = record.value();
-            someService.processMessage(message);
-            ack.acknowledge();
-        } catch (Exception e) {
-            // 에러 처리
-            log.error("메시지 처리 실패", e);
-        }
-    }
-}
-```
-
 ### 주의사항
 - 각 서비스의 application.yml 파일에서 spring.kafka.consumer.group-id를 서비스별로 고유하게 설정해야 합니다.
 - 메시지 직렬화/역직렬화 시 클래스 경로 문제가 발생할 경우 spring.kafka.consumer.properties.spring.json.trusted.packages 속성을 확인하세요. 
