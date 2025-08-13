@@ -1,6 +1,10 @@
 package com.pyokemon.payment.service;
 
 
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.PaymentErrorCodes;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,8 +15,9 @@ import com.pyokemon.payment.producer.KafkaMessageProducer;
 import com.pyokemon.payment.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.View;
 import reactor.core.publisher.Mono;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TossPaymentService {
@@ -27,13 +32,15 @@ public class TossPaymentService {
     boolean markedDone = false;
     try {
       dto = tossWebClient.post().uri("/payments/confirm").bodyValue(request)
-          .exchangeToMono(response -> {
-            if (response.statusCode().isError()) {
-              return response.bodyToMono(String.class)
-                  .doOnNext(error -> System.out.println("에러: " + error))
-                  .then(Mono.error(new RuntimeException("Toss confirm failed")));
+          .exchangeToMono(res -> {
+            if (res.statusCode().isError()) {
+              final HttpStatusCode s = res.statusCode();
+              return res.bodyToMono(String.class).flatMap(body -> {
+                log.error("Toss confirm error: {}", body);
+                  return Mono.error(new BusinessException("Toss confirm failed", PaymentErrorCodes.TOSS_CONFIRM_FAILED));
+              });
             }
-            return response.bodyToMono(PaymentConfirmResponseDto.class);
+            return res.bodyToMono(PaymentConfirmResponseDto.class);
           }).block();
 
       paymentRepository.updatePayment(request.getOrderId(), request.getPaymentKey(), "DONE",
