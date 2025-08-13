@@ -77,6 +77,9 @@ public class BookingService {
             if (request.getSeatId() == null) {
                 throw new BusinessException("좌석 ID가 필요합니다.", "INVALID_SEAT_ID");
             }
+            if (request.getTenantId() == null) {
+                throw new BusinessException("테넌트 ID가 필요합니다.", "INVALID_TENANT_ID");
+            }
             if (accountId == null) {
                 throw new BusinessException("계정 ID가 필요합니다.", "INVALID_ACCOUNT_ID");
             }
@@ -128,6 +131,7 @@ public class BookingService {
                     .eventScheduleId(request.getEventScheduleId())
                     .seatId(request.getSeatId())
                     .accountId(accountId)
+                    .tenantId(request.getTenantId())
                     .paymentId(null)
                     .status(Booking.Booked.PENDING)
                     .createdAt(LocalDateTime.now())

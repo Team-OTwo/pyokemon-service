@@ -12,4 +12,5 @@ import lombok.Setter;
 public class BookingRequest {
     private Long eventScheduleId;
     private Long seatId;
+    private Long tenantId;
 }
