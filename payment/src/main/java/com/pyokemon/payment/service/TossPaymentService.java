@@ -35,7 +35,6 @@ public class TossPaymentService {
       dto = tossWebClient.post().uri("/payments/confirm").bodyValue(request)
           .exchangeToMono(res -> {
             if (res.statusCode().isError()) {
-              final HttpStatusCode s = res.statusCode();
               return res.bodyToMono(String.class).flatMap(body -> {
                 log.error("Toss confirm error: {}", body);
                   return Mono.error(new BusinessException("Toss confirm failed", PaymentErrorCodes.TOSS_CONFIRM_FAILED));
@@ -49,6 +48,12 @@ public class TossPaymentService {
 
       );
       var p = paymentRepository.selectByOrderId(request.getOrderId());
+      if(p==null) {
+        log.error("Payment {} not found.", request.getOrderId());
+        throw new BusinessException(
+              "Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND
+        );
+      }
       PaymentKafkaDto kafkaDto =
           new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
       kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
@@ -56,9 +61,17 @@ public class TossPaymentService {
       return dto;
 
     } catch (Exception e) {
+      log.error("Confirm failed: type={}, msg={}", e.getClass().getName(), e.getMessage(), e);
+
       if (!markedDone) {
         paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
         var p = paymentRepository.selectByOrderId(request.getOrderId());
+        if(p==null) {
+          log.error("Payment {} not found.", request.getOrderId());
+          throw new BusinessException(
+                  "Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND
+          );
+        }
         PaymentKafkaDto kafkaDto =
             new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
         kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
@@ -67,12 +80,18 @@ public class TossPaymentService {
     }
 
   }
-  
+
   @Transactional
   public void fail(PaymentConfirmRequestDto request) {
     paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
 
     var p = paymentRepository.selectByOrderId(request.getOrderId());
+    if(p==null) {
+      log.error("Payment {} not found.", request.getOrderId());
+      throw new BusinessException(
+              "Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND
+      );
+    }
     PaymentKafkaDto kafkaDto =
         new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
     kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
