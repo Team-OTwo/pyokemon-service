@@ -54,7 +54,7 @@ public class EventScheduleService {
 
     return events;
   }
-  
+
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
     // Create and save event schedule
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);

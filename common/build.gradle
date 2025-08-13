@@ -14,6 +14,9 @@ dependencies {
     // implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     
+    // Kafka 의존성 추가
+    implementation 'org.springframework.kafka:spring-kafka'
+    
     // 비밀번호 암호화를 위한 jBCrypt 라이브러리
     implementation 'org.mindrot:jbcrypt:0.4'
     

@@ -1,8 +1,8 @@
 package com.pyokemon.event.entity;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SavedEvent {
-    private Long savedEventId;
-    private Long eventId;
-    private Long accountId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private Long savedEventId;
+  private Long eventId;
+  private Long accountId;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 }

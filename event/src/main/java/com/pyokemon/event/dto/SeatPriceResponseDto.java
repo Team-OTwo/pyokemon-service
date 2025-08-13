@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SeatPriceResponseDto {
-    private String className;
-    private Long price;
+  private String className;
+  private Long price;
 }
