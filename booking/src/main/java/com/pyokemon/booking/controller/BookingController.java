@@ -1,5 +1,6 @@
 package com.pyokemon.booking.controller;
 
+import com.pyokemon.booking.dto.bff.BffBookingDto;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingResponse;
@@ -8,6 +9,7 @@ import com.pyokemon.booking.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +38,13 @@ public class BookingController {
             @RequestHeader("X-Auth-AccountId") Long accountId) {
         BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
         return ResponseEntity.ok(booking);
+    }
+
+
+
+    // bff
+    @GetMapping("/bff")
+    public Flux<BffBookingDto> getBffBookings(@RequestHeader("X-Auth-AccountId") Long accountId){
+        return bookingService.getBffBookings(accountId);
     }
 }

@@ -1,5 +1,6 @@
 package com.pyokemon.booking.repository;
 
+import com.pyokemon.booking.dto.bff.BffBookingDto;
 import com.pyokemon.booking.entity.Booking;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,8 @@ public interface BookingRepository {
     void save(Booking booking);
     void update(Booking booking);
     void delete(@Param("bookingId") Long bookingId);
+
+
+    // bff
+    List<BffBookingDto> findBffBookingsByAccountId(Long accountId);
 }

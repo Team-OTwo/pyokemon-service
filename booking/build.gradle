@@ -11,6 +11,9 @@ dependencies {
     
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Webflux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

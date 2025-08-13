@@ -1,5 +1,6 @@
 package com.pyokemon.booking.service;
 
+import com.pyokemon.booking.dto.bff.BffBookingDto;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingInfo;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -159,5 +161,13 @@ public class BookingService {
         } catch (Exception e) {
             log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
         }
+    }
+
+
+
+    // bff
+    public Flux<BffBookingDto> getBffBookings(Long accountId){
+        List<BffBookingDto> bookings = bookingRepository.findBffBookingsByAccountId(accountId);
+        return Flux.fromIterable(bookings);
     }
 }
