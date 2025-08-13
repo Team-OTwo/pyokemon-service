@@ -6,6 +6,7 @@ import com.pyokemon.common.exception.code.PaymentErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
@@ -66,7 +67,8 @@ public class TossPaymentService {
     }
 
   }
-
+  
+  @Transactional
   public void fail(PaymentConfirmRequestDto request) {
     paymentRepository.updatePaymentFailed(request.getOrderId(), "FAILED", null);
 
