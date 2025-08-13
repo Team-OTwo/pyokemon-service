@@ -187,11 +187,46 @@ public class BookingService {
                 throw new BusinessException("BOOKED 상태의 예약만 취소할 수 있습니다.", "INVALID_BOOKING_STATUS");
             }
             
-            updateBookingStatus(booking.getBookingId(), Booking.Booked.CANCELED, null);
+            booking.setStatus(Booking.Booked.CANCELED);
+            booking.setUpdatedAt(LocalDateTime.now());
+            bookingRepository.save(booking);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
             throw new BusinessException("예약 취소를 처리할 수 없습니다.", "BOOKING_CANCEL_ERROR");
+        }
+    }
+    
+    // 예약 상태 업데이트 (결제 이벤트 처리용)
+    @Transactional
+    public void updateBookingStatus(Long bookingId, Booking.Booked newStatus, Long paymentId) {
+        try {
+            if (bookingId == null) {
+                throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+            }
+            if (newStatus == null) {
+                throw new BusinessException("예약 상태가 필요합니다.", "INVALID_BOOKING_STATUS");
+            }
+            
+            Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+            if (bookingOpt.isEmpty()) {
+                throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
+            }
+            
+            Booking booking = bookingOpt.get();
+            booking.setStatus(newStatus);
+            booking.setPaymentId(paymentId);
+            booking.setUpdatedAt(LocalDateTime.now());
+            
+            bookingRepository.save(booking);
+            
+            log.info("예약 상태 업데이트 완료: bookingId={}, status={}, paymentId={}", 
+                    bookingId, newStatus, paymentId);
+                    
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessException("예약 상태 업데이트를 처리할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
         }
     }
     
@@ -213,5 +248,4 @@ public class BookingService {
             log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
         }
     }
-  }
 }
