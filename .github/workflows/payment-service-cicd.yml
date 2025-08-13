@@ -7,11 +7,6 @@ on:
       - 'payment/**'
       - 'common/**'
       - '.github/workflows/payment-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'payment/**'
-      - 'common/**'
 
 jobs:
   build-and-deploy:

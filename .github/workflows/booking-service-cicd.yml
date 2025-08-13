@@ -7,12 +7,7 @@ on:
       - 'booking/**'
       - 'common/**'
       - '.github/workflows/booking-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'booking/**'
-      - 'common/**'
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
