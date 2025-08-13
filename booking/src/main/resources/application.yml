@@ -4,6 +4,8 @@ server:
     context-path: /booking
 
 spring:
+  application:
+    name: booking-service
   profiles:
     include:
       - flyway

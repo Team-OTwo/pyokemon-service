@@ -4,6 +4,8 @@ server:
     context-path: /payment
 
 spring:
+  application:
+    name: payment-service
   profiles:
     include:
       - flyway
