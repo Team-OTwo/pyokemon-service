@@ -29,7 +29,8 @@ public class BookingService {
     
     private final BookingRepository bookingRepository;
     private final BookingEventPublisher bookingEventPublisher;
-    
+
+    // eventScheduleId -> BOOKED/PENDING인 seatID 반환
     public EventScheduleIdResponse getSeatIdsByEventScheduleId(Long eventScheduleId) {
         try {
             if (eventScheduleId == null) {
@@ -44,7 +45,8 @@ public class BookingService {
             throw new BusinessException("좌석 정보를 조회할 수 없습니다.", "SEAT_QUERY_ERROR");
         }
     }
-    
+
+    // accountId -> 해당 accountId의 예매내역 반환
     public AccountIdResponse getBookingsByAccountId(Long accountId) {
         try {
             if (accountId == null) {
@@ -70,7 +72,8 @@ public class BookingService {
             throw new BusinessException("예약 정보를 조회할 수 없습니다.", "BOOKING_QUERY_ERROR");
         }
     }
-    
+
+    // accountId/bookingId -> 유효한 bookingId 반환
     public ValidBookingResponse validateBookings(ValidBookingRequest request) {
         try {
             if (request.getUserId() == null) {
@@ -92,9 +95,10 @@ public class BookingService {
             throw new BusinessException("예약 검증을 처리할 수 없습니다.", "BOOKING_VALIDATION_ERROR");
         }
     }
-    
+
+    // 예매 내역 저장
     @Transactional
-    public BookingResponse createOrUpdateBooking(BookingRequest request, Long accountId) {
+    public BookingResponse createBooking(BookingRequest request, Long accountId) {
         try {
             if (request.getEventScheduleId() == null) {
                 throw new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID");
@@ -116,30 +120,13 @@ public class BookingService {
             
             if (activeBooking.isPresent()) {
                 Booking userBooking = activeBooking.get();
-                
-                if (userBooking.getSeatId().equals(request.getSeatId())) {
-                    updateBookingStatus(userBooking.getBookingId(), Booking.Booked.CANCELED, null);
-                    
-                    return new BookingResponse(userBooking.getEventScheduleId(), userBooking.getBookingId());
+                if (userBooking.getStatus() == Booking.Booked.PENDING) {
+                    throw new BusinessException("결제중인 내역이 있습니다.", "PAYMENT_IN_PROGRESS");
                 } else {
-                    if (userBooking.getStatus() == Booking.Booked.PENDING) {
-                        throw new BusinessException("결제중인 내역이 있습니다.", "PAYMENT_IN_PROGRESS");
-                    } else {
-                        throw new BusinessException("1인 1매만 가능합니다.", "BOOKING_ONE_PER_EVENT");
-                    }
+                    throw new BusinessException("1인 1매만 가능합니다.", "BOOKING_ONE_PER_EVENT");
                 }
-            } else {
-                return createNewBooking(request, accountId);
             }
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BusinessException("예약을 처리할 수 없습니다.", "BOOKING_PROCESS_ERROR");
-        }
-    }
-    
-    private BookingResponse createNewBooking(BookingRequest request, Long accountId) {
-        try {
+            
             List<Booking> existingSeatBookings = bookingRepository.findAllByEventScheduleIdAndSeatId(
                     request.getEventScheduleId(), 
                     request.getSeatId()
@@ -165,13 +152,48 @@ public class BookingService {
             
             bookingRepository.save(newBooking);
             return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
+            
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("새 예약을 생성할 수 없습니다.", "BOOKING_CREATE_ERROR");
+            throw new BusinessException("예약을 처리할 수 없습니다.", "BOOKING_PROCESS_ERROR");
+        }
+    }
+
+    // 예매 취소
+    @Transactional
+    public void cancelBooking(Long eventScheduleId, Long accountId) {
+        try {
+            if (eventScheduleId == null) {
+                throw new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID");
+            }
+            if (accountId == null) {
+                throw new BusinessException("계정 ID가 필요합니다.", "INVALID_ACCOUNT_ID");
+            }
+            
+            Optional<Booking> bookingOpt = bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(
+                    eventScheduleId, 
+                    accountId
+            );
+            
+            if (bookingOpt.isEmpty()) {
+                throw new BusinessException("취소할 예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
+            }
+            
+            Booking booking = bookingOpt.get();
+            if (booking.getStatus() != Booking.Booked.BOOKED) {
+                throw new BusinessException("BOOKED 상태의 예약만 취소할 수 있습니다.", "INVALID_BOOKING_STATUS");
+            }
+            
+            updateBookingStatus(booking.getBookingId(), Booking.Booked.CANCELED, null);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessException("예약 취소를 처리할 수 없습니다.", "BOOKING_CANCEL_ERROR");
         }
     }
     
+    // PENDING 예약 삭제 스케줄러
     @Transactional(readOnly = false)
     @Scheduled(cron = "0 */5 * * * *")
     public void deletePendingBookings() {
@@ -190,6 +212,7 @@ public class BookingService {
         }
     }
     
+    // kafka -> 예약 상태 업데이트
     @Transactional
     public void updateBookingStatus(Long bookingId, Booking.Booked status, Long paymentId) {
         try {

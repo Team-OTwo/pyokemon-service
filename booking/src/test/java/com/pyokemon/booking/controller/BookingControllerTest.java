@@ -27,7 +27,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -138,10 +140,10 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 성공")
-    void createOrUpdateBooking_Success() throws Exception {
+    void createBooking_Success() throws Exception {
         BookingResponse expectedResponse = new BookingResponse(validEventScheduleId, 1L);
         
-        when(bookingService.createOrUpdateBooking(any(BookingRequest.class), eq(validAccountId)))
+        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
                 .thenReturn(expectedResponse);
 
         mockMvc.perform(post("/api/bookings/booking")
@@ -155,13 +157,23 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("예약 취소 성공")
+    void cancelBooking_Success() throws Exception {
+        doNothing().when(bookingService).cancelBooking(eq(validEventScheduleId), eq(validAccountId));
+
+        mockMvc.perform(delete("/api/bookings/booking/{eventScheduleId}", validEventScheduleId)
+                        .header("X-Auth-AccountId", validAccountId))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("예약 생성 - 잘못된 요청")
-    void createOrUpdateBooking_InvalidRequest() throws Exception {
+    void createBooking_InvalidRequest() throws Exception {
         BookingRequest invalidRequest = new BookingRequest();
         invalidRequest.setEventScheduleId(null);
         invalidRequest.setSeatId(null);
 
-        when(bookingService.createOrUpdateBooking(any(BookingRequest.class), eq(validAccountId)))
+        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
                 .thenThrow(new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID"));
 
         mockMvc.perform(post("/api/bookings/booking")
@@ -175,7 +187,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 - 헤더 누락")
-    void createOrUpdateBooking_MissingHeader() throws Exception {
+    void createBooking_MissingHeader() throws Exception {
         mockMvc.perform(post("/api/bookings/booking")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validRequest)))
@@ -184,7 +196,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 - 잘못된 JSON")
-    void createOrUpdateBooking_InvalidJson() throws Exception {
+    void createBooking_InvalidJson() throws Exception {
         mockMvc.perform(post("/api/bookings/booking")
                         .header("X-Auth-AccountId", validAccountId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,8 +206,8 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 - 결제중인 내역 오류")
-    void createOrUpdateBooking_PaymentInProgress() throws Exception {
-        when(bookingService.createOrUpdateBooking(any(BookingRequest.class), eq(validAccountId)))
+    void createBooking_PaymentInProgress() throws Exception {
+        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
                 .thenThrow(new BusinessException("결제중인 내역이 있습니다.", "PAYMENT_IN_PROGRESS"));
 
         mockMvc.perform(post("/api/bookings/booking")
@@ -209,8 +221,8 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 - 1인1매 제한 오류")
-    void createOrUpdateBooking_OnePerEventLimit() throws Exception {
-        when(bookingService.createOrUpdateBooking(any(BookingRequest.class), eq(validAccountId)))
+    void createBooking_OnePerEventLimit() throws Exception {
+        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
                 .thenThrow(new BusinessException("1인 1매만 가능합니다.", "BOOKING_ONE_PER_EVENT"));
 
         mockMvc.perform(post("/api/bookings/booking")
@@ -224,8 +236,8 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("예약 생성 - 이미 예약된 좌석 오류")
-    void createOrUpdateBooking_SeatAlreadyBooked() throws Exception {
-        when(bookingService.createOrUpdateBooking(any(BookingRequest.class), eq(validAccountId)))
+    void createBooking_SeatAlreadyBooked() throws Exception {
+        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
                 .thenThrow(new BusinessException("이미 예약된 좌석입니다.", "SEAT_ALREADY_BOOKED"));
 
         mockMvc.perform(post("/api/bookings/booking")

@@ -31,10 +31,18 @@ public class BookingController {
     }
 
     @PostMapping("/booking")
-    public ResponseEntity<BookingResponse> createOrUpdateBooking(
+    public ResponseEntity<BookingResponse> createBooking(
             @RequestBody BookingRequest request,
             @RequestHeader("X-Auth-AccountId") Long accountId) {
-        BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
+        BookingResponse booking = bookingService.createBooking(request, accountId);
         return ResponseEntity.ok(booking);
+    }
+
+    @DeleteMapping("/booking/{eventScheduleId}")
+    public ResponseEntity<Void> cancelBooking(
+            @PathVariable Long eventScheduleId,
+            @RequestHeader("X-Auth-AccountId") Long accountId) {
+        bookingService.cancelBooking(eventScheduleId, accountId);
+        return ResponseEntity.ok().build();
     }
 }
