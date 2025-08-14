@@ -3,6 +3,7 @@ package com.pyokemon.event.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.event.dto.bff.BffEventScheduleDto;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.event.dto.EventItemResponseDTO;
@@ -82,6 +83,14 @@ public class EventScheduleService {
     return Price.builder().eventScheduleId(dto.getEventScheduleId())
         .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now()).build();
+  }
+
+
+
+
+  // bff getEventSchedule
+  public BffEventScheduleDto getBffEventSchedule(Long eventScheduleId){
+    return eventScheduleRepository.findBffEventScheduleById(eventScheduleId);
   }
 
 }

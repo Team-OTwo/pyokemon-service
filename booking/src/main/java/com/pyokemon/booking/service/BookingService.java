@@ -1,14 +1,6 @@
 package com.pyokemon.booking.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.pyokemon.booking.dto.bff.BffBookingDto;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingInfo;
@@ -20,6 +12,15 @@ import com.pyokemon.common.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -180,4 +181,12 @@ public class BookingService {
       throw new BusinessException("예약 상태를 업데이트할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
     }
   }
+
+
+
+    // bff
+    public Flux<BffBookingDto> getBffBookings(Long accountId){
+        List<BffBookingDto> bookings = bookingRepository.findBffBookingsByAccountId(accountId);
+        return Flux.fromIterable(bookings);
+    }
 }

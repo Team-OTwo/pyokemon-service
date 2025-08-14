@@ -58,4 +58,11 @@
         WHERE event_schedule_id = #{eventScheduleId};
     </select>
 
+
+    <!--    bff-->
+    <select id="findBffEventById" resultType="BffEventDto">
+        SELECT event_id as id, title, thumbnail_url
+        FROM tb_event
+        WHERE event_id = #{eventId}
+    </select>
 </mapper>

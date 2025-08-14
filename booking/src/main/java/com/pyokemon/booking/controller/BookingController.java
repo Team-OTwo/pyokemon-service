@@ -1,5 +1,6 @@
 package com.pyokemon.booking.controller;
 
+import com.pyokemon.booking.dto.bff.BffBookingDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,32 +11,42 @@ import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
 import com.pyokemon.booking.service.BookingService;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/bookings")
 public class BookingController {
 
-  private final BookingService bookingService;
+    private final BookingService bookingService;
 
-  @GetMapping("/{eventScheduleId}")
-  public ResponseEntity<EventScheduleIdResponse> getSeatIdsByEventScheduleId(
-      @PathVariable Long eventScheduleId) {
-    EventScheduleIdResponse response = bookingService.getSeatIdsByEventScheduleId(eventScheduleId);
-    return ResponseEntity.ok(response);
-  }
+    @GetMapping("/{eventScheduleId}")
+    public ResponseEntity<EventScheduleIdResponse> getSeatIdsByEventScheduleId(
+            @PathVariable Long eventScheduleId) {
+        EventScheduleIdResponse response = bookingService.getSeatIdsByEventScheduleId(eventScheduleId);
+        return ResponseEntity.ok(response);
+    }
 
-  @GetMapping("/account")
-  public ResponseEntity<AccountIdResponse> getBookingsByAccountId(
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
-    AccountIdResponse response = bookingService.getBookingsByAccountId(accountId);
-    return ResponseEntity.ok(response);
-  }
+    @GetMapping("/account")
+    public ResponseEntity<AccountIdResponse> getBookingsByAccountId(
+            @RequestHeader("X-Auth-AccountId") Long accountId) {
+        AccountIdResponse response = bookingService.getBookingsByAccountId(accountId);
+        return ResponseEntity.ok(response);
+    }
 
-  @PostMapping("/booking")
-  public ResponseEntity<BookingResponse> createOrUpdateBooking(@RequestBody BookingRequest request,
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
-    BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
-    return ResponseEntity.ok(booking);
-  }
+    @PostMapping("/booking")
+    public ResponseEntity<BookingResponse> createOrUpdateBooking(
+            @RequestBody BookingRequest request,
+            @RequestHeader("X-Auth-AccountId") Long accountId) {
+        BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
+        return ResponseEntity.ok(booking);
+    }
+
+
+
+    // bff
+    @GetMapping("/bff")
+    public Flux<BffBookingDto> getBffBookings(@RequestHeader("X-Auth-AccountId") Long accountId){
+        return bookingService.getBffBookings(accountId);
+    }
 }

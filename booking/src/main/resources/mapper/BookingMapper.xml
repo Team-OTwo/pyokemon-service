@@ -61,4 +61,12 @@
         WHERE booking_id = #{bookingId}
     </delete>
 
+
+    <!--    bff-->
+    <select id="findBffBookingsByAccountId" resultType="com.pyokemon.booking.dto.bff.BffBookingDto">
+        SELECT booking_id as id, account_id, event_schedule_id, seat_id, payment_id, updated_at, status
+        FROM tb_booking
+        WHERE account_id = #{accountId}
+    </select>
+
 </mapper> 

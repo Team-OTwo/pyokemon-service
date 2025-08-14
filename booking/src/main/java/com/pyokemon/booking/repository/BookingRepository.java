@@ -1,33 +1,37 @@
 package com.pyokemon.booking.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.pyokemon.booking.dto.bff.BffBookingDto;
+import com.pyokemon.booking.entity.Booking;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.pyokemon.booking.entity.Booking;
+import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface BookingRepository {
 
-  List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
+    List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
-  List<Booking> findByAccountId(@Param("accountId") Long accountId);
+    List<Booking> findByAccountId(@Param("accountId") Long accountId);
 
-  List<Booking> findAllByEventScheduleIdAndSeatId(@Param("eventScheduleId") Long eventScheduleId,
-      @Param("seatId") Long seatId);
+    List<Booking> findAllByEventScheduleIdAndSeatId(@Param("eventScheduleId") Long eventScheduleId,
+                                                    @Param("seatId") Long seatId);
 
-  Optional<Booking> findActiveBookingByEventScheduleIdAndAccountId(
-      @Param("eventScheduleId") Long eventScheduleId, @Param("accountId") Long accountId);
+    Optional<Booking> findActiveBookingByEventScheduleIdAndAccountId(
+            @Param("eventScheduleId") Long eventScheduleId, @Param("accountId") Long accountId);
 
-  Optional<Booking> findById(@Param("bookingId") Long bookingId);
+    Optional<Booking> findById(@Param("bookingId") Long bookingId);
 
-  List<Booking> findPendingBookings();
+    List<Booking> findPendingBookings();
 
-  void save(Booking booking);
+    void save(Booking booking);
 
-  void update(Booking booking);
+    void update(Booking booking);
 
-  void delete(@Param("bookingId") Long bookingId);
+    void delete(@Param("bookingId") Long bookingId);
+
+
+    // bff
+    List<BffBookingDto> findBffBookingsByAccountId(Long accountId);
 }

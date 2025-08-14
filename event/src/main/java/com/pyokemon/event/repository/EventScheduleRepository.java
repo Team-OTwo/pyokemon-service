@@ -4,6 +4,7 @@ package com.pyokemon.event.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.event.dto.bff.BffEventScheduleDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,7 +31,10 @@ public interface EventScheduleRepository {
       @Param("limit") int limit, @Param("offset") int offset, @Param("genre") String genre);
 
   int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
-
   int updateEventSchedule(EventSchedule eventSchedule);
 
+
+
+  // bff
+  BffEventScheduleDto findBffEventScheduleById(Long id);
 }
