@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingEventDto {
-    private Long bookingId;
-    private Long eventScheduleId;
-    private Long accountId;
-    private String status;
+  private Long bookingId;
+  private Long eventScheduleId;
+  private Long accountId;
+  private String status;
 
 }
