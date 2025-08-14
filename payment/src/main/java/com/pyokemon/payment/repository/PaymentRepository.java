@@ -14,4 +14,8 @@ public interface PaymentRepository {
   void updatePaymentFailed(String orderId, String status, String method);
 
   Payment selectByOrderId(String orderId);
+
+  void cancelPayment(String orderId, String status);
+
+  Payment selectLatestByBookingId(Long bookingId);
 }

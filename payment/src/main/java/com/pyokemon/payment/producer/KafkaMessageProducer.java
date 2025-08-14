@@ -3,7 +3,7 @@ package com.pyokemon.payment.producer;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.pyokemon.payment.dto.PaymentKafkaDto;
+import com.pyokemon.payment.dto.kafka.PaymentKafkaDto;
 
 import lombok.RequiredArgsConstructor;
 
