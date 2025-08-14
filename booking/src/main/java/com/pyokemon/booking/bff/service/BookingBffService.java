@@ -3,6 +3,7 @@ package com.pyokemon.booking.bff.service;
 import com.pyokemon.booking.bff.dto.BookingDto;
 import com.pyokemon.booking.bff.repository.BookingBffRepository;
 import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class BookingBffService {
     Optional<Booking> bookingOpt = bookingBffRepository.findByBookingId(bookingId);
 
     if (bookingOpt.isEmpty()){
-      return null;
+      throw new BusinessException("해당 예약은 존재하지 않습니다.","NOT_FOUND");
     }
 
     Booking booking = bookingOpt.get();
