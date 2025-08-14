@@ -13,5 +13,6 @@ public class BookingEventDto {
   private Long bookingId;
   private Long eventScheduleId;
   private Long accountId;
+  private Long tenantId;
   private String status;
 }

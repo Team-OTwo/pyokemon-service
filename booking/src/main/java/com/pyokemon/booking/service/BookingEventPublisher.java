@@ -23,10 +23,13 @@ public class BookingEventPublisher {
     try {
       BookingEventDto event = BookingEventDto.builder().bookingId(booking.getBookingId())
           .eventScheduleId(booking.getEventScheduleId()).accountId(booking.getAccountId())
-          .status(booking.getStatus().name()).build();
+          .tenantId(booking.getTenantId()).status(booking.getStatus().name()).build();
 
       String jsonMessage = objectMapper.writeValueAsString(event);
       kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED, booking.getBookingId(), jsonMessage);
+
+      log.info("Published booking status update event: bookingId={}, status={}, message={}",
+          booking.getBookingId(), booking.getStatus().name(), jsonMessage);
     } catch (Exception e) {
       log.error("Failed to publish booking status update event for booking: {}",
           booking.getBookingId(), e);
