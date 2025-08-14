@@ -18,7 +18,8 @@ public class BookingCancelListener {
   private final ObjectMapper objectMapper;
   private final PaymentCancelService paymentCancelService;
 
-  @KafkaListener(topics = "booking-status-updated", groupId = "payment-service")
+  @KafkaListener(topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).BOOKING_STATUS_UPDATED}",
+          groupId = "${spring.application.name}")
   public void onBookingEvent(String payload) {
     try {
       BookingEventDto evt = objectMapper.readValue(payload, BookingEventDto.class);
