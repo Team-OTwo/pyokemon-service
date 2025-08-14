@@ -31,5 +31,10 @@
         WHERE order_id = #{orderId}
     </select>
 
+    <select id="findBffPaymentById" resultType="com.pyokemon.payment.dto.bff.BffPaymentDto">
+        SELECT payment_id as id, amount, method, status, updated_at
+        FROM tb_payment
+        WHERE payment_id = #{paymentId}
+    </select>
 
 </mapper>

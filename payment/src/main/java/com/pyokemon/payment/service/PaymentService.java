@@ -1,5 +1,6 @@
 package com.pyokemon.payment.service;
 
+import com.pyokemon.payment.dto.bff.BffPaymentDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +27,11 @@ public class PaymentService {
     paymentRepository.insertInitiatePayment(dto);
 
 
+  }
+
+
+  // bff getPaymemt
+  public BffPaymentDto getPayment(Long paymentId){
+    return paymentRepository.findBffPaymentById(paymentId);
   }
 }

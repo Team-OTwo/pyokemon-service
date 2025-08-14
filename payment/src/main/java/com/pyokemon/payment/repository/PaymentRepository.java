@@ -1,5 +1,6 @@
 package com.pyokemon.payment.repository;
 
+import com.pyokemon.payment.dto.bff.BffPaymentDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.payment.dto.PaymentDto;
@@ -14,4 +15,6 @@ public interface PaymentRepository {
   void updatePaymentFailed(String orderId, String status, String method);
 
   Payment selectByOrderId(String orderId);
+
+  BffPaymentDto findBffPaymentById(Long paymentId);
 }

@@ -3,6 +3,7 @@ package com.pyokemon.payment.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.pyokemon.payment.dto.bff.BffPaymentDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,13 @@ public class PaymentController {
       return ResponseEntity.badRequest().build();
 
     }
+  }
+
+
+  // bff getPayment
+  @GetMapping("/bff/{paymentId}")
+  public BffPaymentDto getPayment(@PathVariable Long paymentId){
+    return paymentService.getPayment(paymentId);
   }
 
 }
