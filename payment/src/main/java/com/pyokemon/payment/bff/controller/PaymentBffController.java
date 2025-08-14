@@ -17,7 +17,7 @@ public class PaymentBffController {
     private final PaymentBffService paymentBffService;
 
     @GetMapping("/{paymentId}")
-    public PaymentDto getUser(@PathVariable Long paymentId) {
+    public PaymentDto getPayment(@PathVariable Long paymentId) {
         return paymentBffService.getPayment(paymentId);
     }
 

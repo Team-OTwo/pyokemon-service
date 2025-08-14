@@ -28,7 +28,7 @@ public class BookingBffController {
         return bookingBffService.getAccountIdBookings(accountId);
     }
 
-    @GetMapping("/{bookingId}")
+    @GetMapping("/bff/{bookingId}")
     public BookingDto getBooking(@PathVariable Long bookingId) {
         return bookingBffService.getBooking(bookingId);
     }

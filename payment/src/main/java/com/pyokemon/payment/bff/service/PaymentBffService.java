@@ -17,7 +17,7 @@ public class PaymentBffService {
 
   private final PaymentBffRepository paymentBffRepository;
 
-  public PaymentDto getUser(Long paymentId){
+  public PaymentDto getPayment(Long paymentId){
     Optional<Payment> paymentOpt = paymentBffRepository.findByPaymentId(paymentId);
 
     if(paymentOpt.isEmpty()){
