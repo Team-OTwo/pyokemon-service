@@ -27,11 +27,6 @@ spring:
     locations: classpath:db/migration/payment
 
   kafka:
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.LongSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false  # 타입
     consumer:
       group-id: ${spring.application.name}
 
