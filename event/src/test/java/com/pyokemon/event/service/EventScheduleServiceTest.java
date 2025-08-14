@@ -3,88 +3,212 @@ package com.pyokemon.event.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
+import com.pyokemon.event.dto.EventScheduleDto;
+import com.pyokemon.event.dto.PriceDto;
+import com.pyokemon.event.dto.PriceWithSeatClassDTO;
+import com.pyokemon.event.entity.EventSchedule;
+import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.repository.EventScheduleRepository;
+import com.pyokemon.event.repository.PriceRepository;
+import com.pyokemon.event.repository.SeatRepository;
 
+@ExtendWith(MockitoExtension.class)
 class EventScheduleServiceTest {
 
-  @Mock
-  private EventScheduleRepository eventScheduleRepository;
+    @Mock
+    private EventScheduleRepository eventScheduleRepository;
 
-  @InjectMocks
-  private EventScheduleService eventScheduleService;
+    @Mock
+    private PriceRepository priceRepository;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
+    @Mock
+    private SeatRepository seatRepository;
 
-  @Test
-  void getTodayOpenedTickets_호출시_리포지토리_결과가_반환되어야_함() {
+    @InjectMocks
+    private EventScheduleService eventScheduleService;
 
-    EventItemResponseDTO mockEvent = new EventItemResponseDTO();
-    when(eventScheduleRepository.selectTodayOpenedTickets()).thenReturn(List.of(mockEvent));
+    private EventItemResponseDTO mockEventItem;
+    private EventScheduleDto mockEventScheduleDto;
+    private PriceDto mockPriceDto;
+    private PriceWithSeatClassDTO mockPriceWithSeatClass;
 
+    @BeforeEach
+    void setUp() {
+        mockEventItem = new EventItemResponseDTO();
+        mockEventItem.setEventId(1L);
+        mockEventItem.setTitle("Test Event");
+        mockEventItem.setGenre("Pop");
+        mockEventItem.setThumbnailUrl("test.jpg");
 
-    List<EventItemResponseDTO> result = eventScheduleService.getTodayOpenedTickets();
+        mockEventScheduleDto = EventScheduleDto.builder()
+                .eventId(1L)
+                .venueId(1L)
+                .ticketOpenAt(LocalDateTime.now())
+                .eventDate(LocalDateTime.now().plusDays(7))
+                .prices(Arrays.asList(
+                    PriceDto.builder()
+                        .seatClassId(1L)
+                        .price(50000)
+                        .build()
+                ))
+                .build();
 
+        mockPriceDto = PriceDto.builder()
+                .eventScheduleId(1L)
+                .seatClassId(1L)
+                .price(50000)
+                .build();
 
-    assertEquals(1, result.size());
-    verify(eventScheduleRepository).selectTodayOpenedTickets();
-  }
+        mockPriceWithSeatClass = PriceWithSeatClassDTO.builder()
+                .seatClassId(1L)
+                .className("VIP")
+                .price(50000)
+                .build();
+    }
 
-  @Test
-  void getConcertsByPage_정상호출() {
-    // given
-    String genre = "콘서트";
-    int limit = 10;
-    int offset = 0;
+    @Test
+    void getTodayOpenedTickets_ShouldReturnTodayOpenedTickets() {
+        List<EventItemResponseDTO> expectedEvents = Arrays.asList(mockEventItem);
+        when(eventScheduleRepository.selectTodayOpenedTickets()).thenReturn(expectedEvents);
 
-    EventItemResponseDTO mockEvent = new EventItemResponseDTO();
-    when(eventScheduleRepository.selectEventList(genre, limit, offset))
-        .thenReturn(List.of(mockEvent));
-    when(eventScheduleRepository.getTotalCountByGenre(genre)).thenReturn(1);
+        List<EventItemResponseDTO> result = eventScheduleService.getTodayOpenedTickets();
 
-    // when
-    List<EventItemResponseDTO> result =
-        eventScheduleService.getConcertsByPage(genre, offset, limit);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(mockEventItem, result.get(0));
+        verify(eventScheduleRepository).selectTodayOpenedTickets();
+    }
 
-    // then
-    assertEquals(1, result.size());
-    assertEquals(1, result.get(0).getTotal());
-    verify(eventScheduleRepository).selectEventList(genre, limit, offset);
-    verify(eventScheduleRepository).getTotalCountByGenre(genre);
-  }
+    @Test
+    void getTicketsToBeOpened_ShouldReturnTicketsToBeOpened() {
+        List<EventItemResponseDTO> expectedEvents = Arrays.asList(mockEventItem);
+        when(eventScheduleRepository.selectTicketsToBeOpened()).thenReturn(expectedEvents);
 
-  @Test
-  void getEventSearch_키워드검색_정상호출() {
-    // given
-    String keyword = "뮤지컬";
-    int limit = 5;
-    int offset = 0;
-    String genre = "전체";
+        List<EventItemResponseDTO> result = eventScheduleService.getTicketsToBeOpened();
 
-    EventItemResponseDTO mockEvent = new EventItemResponseDTO();
-    when(eventScheduleRepository.selectEventSearchList(keyword, limit, offset, genre))
-        .thenReturn(List.of(mockEvent));
-    when(eventScheduleRepository.getSearchTotalCount(keyword, genre)).thenReturn(1);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(mockEventItem, result.get(0));
+        verify(eventScheduleRepository).selectTicketsToBeOpened();
+    }
 
-    // when
-    List<EventItemResponseDTO> result =
-        eventScheduleService.getEventSearch(keyword, offset, limit, genre);
+    @Test
+    void getConcertsByPage_ShouldReturnConcertsWithTotalCount() {
+        String genre = "Pop";
+        int offset = 0;
+        int limit = 9;
+        int totalCount = 20;
 
-    // then
-    assertEquals(1, result.size());
-    assertEquals(1, result.get(0).getTotal());
-    verify(eventScheduleRepository).selectEventSearchList(keyword, limit, offset, genre);
-    verify(eventScheduleRepository).getSearchTotalCount(keyword, genre);
-  }
+        List<EventItemResponseDTO> expectedEvents = Arrays.asList(mockEventItem);
+        when(eventScheduleRepository.selectEventList(genre, limit, offset)).thenReturn(expectedEvents);
+        when(eventScheduleRepository.getTotalCountByGenre(genre)).thenReturn(totalCount);
+
+        List<EventItemResponseDTO> result = eventScheduleService.getConcertsByPage(genre, offset, limit);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(totalCount, result.get(0).getTotal());
+        verify(eventScheduleRepository).selectEventList(genre, limit, offset);
+        verify(eventScheduleRepository).getTotalCountByGenre(genre);
+    }
+
+    @Test
+    void getEventSearch_ShouldReturnSearchResultsWithTotalCount() {
+        String keyword = "test";
+        int offset = 0;
+        int limit = 9;
+        String genre = "Pop";
+        int totalCount = 15;
+
+        List<EventItemResponseDTO> expectedEvents = Arrays.asList(mockEventItem);
+        when(eventScheduleRepository.selectEventSearchList(keyword, limit, offset, genre)).thenReturn(expectedEvents);
+        when(eventScheduleRepository.getSearchTotalCount(keyword, genre)).thenReturn(totalCount);
+
+        List<EventItemResponseDTO> result = eventScheduleService.getEventSearch(keyword, offset, limit, genre);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(totalCount, result.get(0).getTotal());
+        verify(eventScheduleRepository).selectEventSearchList(keyword, limit, offset, genre);
+        verify(eventScheduleRepository).getSearchTotalCount(keyword, genre);
+    }
+
+    @Test
+    void registerEventSchedule_ShouldSaveEventScheduleAndPrices() {
+        EventSchedule savedEventSchedule = EventSchedule.builder()
+                .eventScheduleId(1L)
+                .eventId(1L)
+                .venueId(1L)
+                .build();
+
+        when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
+        when(priceRepository.save(any(Price.class))).thenReturn(1L);
+
+        eventScheduleService.registerEventSchedule(mockEventScheduleDto);
+
+        verify(eventScheduleRepository).save(any(EventSchedule.class));
+        verify(priceRepository).save(any(Price.class));
+    }
+
+    @Test
+    void registerEventSchedule_WithNoPrices_ShouldOnlySaveEventSchedule() {
+        EventScheduleDto dtoWithoutPrices = EventScheduleDto.builder()
+                .eventId(1L)
+                .venueId(1L)
+                .ticketOpenAt(LocalDateTime.now())
+                .eventDate(LocalDateTime.now().plusDays(7))
+                .prices(null)
+                .build();
+
+        EventSchedule savedEventSchedule = EventSchedule.builder()
+                .eventScheduleId(1L)
+                .eventId(1L)
+                .venueId(1L)
+                .build();
+
+        when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
+
+        eventScheduleService.registerEventSchedule(dtoWithoutPrices);
+
+        verify(eventScheduleRepository).save(any(EventSchedule.class));
+        verify(priceRepository, never()).save(any(Price.class));
+    }
+
+    @Test
+    void getBookingInfo_ShouldReturnBookingInfoWithSeatCounts() {
+        Long eventScheduleId = 1L;
+        Long venueId = 1L;
+        Long seatCount = 100L;
+
+        List<PriceWithSeatClassDTO> prices = Arrays.asList(mockPriceWithSeatClass);
+        when(eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId)).thenReturn(venueId);
+        when(priceRepository.findPricesWithSeatClassByEventScheduleId(eventScheduleId)).thenReturn(prices);
+        when(seatRepository.countByVenueIdAndSeatClassId(venueId, mockPriceWithSeatClass.getSeatClassId())).thenReturn(seatCount);
+
+        List<BookingInfoResponseDTO> result = eventScheduleService.getBookingInfo(eventScheduleId);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(mockPriceWithSeatClass.getSeatClassId(), result.get(0).getSeatClassId());
+        assertEquals(mockPriceWithSeatClass.getClassName(), result.get(0).getSeatGrade());
+        assertEquals(mockPriceWithSeatClass.getPrice(), result.get(0).getPrice());
+        assertEquals(seatCount, result.get(0).getSeatCount());
+
+        verify(eventScheduleRepository).findVenueIdByEventScheduleId(eventScheduleId);
+        verify(priceRepository).findPricesWithSeatClassByEventScheduleId(eventScheduleId);
+        verify(seatRepository).countByVenueIdAndSeatClassId(venueId, mockPriceWithSeatClass.getSeatClassId());
+    }
 }
