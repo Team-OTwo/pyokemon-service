@@ -22,8 +22,9 @@ public class BookingEventPublisher {
   public void publishBookingStatusUpdate(Booking booking) {
     try {
       BookingEventDto event = BookingEventDto.builder().bookingId(booking.getBookingId())
-          .eventScheduleId(booking.getEventScheduleId()).accountId(booking.getAccountId())
-          .tenantId(booking.getTenantId()).status(booking.getStatus().name()).build();
+          .eventScheduleId(booking.getEventScheduleId()).seatId(booking.getSeatId())
+          .accountId(booking.getAccountId()).tenantId(booking.getTenantId())
+          .status(booking.getStatus().name()).build();
 
       String jsonMessage = objectMapper.writeValueAsString(event);
       kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED, booking.getBookingId(), jsonMessage);
