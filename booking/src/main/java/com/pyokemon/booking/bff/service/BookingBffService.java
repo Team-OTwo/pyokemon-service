@@ -1,0 +1,65 @@
+package com.pyokemon.booking.bff.service;
+
+import com.pyokemon.booking.bff.dto.BookingDto;
+import com.pyokemon.booking.bff.repository.BookingBffRepository;
+import com.pyokemon.booking.entity.Booking;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class BookingBffService {
+
+  private final BookingBffRepository bookingBffRepository;
+
+  public List<BookingDto> getEventScheduleBookings(Long eventScheduleId) {
+    List<Booking> bookings = bookingBffRepository.findByEventScheduleId(eventScheduleId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    return bookings.stream()
+            .map(this::toDto)      // Booking -> BookingDto
+            .toList(); // Java 16+면 이거 사용 가능
+  }
+
+  public List<BookingDto> getAccountIdBookings(Long accountId){
+    List<Booking> bookings = bookingBffRepository.findByAccountId(accountId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    return bookings.stream()
+            .map(this::toDto)      // Booking -> BookingDto
+            .toList();
+  }
+
+  public BookingDto getBooking(Long bookingId){
+    Optional<Booking> bookingOpt = bookingBffRepository.findByBookingId(bookingId);
+
+    if (bookingOpt.isEmpty()){
+      return null;
+    }
+
+    Booking booking = bookingOpt.get();
+
+    return toDto(booking);
+  }
+
+  private BookingDto toDto(Booking b) {
+    return BookingDto.builder()
+            .bookingId(b.getBookingId())
+            .eventScheduleId(b.getEventScheduleId())
+            .seatId(b.getSeatId())
+            .accountId(b.getAccountId())
+            .paymentId(b.getPaymentId())
+            .status(b.getStatus())
+            .updatedAt(b.getUpdatedAt())
+            .build();
+  }
+}
