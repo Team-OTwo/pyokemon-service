@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
-@MapperScan("com.pyokemon.event.repository")
+@MapperScan({"com.pyokemon.event.repository", "com.pyokemon.event.bff.repository"})
 @EnableScheduling
 public class EventApplication {
   public static void main(String[] args) {

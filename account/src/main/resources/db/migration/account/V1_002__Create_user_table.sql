@@ -8,4 +8,5 @@ CREATE TABLE tb_user (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (account_id) REFERENCES tb_account(account_id)
-); 
+);
+
