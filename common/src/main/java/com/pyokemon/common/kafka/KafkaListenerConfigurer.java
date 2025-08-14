@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.LongDeserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -40,8 +41,8 @@ public class KafkaListenerConfigurer {
   @SuppressWarnings("removal")
   public <K, V> ConsumerFactory<K, V> consumerFactory() {
     Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
     props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
