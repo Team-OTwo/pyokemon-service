@@ -1,4 +1,4 @@
-package com.pyokemon.payment.dto;
+package com.pyokemon.payment.dto.kafka;
 
 
 import com.pyokemon.payment.entity.Payment;
@@ -15,5 +15,5 @@ import lombok.Setter;
 public class PaymentKafkaDto {
   private Long paymentId;
   private Long bookingId;
-  Payment.PaymentStatus status;
+  private String status;
 }

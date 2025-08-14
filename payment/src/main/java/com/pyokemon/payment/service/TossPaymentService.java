@@ -1,6 +1,7 @@
 package com.pyokemon.payment.service;
 
 
+
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,7 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.PaymentErrorCodes;
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
 import com.pyokemon.payment.dto.PaymentConfirmResponseDto;
-import com.pyokemon.payment.dto.PaymentKafkaDto;
+import com.pyokemon.payment.dto.kafka.PaymentKafkaDto;
 import com.pyokemon.payment.producer.KafkaMessageProducer;
 import com.pyokemon.payment.repository.PaymentRepository;
 
@@ -54,7 +55,7 @@ public class TossPaymentService {
         throw new BusinessException("Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND);
       }
       PaymentKafkaDto kafkaDto =
-          new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
+          new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus().name());
       kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
       markedDone = true;
       return dto;
@@ -70,7 +71,7 @@ public class TossPaymentService {
           throw new BusinessException("Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND);
         }
         PaymentKafkaDto kafkaDto =
-            new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
+            new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus().name());
         kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
       }
       throw e;
@@ -88,7 +89,7 @@ public class TossPaymentService {
       throw new BusinessException("Payment not found.", PaymentErrorCodes.PAYMENT_NOT_FOUND);
     }
     PaymentKafkaDto kafkaDto =
-        new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus());
+        new PaymentKafkaDto(p.getPaymentId(), p.getBookingId(), p.getStatus().name());
     kafkaMessageProducer.sendPaymentConfirmed(kafkaDto);
   }
 

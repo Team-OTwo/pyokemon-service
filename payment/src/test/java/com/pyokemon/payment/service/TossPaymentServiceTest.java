@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.pyokemon.payment.dto.PaymentConfirmRequestDto;
 import com.pyokemon.payment.dto.PaymentConfirmResponseDto;
-import com.pyokemon.payment.dto.PaymentKafkaDto;
+import com.pyokemon.payment.dto.kafka.PaymentKafkaDto;
 import com.pyokemon.payment.entity.Payment;
 import com.pyokemon.payment.entity.Payment.PaymentStatus;
 import com.pyokemon.payment.producer.KafkaMessageProducer;
