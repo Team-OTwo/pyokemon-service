@@ -7,7 +7,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
-@MapperScan("com.pyokemon.booking.repository")
+@MapperScan({"com.pyokemon.booking.repository", "com.pyokemon.booking.bff.repository"})
 @EnableScheduling
 @EnableKafka
 public class BookingApplication {
