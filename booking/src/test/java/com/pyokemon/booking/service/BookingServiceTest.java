@@ -1,12 +1,15 @@
 package com.pyokemon.booking.service;
 
-import com.pyokemon.booking.dto.request.BookingRequest;
-import com.pyokemon.booking.dto.response.AccountIdResponse;
-import com.pyokemon.booking.dto.response.BookingResponse;
-import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
-import com.pyokemon.booking.entity.Booking;
-import com.pyokemon.booking.repository.BookingRepository;
-import com.pyokemon.common.exception.BusinessException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,21 +18,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.pyokemon.booking.dto.request.BookingRequest;
+import com.pyokemon.booking.dto.request.ValidBookingRequest;
+import com.pyokemon.booking.dto.response.AccountIdResponse;
+import com.pyokemon.booking.dto.response.BookingResponse;
+import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.dto.response.ValidBookingDetail;
+import com.pyokemon.booking.dto.response.ValidBookingResponse;
+import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.booking.repository.BookingRepository;
+import com.pyokemon.common.exception.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-
+  
     @Mock
     private BookingRepository bookingRepository;
+
+    @Mock
+    private BookingEventPublisher bookingEventPublisher;
 
     @InjectMocks
     private BookingService bookingService;
@@ -38,16 +45,39 @@ class BookingServiceTest {
     private Long validAccountId;
     private Long validEventScheduleId;
     private Long validSeatId;
+    private Long validTenantId;
+    private ValidBookingRequest validBookingRequest;
+    private List<ValidBookingDetail> mockBookingDetails;
 
     @BeforeEach
     void setUp() {
         validAccountId = 1L;
         validEventScheduleId = 1L;
         validSeatId = 1L;
+        validTenantId = 1L;
         
         validRequest = new BookingRequest();
         validRequest.setEventScheduleId(validEventScheduleId);
         validRequest.setSeatId(validSeatId);
+        validRequest.setTenantId(validTenantId);
+
+        validBookingRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(Arrays.asList(12312341L, 12431231L, 141231L))
+                .build();
+
+        mockBookingDetails = Arrays.asList(
+                ValidBookingDetail.builder()
+                        .bookingId(12312341L)
+                        .eventScheduleId(101L)
+                        .tenantId(201L)
+                        .build(),
+                ValidBookingDetail.builder()
+                        .bookingId(12431231L)
+                        .eventScheduleId(102L)
+                        .tenantId(202L)
+                        .build()
+        );
     }
 
     @Test
@@ -103,7 +133,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("새 예약 생성 성공")
-    void createOrUpdateBooking_NewBooking_Success() {
+    void createBooking_NewBooking_Success() {
         when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
                 .thenReturn(Optional.empty());
         when(bookingRepository.findAllByEventScheduleIdAndSeatId(validEventScheduleId, validSeatId))
@@ -114,7 +144,7 @@ class BookingServiceTest {
             return null;
         }).when(bookingRepository).save(any(Booking.class));
 
-        BookingResponse response = bookingService.createOrUpdateBooking(validRequest, validAccountId);
+        BookingResponse response = bookingService.createBooking(validRequest, validAccountId);
 
         assertNotNull(response);
         assertEquals(validEventScheduleId, response.getEventScheduleId());
@@ -123,28 +153,14 @@ class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("같은 좌석 취소 성공")
-    void createOrUpdateBooking_SameSeat_CancelSuccess() {
-        Booking existingBooking = createBooking(validSeatId, Booking.Booked.PENDING);
-        when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
-                .thenReturn(Optional.of(existingBooking));
-
-        BookingResponse response = bookingService.createOrUpdateBooking(validRequest, validAccountId);
-
-        assertNotNull(response);
-        assertEquals(validEventScheduleId, response.getEventScheduleId());
-        verify(bookingRepository).update(any(Booking.class));
-    }
-
-    @Test
     @DisplayName("다른 좌석 예약 시도 - PENDING 상태")
-    void createOrUpdateBooking_DifferentSeat_PendingStatus() {
+    void createBooking_DifferentSeat_PendingStatus() {
         Booking existingBooking = createBooking(2L, Booking.Booked.PENDING);
         when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
                 .thenReturn(Optional.of(existingBooking));
 
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, validAccountId);
+            bookingService.createBooking(validRequest, validAccountId);
         });
         
         assertEquals("PAYMENT_IN_PROGRESS", exception.getErrorCode());
@@ -152,13 +168,13 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("다른 좌석 예약 시도 - BOOKED 상태")
-    void createOrUpdateBooking_DifferentSeat_BookedStatus() {
+    void createBooking_DifferentSeat_BookedStatus() {
         Booking existingBooking = createBooking(2L, Booking.Booked.BOOKED);
         when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
                 .thenReturn(Optional.of(existingBooking));
 
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, validAccountId);
+            bookingService.createBooking(validRequest, validAccountId);
         });
         
         assertEquals("BOOKING_ONE_PER_EVENT", exception.getErrorCode());
@@ -166,7 +182,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("이미 예약된 좌석 예약 시도")
-    void createOrUpdateBooking_AlreadyBookedSeat() {
+    void createBooking_AlreadyBookedSeat() {
         when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
                 .thenReturn(Optional.empty());
         
@@ -175,7 +191,7 @@ class BookingServiceTest {
                 .thenReturn(Collections.singletonList(existingSeatBooking));
 
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, validAccountId);
+            bookingService.createBooking(validRequest, validAccountId);
         });
         
         assertEquals("SEAT_ALREADY_BOOKED", exception.getErrorCode());
@@ -183,11 +199,11 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("예약 생성 - null eventScheduleId")
-    void createOrUpdateBooking_NullEventScheduleId() {
+    void createBooking_NullEventScheduleId() {
         validRequest.setEventScheduleId(null);
 
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, validAccountId);
+            bookingService.createBooking(validRequest, validAccountId);
         });
         
         assertEquals("INVALID_EVENT_SCHEDULE_ID", exception.getErrorCode());
@@ -195,24 +211,103 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("예약 생성 - null seatId")
-    void createOrUpdateBooking_NullSeatId() {
+    void createBooking_NullSeatId() {
         validRequest.setSeatId(null);
 
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, validAccountId);
+            bookingService.createBooking(validRequest, validAccountId);
         });
         
         assertEquals("INVALID_SEAT_ID", exception.getErrorCode());
     }
 
     @Test
-    @DisplayName("예약 생성 - null accountId")
-    void createOrUpdateBooking_NullAccountId() {
+    @DisplayName("예약 생성 - null tenantId")
+    void createBooking_NullTenantId() {
+        validRequest.setTenantId(null);
+
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bookingService.createOrUpdateBooking(validRequest, null);
+            bookingService.createBooking(validRequest, validAccountId);
+        });
+        
+        assertEquals("INVALID_TENANT_ID", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("예약 생성 - null accountId")
+    void createBooking_NullAccountId() {
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.createBooking(validRequest, null);
         });
         
         assertEquals("INVALID_ACCOUNT_ID", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("예약 취소 성공")
+    void cancelBooking_Success() {
+        Booking existingBooking = createBooking(validSeatId, Booking.Booked.BOOKED);
+        when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
+                .thenReturn(Optional.of(existingBooking));
+
+        bookingService.cancelBooking(validEventScheduleId, validAccountId);
+
+        verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("예약 취소 - 예약을 찾을 수 없는 경우")
+    void cancelBooking_BookingNotFound() {
+        when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
+                .thenReturn(Optional.empty());
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.cancelBooking(validEventScheduleId, validAccountId);
+        });
+        
+        assertEquals("BOOKING_NOT_FOUND", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("예약 취소 - PENDING 상태인 경우")
+    void cancelBooking_PendingStatus() {
+        Booking existingBooking = createBooking(validSeatId, Booking.Booked.PENDING);
+        when(bookingRepository.findActiveBookingByEventScheduleIdAndAccountId(validEventScheduleId, validAccountId))
+                .thenReturn(Optional.of(existingBooking));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.cancelBooking(validEventScheduleId, validAccountId);
+        });
+        
+        assertEquals("INVALID_BOOKING_STATUS", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("예약 상태 업데이트 성공")
+    void updateBookingStatus_Success() {
+        Long bookingId = 1L;
+        Long paymentId = 100L;
+        Booking.Booked newStatus = Booking.Booked.BOOKED;
+        
+        Booking existingBooking = createBooking(validSeatId, Booking.Booked.PENDING);
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(existingBooking));
+
+        bookingService.updateBookingStatus(bookingId, newStatus, paymentId);
+
+        verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("예약 상태 업데이트 - 예약을 찾을 수 없는 경우")
+    void updateBookingStatus_BookingNotFound() {
+        Long bookingId = 1L;
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.updateBookingStatus(bookingId, Booking.Booked.BOOKED, 100L);
+        });
+        
+        assertEquals("BOOKING_NOT_FOUND", exception.getErrorCode());
     }
 
     @Test
@@ -239,12 +334,92 @@ class BookingServiceTest {
         verify(bookingRepository, never()).delete(anyLong());
     }
 
+    @Test
+    @DisplayName("유효한 예약 검증 - 성공")
+    void validateBookings_Success() {
+        when(bookingRepository.findValidBookingsWithEventInfo(
+                eq(validBookingRequest.getBookings()), 
+                eq(validBookingRequest.getUserId())))
+                .thenReturn(mockBookingDetails);
+
+        ValidBookingResponse response = bookingService.validateBookings(validBookingRequest);
+
+        assertNotNull(response);
+        assertEquals(2, response.getBookings().size());
+        assertEquals(12312341L, response.getBookings().get(0).getBookingId());
+        assertEquals(101L, response.getBookings().get(0).getEventScheduleId());
+        assertEquals(201L, response.getBookings().get(0).getTenantId());
+        verify(bookingRepository).findValidBookingsWithEventInfo(
+                validBookingRequest.getBookings(), 
+                validBookingRequest.getUserId());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - 빈 결과")
+    void validateBookings_EmptyResult() {
+        when(bookingRepository.findValidBookingsWithEventInfo(
+                eq(validBookingRequest.getBookings()), 
+                eq(validBookingRequest.getUserId())))
+                .thenReturn(Collections.emptyList());
+
+        ValidBookingResponse response = bookingService.validateBookings(validBookingRequest);
+
+        assertNotNull(response);
+        assertTrue(response.getBookings().isEmpty());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - userId가 null인 경우")
+    void validateBookings_UserIdNull() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(null)
+                .bookings(Arrays.asList(12312341L, 12431231L))
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_USER_ID", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - bookings가 null인 경우")
+    void validateBookings_BookingsNull() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(null)
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_BOOKING_IDS", exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("유효한 예약 검증 - bookings가 빈 리스트인 경우")
+    void validateBookings_BookingsEmpty() {
+        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
+                .userId(398413L)
+                .bookings(Collections.emptyList())
+                .build();
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bookingService.validateBookings(invalidRequest);
+        });
+        
+        assertEquals("INVALID_BOOKING_IDS", exception.getErrorCode());
+    }
+
     private Booking createBooking(Long seatId, Booking.Booked status) {
         return Booking.builder()
                 .bookingId(1L)
                 .eventScheduleId(validEventScheduleId)
                 .seatId(seatId)
                 .accountId(validAccountId)
+                .tenantId(validTenantId)
                 .paymentId(null)
                 .status(status)
                 .createdAt(LocalDateTime.now())

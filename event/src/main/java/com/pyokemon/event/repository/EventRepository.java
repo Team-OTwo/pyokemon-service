@@ -2,33 +2,33 @@ package com.pyokemon.event.repository;
 
 import java.util.List;
 
-import com.pyokemon.event.dto.SeatPriceResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.entity.Event;
 
 @Mapper
 public interface EventRepository {
-    List<Event> findByTenantId(Long tenantId);
+  List<Event> findByTenantId(Long tenantId);
 
-    List<Event> findByAccountId(Long accountId);
+  List<Event> findByAccountId(Long accountId);
 
-    List<Event> findByStatus(Event.EventStatus status);
+  List<Event> findByStatus(Event.EventStatus status);
 
-    List<Event> findByGenre(String genre);
+  List<Event> findByGenre(String genre);
 
-    List<Event> findByTitleContainingIgnoreCase(String title);
+  List<Event> findByTitleContainingIgnoreCase(String title);
 
-    List<Event> findByAgeLimit(Long ageLimit);
+  List<Event> findByAgeLimit(Long ageLimit);
 
-    Long save(Event event);
+  Long save(Event event);
 
-    EventDetailResponseDTO findEventDetailByEventId(Long eventId);
+  EventDetailResponseDTO findEventDetailByEventId(Long eventId);
 
-    Event findById(Long eventId);
+  Event findById(Long eventId);
 
-    int updateEvent(Event event);
+  int updateEvent(Event event);
 
-    List<SeatPriceResponseDto> findSeatPriceByEventScheduleId(Long eventScheduleId);
+  List<SeatPriceResponseDto> findSeatPriceByEventScheduleId(Long eventScheduleId);
 }

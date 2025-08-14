@@ -1,6 +1,4 @@
-package com.pyokemon.event.dto;
-
-import java.util.List;
+package com.pyokemon.booking.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,12 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyEventSummaryResponse {
-  private List<MonthlyEventDTO> events;
-  private MonthlySummaryDTO summary;
+public class ValidBookingRequest {
+    private Long userId;
+    private List<Long> bookings;
 }

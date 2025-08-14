@@ -4,6 +4,8 @@ server:
     context-path: /payment
 
 spring:
+  application:
+    name: payment-service
   profiles:
     include:
       - flyway
@@ -25,22 +27,14 @@ spring:
     locations: classpath:db/migration/payment
 
   kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: payment-service
-      auto-offset-reset: latest
-      enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      max-poll-records: 10
-      properties:
-        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-        spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
     producer:
       key-serializer: org.apache.kafka.common.serialization.LongSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false  # 타입
+    consumer:
+      group-id: ${spring.application.name}
+
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

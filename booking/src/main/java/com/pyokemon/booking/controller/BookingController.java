@@ -1,13 +1,15 @@
 package com.pyokemon.booking.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
 import com.pyokemon.booking.service.BookingService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,10 +33,18 @@ public class BookingController {
     }
 
     @PostMapping("/booking")
-    public ResponseEntity<BookingResponse> createOrUpdateBooking(
+    public ResponseEntity<BookingResponse> createBooking(
             @RequestBody BookingRequest request,
             @RequestHeader("X-Auth-AccountId") Long accountId) {
-        BookingResponse booking = bookingService.createOrUpdateBooking(request, accountId);
+        BookingResponse booking = bookingService.createBooking(request, accountId);
         return ResponseEntity.ok(booking);
+    }
+
+    @DeleteMapping("/booking/{eventScheduleId}")
+    public ResponseEntity<Void> cancelBooking(
+            @PathVariable Long eventScheduleId,
+            @RequestHeader("X-Auth-AccountId") Long accountId) {
+        bookingService.cancelBooking(eventScheduleId, accountId);
+        return ResponseEntity.ok().build();
     }
 }

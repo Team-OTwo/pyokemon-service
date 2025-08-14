@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingResponseDto {
-    private Long bookingId;
-    private Long eventScheduleId;
-} 
+  private Long bookingId;
+  private Long eventScheduleId;
+}

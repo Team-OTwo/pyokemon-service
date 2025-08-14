@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.tenant.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,44 +9,39 @@ import lombok.NoArgsConstructor;
 
 public class WalletRequest {
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AcaPyCreateWalletRequest {
-        private String label;
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class AcaPyCreateWalletRequest {
+    private String label;
 
-        @JsonProperty("wallet_key")
-        private String walletKey;
+    @JsonProperty("wallet_key")
+    private String walletKey;
 
-        @JsonProperty("wallet_name")
-        private String walletName;
+    @JsonProperty("wallet_name")
+    private String walletName;
 
-        @JsonProperty("wallet_type")
-        private String walletType;
+    @JsonProperty("wallet_type")
+    private String walletType;
 
-        @JsonProperty("wallet_dispatch_type")
-        private String walletDispatchType;
+    @JsonProperty("wallet_dispatch_type")
+    private String walletDispatchType;
 
-        @JsonProperty("key_management_mode")
-        private String keyManagementMode;
+    @JsonProperty("key_management_mode")
+    private String keyManagementMode;
 
-        /**
-         * 특정 테넌트를 위한 지갑 요청을 생성하는 팩토리 메서드
-         *
-         * @param tenantId 테넌트 식별자
-         * @param walletKey 지갑 암호화 키
-         * @return 구성된 지갑 생성 요청
-         */
-        public static AcaPyCreateWalletRequest generate(Long tenantId, String walletKey) {
-            return AcaPyCreateWalletRequest.builder()
-                    .label(tenantId + "")
-                    .walletKey(walletKey)
-                    .walletName("wallet:" + tenantId)
-                    .walletType("askar")
-                    .walletDispatchType("default")
-                    .keyManagementMode("managed")
-                    .build();
-        }
+    /**
+     * 특정 테넌트를 위한 지갑 요청을 생성하는 팩토리 메서드
+     *
+     * @param tenantId 테넌트 식별자
+     * @param walletKey 지갑 암호화 키
+     * @return 구성된 지갑 생성 요청
+     */
+    public static AcaPyCreateWalletRequest generate(Long tenantId, String walletKey) {
+      return AcaPyCreateWalletRequest.builder().label(tenantId + "").walletKey(walletKey)
+          .walletName("wallet:" + tenantId).walletType("askar").walletDispatchType("default")
+          .keyManagementMode("managed").build();
     }
+  }
 }
