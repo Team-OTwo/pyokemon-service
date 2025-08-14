@@ -189,7 +189,9 @@ public class BookingService {
             
             booking.setStatus(Booking.Booked.CANCELED);
             booking.setUpdatedAt(LocalDateTime.now());
-            bookingRepository.save(booking);
+            bookingRepository.update(booking);
+            
+            bookingEventPublisher.publishBookingStatusUpdate(booking);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -218,11 +220,9 @@ public class BookingService {
             booking.setPaymentId(paymentId);
             booking.setUpdatedAt(LocalDateTime.now());
             
-            bookingRepository.save(booking);
+            bookingRepository.update(booking);
             
-            log.info("예약 상태 업데이트 완료: bookingId={}, status={}, paymentId={}", 
-                    bookingId, newStatus, paymentId);
-                    
+            bookingEventPublisher.publishBookingStatusUpdate(booking);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {

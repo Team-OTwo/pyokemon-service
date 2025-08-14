@@ -39,7 +39,7 @@ public class KafkaCommonConfig {
     Map<String, Object> producerProperties = kafkaProperties.buildProducerProperties();
 
     // JSON 직렬화에 ObjectMapper 사용
-    producerProperties.put(JsonSerializer.TYPE_MAPPINGS, "true");
+    producerProperties.put(JsonSerializer.TYPE_MAPPINGS, "");
 
     return new DefaultKafkaProducerFactory<>(producerProperties);
   }
