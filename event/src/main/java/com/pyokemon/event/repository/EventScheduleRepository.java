@@ -32,4 +32,5 @@ public interface EventScheduleRepository {
   int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
   int updateEventSchedule(EventSchedule eventSchedule);
   
+  Long findVenueIdByEventScheduleId(Long eventScheduleId);
 }

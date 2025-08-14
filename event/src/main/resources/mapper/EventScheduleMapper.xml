@@ -41,6 +41,12 @@
         WHERE event_schedule_id = #{param1}
     </select>
 
+    <select id="findVenueIdByEventScheduleId" resultType="long" parameterType="long">
+        SELECT venue_id
+        FROM tb_event_schedule
+        WHERE event_schedule_id = #{param1}
+    </select>
+
 
     <select id="selectTodayOpenedTickets" resultType="EventItemResponseDTO">
         SELECT

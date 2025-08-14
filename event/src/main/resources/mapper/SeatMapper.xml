@@ -22,4 +22,16 @@
         FROM tb_seat
     </select>
 
+    <select id="countBySeatClassId" resultType="long" parameterType="long">
+        SELECT COUNT(*)
+        FROM tb_seat
+        WHERE seat_class_id = #{param1}
+    </select>
+
+    <select id="countByVenueIdAndSeatClassId" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_seat
+        WHERE venue_id = #{param1} AND seat_class_id = #{param2}
+    </select>
+
 </mapper>

@@ -2,6 +2,7 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -82,5 +83,11 @@ public class EventController {
                                                      @RequestParam(defaultValue = "전체") String genre) {
         int offset = (page - 1) * size;
         return eventScheduleService.getEventSearch(keyword, offset, size, genre);
+    }
+
+    // 예매 초기 정보 조회
+    @GetMapping("/booking-info/{eventScheduleId}")
+    public List<BookingInfoResponseDTO> getBookingInfo(@PathVariable Long eventScheduleId) {
+        return eventScheduleService.getBookingInfo(eventScheduleId);
     }
 }
