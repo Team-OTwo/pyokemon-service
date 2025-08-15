@@ -5,15 +5,10 @@
 
 <mapper namespace="com.pyokemon.event.repository.SeatClassRepository">
 
-    <select id="findAll" resultType="SeatClass">
-        SELECT seat_class_id, class_name, created_at, updated_at
+    <select id="findByClassName" resultType="SeatClass" parameterType="string">
+        SELECT seat_class_id, class_name, priority, created_at, updated_at
         FROM tb_seat_class
-    </select>
-
-    <select id="findById" resultType="SeatClass" parameterType="long">
-        SELECT seat_class_id, class_name, created_at, updated_at
-        FROM tb_seat_class
-        WHERE seat_class_id = #{param1}
+        WHERE class_name = #{param1}
     </select>
 
 </mapper>

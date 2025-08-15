@@ -90,4 +90,10 @@ public class EventController {
     public List<BookingInfoResponseDTO> getBookingInfo(@PathVariable Long eventScheduleId) {
         return eventScheduleService.getBookingInfo(eventScheduleId);
     }
+
+    // 등급 좌석 정보 조회
+    @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
+    public List<Long> getSeatIdsByGrade(@PathVariable Long eventScheduleId, @PathVariable String seatGrade) {
+        return eventScheduleService.getSeatIdsByGrade(seatGrade);
+    }
 }

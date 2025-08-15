@@ -2,6 +2,7 @@ package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,11 @@ import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.dto.PriceWithSeatClassDTO;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
+import com.pyokemon.event.entity.Seat;
+import com.pyokemon.event.entity.SeatClass;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
+import com.pyokemon.event.repository.SeatClassRepository;
 import com.pyokemon.event.repository.SeatRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ public class EventScheduleService {
   private final EventScheduleRepository eventScheduleRepository;
   private final PriceRepository priceRepository;
   private final SeatRepository seatRepository;
+  private final SeatClassRepository seatClassRepository;
 
   public List<EventItemResponseDTO> getTodayOpenedTickets() {
     return eventScheduleRepository.selectTodayOpenedTickets();
@@ -60,12 +65,10 @@ public class EventScheduleService {
   }
   
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
-    // Create and save event schedule
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);
     eventScheduleRepository.save(eventSchedule);
     Long eventScheduleId = eventSchedule.getEventScheduleId();
 
-    // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {
         priceDto.setEventScheduleId(eventScheduleId);
@@ -88,17 +91,11 @@ public class EventScheduleService {
         .updatedAt(LocalDateTime.now()).build();
   }
 
-  /**
-   * 예매 정보 조회 - 좌석 등급별 가격과 좌석 개수 정보
-   */
   public List<BookingInfoResponseDTO> getBookingInfo(Long eventScheduleId) {
-    // 1. 해당 이벤트 스케줄의 venueId 조회
     Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
     
-    // 2. 해당 이벤트 스케줄의 좌석 등급별 가격 정보 조회
     List<PriceWithSeatClassDTO> prices = priceRepository.findPricesWithSeatClassByEventScheduleId(eventScheduleId);
     
-    // 3. 각 등급별 좌석 개수 조회하여 BookingInfoResponseDTO 리스트 생성
     return prices.stream()
         .map(price -> {
           Long seatCount = seatRepository.countByVenueIdAndSeatClassId(venueId, price.getSeatClassId());
@@ -110,6 +107,17 @@ public class EventScheduleService {
               .build();
         })
         .toList();
+  }
+
+  public List<Long> getSeatIdsByGrade(String seatGradeName) {
+    SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
+    
+    List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
+    
+    return seats.stream()
+        .map(Seat::getSeatId)
+        .collect(Collectors.toList());
   }
 
 }
