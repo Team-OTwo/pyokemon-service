@@ -6,12 +6,6 @@
 
 <mapper namespace="com.pyokemon.event.repository.PriceRepository">
 
-    <select id="findByEventScheduleId" resultType="Price">
-        SELECT *
-        FROM tb_price
-        WHERE event_schedule_id = #{eventScheduleId}
-    </select>
-
     <select id="findPricesWithSeatClassByEventScheduleId" resultType="PriceWithSeatClassDTO">
         SELECT p.price_id, p.event_schedule_id, p.seat_class_id, p.price,
                sc.class_name
