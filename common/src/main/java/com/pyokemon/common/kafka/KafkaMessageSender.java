@@ -1,7 +1,6 @@
 package com.pyokemon.common.kafka;
 
-import java.util.concurrent.CompletableFuture;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -9,46 +8,57 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Kafka 메시지 전송을 위한 공통 클래스 모든 서비스에서 동일한 방식으로 Kafka 메시지를 전송할 수 있도록 지원합니다.
- */
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class KafkaMessageSender {
 
-  private final KafkaTemplate<Long, Object> kafkaTemplate;
+    private final KafkaTemplate<String, Object> defaultKafkaTemplate;
+    private final Map<String, KafkaTemplate<?, ?>> kafkaTemplates;
 
-  /**
-   * 메시지 ID와 함께 Kafka 토픽으로 메시지를 전송합니다.
-   * 
-   * @param topic 메시지를 전송할 토픽 이름
-   * @param id 메시지 ID (Kafka 메시지 키로 사용)
-   * @param message 전송할 메시지 객체
-   */
-  public <T> void send(String topic, Long id, T message) {
-    CompletableFuture<SendResult<Long, Object>> future = kafkaTemplate.send(topic, id, message);
-    future.thenAccept(result -> {
-      log.info("메시지 전송 성공: 토픽={}, 키={}, 메시지={}", topic, id, message);
-    }).exceptionally(ex -> {
-      log.error("메시지 전송 실패: 토픽={}, 키={}, 메시지={}, 예외={}", topic, id, message, ex.getMessage());
-      return null;
-    });
-  }
+    public KafkaMessageSender(@Qualifier("kafkaTemplate") KafkaTemplate<String, Object> defaultKafkaTemplate, 
+                              Map<String, KafkaTemplate<?, ?>> kafkaTemplates) {
+        this.defaultKafkaTemplate = defaultKafkaTemplate;
+        this.kafkaTemplates = kafkaTemplates;
+    }
 
-  /**
-   * Kafka 토픽으로 메시지를 전송합니다.
-   * 
-   * @param topic 메시지를 전송할 토픽 이름
-   * @param message 전송할 메시지 객체
-   */
-  public <T> void send(String topic, T message) {
-    CompletableFuture<SendResult<Long, Object>> future = kafkaTemplate.send(topic, message);
-    future.thenAccept(result -> {
-      log.info("메시지 전송 성공: 토픽={}, 메시지={}", topic, message);
-    }).exceptionally(ex -> {
-      log.error("메시지 전송 실패: 토픽={}, 메시지={}, 예외={}", topic, message, ex.getMessage());
-      return null;
-    });
-  }
-}
+    public <T> void send(String topic, String key, T message) {
+        CompletableFuture<SendResult<String, Object>> future = defaultKafkaTemplate.send(topic, key, message);
+        
+        future.whenComplete((result, ex) -> {
+            if (ex == null) {
+                log.info("메시지 전송 성공 - topic: {}, key: {}, message: {}, partition: {}, offset: {}",
+                        topic, key, message, 
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+            } else {
+                log.error("메시지 전송 실패 - topic: {}, key: {}, message: {}", topic, key, message, ex);
+            }
+        });
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <K, V> void send(String templateName, String topic, K key, V message) {
+        KafkaTemplate<K, V> template = (KafkaTemplate<K, V>) kafkaTemplates.get(templateName);
+        if (template == null) {
+            log.error("템플릿을 찾을 수 없음: {}", templateName);
+            return;
+        }
+        
+        CompletableFuture<SendResult<K, V>> future = template.send(topic, key, message);
+        
+        future.whenComplete((result, ex) -> {
+            if (ex == null) {
+                log.info("메시지 전송 성공 [{}] - topic: {}, key: {}, message: {}, partition: {}, offset: {}",
+                        templateName, topic, key, message, 
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+            } else {
+                log.error("메시지 전송 실패 [{}] - topic: {}, key: {}, message: {}", 
+                        templateName, topic, key, message, ex);
+            }
+        });
+    }
+} 

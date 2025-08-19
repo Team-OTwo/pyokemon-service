@@ -9,29 +9,29 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
+import com.pyokemon.common.kafka.KafkaMessageSender;
+import com.pyokemon.common.kafka.KafkaTopicConstants;
 import com.pyokemon.payment.dto.kafka.PaymentKafkaDto;
-import com.pyokemon.payment.entity.Payment;
 
 @ExtendWith(MockitoExtension.class)
 class KafkaMessageProducerTest {
 
   @Mock
-  KafkaTemplate<Long, PaymentKafkaDto> kafkaTemplate;
+  KafkaMessageSender kafkaMessageSender;
 
   KafkaMessageProducer producer;
 
   @Captor
   ArgumentCaptor<String> topicCaptor;
   @Captor
-  ArgumentCaptor<Long> keyCaptor;
+  ArgumentCaptor<String> keyCaptor;
   @Captor
   ArgumentCaptor<PaymentKafkaDto> valueCaptor;
 
   @BeforeEach
   void setUp() {
-    producer = new KafkaMessageProducer(kafkaTemplate);
+    producer = new KafkaMessageProducer(kafkaMessageSender);
   }
 
   @Test
@@ -46,14 +46,12 @@ class KafkaMessageProducerTest {
     producer.sendPaymentConfirmed(dto);
 
     // then
-    verify(kafkaTemplate, times(1)).send(anyString(), anyLong(), any(PaymentKafkaDto.class));
-    verify(kafkaTemplate).send(topicCaptor.capture(), keyCaptor.capture(), valueCaptor.capture());
+    verify(kafkaMessageSender, times(1)).send(
+        eq(KafkaTopicConstants.PAYMENT_STATUS_UPDATED),
+        eq(String.valueOf(10L)),
+        eq(dto)
+    );
 
-    assertThat(topicCaptor.getValue()).isEqualTo("payment-status-updated");
-    assertThat(keyCaptor.getValue()).isEqualTo(10L);
-    assertThat(valueCaptor.getValue()).isSameAs(dto);
-    assertThat(valueCaptor.getValue().getStatus()).isEqualTo("DONE"); // 상태 확인
-
-    verifyNoMoreInteractions(kafkaTemplate);
+    verifyNoMoreInteractions(kafkaMessageSender);
   }
 }

@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.pyokemon.booking.dto.kafka.PaymentEventDto;
+import com.pyokemon.booking.dto.kafka.PaymentKafkaDto;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.service.BookingService;
 
@@ -25,7 +25,7 @@ class PaymentEventListenerTest {
   @Test
   void handlePaymentStatusUpdate_Done_ShouldUpdateToBooked() {
     // Given
-    PaymentEventDto paymentEvent = new PaymentEventDto(1L, 1L, "DONE");
+    PaymentKafkaDto paymentEvent = new PaymentKafkaDto(1L, 1L, "DONE");
 
     // When
     paymentEventListener.processPaymentEvent(paymentEvent);
@@ -37,7 +37,7 @@ class PaymentEventListenerTest {
   @Test
   void handlePaymentStatusUpdate_Canceled_ShouldUpdateToCanceled() {
     // Given
-    PaymentEventDto paymentEvent = new PaymentEventDto(2L, 1L, "CANCELED");
+    PaymentKafkaDto paymentEvent = new PaymentKafkaDto(2L, 1L, "CANCELED");
 
     // When
     paymentEventListener.processPaymentEvent(paymentEvent);
@@ -49,7 +49,7 @@ class PaymentEventListenerTest {
   @Test
   void handlePaymentStatusUpdate_Failed_ShouldUpdateToFailed() {
     // Given
-    PaymentEventDto paymentEvent = new PaymentEventDto(3L, 1L, "FAILED");
+    PaymentKafkaDto paymentEvent = new PaymentKafkaDto(3L, 1L, "FAILED");
 
     // When
     paymentEventListener.processPaymentEvent(paymentEvent);
@@ -61,7 +61,7 @@ class PaymentEventListenerTest {
   @Test
   void handlePaymentStatusUpdate_UnknownStatus_ShouldUpdateToFailed() {
     // Given
-    PaymentEventDto paymentEvent = new PaymentEventDto(5L, 1L, "UNKNOWN");
+    PaymentKafkaDto paymentEvent = new PaymentKafkaDto(5L, 1L, "UNKNOWN");
 
     // When
     paymentEventListener.processPaymentEvent(paymentEvent);

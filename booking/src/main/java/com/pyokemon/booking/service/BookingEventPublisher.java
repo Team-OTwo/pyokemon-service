@@ -26,11 +26,11 @@ public class BookingEventPublisher {
           .accountId(booking.getAccountId()).tenantId(booking.getTenantId())
           .status(booking.getStatus().name()).build();
 
-      String jsonMessage = objectMapper.writeValueAsString(event);
-      kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED, booking.getBookingId(), jsonMessage);
+      kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED,
+          String.valueOf(booking.getBookingId()), event);
 
       log.info("Published booking status update event: bookingId={}, status={}, message={}",
-          booking.getBookingId(), booking.getStatus().name(), jsonMessage);
+          booking.getBookingId(), booking.getStatus().name(), event);
     } catch (Exception e) {
       log.error("Failed to publish booking status update event for booking: {}",
           booking.getBookingId(), e);
