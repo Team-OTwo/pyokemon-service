@@ -3,12 +3,16 @@ package com.pyokemon.payment.Listener;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.payment.service.PaymentCancelService;
 
@@ -24,16 +28,18 @@ class BookingCancelListenerTest {
   @BeforeEach
   void setUp() {
     objectMapper = new ObjectMapper();
-    listener = new BookingCancelListener(objectMapper, paymentCancelService);
+    listener = new BookingCancelListener(paymentCancelService);
   }
 
   @Test
-  void onBookingEvent_callsService_whenStatusCancelRequested() {
+  void onBookingEvent_callsService_whenStatusCancelRequested() throws JsonProcessingException {
     // given
-    String payload = "{\"bookingId\":123,\"status\":\"CANCEL_REQUESTED\"}";
+    Map<String, Object> message = new HashMap<>();
+    message.put("bookingId", 123);
+    message.put("status", "CANCEL_REQUESTED");
 
     // when
-    listener.onBookingEvent(payload);
+    listener.onBookingEvent(message);
 
     // then
     verify(paymentCancelService, times(1)).cancelByBookingId(123L, "예약 취소 요청");
@@ -41,12 +47,14 @@ class BookingCancelListenerTest {
   }
 
   @Test
-  void onBookingEvent_callsService_whenStatusCanceled() {
+  void onBookingEvent_callsService_whenStatusCanceled() throws JsonProcessingException {
     // given
-    String payload = "{\"bookingId\":456,\"status\":\"CANCELED\"}";
+    Map<String, Object> message = new HashMap<>();
+    message.put("bookingId", 456);
+    message.put("status", "CANCELED");
 
     // when
-    listener.onBookingEvent(payload);
+    listener.onBookingEvent(message);
 
     // then
     verify(paymentCancelService, times(1)).cancelByBookingId(456L, "예약 취소 요청");
@@ -54,24 +62,27 @@ class BookingCancelListenerTest {
   }
 
   @Test
-  void onBookingEvent_ignoresOtherStatuses() {
+  void onBookingEvent_ignoresOtherStatuses() throws JsonProcessingException {
     // given
-    String payload = "{\"bookingId\":789,\"status\":\"CONFIRMED\"}";
+    Map<String, Object> message = new HashMap<>();
+    message.put("bookingId", 789);
+    message.put("status", "CONFIRMED");
 
     // when
-    listener.onBookingEvent(payload);
+    listener.onBookingEvent(message);
 
     // then
     verifyNoInteractions(paymentCancelService);
   }
 
   @Test
-  void onBookingEvent_handlesBadJsonGracefully() {
+  void onBookingEvent_handlesBadMessageGracefully() {
     // given
-    String bad = "NOT_JSON";
+    Map<String, Object> badMessage = new HashMap<>();
+    // bookingId나 status 필드가 없는 메시지
 
     // when & then: 예외 터지지 않고 내부에서 로그만 찍고 끝나야 함
-    assertDoesNotThrow(() -> listener.onBookingEvent(bad));
+    assertDoesNotThrow(() -> listener.onBookingEvent(badMessage));
     verifyNoInteractions(paymentCancelService);
   }
 }
