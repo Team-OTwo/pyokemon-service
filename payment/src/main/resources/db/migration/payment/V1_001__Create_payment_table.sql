@@ -1,6 +1,7 @@
 -- tb_payment 테이블 생성
 CREATE TABLE tb_payment (
         payment_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+        event_schedule_id BIGINT NOT NULL,
         booking_id     BIGINT NOT NULL,
         account_id     BIGINT NOT NULL,
         order_id       VARCHAR(255),

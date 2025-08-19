@@ -5,15 +5,15 @@
         SELECT event_schedule_id, event_id, venue_id, event_date FROM tb_event_schedule WHERE event_schedule_id = #{eventScheduleId}
     </select>
     <select id="findVenueById" resultType="com.pyokemon.event.bff.dto.BffVenueDto">
-        SELECT venue_id, name FROM tb_venue WHERE venue_id = #{venueId}
+        SELECT venue_id, venue_name FROM tb_venue WHERE venue_id = #{venueId}
     </select>
     <select id="findSeatById" resultType="com.pyokemon.event.bff.dto.BffSeatDto">
-        SELECT seat_id, seat_class_id, floor, row, col FROM tb_seat WHERE seat_id = #{seatId}
+        SELECT seat_id, seat_class_id, floor, `row`, col FROM tb_seat WHERE seat_id = #{seatId}
     </select>
     <select id="findEventById" resultType="com.pyokemon.event.bff.dto.BffEventDto">
         SELECT event_id, title, thumbnail_url FROM tb_event WHERE event_id = #{eventId}
     </select>
     <select id="findSeatClassById" resultType="com.pyokemon.event.bff.dto.BffSeatClassDto">
-        SELECT seat_class_id, class_name, priority FROM tb_class_seat WHERE seat_class_id = #{seatClassId}
+        SELECT seat_class_id, class_name, priority FROM tb_seat_class WHERE seat_class_id = #{seatClassId}
     </select>
 </mapper>
