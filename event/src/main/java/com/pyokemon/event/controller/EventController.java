@@ -3,6 +3,7 @@ package com.pyokemon.event.controller;
 import java.util.List;
 
 import com.pyokemon.event.dto.BookingInfoResponseDTO;
+import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -93,7 +94,7 @@ public class EventController {
 
     // 등급 좌석 정보 조회
     @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
-    public List<Long> getSeatIdsByGrade(@PathVariable Long eventScheduleId, @PathVariable String seatGrade) {
-        return eventScheduleService.getSeatIdsByGrade(seatGrade);
+    public List<SeatInfoResponseDTO> getSeatInfoByGrade(@PathVariable Long eventScheduleId, @PathVariable String seatGrade) {
+        return eventScheduleService.getSeatInfoByGrade(seatGrade);
     }
 }

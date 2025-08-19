@@ -11,6 +11,7 @@ import com.pyokemon.event.dto.EventItemResponseDTO;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.dto.PriceWithSeatClassDTO;
+import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.entity.Seat;
@@ -117,6 +118,22 @@ public class EventScheduleService {
     
     return seats.stream()
         .map(Seat::getSeatId)
+        .collect(Collectors.toList());
+  }
+
+  public List<SeatInfoResponseDTO> getSeatInfoByGrade(String seatGradeName) {
+    SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
+    
+    List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
+    
+    return seats.stream()
+        .map(seat -> SeatInfoResponseDTO.builder()
+            .seatId(seat.getSeatId())
+            .col(seat.getCol())
+            .row(seat.getRow())
+            .seatGrade(seatClass.getClassName())
+            .build())
         .collect(Collectors.toList());
   }
 
