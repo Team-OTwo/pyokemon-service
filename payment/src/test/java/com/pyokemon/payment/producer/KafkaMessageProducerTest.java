@@ -46,11 +46,8 @@ class KafkaMessageProducerTest {
     producer.sendPaymentConfirmed(dto);
 
     // then
-    verify(kafkaMessageSender, times(1)).send(
-        eq(KafkaTopicConstants.PAYMENT_STATUS_UPDATED),
-        eq(String.valueOf(10L)),
-        eq(dto)
-    );
+    verify(kafkaMessageSender, times(1)).send(eq(KafkaTopicConstants.PAYMENT_STATUS_UPDATED),
+        eq(String.valueOf(10L)), eq(dto));
 
     verifyNoMoreInteractions(kafkaMessageSender);
   }
