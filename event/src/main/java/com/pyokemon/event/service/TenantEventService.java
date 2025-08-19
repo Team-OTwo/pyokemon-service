@@ -328,4 +328,12 @@ public class TenantEventService {
   private Long savePrice(Price price) {
     return priceRepository.save(price);
   }
+
+
+
+
+  // 앱 커서 기반 공연 조회
+  public List<TenantEventListDto> getEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit){
+    return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit);
+  }
 }

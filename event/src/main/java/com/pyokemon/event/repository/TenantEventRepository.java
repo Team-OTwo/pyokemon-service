@@ -1,5 +1,6 @@
 package com.pyokemon.event.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +29,9 @@ public interface TenantEventRepository {
   int updateEvent(Event event);
 
   Long save(Event event);
+
+
+
+  // 앱 커서 기반 공연 조회
+  List<TenantEventListDto> findEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit);
 }
