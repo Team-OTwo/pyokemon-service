@@ -1,12 +1,13 @@
 package com.pyokemon.booking.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.booking.dto.request.ValidBookingRequest;
-import com.pyokemon.booking.dto.response.ValidBookingDetail;
-import com.pyokemon.booking.dto.response.ValidBookingResponse;
-import com.pyokemon.booking.service.BookingService;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.GlobalExceptionHandler;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,60 +19,48 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pyokemon.booking.dto.request.ValidBookingRequest;
+import com.pyokemon.booking.dto.response.ValidBookingDetail;
+import com.pyokemon.booking.dto.response.ValidBookingResponse;
+import com.pyokemon.booking.service.BookingService;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.GlobalExceptionHandler;
 
 @ExtendWith(MockitoExtension.class)
 class ValidBookingControllerTest {
 
-    @Mock
-    private BookingService bookingService;
+  @Mock
+  private BookingService bookingService;
 
-    @InjectMocks
-    private ValidBookingController validBookingController;
+  @InjectMocks
+  private ValidBookingController validBookingController;
 
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
+  private MockMvc mockMvc;
+  private ObjectMapper objectMapper;
 
-    private ValidBookingRequest validRequest;
-    private ValidBookingResponse validResponse;
+  private ValidBookingRequest validRequest;
+  private ValidBookingResponse validResponse;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(validBookingController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
-        objectMapper = new ObjectMapper();
+  @BeforeEach
+  void setUp() {
+    mockMvc = MockMvcBuilders.standaloneSetup(validBookingController)
+        .setControllerAdvice(new GlobalExceptionHandler()).build();
+    objectMapper = new ObjectMapper();
 
-        validRequest = ValidBookingRequest.builder()
-                .userId(398413L)
-                .bookings(Arrays.asList(12312341L, 12431231L, 141231L))
-                .build();
+    validRequest = ValidBookingRequest.builder().userId(398413L)
+        .bookings(Arrays.asList(12312341L, 12431231L, 141231L)).build();
 
-        List<ValidBookingDetail> bookingDetails = Arrays.asList(
-                ValidBookingDetail.builder()
-                        .bookingId(12312341L)
-                        .eventScheduleId(101L)
-                        .tenantId(201L)
-                        .build(),
-                ValidBookingDetail.builder()
-                        .bookingId(12431231L)
-                        .eventScheduleId(102L)
-                        .tenantId(202L)
-                        .build()
-        );
+    List<ValidBookingDetail> bookingDetails = Arrays.asList(
+        ValidBookingDetail.builder().bookingId(12312341L).eventScheduleId(101L).tenantId(201L)
+            .build(),
+        ValidBookingDetail.builder().bookingId(12431231L).eventScheduleId(102L).tenantId(202L)
+            .build());
 
-        validResponse = ValidBookingResponse.builder()
-                .bookings(bookingDetails)
-                .build();
-    }
+    validResponse = ValidBookingResponse.builder().bookings(bookingDetails).build();
+  }
 
-    @Test
+  @Test
     @DisplayName("유효한 예약 검증 API 테스트 - 성공")
     void validateBookings_Success() throws Exception {
         when(bookingService.validateBookings(any(ValidBookingRequest.class)))
@@ -91,53 +80,43 @@ class ValidBookingControllerTest {
                 .andExpect(jsonPath("$.bookings[1].tenantId").value(202));
     }
 
-    @Test
-    @DisplayName("유효한 예약 검증 API 테스트 - 빈 예약 목록")
-    void validateBookings_EmptyBookings() throws Exception {
-        ValidBookingRequest emptyRequest = ValidBookingRequest.builder()
-                .userId(398413L)
-                .bookings(List.of())
-                .build();
+  @Test
+  @DisplayName("유효한 예약 검증 API 테스트 - 빈 예약 목록")
+  void validateBookings_EmptyBookings() throws Exception {
+    ValidBookingRequest emptyRequest =
+        ValidBookingRequest.builder().userId(398413L).bookings(List.of()).build();
 
-        ValidBookingResponse emptyResponse = ValidBookingResponse.builder()
-                .bookings(List.of())
-                .build();
+    ValidBookingResponse emptyResponse = ValidBookingResponse.builder().bookings(List.of()).build();
 
-        when(bookingService.validateBookings(any(ValidBookingRequest.class)))
-                .thenReturn(emptyResponse);
+    when(bookingService.validateBookings(any(ValidBookingRequest.class))).thenReturn(emptyResponse);
 
-        mockMvc.perform(post("/backend/validbookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(emptyRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bookings").isArray())
-                .andExpect(jsonPath("$.bookings.length()").value(0));
-    }
+    mockMvc
+        .perform(post("/backend/validbookings").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(emptyRequest)))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.bookings").isArray())
+        .andExpect(jsonPath("$.bookings.length()").value(0));
+  }
 
-    @Test
-    @DisplayName("유효한 예약 검증 API 테스트 - 잘못된 요청")
-    void validateBookings_InvalidRequest() throws Exception {
-        ValidBookingRequest invalidRequest = ValidBookingRequest.builder()
-                .userId(null)
-                .bookings(Arrays.asList(12312341L, 12431231L))
-                .build();
+  @Test
+  @DisplayName("유효한 예약 검증 API 테스트 - 잘못된 요청")
+  void validateBookings_InvalidRequest() throws Exception {
+    ValidBookingRequest invalidRequest = ValidBookingRequest.builder().userId(null)
+        .bookings(Arrays.asList(12312341L, 12431231L)).build();
 
-        when(bookingService.validateBookings(any(ValidBookingRequest.class)))
-                .thenThrow(new BusinessException("사용자 ID가 필요합니다.", "INVALID_USER_ID"));
+    when(bookingService.validateBookings(any(ValidBookingRequest.class)))
+        .thenThrow(new BusinessException("사용자 ID가 필요합니다.", "INVALID_USER_ID"));
 
-        mockMvc.perform(post("/backend/validbookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode").value("INVALID_USER_ID"));
-    }
+    mockMvc
+        .perform(post("/backend/validbookings").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidRequest)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorCode").value("INVALID_USER_ID"));
+  }
 
-    @Test
-    @DisplayName("유효한 예약 검증 API 테스트 - 잘못된 JSON")
-    void validateBookings_InvalidJson() throws Exception {
-        mockMvc.perform(post("/backend/validbookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("invalid json"))
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  @DisplayName("유효한 예약 검증 API 테스트 - 잘못된 JSON")
+  void validateBookings_InvalidJson() throws Exception {
+    mockMvc.perform(post("/backend/validbookings").contentType(MediaType.APPLICATION_JSON)
+        .content("invalid json")).andExpect(status().isBadRequest());
+  }
 }

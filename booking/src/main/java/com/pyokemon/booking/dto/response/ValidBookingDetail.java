@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ValidBookingDetail {
-    private Long bookingId;
-    private Long eventScheduleId;
-    private Long tenantId;
+  private Long bookingId;
+  private Long eventScheduleId;
+  private Long tenantId;
 }
