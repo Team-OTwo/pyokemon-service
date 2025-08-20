@@ -2,8 +2,6 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
-import com.pyokemon.event.dto.BookingInfoResponseDTO;
-import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -13,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
+import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
 
@@ -24,77 +24,78 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventController {
-    private final EventService eventService;
-    private final EventScheduleService eventScheduleService;
+  private final EventService eventService;
+  private final EventScheduleService eventScheduleService;
 
-    // 오늘 오픈 티켓
-    @GetMapping("/open-today")
-    public List<EventItemResponseDTO> getOpenTicketsToday() {
-        return eventScheduleService.getTodayOpenedTickets();
+  // 오늘 오픈 티켓
+  @GetMapping("/open-today")
+  public List<EventItemResponseDTO> getOpenTicketsToday() {
+    return eventScheduleService.getTodayOpenedTickets();
+  }
+
+  // 오픈 예정 티켓
+  @GetMapping("/to-be-opened")
+  public List<EventItemResponseDTO> getOpenTicketsToBeOpened() {
+    return eventScheduleService.getTicketsToBeOpened();
+  }
+
+  // 공연 상세 조회
+  @GetMapping("/{eventId}")
+  public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId,
+      @RequestHeader(value = "X-Auth-AccountId", required = false) Long accountId)
+      throws NotFoundException {
+    EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
+    return ResponseEntity.ok(dto);
+  }
+
+  // 장르별 리스트 조회
+  @GetMapping
+  public List<EventItemResponseDTO> getConcertsByPage(
+      @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "9") int size) {
+    int offset = (page - 1) * size;
+    return eventScheduleService.getConcertsByPage(genre, offset, size);
+  }
+
+  // 관심 공연 등록, 취소
+  @PostMapping("/save/{eventId}")
+  public ResponseEntity<String> saveEvent(@PathVariable Long eventId,
+      @RequestHeader("X-Auth-AccountId") Long accountId) {
+    return ResponseEntity.ok(eventService.saveSavedEvent(accountId, eventId));
+  }
+
+  // 관심 공연 조회
+  @GetMapping("/saved-events")
+  public List<EventItemResponseDTO> getSavedEvents(
+      @RequestHeader("X-Auth-AccountId") Long accountId, @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "9") int size) {
+    if (accountId == null) {
+      throw new BusinessException("로그인이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
     }
 
-    // 오픈 예정 티켓
-    @GetMapping("/to-be-opened")
-    public List<EventItemResponseDTO> getOpenTicketsToBeOpened() {
-        return eventScheduleService.getTicketsToBeOpened();
-    }
+    int offset = (page - 1) * size;
+    return eventService.getSavedEvents(accountId, offset, size);
+  }
 
-    // 공연 상세 조회
-    @GetMapping("/{eventId}")
-    public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId,
-                                                                 @RequestHeader(value = "X-Auth-AccountId", required = false) Long accountId)
-            throws NotFoundException {
-        EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
-        return ResponseEntity.ok(dto);
-    }
+  // 검색
+  @GetMapping("/keyword")
+  public List<EventItemResponseDTO> getEventSearch(@RequestParam String keyword,
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "9") int size,
+      @RequestParam(defaultValue = "전체") String genre) {
+    int offset = (page - 1) * size;
+    return eventScheduleService.getEventSearch(keyword, offset, size, genre);
+  }
 
-    // 장르별 리스트 조회
-    @GetMapping
-    public List<EventItemResponseDTO> getConcertsByPage(
-            @RequestParam(defaultValue = "전체") String genre, @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "9") int size) {
-        int offset = (page - 1) * size;
-        return eventScheduleService.getConcertsByPage(genre, offset, size);
-    }
+  // 예매 초기 정보 조회
+  @GetMapping("/booking-info/{eventScheduleId}")
+  public List<BookingInfoResponseDTO> getBookingInfo(@PathVariable Long eventScheduleId) {
+    return eventScheduleService.getBookingInfo(eventScheduleId);
+  }
 
-    // 관심 공연 등록, 취소
-    @PostMapping("/save/{eventId}")
-    public ResponseEntity<String> saveEvent(@PathVariable Long eventId,
-                                            @RequestHeader("X-Auth-AccountId") Long accountId) {
-        return ResponseEntity.ok(eventService.saveSavedEvent(accountId, eventId));
-    }
-
-    // 관심 공연 조회
-    @GetMapping("/saved-events")
-    public List<EventItemResponseDTO> getSavedEvents(
-            @RequestHeader("X-Auth-AccountId") Long accountId, @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "9") int size) {
-        if (accountId == null) {
-            throw new BusinessException("로그인이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
-        }
-
-        int offset = (page - 1) * size;
-        return eventService.getSavedEvents(accountId, offset, size);
-    }
-
-    // 검색
-    @GetMapping("/keyword")
-    public List<EventItemResponseDTO> getEventSearch(@RequestParam String keyword,
-                                                     @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "9") int size,
-                                                     @RequestParam(defaultValue = "전체") String genre) {
-        int offset = (page - 1) * size;
-        return eventScheduleService.getEventSearch(keyword, offset, size, genre);
-    }
-
-    // 예매 초기 정보 조회
-    @GetMapping("/booking-info/{eventScheduleId}")
-    public List<BookingInfoResponseDTO> getBookingInfo(@PathVariable Long eventScheduleId) {
-        return eventScheduleService.getBookingInfo(eventScheduleId);
-    }
-
-    // 등급 좌석 정보 조회
-    @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
-    public List<SeatInfoResponseDTO> getSeatInfoByGrade(@PathVariable Long eventScheduleId, @PathVariable String seatGrade) {
-        return eventScheduleService.getSeatInfoByGrade(seatGrade);
-    }
+  // 등급 좌석 정보 조회
+  @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
+  public List<SeatInfoResponseDTO> getSeatInfoByGrade(@PathVariable Long eventScheduleId,
+      @PathVariable String seatGrade) {
+    return eventScheduleService.getSeatInfoByGrade(seatGrade);
+  }
 }

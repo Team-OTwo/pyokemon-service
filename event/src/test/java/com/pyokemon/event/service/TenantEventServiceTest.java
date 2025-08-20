@@ -43,213 +43,179 @@ import com.pyokemon.event.repository.VenueRepository;
 @ExtendWith(MockitoExtension.class)
 class TenantEventServiceTest {
 
-    @Mock
-    private EventRepository eventRepository;
+  @Mock
+  private EventRepository eventRepository;
 
-    @Mock
-    private TenantEventRepository tenantEventRepository;
+  @Mock
+  private TenantEventRepository tenantEventRepository;
 
-    @Mock
-    private EventScheduleRepository eventScheduleRepository;
+  @Mock
+  private EventScheduleRepository eventScheduleRepository;
 
-    @Mock
-    private VenueRepository venueRepository;
+  @Mock
+  private VenueRepository venueRepository;
 
-    @Mock
-    private PriceRepository priceRepository;
+  @Mock
+  private PriceRepository priceRepository;
 
-    @Mock
-    private ObjectMapper objectMapper;
+  @Mock
+  private ObjectMapper objectMapper;
 
-    @InjectMocks
-    private TenantEventService tenantEventService;
+  @InjectMocks
+  private TenantEventService tenantEventService;
 
-    private EventRegisterDto mockEventRegisterDto;
-    private EventUpdateDto mockEventUpdateDto;
-    private EventScheduleDto mockEventScheduleDto;
-    private TenantEventDetailResponseDTO mockTenantEventDetail;
-    private TenantBookingDetailResponseDTO mockTenantBookingDetail;
-    private TenantEventListDto mockTenantEventList;
-    private Event mockEvent;
-    private Venue mockVenue;
+  private EventRegisterDto mockEventRegisterDto;
+  private EventUpdateDto mockEventUpdateDto;
+  private EventScheduleDto mockEventScheduleDto;
+  private TenantEventDetailResponseDTO mockTenantEventDetail;
+  private TenantBookingDetailResponseDTO mockTenantBookingDetail;
+  private TenantEventListDto mockTenantEventList;
+  private Event mockEvent;
+  private Venue mockVenue;
 
-    @BeforeEach
-    void setUp() {
-        mockEventRegisterDto = EventRegisterDto.builder()
-                .accountId(1L)
-                .title("Test Event")
-                .ageLimit(19L)
-                .description("Test Description")
-                .genre("Pop")
-                .thumbnailUrl("test.jpg")
-                .schedules(Arrays.asList(
-                    EventScheduleDto.builder()
-                        .venueId(1L)
-                        .ticketOpenAt(LocalDateTime.now().plusDays(1))
-                        .eventDate(LocalDateTime.now().plusDays(7))
-                        .prices(Arrays.asList(
-                            PriceDto.builder()
-                                .seatClassId(1L)
-                                .price(50000)
-                                .build()
-                        ))
-                        .build()
-                ))
-                .build();
-
-        mockEventUpdateDto = EventUpdateDto.builder()
-                .eventId(1L)
-                .title("Updated Event")
-                .ageLimit(19L)
-                .description("Updated Description")
-                .genre("Rock")
-                .thumbnailUrl("updated.jpg")
-                .build();
-
-        mockEventScheduleDto = EventScheduleDto.builder()
-                .eventId(1L)
-                .venueId(1L)
-                .ticketOpenAt(LocalDateTime.now().plusDays(1))
+  @BeforeEach
+  void setUp() {
+    mockEventRegisterDto = EventRegisterDto.builder().accountId(1L).title("Test Event")
+        .ageLimit(19L).description("Test Description").genre("Pop").thumbnailUrl("test.jpg")
+        .schedules(Arrays.asList(
+            EventScheduleDto.builder().venueId(1L).ticketOpenAt(LocalDateTime.now().plusDays(1))
                 .eventDate(LocalDateTime.now().plusDays(7))
-                .prices(Arrays.asList(
-                    PriceDto.builder()
-                        .seatClassId(1L)
-                        .price(50000)
-                        .build()
-                ))
-                .build();
+                .prices(Arrays.asList(PriceDto.builder().seatClassId(1L).price(50000).build()))
+                .build()))
+        .build();
 
-        mockTenantEventDetail = new TenantEventDetailResponseDTO();
-        mockTenantEventDetail.setEventId(1L);
-        mockTenantEventDetail.setTitle("Test Event");
-        mockTenantEventDetail.setStatus("APPROVED");
+    mockEventUpdateDto = EventUpdateDto.builder().eventId(1L).title("Updated Event").ageLimit(19L)
+        .description("Updated Description").genre("Rock").thumbnailUrl("updated.jpg").build();
 
-        mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
-        mockTenantBookingDetail.setEventScheduleId(1L);
+    mockEventScheduleDto = EventScheduleDto.builder().eventId(1L).venueId(1L)
+        .ticketOpenAt(LocalDateTime.now().plusDays(1)).eventDate(LocalDateTime.now().plusDays(7))
+        .prices(Arrays.asList(PriceDto.builder().seatClassId(1L).price(50000).build())).build();
 
-        mockTenantEventList = new TenantEventListDto();
-        mockTenantEventList.setEventId(1L);
-        mockTenantEventList.setTitle("Test Event");
+    mockTenantEventDetail = new TenantEventDetailResponseDTO();
+    mockTenantEventDetail.setEventId(1L);
+    mockTenantEventDetail.setTitle("Test Event");
+    mockTenantEventDetail.setStatus("APPROVED");
 
-        mockEvent = Event.builder()
-                .eventId(1L)
-                .accountId(1L)
-                .title("Test Event")
-                .ageLimit(19L)
-                .description("Test Description")
-                .genre("Pop")
-                .thumbnailUrl("test.jpg")
-                .status(Event.EventStatus.APPROVED)
-                .build();
+    mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
+    mockTenantBookingDetail.setEventScheduleId(1L);
 
-        mockVenue = Venue.builder()
-                .venueId(1L)
-                .venueName("Test Venue")
-                .build();
-    }
+    mockTenantEventList = new TenantEventListDto();
+    mockTenantEventList.setEventId(1L);
+    mockTenantEventList.setTitle("Test Event");
 
-    @Test
-    void getTenantEventDetailByEventId_ShouldReturnTenantEventDetail() {
-        Long eventId = 1L;
+    mockEvent = Event.builder().eventId(1L).accountId(1L).title("Test Event").ageLimit(19L)
+        .description("Test Description").genre("Pop").thumbnailUrl("test.jpg")
+        .status(Event.EventStatus.APPROVED).build();
 
-        when(tenantEventRepository.findTenantEventDetailByEventId(eventId)).thenReturn(mockTenantEventDetail);
+    mockVenue = Venue.builder().venueId(1L).venueName("Test Venue").build();
+  }
 
-        TenantEventDetailResponseDTO result = tenantEventService.getTenantEventDetailByEventId(eventId);
+  @Test
+  void getTenantEventDetailByEventId_ShouldReturnTenantEventDetail() {
+    Long eventId = 1L;
 
-        assertNotNull(result);
-        assertEquals(mockTenantEventDetail.getEventId(), result.getEventId());
-        verify(tenantEventRepository).findTenantEventDetailByEventId(eventId);
-    }
+    when(tenantEventRepository.findTenantEventDetailByEventId(eventId))
+        .thenReturn(mockTenantEventDetail);
 
-    @Test
-    void getTenantBookingDetailByEventScheduleId_ShouldReturnTenantBookingDetail() {
-        Long eventScheduleId = 1L;
+    TenantEventDetailResponseDTO result = tenantEventService.getTenantEventDetailByEventId(eventId);
 
-        when(tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId)).thenReturn(mockTenantBookingDetail);
+    assertNotNull(result);
+    assertEquals(mockTenantEventDetail.getEventId(), result.getEventId());
+    verify(tenantEventRepository).findTenantEventDetailByEventId(eventId);
+  }
 
-        TenantBookingDetailResponseDTO result = tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
+  @Test
+  void getTenantBookingDetailByEventScheduleId_ShouldReturnTenantBookingDetail() {
+    Long eventScheduleId = 1L;
 
-        assertNotNull(result);
-        assertEquals(mockTenantBookingDetail.getEventScheduleId(), result.getEventScheduleId());
-        verify(tenantEventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
-    }
+    when(tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
+        .thenReturn(mockTenantBookingDetail);
 
-    @Test
-    void getTenantEventListByAccountId_ShouldReturnTenantEventList() {
-        Long accountId = 1L;
-        List<TenantEventListDto> expectedEvents = Arrays.asList(mockTenantEventList);
+    TenantBookingDetailResponseDTO result =
+        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
 
-        when(tenantEventRepository.findTenantEventListByAccountId(accountId)).thenReturn(expectedEvents);
+    assertNotNull(result);
+    assertEquals(mockTenantBookingDetail.getEventScheduleId(), result.getEventScheduleId());
+    verify(tenantEventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
+  }
 
-        List<TenantEventListDto> result = tenantEventService.getTenantEventListByAccountId(accountId);
+  @Test
+  void getTenantEventListByAccountId_ShouldReturnTenantEventList() {
+    Long accountId = 1L;
+    List<TenantEventListDto> expectedEvents = Arrays.asList(mockTenantEventList);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(mockTenantEventList.getEventId(), result.get(0).getEventId());
-        verify(tenantEventRepository).findTenantEventListByAccountId(accountId);
-    }
+    when(tenantEventRepository.findTenantEventListByAccountId(accountId))
+        .thenReturn(expectedEvents);
 
-    @Test
-    void getMonthlyEventSummary_ShouldReturnMonthlyEventSummary() {
-        Long accountId = 1L;
-        int year = 2024;
-        int month = 1;
-        String startDate = "2024-01-01 00:00:00";
-        String endDate = "2024-01-31 23:59:59";
+    List<TenantEventListDto> result = tenantEventService.getTenantEventListByAccountId(accountId);
 
-        List<MonthlyEventDTO> events = Arrays.asList(new MonthlyEventDTO());
-        MonthlySummaryDTO summary = MonthlySummaryDTO.builder()
-                .totalRevenue(1000000)
-                .activeEventCount(5)
-                .totalTicketsSold(100)
-                .build();
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(mockTenantEventList.getEventId(), result.get(0).getEventId());
+    verify(tenantEventRepository).findTenantEventListByAccountId(accountId);
+  }
 
-        when(tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate)).thenReturn(events);
-        when(tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate)).thenReturn(summary);
+  @Test
+  void getMonthlyEventSummary_ShouldReturnMonthlyEventSummary() {
+    Long accountId = 1L;
+    int year = 2024;
+    int month = 1;
+    String startDate = "2024-01-01 00:00:00";
+    String endDate = "2024-01-31 23:59:59";
 
-        MonthlyEventSummaryResponse result = tenantEventService.getMonthlyEventSummary(accountId, year, month);
+    List<MonthlyEventDTO> events = Arrays.asList(new MonthlyEventDTO());
+    MonthlySummaryDTO summary = MonthlySummaryDTO.builder().totalRevenue(1000000)
+        .activeEventCount(5).totalTicketsSold(100).build();
 
-        assertNotNull(result);
-        assertEquals(events, result.getEvents());
-        assertEquals(summary, result.getSummary());
-        verify(tenantEventRepository).findMonthlyEventsByAccountId(accountId, startDate, endDate);
-        verify(tenantEventRepository).findMonthlySummaryByAccountId(accountId, startDate, endDate);
-    }
+    when(tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate))
+        .thenReturn(events);
+    when(tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate))
+        .thenReturn(summary);
 
-    @Test
-    void registerEvent_ShouldRegisterEventSuccessfully() {
-        Long accountId = 1L;
+    MonthlyEventSummaryResponse result =
+        tenantEventService.getMonthlyEventSummary(accountId, year, month);
 
-        when(venueRepository.findById(1L)).thenReturn(Optional.of(mockVenue));
-        when(tenantEventRepository.save(any(Event.class))).thenReturn(1L);
-        when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
-        when(priceRepository.save(any(Price.class))).thenReturn(1L);
+    assertNotNull(result);
+    assertEquals(events, result.getEvents());
+    assertEquals(summary, result.getSummary());
+    verify(tenantEventRepository).findMonthlyEventsByAccountId(accountId, startDate, endDate);
+    verify(tenantEventRepository).findMonthlySummaryByAccountId(accountId, startDate, endDate);
+  }
 
-        EventResponseDto result = tenantEventService.registerEvent(mockEventRegisterDto, accountId);
+  @Test
+  void registerEvent_ShouldRegisterEventSuccessfully() {
+    Long accountId = 1L;
 
-        assertNotNull(result);
-        assertEquals(mockEventRegisterDto.getTitle(), result.getTitle());
-        verify(tenantEventRepository).save(any(Event.class));
-        verify(eventScheduleRepository).save(any(EventSchedule.class));
-        verify(priceRepository).save(any(Price.class));
-    }
+    when(venueRepository.findById(1L)).thenReturn(Optional.of(mockVenue));
+    when(tenantEventRepository.save(any(Event.class))).thenReturn(1L);
+    when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
+    when(priceRepository.save(any(Price.class))).thenReturn(1L);
 
-    @Test
-    void registerEvent_WithInvalidVenue_ShouldThrowBusinessException() {
-        Long accountId = 1L;
+    EventResponseDto result = tenantEventService.registerEvent(mockEventRegisterDto, accountId);
 
-        when(venueRepository.findById(999L)).thenReturn(Optional.empty());
+    assertNotNull(result);
+    assertEquals(mockEventRegisterDto.getTitle(), result.getTitle());
+    verify(tenantEventRepository).save(any(Event.class));
+    verify(eventScheduleRepository).save(any(EventSchedule.class));
+    verify(priceRepository).save(any(Price.class));
+  }
 
-        mockEventRegisterDto.getSchedules().get(0).setVenueId(999L);
+  @Test
+  void registerEvent_WithInvalidVenue_ShouldThrowBusinessException() {
+    Long accountId = 1L;
 
-        assertThrows(BusinessException.class, () -> {
-            tenantEventService.registerEvent(mockEventRegisterDto, accountId);
-        });
+    when(venueRepository.findById(999L)).thenReturn(Optional.empty());
 
-        verify(venueRepository).findById(999L);
-    }
+    mockEventRegisterDto.getSchedules().get(0).setVenueId(999L);
 
-    @Test
+    assertThrows(BusinessException.class, () -> {
+      tenantEventService.registerEvent(mockEventRegisterDto, accountId);
+    });
+
+    verify(venueRepository).findById(999L);
+  }
+
+  @Test
     void updateEvent_ShouldUpdateEventSuccessfully() {
         when(tenantEventRepository.findTenantEventDetailByEventId(1L)).thenReturn(mockTenantEventDetail);
         when(objectMapper.convertValue(any(), eq(Event.class))).thenReturn(mockEvent);
@@ -262,7 +228,7 @@ class TenantEventServiceTest {
         verify(tenantEventRepository).updateEvent(any(Event.class));
     }
 
-    @Test
+  @Test
     void updateEvent_WhenEventNotFound_ShouldThrowBusinessException() {
         when(tenantEventRepository.findTenantEventDetailByEventId(999L)).thenReturn(null);
 
@@ -273,17 +239,17 @@ class TenantEventServiceTest {
         });
     }
 
-    @Test
-    void registerEventSchedule_ShouldRegisterEventScheduleSuccessfully() {
-        Long eventId = 1L;
+  @Test
+  void registerEventSchedule_ShouldRegisterEventScheduleSuccessfully() {
+    Long eventId = 1L;
 
-        when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
-        when(priceRepository.save(any(Price.class))).thenReturn(1L);
+    when(eventScheduleRepository.save(any(EventSchedule.class))).thenReturn(1L);
+    when(priceRepository.save(any(Price.class))).thenReturn(1L);
 
-        String result = tenantEventService.registerEventSchedule(eventId, mockEventScheduleDto);
+    String result = tenantEventService.registerEventSchedule(eventId, mockEventScheduleDto);
 
-        assertEquals("Event schedule registered successfully", result);
-        verify(eventScheduleRepository).save(any(EventSchedule.class));
-        verify(priceRepository).save(any(Price.class));
-    }
+    assertEquals("Event schedule registered successfully", result);
+    verify(eventScheduleRepository).save(any(EventSchedule.class));
+    verify(priceRepository).save(any(Price.class));
+  }
 }

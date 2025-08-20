@@ -2,7 +2,6 @@ package com.pyokemon.event.repository;
 
 import java.util.List;
 
-import com.pyokemon.event.dto.SeatPriceResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.EventDetailResponseDTO;

@@ -94,46 +94,35 @@ public class EventScheduleService {
 
   public List<BookingInfoResponseDTO> getBookingInfo(Long eventScheduleId) {
     Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
-    
-    List<PriceWithSeatClassDTO> prices = priceRepository.findPricesWithSeatClassByEventScheduleId(eventScheduleId);
-    
-    return prices.stream()
-        .map(price -> {
-          Long seatCount = seatRepository.countByVenueIdAndSeatClassId(venueId, price.getSeatClassId());
-          return BookingInfoResponseDTO.builder()
-              .seatClassId(price.getSeatClassId())
-              .seatGrade(price.getClassName())
-              .price(price.getPrice())
-              .seatCount(seatCount)
-              .build();
-        })
-        .toList();
+
+    List<PriceWithSeatClassDTO> prices =
+        priceRepository.findPricesWithSeatClassByEventScheduleId(eventScheduleId);
+
+    return prices.stream().map(price -> {
+      Long seatCount = seatRepository.countByVenueIdAndSeatClassId(venueId, price.getSeatClassId());
+      return BookingInfoResponseDTO.builder().seatClassId(price.getSeatClassId())
+          .seatGrade(price.getClassName()).price(price.getPrice()).seatCount(seatCount).build();
+    }).toList();
   }
 
   public List<Long> getSeatIdsByGrade(String seatGradeName) {
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
-    
+
     List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
-    
-    return seats.stream()
-        .map(Seat::getSeatId)
-        .collect(Collectors.toList());
+
+    return seats.stream().map(Seat::getSeatId).collect(Collectors.toList());
   }
 
   public List<SeatInfoResponseDTO> getSeatInfoByGrade(String seatGradeName) {
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
-    
+
     List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
-    
+
     return seats.stream()
-        .map(seat -> SeatInfoResponseDTO.builder()
-            .seatId(seat.getSeatId())
-            .col(seat.getCol())
-            .row(seat.getRow())
-            .seatGrade(seatClass.getClassName())
-            .build())
+        .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getSeatId()).col(seat.getCol())
+            .row(seat.getRow()).seatGrade(seatClass.getClassName()).build())
         .collect(Collectors.toList());
   }
 

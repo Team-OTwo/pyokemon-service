@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SeatInfoResponseDTO {
-    private Long seatId;
-    private String col;
-    private String row;
-    private String seatGrade;
+  private Long seatId;
+  private String col;
+  private String row;
+  private String seatGrade;
 }

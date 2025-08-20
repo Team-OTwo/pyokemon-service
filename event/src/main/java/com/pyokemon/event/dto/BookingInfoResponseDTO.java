@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class BookingInfoResponseDTO {
-    private Long seatClassId;
-    private String seatGrade;
-    private Integer price;
-    private Long seatCount;
+  private Long seatClassId;
+  private String seatGrade;
+  private Integer price;
+  private Long seatCount;
 }

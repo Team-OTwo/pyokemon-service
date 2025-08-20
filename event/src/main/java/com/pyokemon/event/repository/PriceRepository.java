@@ -13,6 +13,6 @@ public interface PriceRepository {
   Long save(Price price);
 
   int updatePrice(Price price);
-  
+
   List<PriceWithSeatClassDTO> findPricesWithSeatClassByEventScheduleId(Long eventScheduleId);
 }

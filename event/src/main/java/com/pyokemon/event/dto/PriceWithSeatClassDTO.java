@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PriceWithSeatClassDTO {
-    private Long priceId;
-    private Long eventScheduleId;
-    private Long seatClassId;
-    private Integer price;
-    private String className; // 좌석 등급명
+  private Long priceId;
+  private Long eventScheduleId;
+  private Long seatClassId;
+  private Integer price;
+  private String className; // 좌석 등급명
 }
