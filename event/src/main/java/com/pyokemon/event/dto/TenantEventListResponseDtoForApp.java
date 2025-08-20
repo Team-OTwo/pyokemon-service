@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantEventListResponseDtoForApp {
-    private List<TenantEventListDto> events;
+    private List<TenantEventDetailDtoForApp> events;
     private LocalDateTime lastCursorDate;
     private Long lastCursorId;
 }

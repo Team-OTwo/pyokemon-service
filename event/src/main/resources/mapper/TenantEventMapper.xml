@@ -189,21 +189,19 @@
 
 
     <!--    앱 커서 기반 공연 조회-->
-    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.TenantEventListDto">
+    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.TenantEventDetailDtoForApp">
         SELECT
         e.event_id as eventId,
-        es.event_schedule_id as eventScheduleId,
-        e.thumbnail_url as thumbnailUrl,
         e.title,
         es.event_date as eventDate,
         v.venue_name as venueName,
-        e.status
+        e.genre
         FROM tb_event e
         LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
         LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE e.account_id = #{accountId}
         <if test="cursorDate != null and cursorId != null">
-            AND (es.event_date, e.event_id) &gt; (#{cursorDate}, #{cursorId})
+            AND (es.event_date, e.event_id) &gt;= (#{cursorDate}, #{cursorId})
         </if>
         ORDER BY es.event_date ASC, e.event_id ASC
         <if test="limit != null">
