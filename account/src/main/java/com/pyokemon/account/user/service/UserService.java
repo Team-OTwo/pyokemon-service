@@ -172,7 +172,7 @@ public class UserService {
   }
 
   @Transactional
-  public void deleteUserDevice(Long accountId, String deviceNumber) {
+  public void deleteUserDevice(Long accountId) {
     Optional<User> userOpt = userRepository.findByAccountId(accountId);
     if (userOpt.isEmpty()) {
       throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
@@ -180,7 +180,7 @@ public class UserService {
     User user = userOpt.get();
 
     UserDevice userDevice = userDeviceRepository
-        .findByUserIdAndDeviceNumberAndIsValid(user.getUserId(), deviceNumber, true).orElseThrow(
+        .findByUserIdAndIsValid(user.getUserId(), true).orElseThrow(
             () -> new BusinessException("디바이스를 찾을 수 없습니다.", AccountErrorCodes.DEVICE_NOT_FOUND));
 
     userDevice.setIsValid(false);

@@ -99,11 +99,11 @@ public class UserController {
   }
 
   // 사용자 기기 삭제 (사용자 본인만)
-  @DeleteMapping("/devices/{deviceId}")
-  public ResponseEntity<ResponseDto<Void>> deleteUserDevice(@PathVariable String deviceId) {
+  @DeleteMapping("/devices")
+  public ResponseEntity<ResponseDto<Void>> deleteUserDevice() {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     Long accountId = Long.parseLong(currentUserAccountId);
-    userService.deleteUserDevice(accountId, deviceId);
+    userService.deleteUserDevice(accountId);
     return ResponseEntity.ok(ResponseDto.success("기기 삭제 성공"));
   }
 }
