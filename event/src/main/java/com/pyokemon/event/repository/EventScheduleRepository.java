@@ -17,8 +17,6 @@ public interface EventScheduleRepository {
 
   List<EventItemResponseDTO> selectTicketsToBeOpened();
 
-  Optional<EventSchedule> findById(Long id);
-
   Long save(EventSchedule eventSchedule);
 
   List<EventItemResponseDTO> selectEventList(@Param("genre") String genre,
@@ -33,4 +31,5 @@ public interface EventScheduleRepository {
 
   int updateEventSchedule(EventSchedule eventSchedule);
 
+  Long findVenueIdByEventScheduleId(Long eventScheduleId);
 }
