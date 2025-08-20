@@ -4,6 +4,8 @@ server:
     context-path: /did
 
 spring:
+  application:
+    name: did-service
   profiles:
     include:
       - flyway

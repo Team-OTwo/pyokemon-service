@@ -4,6 +4,8 @@ server:
     context-path: /booking
 
 spring:
+  application:
+    name: booking-service
   profiles:
     include:
       - flyway
@@ -12,8 +14,8 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3311/pyokemon_booking?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: pyokemon
-    password: pyokemon123
+    username: root
+    password: root_password
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
@@ -25,15 +27,8 @@ spring:
     locations: classpath:db/migration/booking
 
   kafka:
-    bootstrap-servers: localhost:9092
     consumer:
-      group-id: booking-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      group-id: ${spring.application.name}
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

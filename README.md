@@ -206,6 +206,9 @@ public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
 - **WebConfig**: CORS 및 웹 설정
 - **JacksonConfig**: JSON 직렬화 설정
 - **StringUtils**: 문자열 유틸리티
+- **KafkaCommonConfig**: Kafka 공통 설정
+- **KafkaMessageSender**: Kafka 메시지 전송 유틸리티
+- **KafkaListenerConfigurer**: Kafka Consumer 공통 설정
 
 ### User 모듈
 - **User Entity**: 사용자 정보 관리
@@ -358,3 +361,41 @@ public abstract class BaseEntity {
 2. 모듈 디렉토리 생성
 3. 모듈별 `build.gradle` 생성
 4. `common` 모듈 dependency 추가 
+
+## 6. Kafka 공통 모듈 사용법
+
+### 의존성 설정
+각 서비스 모듈에서는 common 모듈에 대한 의존성만 추가하면 Kafka 관련 기능을 사용할 수 있습니다:
+```groovy
+dependencies {
+    implementation project(':common')
+    // ... 기타 의존성 ...
+}
+```
+
+### Kafka 메시지 전송
+KafkaMessageSender를 주입받아 사용합니다:
+```java
+@Service
+@RequiredArgsConstructor
+public class ExampleService {
+    private final KafkaMessageSender kafkaMessageSender;
+    
+    public void sendNotification(SomeDto dto) {
+        kafkaMessageSender.send(KafkaTopicConstants.SOME_TOPIC, dto.getId(), dto);
+    }
+}
+```
+
+### Kafka 토픽 이름
+KafkaTopicConstants 클래스에 정의된 상수를 사용합니다:
+```java
+public void sendEvent() {
+    // 상수를 사용하여 토픽 이름 참조
+    kafkaMessageSender.send(KafkaTopicConstants.EVENT_CREATED, eventDto);
+}
+```
+
+### 주의사항
+- 각 서비스의 application.yml 파일에서 spring.kafka.consumer.group-id를 서비스별로 고유하게 설정해야 합니다.
+- 메시지 직렬화/역직렬화 시 클래스 경로 문제가 발생할 경우 spring.kafka.consumer.properties.spring.json.trusted.packages 속성을 확인하세요. 

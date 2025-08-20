@@ -7,8 +7,5 @@ CREATE TABLE tb_booking (
     payment_id BIGINT,
     status ENUM('PENDING', 'BOOKED', 'CANCELED', 'FAILED') DEFAULT 'PENDING',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_event_schedule_id (event_schedule_id),
-    INDEX idx_account_id (account_id),
-    INDEX idx_payment_id (payment_id)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

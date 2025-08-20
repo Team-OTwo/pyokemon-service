@@ -31,5 +31,16 @@
         WHERE order_id = #{orderId}
     </select>
 
+    <update id="cancelPayment" parameterType="com.pyokemon.payment.dto.PaymentConfirmRequestDto">
+        UPDATE tb_payment
+        SET status = #{status}, updated_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="selectLatestByBookingId" resultType="Payment">
+        SELECT payment_id, booking_id, order_id, payment_key, status
+        FROM tb_payment
+        WHERE booking_id = #{bookingId}
+    </select>
 
 </mapper>

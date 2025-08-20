@@ -14,6 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonthlyEventSummaryResponse {
-    private List<MonthlyEventDTO> events;
-    private MonthlySummaryDTO summary;
-} 
+  private List<MonthlyEventDTO> events;
+  private MonthlySummaryDTO summary;
+}

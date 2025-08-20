@@ -60,6 +60,9 @@
 		{
 			"name": "공연 예매 내역 조회",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -79,7 +82,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8088/booking/api/bookings/2",
+					"raw": "http://localhost:8088/booking/api/bookings/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -89,7 +92,7 @@
 						"booking",
 						"api",
 						"bookings",
-						"2"
+						"1"
 					]
 				}
 			},
@@ -99,28 +102,91 @@
 			"name": "사용자 예매 내역 조회",
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTQ2MzEyNTEsImV4cCI6MTc1NDYzMzA1MX0.qA8DMbh7u-2n9O7kLcCIubv8hJRWFTd_N8tcAmFtfHg",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [
 					{
 						"key": "X-Auth-AccountId",
 						"value": "2",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					},
 					{
 						"key": "X-Auth-Role",
 						"value": "USER",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					},
 					{
 						"key": "Content-Type",
 						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8088/booking/api/bookings/account",
+					"raw": "http://localhost:8087/booking/api/bookings/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"booking",
+						"api",
+						"bookings",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "유효 예매 확인",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Auth-AccountId",
+						"value": "1",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X-Auth-Role",
+						"value": "USER",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"userId\": 8,\r\n\t\"bookings\" : [3, 4, 5, 6, 7]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/booking/backend/validbookings",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -128,9 +194,8 @@
 					"port": "8088",
 					"path": [
 						"booking",
-						"api",
-						"bookings",
-						"account"
+						"backend",
+						"validbookings"
 					]
 				}
 			},

@@ -4,6 +4,8 @@ server:
     context-path: /event
 
 spring:
+  application:
+    name: event-service
   profiles:
     include:
       - flyway

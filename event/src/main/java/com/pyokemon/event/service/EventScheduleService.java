@@ -64,7 +64,7 @@ public class EventScheduleService {
 
     return events;
   }
-  
+
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);
     eventScheduleRepository.save(eventSchedule);

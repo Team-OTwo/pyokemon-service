@@ -17,7 +17,7 @@ public class Payment {
 
   private Long paymentId;
   private Long bookingId;
-  private Long accountId;
+  private String orderId;
   private String paymentKey;
   private String method;
   private Long amount;

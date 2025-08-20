@@ -1,19 +1,18 @@
-package com.pyokemon.payment.dto;
-
-
-import com.pyokemon.payment.entity.Payment;
+package com.pyokemon.booking.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentKafkaDto {
-  private Long paymentId;
+public class ValidBookingDetail {
   private Long bookingId;
-  Payment.PaymentStatus status;
+  private Long eventScheduleId;
+  private Long tenantId;
 }
