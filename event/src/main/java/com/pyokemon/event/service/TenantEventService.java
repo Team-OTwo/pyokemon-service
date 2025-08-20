@@ -318,6 +318,11 @@ public class TenantEventService {
     return priceRepository.save(price);
   }
 
+  // 앱 커서 기반 공연 조회
+  public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit){
+    return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit);
+  }
+  
   public void updateStatus(Long eventId, String status) {
     CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
             .eventId(eventId)
@@ -329,6 +334,5 @@ public class TenantEventService {
     if(scheduleId == null) {
       throw new BusinessException("Event not fount.", EventErrorCodes.EVENT_NOT_FOUND);
     }
-
   }
 }
