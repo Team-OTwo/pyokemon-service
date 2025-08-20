@@ -4,7 +4,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.booking.dto.kafka.PaymentEventDto;
+import com.pyokemon.booking.dto.kafka.PaymentKafkaDto;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.service.BookingService;
 
@@ -22,16 +22,16 @@ public class PaymentEventListener {
   @KafkaListener(
       topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).PAYMENT_STATUS_UPDATED}",
       groupId = "${spring.application.name}")
-  public void handlePaymentStatusUpdate(String message) {
+  public void handlePaymentStatusUpdate(PaymentKafkaDto paymentEvent) {
     try {
-      PaymentEventDto paymentEvent = objectMapper.readValue(message, PaymentEventDto.class);
+      log.info("결제 상태 업데이트 이벤트 수신: {}", paymentEvent);
       processPaymentEvent(paymentEvent);
     } catch (Exception e) {
-      log.error("Error processing payment status update message: {}", message, e);
+      log.error("결제 상태 업데이트 메시지 처리 중 오류 발생: {}", paymentEvent, e);
     }
   }
 
-  public void processPaymentEvent(PaymentEventDto paymentEvent) {
+  public void processPaymentEvent(PaymentKafkaDto paymentEvent) {
     Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
     bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus,
         paymentEvent.getPaymentId());
