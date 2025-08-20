@@ -1,12 +1,12 @@
 package com.pyokemon.event.bff.controller;
 
+import com.pyokemon.common.dto.IdsRequest;
 import com.pyokemon.event.bff.dto.*;
 import com.pyokemon.event.bff.service.BffEventService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -43,6 +43,16 @@ public class BffEventController {
     @GetMapping("/seat-classes/{seatClassId}")
     public BffSeatClassDto getSeatClass(@PathVariable Long seatClassId) {
         return bffEventService.getSeatClass(seatClassId);
+    }
+
+    @PostMapping("/seats/_batch")
+    public List<BffSeatDto> getSeat(@RequestBody IdsRequest request) {
+        return bffEventService.getSeats(request.getIds());
+    }
+
+    @PostMapping("/seat-classes/_batch")
+    public List<BffSeatClassDto> getSeatClasses(@RequestBody IdsRequest request) {
+        return bffEventService.getSeatClasses(request.getIds());
     }
 }
 

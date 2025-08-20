@@ -4,6 +4,7 @@ import com.pyokemon.event.bff.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -17,4 +18,8 @@ public interface BffEventRepository {
     Optional<BffEventDto>        findEventById(@Param("eventId") Long eventId);
 
     Optional<BffSeatClassDto>    findSeatClassById(@Param("seatClassId") Long seatClassId);
+
+    List<BffSeatDto> findSeatsByIdIn(@Param("ids") List<Long> ids);
+
+    List<BffSeatClassDto> findSeatClassesByIdIn(@Param("ids") List<Long> ids);
 }

@@ -1,12 +1,12 @@
 package com.pyokemon.payment.bff.controller;
 
+import com.pyokemon.common.dto.IdsRequest;
 import com.pyokemon.payment.bff.dto.PaymentDto;
 import com.pyokemon.payment.bff.service.PaymentBffService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -19,6 +19,11 @@ public class PaymentBffController {
     @GetMapping("/{paymentId}")
     public PaymentDto getPayment(@PathVariable Long paymentId) {
         return paymentBffService.getPayment(paymentId);
+    }
+
+    @PostMapping("/_batch")
+    public List<PaymentDto> getPayments(@RequestBody IdsRequest request) {
+        return paymentBffService.getPayments(request.getIds());
     }
 
 }

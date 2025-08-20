@@ -2,6 +2,7 @@ package com.pyokemon.account.user.bff.controller;
 
 import com.pyokemon.account.user.bff.dto.UserDto;
 import com.pyokemon.account.user.bff.service.UserBffService;
+import com.pyokemon.common.dto.IdsRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -33,4 +36,8 @@ public class UserBffController {
         return userBffService.getUser(accountId);
     }
 
+    @PostMapping("/_batch")
+    public List<UserDto> getUsers(@RequestBody IdsRequest request) {
+        return userBffService.getUsers(request.getIds());
+    }
 }

@@ -15,6 +15,7 @@ import com.pyokemon.account.user.entity.User;
 import com.pyokemon.account.user.entity.UserDevice;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
 import com.pyokemon.account.user.repository.UserRepository;
+import com.pyokemon.common.dto.IdsRequest;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 import com.pyokemon.common.util.PasswordUtil;
@@ -22,7 +23,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +48,32 @@ public class UserBffService {
             .accountId(accountId)
             .name(user.getName())
             .build();
+  }
+
+  public List<UserDto> getUsers(List<Long> accountIds) {
+    if (accountIds == null || accountIds.isEmpty()) return List.of();
+
+    // DB 호출은 1번
+    List<User> users = userBffRepository.findAllByAccountIdIn(accountIds);
+
+    Map<Long, User> byId = users.stream()
+            .collect(Collectors.toMap(User::getAccountId, Function.identity()));
+
+    // 요청 순서/중복 그대로 매핑, 누락 시 기존 정책대로 예외
+    List<Long> missing = accountIds.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
+    if (!missing.isEmpty()) {
+      throw new BusinessException("사용자를 찾을 수 없습니다. ids=" + missing,
+              AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    return accountIds.stream()
+            .map(id -> {
+              User u = byId.get(id);
+              return UserDto.builder()
+                      .accountId(id)
+                      .name(u.getName())
+                      .build();
+            })
+            .toList();
   }
 }
