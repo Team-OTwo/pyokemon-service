@@ -200,6 +200,7 @@
         LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
         LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
         WHERE e.account_id = #{accountId}
+        AND e.status = 'APPROVED'
         AND es.event_date &gt;= NOW()
         <if test="cursorDate != null and cursorId != null">
             AND (es.event_date, e.event_id) &gt;= (#{cursorDate}, #{cursorId})
