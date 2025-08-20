@@ -9,20 +9,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.booking.dto.request.BookingRequest;
-import com.pyokemon.booking.dto.response.AccountIdResponse;
-import com.pyokemon.booking.dto.response.BookingInfo;
-import com.pyokemon.booking.dto.response.BookingResponse;
-import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
-import com.pyokemon.booking.entity.Booking;
-import com.pyokemon.booking.service.BookingService;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.GlobalExceptionHandler;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +23,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pyokemon.booking.dto.request.BookingRequest;
+import com.pyokemon.booking.dto.response.AccountIdResponse;
+import com.pyokemon.booking.dto.response.BookingInfo;
+import com.pyokemon.booking.dto.response.BookingResponse;
+import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.booking.service.BookingService;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.GlobalExceptionHandler;
 
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
@@ -123,80 +124,76 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("INVALID_ACCOUNT_ID"));
     }
 
-    @Test
-    @DisplayName("계정별 예약 조회 - 헤더 누락")
-    void getBookingsByAccountId_MissingHeader() throws Exception {
-        mockMvc.perform(get("/api/bookings/account"))
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  @DisplayName("계정별 예약 조회 - 헤더 누락")
+  void getBookingsByAccountId_MissingHeader() throws Exception {
+    mockMvc.perform(get("/api/bookings/account")).andExpect(status().isBadRequest());
+  }
 
-    @Test
-    @DisplayName("예약 생성 성공")
-    void createBooking_Success() throws Exception {
-        BookingResponse expectedResponse = new BookingResponse(validEventScheduleId, 1L);
-        
-        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
-                .thenReturn(expectedResponse);
+  @Test
+  @DisplayName("예약 생성 성공")
+  void createBooking_Success() throws Exception {
+    BookingResponse expectedResponse = new BookingResponse(validEventScheduleId, 1L);
 
-        mockMvc.perform(post("/api/bookings/booking")
-                        .header("X-Auth-AccountId", validAccountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.eventScheduleId").value(validEventScheduleId))
-                .andExpect(jsonPath("$.bookingId").value(1));
-    }
+    when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
+        .thenReturn(expectedResponse);
 
-    @Test
-    @DisplayName("예약 취소 성공")
-    void cancelBooking_Success() throws Exception {
-        doNothing().when(bookingService).cancelBooking(eq(validEventScheduleId), eq(validAccountId));
+    mockMvc
+        .perform(post("/api/bookings/booking").header("X-Auth-AccountId", validAccountId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(validRequest)))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.eventScheduleId").value(validEventScheduleId))
+        .andExpect(jsonPath("$.bookingId").value(1));
+  }
 
-        mockMvc.perform(delete("/api/bookings/booking/{eventScheduleId}", validEventScheduleId)
-                        .header("X-Auth-AccountId", validAccountId))
-                .andExpect(status().isOk());
-    }
+  @Test
+  @DisplayName("예약 취소 성공")
+  void cancelBooking_Success() throws Exception {
+    doNothing().when(bookingService).cancelBooking(eq(validEventScheduleId), eq(validAccountId));
 
-    @Test
-    @DisplayName("예약 생성 - 잘못된 요청")
-    void createBooking_InvalidRequest() throws Exception {
-        BookingRequest invalidRequest = new BookingRequest();
-        invalidRequest.setEventScheduleId(null);
-        invalidRequest.setSeatId(null);
+    mockMvc.perform(delete("/api/bookings/booking/{eventScheduleId}", validEventScheduleId)
+        .header("X-Auth-AccountId", validAccountId)).andExpect(status().isOk());
+  }
 
-        when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
-                .thenThrow(new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID"));
+  @Test
+  @DisplayName("예약 생성 - 잘못된 요청")
+  void createBooking_InvalidRequest() throws Exception {
+    BookingRequest invalidRequest = new BookingRequest();
+    invalidRequest.setEventScheduleId(null);
+    invalidRequest.setSeatId(null);
 
-        mockMvc.perform(post("/api/bookings/booking")
-                        .header("X-Auth-AccountId", validAccountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.errorCode").value("INVALID_EVENT_SCHEDULE_ID"));
-    }
+    when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
+        .thenThrow(new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID"));
 
-    @Test
-    @DisplayName("예약 생성 - 헤더 누락")
-    void createBooking_MissingHeader() throws Exception {
-        mockMvc.perform(post("/api/bookings/booking")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/api/bookings/booking").header("X-Auth-AccountId", validAccountId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidRequest)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.errorCode").value("INVALID_EVENT_SCHEDULE_ID"));
+  }
 
-    @Test
-    @DisplayName("예약 생성 - 잘못된 JSON")
-    void createBooking_InvalidJson() throws Exception {
-        mockMvc.perform(post("/api/bookings/booking")
-                        .header("X-Auth-AccountId", validAccountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("invalid json"))
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  @DisplayName("예약 생성 - 헤더 누락")
+  void createBooking_MissingHeader() throws Exception {
+    mockMvc
+        .perform(post("/api/bookings/booking").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(validRequest)))
+        .andExpect(status().isBadRequest());
+  }
 
-    @Test
+  @Test
+  @DisplayName("예약 생성 - 잘못된 JSON")
+  void createBooking_InvalidJson() throws Exception {
+    mockMvc
+        .perform(post("/api/bookings/booking").header("X-Auth-AccountId", validAccountId)
+            .contentType(MediaType.APPLICATION_JSON).content("invalid json"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
     @DisplayName("예약 생성 - 결제중인 내역 오류")
     void createBooking_PaymentInProgress() throws Exception {
         when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
@@ -211,7 +208,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("PAYMENT_IN_PROGRESS"));
     }
 
-    @Test
+  @Test
     @DisplayName("예약 생성 - 1인1매 제한 오류")
     void createBooking_OnePerEventLimit() throws Exception {
         when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
@@ -226,7 +223,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("BOOKING_ONE_PER_EVENT"));
     }
 
-    @Test
+  @Test
     @DisplayName("예약 생성 - 이미 예약된 좌석 오류")
     void createBooking_SeatAlreadyBooked() throws Exception {
         when(bookingService.createBooking(any(BookingRequest.class), eq(validAccountId)))
