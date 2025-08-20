@@ -21,7 +21,7 @@ public class PaymentBffService {
     Optional<Payment> paymentOpt = paymentBffRepository.findByPaymentId(paymentId);
 
     if(paymentOpt.isEmpty()){
-      throw new BusinessException("없음 ㅋㅋ", "ㅋㅋㄹㅃㅃ");
+      throw new BusinessException("결제 정보를 조회할 수 없습니다.", "PAYMENT_NOT_FOUND");
     }
 
     Payment payment = paymentOpt.get();

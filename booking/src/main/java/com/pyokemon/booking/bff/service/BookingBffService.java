@@ -44,7 +44,7 @@ public class BookingBffService {
     Optional<Booking> bookingOpt = bookingBffRepository.findByBookingId(bookingId);
 
     if (bookingOpt.isEmpty()){
-      throw new BusinessException("해당 예약은 존재하지 않습니다.","NOT_FOUND");
+      throw new BusinessException("해당 예약은 존재하지 않습니다.","BOOKING_NOT_FOUND");
     }
 
     Booking booking = bookingOpt.get();

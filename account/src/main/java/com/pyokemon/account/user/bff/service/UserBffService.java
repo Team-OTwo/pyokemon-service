@@ -34,7 +34,7 @@ public class UserBffService {
     Optional<User> userOpt = userBffRepository.findByAccountId(accountId);
 
     if(userOpt.isEmpty()){
-      throw new BusinessException("없음 ㅋㅋ", "ㅋㅋㄹㅃㅃ");
+      throw new BusinessException("사용자를 찾을 수 없습니다.", AccountErrorCodes.USER_NOT_FOUND);
     }
 
     User user = userOpt.get();
