@@ -88,7 +88,7 @@ public class TenantEventController {
     // 앱 커서기반 공연 조회
     @GetMapping("/app")
     public ResponseDto<TenantEventListResponseDtoForApp> getEventListForApp(@RequestHeader(value = "X-Auth-AccountId") Long accountId, @RequestParam(required = false) LocalDateTime cursorDate, @RequestParam(required = false) Long cursorId,
-                                                                            @RequestParam(defaultValue = "2") int limit) {
+                                                                            @RequestParam(defaultValue = "8") int limit) {
         List<TenantEventDetailDtoForApp> events = tenantEventService.getEventListForApp(accountId, cursorDate, cursorId, limit + 1);
 
         TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
