@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class TenantEventService {
   private final EventRepository eventRepository;
   private final TenantEventRepository tenantEventRepository;
@@ -326,7 +326,7 @@ public class TenantEventService {
     tenantEventRepository.cancelEvent(dto);
 
     Long scheduleId = tenantEventRepository.findEventScheduleId(eventId);
-    if(scheduleId != null) {
+    if(scheduleId == null) {
       throw new BusinessException("Event not fount.", EventErrorCodes.EVENT_NOT_FOUND);
     }
 

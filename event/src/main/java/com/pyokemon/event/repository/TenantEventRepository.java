@@ -25,7 +25,7 @@ public interface TenantEventRepository {
 
   Long save(Event event);
 
-  Void cancelEvent(CancelEventResponseDTO dto);
+  Long cancelEvent(CancelEventResponseDTO dto);
 
   Long findEventScheduleId (Long eventId);
 }
