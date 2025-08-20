@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.pyokemon.account.user.entity.UserDevice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,8 +125,19 @@ public class AccountService {
       if (!userDeviceRepository.existsByUserId(user.getUserId())) {
         deviceStatus = "NOT_REGISTERED";
       } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(),
-          request.getDevice_number(), true)) {
+          request.getDeviceNumber(), true)) {
         deviceStatus = "MISMATCHED";
+      }
+
+      if (deviceStatus.equals("REGISTERED")){
+        Optional<UserDevice> userDeviceOpt= userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+        if (userDeviceOpt.isEmpty()){
+          throw new BusinessException("존재하지 않는 디바이스 입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
+        }
+
+        UserDevice userDevice = userDeviceOpt.get();
+        userDevice.setIsLogin(true);
+        userDeviceRepository.update(userDevice);
       }
     }
 
@@ -227,7 +239,7 @@ public class AccountService {
   }
 
   @Transactional
-  public void logout(String token) {
+  public void logout(String token, String accountId) {
     log.info("로그아웃 시도");
 
     // 토큰이 null인 경우 처리
@@ -259,6 +271,31 @@ public class AccountService {
       // 토큰 파싱 실패 시 무시 (이미 만료된 토큰일 수 있음)
       log.warn("로그아웃 처리 중 예외 발생: {}", e.getMessage());
     }
+
+    Optional<Account> accountOpt = accountRepository.findByAccountId(Long.parseLong(accountId));
+
+    if (accountOpt.isEmpty()){
+      throw new BusinessException("존재하지 않는 계정입니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
+    }
+
+    if (accountOpt.get().getRole().equals("USER")){
+      Optional<User> userOpt = userRepository.findByAccountId(Long.parseLong(accountId));
+      if (userOpt.isEmpty()){
+        throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
+      }
+      Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByUserIdAndIsValid(userOpt.get().getUserId(), true);
+
+      if (userDeviceOpt.isEmpty()){
+        throw new BusinessException("존재하지 않는 디바이스입니다", AccountErrorCodes.DEVICE_NOT_FOUND);
+      }
+
+      UserDevice userDevice = userDeviceOpt.get();
+
+      userDevice.setIsLogin(false);
+
+      userDeviceRepository.update(userDevice);
+    }
+
   }
 
   @Transactional

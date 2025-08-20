@@ -1,5 +1,7 @@
 package com.pyokemon.account.user.controller;
 
+import com.pyokemon.account.user.dto.response.UserDuplicateDto;
+import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,21 @@ public class UserController {
         .body(ResponseDto.success(response, "사용자 등록 성공"));
   }
 
+  @GetMapping("/check-duplicate")
+  public ResponseEntity<ResponseDto<UserDuplicateDto>> checkDuplicate(
+          @RequestParam(value = "loginId", required = true) String loginId) {
+    UserDuplicateDto response = userService.checkDuplicate(loginId);
+    return ResponseEntity.ok(ResponseDto.success(response, "중복 확인 성공"));
+  }
+
+  //todo: 알림 서비스 openFeign 따로 빼야함
+  @GetMapping("/notification")
+  public UserNotificationDto checkNotification (
+          @RequestParam(value = "accountId", required = true) Long accountId){
+    return userService.checkNotification(accountId);
+  }
+
+  // 본인 인증
   @PostMapping("/verify")
   public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();

@@ -159,6 +159,7 @@ public class AccountServiceTest {
   void logoutSuccess() {
     // given
     String token = "Bearer valid-token";
+    String accountId = "1";
     Claims claims = mock(Claims.class);
 
     when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
@@ -167,7 +168,7 @@ public class AccountServiceTest {
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
     // when
-    accountService.logout(token);
+    accountService.logout(token, accountId);
 
     // then
     verify(tokenGenerator).parseToken("valid-token");
@@ -182,6 +183,7 @@ public class AccountServiceTest {
   void logoutWithoutBearerPrefix() {
     // given
     String token = "valid-token";
+    String accountId = "1";
     Claims claims = mock(Claims.class);
 
     when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
@@ -190,7 +192,7 @@ public class AccountServiceTest {
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
     // when
-    accountService.logout(token);
+    accountService.logout(token, accountId);
 
     // then
     verify(tokenGenerator).parseToken("valid-token");
@@ -202,12 +204,13 @@ public class AccountServiceTest {
   void logoutTokenParseFailure() {
     // given
     String token = "Bearer invalid-token";
+    String accountId= "1";
 
     when(tokenGenerator.parseToken("invalid-token"))
         .thenThrow(new RuntimeException("Invalid token"));
 
     // when & then (예외가 발생하지 않아야 함)
-    assertDoesNotThrow(() -> accountService.logout(token));
+    assertDoesNotThrow(() -> accountService.logout(token, accountId));
 
     verify(tokenGenerator).parseToken("invalid-token");
     verifyNoInteractions(redisTemplate);

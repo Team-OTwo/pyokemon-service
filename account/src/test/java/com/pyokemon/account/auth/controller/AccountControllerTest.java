@@ -91,17 +91,18 @@ public class AccountControllerTest {
   void logoutSuccess() {
     // given
     String authHeader = "Bearer valid-token";
-    doNothing().when(accountService).logout(authHeader);
+    String accountId = "1";
+    doNothing().when(accountService).logout(authHeader, accountId);
 
     // when
-    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader);
+    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader, accountId);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader);
+    verify(accountService).logout(authHeader, accountId);
   }
 
   @Test
@@ -109,17 +110,17 @@ public class AccountControllerTest {
   void logoutWithoutAuthHeader() {
     // given
     String authHeader = null;
-    doNothing().when(accountService).logout(null);
+    doNothing().when(accountService).logout(null, null);
 
     // when
-    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader);
+    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader, null);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(null);
+    verify(accountService).logout(null, null);
   }
 
   // ========== 토큰 갱신 테스트 ==========

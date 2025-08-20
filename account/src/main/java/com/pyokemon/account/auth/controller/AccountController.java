@@ -44,8 +44,9 @@ public class AccountController {
   // 통합 로그아웃
   @PostMapping("/logout")
   public ResponseEntity<ResponseDto<Void>> logout(
-      @RequestHeader(value = "Authorization", required = false) String authHeader) {
-    accountService.logout(authHeader);
+      @RequestHeader(value = "Authorization", required = false) String authHeader,
+      @RequestHeader(value = "X-Auth-AccountId", required = false) String accountId) {
+    accountService.logout(authHeader, accountId);
     return ResponseEntity.ok(ResponseDto.success("로그아웃 성공"));
   }
 

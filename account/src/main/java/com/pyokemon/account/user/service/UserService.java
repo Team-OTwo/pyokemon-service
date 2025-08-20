@@ -3,6 +3,8 @@ package com.pyokemon.account.user.service;
 // import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
+import com.pyokemon.account.user.dto.response.UserDuplicateDto;
+import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,48 @@ public class UserService {
 
     return UserDetailDto.builder().loginId(request.getLoginId()).name(request.getName())
         .phone(request.getPhone()).birth(request.getBirth()).build();
+  }
+
+  @Transactional(readOnly = true)
+  public UserDuplicateDto checkDuplicate(String loginId) {
+    Optional<Account> accountOpt = accountRepository.findByLoginIdAndStatus(loginId, AccountStatus.ACTIVE);
+
+    if(accountOpt.isPresent()){
+      return UserDuplicateDto.builder()
+              .loginId(loginId)
+              .isDuplicated(false)
+              .build();
+    }
+
+    return UserDuplicateDto.builder()
+            .loginId(loginId)
+            .isDuplicated(true)
+            .build();
+  }
+
+  @Transactional(readOnly = true)
+  public UserNotificationDto checkNotification(Long accountId) {
+    Optional<User> userOpt = userRepository.findByAccountId(accountId);
+
+    if(userOpt.isEmpty()){
+      throw new BusinessException("사용자를 찾을 수 없습니다", AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    User user = userOpt.get();
+
+    Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+
+    if (userDeviceOpt.isEmpty()){
+      throw new BusinessException("기기를 찾을 수 없습니다", AccountErrorCodes.DEVICE_NOT_FOUND);
+    }
+
+    UserDevice userDevice = userDeviceOpt.get();
+
+    return UserNotificationDto.builder()
+            .name(user.getName())
+            .fcmToken(userDevice.getFcmToken())
+            .isLogin(userDevice.getIsLogin())
+            .build();
   }
 
   @Transactional
