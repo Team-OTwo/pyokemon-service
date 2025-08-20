@@ -185,4 +185,17 @@
           AND es.event_date BETWEEN #{startDate} AND #{endDate}
     </select>
 
+    <update id="cancelEvent" parameterType="CancelEventResponseDTO">
+        UPDATE tb_event
+        SET status = #{status}, updated_at = NOW()
+        WHERE event_id = #{eventId}
+    </update>
+
+    <select id="findEventScheduleId" resultType="Long">
+        SELECT event_schedule_id
+        FROM tb_event_schedule es JOIN tb_event e ON es.event_id = e.event_id
+        WHERE
+            e.event_id = #{eventId}
+    </select>
+
 </mapper> 

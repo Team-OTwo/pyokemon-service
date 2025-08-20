@@ -2,20 +2,14 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import com.pyokemon.event.dto.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.event.dto.EventRegisterDto;
-import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.EventUpdateDto;
-import com.pyokemon.event.dto.MonthlyEventSummaryResponse;
-import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.service.TenantEventService;
 
 import lombok.RequiredArgsConstructor;
@@ -88,5 +82,12 @@ public class TenantEventController {
       @Valid @RequestBody EventScheduleDto eventScheduleDto) {
     String result = tenantEventService.registerEventSchedule(eventId, eventScheduleDto);
     return ResponseDto.success(result, "Event schedule registered successfully");
+  }
+
+  //공연삭제
+  @PostMapping("/{eventId}")
+  public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId){
+    tenantEventService.updateStatus(eventId, "CANCELED");
+    return ResponseEntity.ok().build();
   }
 }

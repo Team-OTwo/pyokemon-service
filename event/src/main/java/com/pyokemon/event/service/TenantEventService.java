@@ -3,24 +3,13 @@ package com.pyokemon.event.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.common.exception.code.EventErrorCodes;
+import com.pyokemon.event.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.event.dto.EventRegisterDto;
-import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.EventScheduleUpdateDto;
-import com.pyokemon.event.dto.EventUpdateDto;
-import com.pyokemon.event.dto.MonthlyEventDTO;
-import com.pyokemon.event.dto.MonthlyEventSummaryResponse;
-import com.pyokemon.event.dto.MonthlySummaryDTO;
-import com.pyokemon.event.dto.PriceDto;
-import com.pyokemon.event.dto.PriceUpdateDto;
-import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -327,5 +316,19 @@ public class TenantEventService {
 
   private Long savePrice(Price price) {
     return priceRepository.save(price);
+  }
+
+  public void updateStatus(Long eventId, String status) {
+    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
+            .eventId(eventId)
+            .status(status)
+                    .build();
+    tenantEventRepository.cancelEvent(dto);
+
+    Long scheduleId = tenantEventRepository.findEventScheduleId(eventId);
+    if(scheduleId != null) {
+      throw new BusinessException("Event not fount.", EventErrorCodes.EVENT_NOT_FOUND);
+    }
+
   }
 }
