@@ -114,11 +114,13 @@ public class EventScheduleService {
     return seats.stream().map(Seat::getSeatId).collect(Collectors.toList());
   }
 
-  public List<SeatInfoResponseDTO> getSeatInfoByGrade(String seatGradeName) {
+  public List<SeatInfoResponseDTO> getSeatInfoByGrade(Long eventScheduleId, String seatGradeName) {
+    Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
+    
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
-    List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
+    List<Seat> seats = seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getSeatClassId());
 
     return seats.stream()
         .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getSeatId()).col(seat.getCol())

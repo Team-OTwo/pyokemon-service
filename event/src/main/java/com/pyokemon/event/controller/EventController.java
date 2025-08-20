@@ -96,6 +96,6 @@ public class EventController {
   @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
   public List<SeatInfoResponseDTO> getSeatInfoByGrade(@PathVariable Long eventScheduleId,
       @PathVariable String seatGrade) {
-    return eventScheduleService.getSeatInfoByGrade(seatGrade);
+    return eventScheduleService.getSeatInfoByGrade(eventScheduleId, seatGrade);
   }
 }
