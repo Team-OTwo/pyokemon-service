@@ -7,11 +7,7 @@ CREATE TABLE tb_event (
     description     TEXT,
     genre           VARCHAR(100),
     thumbnail_url   VARCHAR(500),
-    status          VARCHAR(50) NOT NULL,
+    status          ENUM('APPROVED', 'REJECTED', 'PENDING', 'CANCELED') DEFAULT 'PENDING',
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 제약조건 추가
-ALTER TABLE tb_event ADD CONSTRAINT chk_event_status
-CHECK (status IN ('APPROVED', 'REJECTED', 'PENDING'));

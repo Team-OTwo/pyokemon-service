@@ -6,10 +6,13 @@
 
 <mapper namespace="com.pyokemon.event.repository.PriceRepository">
 
-    <select id="findByEventScheduleId" resultType="Price">
-        SELECT *
-        FROM tb_price
-        WHERE event_schedule_id = #{eventScheduleId}
+    <select id="findPricesWithSeatClassByEventScheduleId" resultType="PriceWithSeatClassDTO">
+        SELECT p.price_id, p.event_schedule_id, p.seat_class_id, p.price,
+               sc.class_name
+        FROM tb_price p
+        JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        WHERE p.event_schedule_id = #{eventScheduleId}
+        ORDER BY sc.priority
     </select>
 
     <insert id="save" parameterType="Price" useGeneratedKeys="true" keyProperty="priceId" keyColumn="price_id">
