@@ -27,6 +27,8 @@ public class Event {
   private LocalDateTime updatedAt;
 
   public enum EventStatus {
-    APPROVED, REJECTED, PENDING
+    APPROVED, REJECTED, PENDING, CANCELLED;
   }
+
+
 }

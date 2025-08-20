@@ -7,6 +7,7 @@ import com.pyokemon.event.dto.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/events/tenant")
 @RequiredArgsConstructor
 public class TenantEventController {
+  
     private final TenantEventService tenantEventService;
 
     // 테넌트별 공연 목록 조회 (테넌트 웹용)
@@ -108,4 +110,12 @@ public class TenantEventController {
 
         return ResponseDto.success(response, "Tenant events retrieved successfully");
     }
+  
+   //공연삭제
+  @PostMapping("/{eventId}")
+  public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId){
+    tenantEventService.updateStatus(eventId, "CANCELED");
+    return ResponseEntity.ok().build();
+  }
+
 }

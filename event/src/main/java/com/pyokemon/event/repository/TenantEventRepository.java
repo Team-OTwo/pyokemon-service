@@ -26,8 +26,11 @@ public interface TenantEventRepository {
 
   Long save(Event event);
 
+  Long cancelEvent(CancelEventResponseDTO dto);
 
+  Long findEventScheduleId (Long eventId);
 
   // 앱 커서 기반 공연 조회
   List<TenantEventDetailDtoForApp> findEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit);
+
 }
