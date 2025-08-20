@@ -44,7 +44,6 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success(response, "중복 확인 성공"));
   }
 
-  //todo: 알림 서비스 openFeign 따로 빼야함
   @GetMapping("/notification")
   public UserNotificationDto checkNotification (
           @RequestParam(value = "accountId", required = true) Long accountId){
