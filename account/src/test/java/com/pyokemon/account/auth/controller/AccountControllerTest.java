@@ -10,196 +10,274 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
 
+import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
+import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import com.pyokemon.account.auth.dto.response.LoginResponseDto;
 import com.pyokemon.account.auth.dto.response.TokenResponseDto;
 import com.pyokemon.account.auth.service.AccountService;
 import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.AccountErrorCodes;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
 
-  @Mock
-  private AccountService accountService;
+    @Mock
+    private AccountService accountService;
 
-  @InjectMocks
-  private AccountController accountController;
+    @InjectMocks
+    private AccountController accountController;
 
-  private LoginRequestDto loginRequest;
-  private LoginResponseDto loginResponse;
-  private UpdatePasswordRequestDto updatePasswordRequest;
+    private LoginRequestDto loginRequest;
+    private AppLoginRequestDto appLoginRequest;
+    private LoginResponseDto loginResponse;
+    private AppLoginResponseDto appLoginResponse;
+    private UpdatePasswordRequestDto updatePasswordRequest;
+    private TokenResponseDto tokenResponse;
 
-  @BeforeEach
-  void setUp() {
-    // 테스트용 요청 데이터 생성
-    loginRequest = new LoginRequestDto();
-    loginRequest.setLoginId("test@example.com");
-    loginRequest.setPassword("password123");
+    @BeforeEach
+    void setUp() {
+        // 테스트용 요청 데이터 생성
+        loginRequest = new LoginRequestDto();
+        loginRequest.setLoginId("test@example.com");
+        loginRequest.setPassword("password123");
 
-    // 테스트용 응답 데이터 생성
-    loginResponse = LoginResponseDto.builder().accountId(1L).role("USER")
-        .accessToken("access-token").refreshToken("refresh-token").build();
+        appLoginRequest = new AppLoginRequestDto();
+        appLoginRequest.setLoginId("app@example.com");
+        appLoginRequest.setPassword("password123");
+        appLoginRequest.setDeviceNumber("device123");
 
-    updatePasswordRequest = new UpdatePasswordRequestDto();
-    updatePasswordRequest.setCurrentPassword("oldPassword");
-    updatePasswordRequest.setNewPassword("newPassword123");
-  }
+        // 테스트용 응답 데이터 생성
+        loginResponse =
+                LoginResponseDto.builder().accountId(1L).role("USER").accessToken("access-token")
+                        .refreshToken("refresh-token").userName("테스트 사용자").isVerified(true).build();
 
-  // ========== 로그인 테스트 ==========
+        appLoginResponse =
+                AppLoginResponseDto.builder().accountId(1L).role("USER").accessToken("access-token")
+                        .refreshToken("refresh-token").deviceStatus("REGISTERED").build();
 
-  @Test
+        updatePasswordRequest = new UpdatePasswordRequestDto();
+        updatePasswordRequest.setCurrentPassword("oldPassword");
+        updatePasswordRequest.setNewPassword("newPassword123");
+
+        tokenResponse = TokenResponseDto.builder().accessToken("new-access-token").build();
+    }
+
+    // ========== 로그인 테스트 ==========
+
+    @Test
     @DisplayName("로그인 성공 테스트")
     void loginSuccess() {
         // given
         when(accountService.login(loginRequest)).thenReturn(loginResponse);
-        
+
         // when
         ResponseEntity<ResponseDto<LoginResponseDto>> response = accountController.login(loginRequest);
-        
+
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("로그인 성공", response.getBody().getMessage());
         assertEquals(loginResponse, response.getBody().getData());
-        
+
         verify(accountService).login(loginRequest);
     }
 
-  @Test
+    @Test
     @DisplayName("로그인 실패 테스트")
     void loginFailure() {
         // given
         when(accountService.login(loginRequest)).thenThrow(new RuntimeException("Login failed"));
-        
+
         // when & then
         assertThrows(RuntimeException.class, () -> accountController.login(loginRequest));
-        
+
         verify(accountService).login(loginRequest);
     }
 
-  // ========== 로그아웃 테스트 ==========
+    // ========== 앱 로그인 테스트 ==========
 
-  @Test
-  @DisplayName("로그아웃 성공 테스트")
-  void logoutSuccess() {
-    // given
-    String authHeader = "Bearer valid-token";
-    String accountId = "1";
-    doNothing().when(accountService).logout(authHeader, accountId);
+    @Test
+    @DisplayName("앱 로그인 성공 테스트")
+    void appLoginSuccess() {
+        // given
+        when(accountService.appLogin(appLoginRequest)).thenReturn(appLoginResponse);
 
-    // when
-    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader, accountId);
+        // when
+        ResponseEntity<ResponseDto<AppLoginResponseDto>> response = accountController.appLogin(appLoginRequest);
 
-    // then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals("로그아웃 성공", response.getBody().getMessage());
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("로그인 성공", response.getBody().getMessage());
+        assertEquals(appLoginResponse, response.getBody().getData());
 
-    verify(accountService).logout(authHeader, accountId);
-  }
-
-  @Test
-  @DisplayName("로그아웃 - Authorization 헤더 없음")
-  void logoutWithoutAuthHeader() {
-    // given
-    String authHeader = null;
-    doNothing().when(accountService).logout(null, null);
-
-    // when
-    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader, null);
-
-    // then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals("로그아웃 성공", response.getBody().getMessage());
-
-    verify(accountService).logout(null, null);
-  }
-
-  // ========== 토큰 갱신 테스트 ==========
-
-  @Test
-  @DisplayName("토큰 갱신 성공 테스트")
-  void refreshTokenSuccess() {
-    // given
-    String refreshToken = "valid-refresh-token";
-    TokenResponseDto tokenResponse =
-        TokenResponseDto.builder().accessToken("new-access-token").build();
-
-    when(accountService.refreshToken(refreshToken)).thenReturn(tokenResponse);
-
-    // when
-    ResponseEntity<ResponseDto<TokenResponseDto>> response =
-        accountController.refreshToken(refreshToken);
-
-    // then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals("토큰 갱신 성공", response.getBody().getMessage());
-    assertEquals(tokenResponse, response.getBody().getData());
-
-    verify(accountService).refreshToken(refreshToken);
-  }
-
-  @Test
-  @DisplayName("토큰 갱신 실패 테스트")
-  void refreshTokenFailure() {
-    // given
-    String refreshToken = "invalid-refresh-token";
-    when(accountService.refreshToken(refreshToken))
-        .thenThrow(new RuntimeException("Token refresh failed"));
-
-    // when & then
-    assertThrows(RuntimeException.class, () -> accountController.refreshToken(refreshToken));
-
-    verify(accountService).refreshToken(refreshToken);
-  }
-
-  // ========== 비밀번호 변경 테스트 ==========
-
-  @Test
-  @DisplayName("비밀번호 변경 성공 테스트")
-  void changePasswordSuccess() {
-    // given
-    // GatewayRequestHeaderUtils 모킹을 위해 정적 메소드 모킹 설정
-    try (var gatewayUtilsMock = mockStatic(GatewayRequestHeaderUtils.class)) {
-      gatewayUtilsMock.when(GatewayRequestHeaderUtils::getUserIdOrThrowException).thenReturn("1");
-
-      doNothing().when(accountService).changePassword(1L, updatePasswordRequest);
-
-      // when
-      ResponseEntity<ResponseDto<Void>> response =
-          accountController.changePassword(updatePasswordRequest);
-
-      // then
-      assertEquals(HttpStatus.OK, response.getStatusCode());
-      assertNotNull(response.getBody());
-      assertEquals("비밀번호 변경 성공", response.getBody().getMessage());
-
-      verify(accountService).changePassword(1L, updatePasswordRequest);
+        verify(accountService).appLogin(appLoginRequest);
     }
-  }
 
-  @Test
-  @DisplayName("비밀번호 변경 실패 - 인증 정보 없음")
-  void changePasswordNoAuthInfo() {
-    // given
-    try (var gatewayUtilsMock = mockStatic(GatewayRequestHeaderUtils.class)) {
-      gatewayUtilsMock.when(GatewayRequestHeaderUtils::getUserIdOrThrowException)
-          .thenThrow(new RuntimeException("No auth info"));
+    @Test
+    @DisplayName("앱 로그인 실패 테스트")
+    void appLoginFailure() {
+        // given
+        when(accountService.appLogin(appLoginRequest)).thenThrow(new RuntimeException("App login failed"));
 
-      // when & then
-      assertThrows(RuntimeException.class,
-          () -> accountController.changePassword(updatePasswordRequest));
+        // when & then
+        assertThrows(RuntimeException.class, () -> accountController.appLogin(appLoginRequest));
 
-      verifyNoInteractions(accountService);
+        verify(accountService).appLogin(appLoginRequest);
     }
-  }
+
+    // ========== 로그아웃 테스트 ==========
+
+    @Test
+    @DisplayName("로그아웃 성공 테스트")
+    void logoutSuccess() {
+        // given
+        String authHeader = "Bearer valid-token";
+        String accountId = "1";
+        String deviceNumber = "device123";
+        doNothing().when(accountService).logout(authHeader, accountId, deviceNumber);
+
+        // when
+        ResponseEntity<ResponseDto<Void>> response =
+                accountController.logout(authHeader, accountId, deviceNumber);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("로그아웃 성공", response.getBody().getMessage());
+
+        verify(accountService).logout(authHeader, accountId, deviceNumber);
+    }
+
+    @Test
+    @DisplayName("로그아웃 성공 테스트 - deviceNumber 없음")
+    void logoutSuccessWithoutDeviceNumber() {
+        // given
+        String authHeader = "Bearer valid-token";
+        String accountId = "1";
+        doNothing().when(accountService).logout(authHeader, accountId, null);
+
+        // when
+        ResponseEntity<ResponseDto<Void>> response =
+                accountController.logout(authHeader, accountId, null);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("로그아웃 성공", response.getBody().getMessage());
+
+        verify(accountService).logout(authHeader, accountId, null);
+    }
+
+    @Test
+    @DisplayName("로그아웃 성공 테스트 - Authorization 헤더 없음")
+    void logoutSuccessWithoutAuthHeader() {
+        // given
+        String authHeader = null;
+        String accountId = "1";
+        String deviceNumber = "device123";
+        doNothing().when(accountService).logout(null, accountId, deviceNumber);
+
+        // when
+        ResponseEntity<ResponseDto<Void>> response =
+                accountController.logout(authHeader, accountId, deviceNumber);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("로그아웃 성공", response.getBody().getMessage());
+
+        verify(accountService).logout(null, accountId, deviceNumber);
+    }
+
+    // ========== 토큰 갱신 테스트 ==========
+
+    @Test
+    @DisplayName("토큰 갱신 성공 테스트 - Bearer 접두사 있음")
+    void refreshTokenSuccess_WithBearer() {
+        // given
+        String authHeader = "Bearer refresh-token";
+        when(accountService.refreshToken("refresh-token")).thenReturn(tokenResponse);
+
+        // when
+        ResponseEntity<ResponseDto<TokenResponseDto>> response =
+                accountController.refreshToken(authHeader);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("토큰 갱신 성공", response.getBody().getMessage());
+        assertEquals(tokenResponse, response.getBody().getData());
+
+        verify(accountService).refreshToken("refresh-token");
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 성공 테스트 - Bearer 접두사 없음")
+    void refreshTokenSuccess_WithoutBearer() {
+        // given
+        String authHeader = "refresh-token";
+        when(accountService.refreshToken("refresh-token")).thenReturn(tokenResponse);
+
+        // when
+        ResponseEntity<ResponseDto<TokenResponseDto>> response =
+                accountController.refreshToken(authHeader);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("토큰 갱신 성공", response.getBody().getMessage());
+        assertEquals(tokenResponse, response.getBody().getData());
+
+        verify(accountService).refreshToken("refresh-token");
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 실패 테스트")
+    void refreshTokenFailure() {
+        // given
+        String authHeader = "Bearer invalid-token";
+        when(accountService.refreshToken("invalid-token"))
+                .thenThrow(new RuntimeException("Token refresh failed"));
+
+        // when & then
+        assertThrows(RuntimeException.class, () -> accountController.refreshToken(authHeader));
+
+        verify(accountService).refreshToken("invalid-token");
+    }
+
+    // ========== 비밀번호 변경 테스트 ==========
+
+    @Test
+    @DisplayName("비밀번호 변경 성공 테스트")
+    void changePasswordSuccess() {
+        // given
+        doNothing().when(accountService).changePassword(1L, updatePasswordRequest);
+
+        // Mock GatewayRequestHeaderUtils
+        try (MockedStatic<GatewayRequestHeaderUtils> mockedUtils =
+                     mockStatic(GatewayRequestHeaderUtils.class)) {
+            mockedUtils.when(GatewayRequestHeaderUtils::getUserIdOrThrowException).thenReturn("1");
+
+            // when
+            ResponseEntity<ResponseDto<Void>> response =
+                    accountController.changePassword(updatePasswordRequest);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals("비밀번호 변경 성공", response.getBody().getMessage());
+
+            verify(accountService).changePassword(1L, updatePasswordRequest);
+        }
+    }
 }
