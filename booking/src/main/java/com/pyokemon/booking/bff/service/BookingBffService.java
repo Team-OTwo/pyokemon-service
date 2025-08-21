@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.booking.bff.dto.BookingDto;
+import com.pyokemon.booking.bff.dto.PageResponse;
 import com.pyokemon.booking.bff.repository.BookingBffRepository;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.exception.BusinessException;
@@ -40,17 +41,21 @@ public class BookingBffService {
         .toList();
   }
 
-  public List<BookingDto> getAccountIdBookingsOrderByDate(Long accountId, Integer page,
+  public PageResponse<BookingDto> getAccountIdBookingsOrderByDate(Long accountId, Integer page,
       Integer size) {
     List<Booking> bookings =
         bookingBffRepository.findByAccountIdOrderByDate(accountId, page * size, size);
+    Long totalCount = bookingBffRepository.countByAccountId(accountId);
 
     if (bookings.isEmpty()) {
       return null;
     }
 
-    return bookings.stream().map(this::toDto) // Booking -> BookingDto
+    List<BookingDto> dtoList = bookings.stream().map(this::toDto) // Booking -> BookingDto
         .toList();
+
+
+    return new PageResponse<>(dtoList, page, totalCount);
   }
 
   public BookingDto getBooking(Long bookingId) {

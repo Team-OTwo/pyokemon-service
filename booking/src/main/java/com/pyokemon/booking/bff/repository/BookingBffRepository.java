@@ -18,5 +18,7 @@ public interface BookingBffRepository {
   List<Booking> findByAccountIdOrderByDate(@Param("accountId") Long accountId,
       @Param("offset") Integer offset, @Param("size") Integer size);
 
+  Long countByAccountId(@Param("accountId") Long accountId);
+
   Optional<Booking> findByBookingId(@Param("bookingId") Long bookingId);
 }

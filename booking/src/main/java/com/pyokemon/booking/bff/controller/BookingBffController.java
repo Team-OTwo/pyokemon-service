@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.booking.bff.dto.BookingDto;
+import com.pyokemon.booking.bff.dto.PageResponse;
 import com.pyokemon.booking.bff.service.BookingBffService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class BookingBffController {
   }
 
   @GetMapping("/accounts/{accountId}/bookings/order")
-  public List<BookingDto> getAccountBookingsOrderByDate(@PathVariable Long accountId,
+  public PageResponse<BookingDto> getAccountBookingsOrderByDate(@PathVariable Long accountId,
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "10") Integer size) {
     return bookingBffService.getAccountIdBookingsOrderByDate(accountId, page, size);
