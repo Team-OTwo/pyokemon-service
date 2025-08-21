@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDuplicateDto {
-    private String loginId;
-    private boolean isDuplicated;
+  private String loginId;
+  private boolean isDuplicated;
 }

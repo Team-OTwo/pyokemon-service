@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserNotificationDto {
-    private String name;
-    private String fcmToken;
-    private Boolean isLogin;
+  private String name;
+  private String fcmToken;
+  private Boolean isLogin;
 }
