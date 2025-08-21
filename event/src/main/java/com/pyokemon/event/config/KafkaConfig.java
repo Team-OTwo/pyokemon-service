@@ -40,21 +40,10 @@ public class KafkaConfig {
     return CommonKafkaConfig.createProducerFactory(bootstrapServers);
   }
 
-
-
   @Bean
-  public ConsumerFactory<String, BookingEventDto> bookingEventDtoConsumerFactory() {
-    return CommonKafkaConfig.createConsumerFactory(bootstrapServers, applicationName, BookingEventDto.class,"com.pyokemon.common.dto.kafka", "com.pyokemon.common.dto.kafka" );
-   }
-
-  @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, BookingEventDto> bookingEventListenerContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<String, BookingEventDto> factory =
-       new ConcurrentKafkaListenerContainerFactory<>();
-     factory.setConsumerFactory(bookingEventDtoConsumerFactory());
-      return factory;
-    }
-
+  public ConcurrentKafkaListenerContainerFactory<Long, Object> bookingEventListenerContainerFactory() {
+    return CommonKafkaConfig.longObjectKafkaListenerContainerFactory(bootstrapServers, applicationName);
+  }
 
   @Bean("kafkaTemplate")
   public KafkaTemplate<String, Object> kafkaTemplate() {
