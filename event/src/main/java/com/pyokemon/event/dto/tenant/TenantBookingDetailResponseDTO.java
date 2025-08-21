@@ -1,6 +1,5 @@
-package com.pyokemon.event.dto;
+package com.pyokemon.event.dto.tenant;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -12,35 +11,28 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantEventDetailResponseDTO {
-  // event 정보
+public class TenantBookingDetailResponseDTO {
   private Long eventId;
   private String title;
-  private Long ageLimit;
-  private String description;
   private String genre;
-  private String thumbnailUrl;
   private String status;
-
-  // event schedule 정보
   private Long eventScheduleId;
-  private LocalDateTime ticketOpenAt;
-  private LocalDateTime eventDate;
-
-  // venue 정보
+  private String ticketOpenAt;
+  private String eventDate;
   private String venueName;
-
-  // 가격 정보
-  private List<PriceInfo> prices;
+  private List<BookingStatusInfo> bookingStatus;
 
   @Data
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class PriceInfo {
-    private Long priceId;
+  public static class BookingStatusInfo {
     private Long seatClassId;
     private String className;
+    private Integer totalSeats;
+    private Integer bookedSeats;
+    private Integer availableSeats;
     private Integer price;
+    private Double bookingRate;
   }
 }

@@ -20,6 +20,7 @@ import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.SeatClassRepository;
 import com.pyokemon.event.repository.SeatRepository;
+import com.pyokemon.event.service.SeatStatusInitService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,7 @@ public class EventScheduleService {
   private final PriceRepository priceRepository;
   private final SeatRepository seatRepository;
   private final SeatClassRepository seatClassRepository;
+  private final SeatStatusInitService seatStatusInitService;
 
   public List<EventItemResponseDTO> getTodayOpenedTickets() {
     return eventScheduleRepository.selectTodayOpenedTickets();
@@ -64,11 +66,14 @@ public class EventScheduleService {
 
     return events;
   }
-
+  
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);
     eventScheduleRepository.save(eventSchedule);
     Long eventScheduleId = eventSchedule.getEventScheduleId();
+
+    // 공연 등록 시 좌석 상태를 Redis에 초기화
+    seatStatusInitService.initSeatStatuses(eventScheduleId);
 
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {

@@ -19,16 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.exception.GlobalExceptionHandler;
 import com.pyokemon.event.dto.EventRegisterDto;
 import com.pyokemon.event.dto.EventResponseDto;
 import com.pyokemon.event.dto.EventScheduleDto;
 import com.pyokemon.event.dto.EventUpdateDto;
-import com.pyokemon.event.dto.MonthlyEventSummaryResponse;
-import com.pyokemon.event.dto.TenantBookingDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventDetailResponseDTO;
-import com.pyokemon.event.dto.TenantEventListDto;
 import com.pyokemon.event.service.TenantEventService;
 
 @ExtendWith(MockitoExtension.class)

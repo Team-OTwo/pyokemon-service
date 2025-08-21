@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.event.repository.TenantEventRepository">
 
-    <select id="findTenantEventListByAccountId" resultType="com.pyokemon.event.dto.TenantEventListDto">
+    <select id="findTenantEventListByAccountId" resultType="com.pyokemon.event.dto.tenant.TenantEventListDto">
         SELECT
         e.event_id as eventId,
         es.event_schedule_id as eventScheduleId,
@@ -18,7 +18,7 @@
         ORDER BY es.event_date ASC
     </select>
 
-    <resultMap id="TenantEventDetailResultMap" type="com.pyokemon.event.dto.TenantEventDetailResponseDTO">
+    <resultMap id="TenantEventDetailResultMap" type="com.pyokemon.event.dto.tenant.TenantEventDetailResponseDTO">
         <id column="event_id" property="eventId"/>
         <result column="title" property="title"/>
         <result column="age_limit" property="ageLimit"/>
@@ -30,7 +30,7 @@
         <result column="ticket_open_at" property="ticketOpenAt"/>
         <result column="event_date" property="eventDate"/>
         <result column="venue_name" property="venueName"/>
-        <collection property="prices" ofType="com.pyokemon.event.dto.TenantEventDetailResponseDTO$PriceInfo">
+        <collection property="prices" ofType="com.pyokemon.event.dto.tenant.TenantEventDetailResponseDTO$PriceInfo">
             <id column="price_id" property="priceId"/>
             <result column="seat_class_id" property="seatClassId"/>
             <result column="class_name" property="className"/>
@@ -104,7 +104,7 @@
         </selectKey>
     </insert>
 
-    <resultMap id="TenantBookingDetailResultMap" type="com.pyokemon.event.dto.TenantBookingDetailResponseDTO">
+    <resultMap id="TenantBookingDetailResultMap" type="com.pyokemon.event.dto.tenant.TenantBookingDetailResponseDTO">
         <id column="event_id" property="eventId"/>
         <result column="title" property="title"/>
         <result column="genre" property="genre"/>
@@ -114,7 +114,7 @@
         <result column="event_date" property="eventDate"/>
         <result column="venue_name" property="venueName"/>
         <collection property="bookingStatus"
-                    ofType="com.pyokemon.event.dto.TenantBookingDetailResponseDTO$BookingStatusInfo">
+                    ofType="com.pyokemon.event.dto.tenant.TenantBookingDetailResponseDTO$BookingStatusInfo">
             <result column="seat_class_id" property="seatClassId"/>
             <result column="class_name" property="className"/>
             <result column="total_seats" property="totalSeats"/>
@@ -155,7 +155,7 @@
         ORDER BY sc.priority ASC
     </select>
 
-    <select id="findMonthlyEventsByAccountId" resultType="com.pyokemon.event.dto.MonthlyEventDTO">
+    <select id="findMonthlyEventsByAccountId" resultType="com.pyokemon.event.dto.tenant.MonthlyEventDTO">
         SELECT
         e.title,
         v.venue_name as venueName,
@@ -172,7 +172,7 @@
         ORDER BY es.event_date ASC
     </select>
 
-    <select id="findMonthlySummaryByAccountId" resultType="com.pyokemon.event.dto.MonthlySummaryDTO">
+    <select id="findMonthlySummaryByAccountId" resultType="com.pyokemon.event.dto.tenant.MonthlySummaryDTO">
         SELECT
         COALESCE(SUM(p.price), 0) as totalRevenue,
         COUNT(DISTINCT CASE WHEN es.event_date >= NOW() THEN es.event_schedule_id END) as activeEventCount,

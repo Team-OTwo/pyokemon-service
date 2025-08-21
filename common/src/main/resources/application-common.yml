@@ -78,8 +78,17 @@ spring:
   config:
     activate:
       on-profile: dev
-  kafka:
-    bootstrap-servers: pyokemon-kafka:9092
+  # Redis 설정
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
 
 # dev 환경에서 로그 환경 변수 설정
 logging:
