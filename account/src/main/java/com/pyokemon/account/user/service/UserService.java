@@ -166,7 +166,7 @@ public class UserService {
 
     UserDevice userDevice =
         UserDevice.builder().userId(user.getUserId()).deviceNumber(request.getDeviceNumber())
-            .fcmToken(request.getFcmToken()).osType(request.getOsType()).isValid(true).build();
+            .fcmToken(request.getFcmToken()).osType(request.getOsType()).isValid(true).isLogin(true).build();
 
     userDeviceRepository.insert(userDevice);
   }
