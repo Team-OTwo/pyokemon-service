@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.pyokemon.event.dto.PriceWithSeatClassDTO;
 import com.pyokemon.event.entity.Price;
 
 @Mapper
@@ -13,7 +14,5 @@ public interface PriceRepository {
 
   int updatePrice(Price price);
 
-  int deletePrice(Long priceId);
-
-  List<Price> findByEventScheduleId(Long eventScheduleId);
+  List<PriceWithSeatClassDTO> findPricesWithSeatClassByEventScheduleId(Long eventScheduleId);
 }

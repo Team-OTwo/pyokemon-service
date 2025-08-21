@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
+import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
 
@@ -82,5 +84,18 @@ public class EventController {
       @RequestParam(defaultValue = "전체") String genre) {
     int offset = (page - 1) * size;
     return eventScheduleService.getEventSearch(keyword, offset, size, genre);
+  }
+
+  // 예매 초기 정보 조회
+  @GetMapping("/booking-info/{eventScheduleId}")
+  public List<BookingInfoResponseDTO> getBookingInfo(@PathVariable Long eventScheduleId) {
+    return eventScheduleService.getBookingInfo(eventScheduleId);
+  }
+
+  // 등급 좌석 정보 조회
+  @GetMapping("/booking-info/{eventScheduleId}/{seatGrade}")
+  public List<SeatInfoResponseDTO> getSeatInfoByGrade(@PathVariable Long eventScheduleId,
+      @PathVariable String seatGrade) {
+    return eventScheduleService.getSeatInfoByGrade(eventScheduleId, seatGrade);
   }
 }

@@ -5,21 +5,22 @@
 
 <mapper namespace="com.pyokemon.event.repository.SeatRepository">
 
-    <select id="findByVenueId" resultType="Seat" parameterType="long">
-        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+    <select id="findBySeatClassId" resultType="Seat" parameterType="long">
+        SELECT seat_id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
         FROM tb_seat
-        WHERE venue_id = #{param1}
+        WHERE seat_class_id = #{param1}
     </select>
 
-    <select id="findById" resultType="Seat" parameterType="long">
-        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+    <select id="findByVenueIdAndSeatClassId" resultType="Seat">
+        SELECT seat_id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
         FROM tb_seat
-        WHERE seat_id = #{param1}
+        WHERE venue_id = #{param1} AND seat_class_id = #{param2}
     </select>
 
-    <select id="findAll" resultType="Seat">
-        SELECT seat_id, venue_id, seat_class_id, `row`, col, created_at, updated_at
+    <select id="countByVenueIdAndSeatClassId" resultType="long">
+        SELECT COUNT(*)
         FROM tb_seat
+        WHERE venue_id = #{param1} AND seat_class_id = #{param2}
     </select>
 
 </mapper>
