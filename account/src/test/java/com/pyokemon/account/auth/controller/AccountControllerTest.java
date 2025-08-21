@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.pyokemon.account.auth.dto.request.LogoutRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -143,19 +144,21 @@ public class AccountControllerTest {
         // given
         String authHeader = "Bearer valid-token";
         String accountId = "1";
-        String deviceNumber = "device123";
-        doNothing().when(accountService).logout(authHeader, accountId, deviceNumber);
+        LogoutRequestDto request = LogoutRequestDto.builder()
+                .deviceNumber("deviceNumber")
+                .build();
+        doNothing().when(accountService).logout(authHeader, accountId, request.getDeviceNumber());
 
         // when
         ResponseEntity<ResponseDto<Void>> response =
-                accountController.logout(authHeader, accountId, deviceNumber);
+                accountController.logout(authHeader, accountId, request);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-        verify(accountService).logout(authHeader, accountId, deviceNumber);
+        verify(accountService).logout(authHeader, accountId, request.getDeviceNumber());
     }
 
     @Test
@@ -184,19 +187,21 @@ public class AccountControllerTest {
         // given
         String authHeader = null;
         String accountId = "1";
-        String deviceNumber = "device123";
-        doNothing().when(accountService).logout(null, accountId, deviceNumber);
+        LogoutRequestDto request = LogoutRequestDto.builder()
+                .deviceNumber("deviceNumber")
+                .build();
+        doNothing().when(accountService).logout(null, accountId, request.getDeviceNumber());
 
         // when
         ResponseEntity<ResponseDto<Void>> response =
-                accountController.logout(authHeader, accountId, deviceNumber);
+                accountController.logout(authHeader, accountId, request);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-        verify(accountService).logout(null, accountId, deviceNumber);
+        verify(accountService).logout(null, accountId, request.getDeviceNumber());
     }
 
     // ========== 토큰 갱신 테스트 ==========
