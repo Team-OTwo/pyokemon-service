@@ -135,6 +135,9 @@ public class TenantEventService {
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
+        // 공연 등록 시 좌석 상태를 Redis에 초기화
+        seatStatusInitService.initSeatStatuses(eventScheduleId);
+
         // Save prices if present
         if (scheduleDto.getPrices() != null) {
           for (PriceDto priceDto : scheduleDto.getPrices()) {
