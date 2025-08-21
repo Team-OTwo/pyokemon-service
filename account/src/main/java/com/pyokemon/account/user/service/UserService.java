@@ -13,6 +13,8 @@ import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
+import com.pyokemon.account.user.dto.response.UserDuplicateDto;
+import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import com.pyokemon.account.user.entity.User;
 import com.pyokemon.account.user.entity.UserDevice;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
@@ -58,6 +60,41 @@ public class UserService {
 
     return UserDetailDto.builder().loginId(request.getLoginId()).name(request.getName())
         .phone(request.getPhone()).birth(request.getBirth()).build();
+  }
+
+  @Transactional(readOnly = true)
+  public UserDuplicateDto checkDuplicate(String loginId) {
+    Optional<Account> accountOpt =
+        accountRepository.findByLoginIdAndStatus(loginId, AccountStatus.ACTIVE);
+
+    if (accountOpt.isPresent()) {
+      return UserDuplicateDto.builder().loginId(loginId).isDuplicated(false).build();
+    }
+
+    return UserDuplicateDto.builder().loginId(loginId).isDuplicated(true).build();
+  }
+
+  @Transactional(readOnly = true)
+  public UserNotificationDto checkNotification(Long accountId) {
+    Optional<User> userOpt = userRepository.findByAccountId(accountId);
+
+    if (userOpt.isEmpty()) {
+      throw new BusinessException("사용자를 찾을 수 없습니다", AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    User user = userOpt.get();
+
+    Optional<UserDevice> userDeviceOpt =
+        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+
+    if (userDeviceOpt.isEmpty()) {
+      throw new BusinessException("기기를 찾을 수 없습니다", AccountErrorCodes.DEVICE_NOT_FOUND);
+    }
+
+    UserDevice userDevice = userDeviceOpt.get();
+
+    return UserNotificationDto.builder().name(user.getName()).fcmToken(userDevice.getFcmToken())
+        .isLogin(userDevice.getIsLogin()).build();
   }
 
   @Transactional
@@ -120,23 +157,23 @@ public class UserService {
       throw new BusinessException("이미 등록된 디바이스입니다.", AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
     }
 
-    UserDevice userDevice =
-        UserDevice.builder().userId(user.getUserId()).deviceNumber(request.getDeviceNumber())
-            .fcmToken(request.getFcmToken()).osType(request.getOsType()).isValid(true).build();
+    UserDevice userDevice = UserDevice.builder().userId(user.getUserId())
+        .deviceNumber(request.getDeviceNumber()).fcmToken(request.getFcmToken())
+        .osType(request.getOsType()).isValid(true).isLogin(true).build();
 
     userDeviceRepository.insert(userDevice);
   }
 
   @Transactional
-  public void deleteUserDevice(Long accountId, String deviceNumber) {
+  public void deleteUserDevice(Long accountId) {
     Optional<User> userOpt = userRepository.findByAccountId(accountId);
     if (userOpt.isEmpty()) {
       throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
     }
     User user = userOpt.get();
 
-    UserDevice userDevice = userDeviceRepository
-        .findByUserIdAndDeviceNumberAndIsValid(user.getUserId(), deviceNumber, true).orElseThrow(
+    UserDevice userDevice =
+        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true).orElseThrow(
             () -> new BusinessException("디바이스를 찾을 수 없습니다.", AccountErrorCodes.DEVICE_NOT_FOUND));
 
     userDevice.setIsValid(false);

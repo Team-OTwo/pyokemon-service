@@ -22,5 +22,5 @@ public class AppLoginRequestDto {
   private String password;
 
   @NotBlank(message = "디바이스 넘버는 필수입니다.")
-  private String device_number;
+  private String deviceNumber;
 }

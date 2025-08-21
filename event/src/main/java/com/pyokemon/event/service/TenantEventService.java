@@ -6,6 +6,8 @@ import java.util.List;
 import com.pyokemon.common.exception.code.EventErrorCodes;
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.kafka.EventKafkaDto;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,8 @@ public class TenantEventService {
   private final PriceRepository priceRepository;
   private final ObjectMapper objectMapper;
   private final SeatStatusInitService seatStatusInitService;
+  private final KafkaMessageProducer kafkaMessageProducer;
+
 
   public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
     return tenantEventRepository.findTenantEventDetailByEventId(eventId);
@@ -345,5 +349,10 @@ public class TenantEventService {
     if(scheduleId == null) {
       throw new BusinessException("Event not fount.", EventErrorCodes.EVENT_NOT_FOUND);
     }
+
+    EventKafkaDto kafkaDto =
+            new EventKafkaDto(scheduleId, dto.getStatus());
+    kafkaMessageProducer.sendEventConfirmed(kafkaDto);
+
   }
 }
