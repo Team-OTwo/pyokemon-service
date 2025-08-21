@@ -21,7 +21,8 @@ public class RegisterDeviceRequestDto {
   private String deviceNumber;
 
   @NotBlank(message = "FCM 토큰은 필수입니다.")
-  @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "FCM 토큰은 영문자, 숫자, 하이픈(-) 또는 언더바(_)만 포함할 수 있습니다.")
+  // @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "FCM 토큰은 영문자, 숫자, 하이픈(-) 또는 언더바(_)만 포함할 수
+  // 있습니다.")
   private String fcmToken;
 
   @NotBlank(message = "운영체제 타입은 필수입니다.")
