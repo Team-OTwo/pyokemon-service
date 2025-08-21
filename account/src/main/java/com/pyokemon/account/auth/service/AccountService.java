@@ -279,7 +279,7 @@ public class AccountService {
       throw new BusinessException("존재하지 않는 계정입니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
     }
 
-    if (accountOpt.get().getRole().equals("USER") || deviceNumber != null) {
+    if (accountOpt.get().getRole().equals("USER") && deviceNumber != null) {
       Optional<User> userOpt = userRepository.findByAccountId(Long.parseLong(accountId));
       if (userOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
