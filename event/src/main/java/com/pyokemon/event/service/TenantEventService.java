@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.pyokemon.common.exception.code.EventErrorCodes;
 import com.pyokemon.event.dto.*;
+import com.pyokemon.event.dto.tenant.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +19,14 @@ import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.repository.VenueRepository;
+import com.pyokemon.event.service.SeatStatusInitService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 //@Transactional(readOnly = true)
 public class TenantEventService {
   private final EventRepository eventRepository;
@@ -31,6 +35,7 @@ public class TenantEventService {
   private final VenueRepository venueRepository;
   private final PriceRepository priceRepository;
   private final ObjectMapper objectMapper;
+  private final SeatStatusInitService seatStatusInitService;
 
   public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
     return tenantEventRepository.findTenantEventDetailByEventId(eventId);
@@ -152,6 +157,9 @@ public class TenantEventService {
 
     Long eventScheduleId = saveEventSchedule(eventSchedule);
 
+    // 공연 등록 시 좌석 상태를 Redis에 초기화
+    seatStatusInitService.initSeatStatuses(eventScheduleId);
+
     // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {
@@ -234,6 +242,9 @@ public class TenantEventService {
 
     eventScheduleRepository.save(newSchedule);
     Long newScheduleId = newSchedule.getEventScheduleId();
+
+    // 새 스케줄 추가 시 좌석 상태를 Redis에 초기화
+    seatStatusInitService.initSeatStatuses(newScheduleId);
 
     // 새 가격 정보 추가
     if (scheduleDto.getPrices() != null) {

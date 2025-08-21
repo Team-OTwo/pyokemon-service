@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.pyokemon.event.dto.*;
+import com.pyokemon.event.dto.tenant.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;

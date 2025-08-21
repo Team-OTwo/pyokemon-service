@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
 bootJar {
     enabled = false
 }
@@ -13,6 +17,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+    api 'org.springframework.kafka:spring-kafka'
     
     // Kafka 의존성 추가
     implementation 'org.springframework.kafka:spring-kafka'

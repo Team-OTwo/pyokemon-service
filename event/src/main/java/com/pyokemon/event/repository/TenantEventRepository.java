@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.pyokemon.event.dto.*;
+import com.pyokemon.event.dto.tenant.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.entity.Event;
