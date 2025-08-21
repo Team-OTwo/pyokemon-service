@@ -20,6 +20,7 @@ public class UserDevice {
   private String deviceNumber;
   private String fcmToken;
   private String osType; // ANDROID, IOS
+  private Boolean isLogin;
   private Boolean isValid;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;

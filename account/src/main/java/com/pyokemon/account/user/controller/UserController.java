@@ -13,6 +13,8 @@ import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
+import com.pyokemon.account.user.dto.response.UserDuplicateDto;
+import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import com.pyokemon.account.user.service.UserService;
 import com.pyokemon.common.dto.ResponseDto;
 
@@ -35,6 +37,20 @@ public class UserController {
         .body(ResponseDto.success(response, "사용자 등록 성공"));
   }
 
+  @GetMapping("/check-duplicate")
+  public ResponseEntity<ResponseDto<UserDuplicateDto>> checkDuplicate(
+      @RequestParam(value = "loginId", required = true) String loginId) {
+    UserDuplicateDto response = userService.checkDuplicate(loginId);
+    return ResponseEntity.ok(ResponseDto.success(response, "중복 확인 성공"));
+  }
+
+  @GetMapping("/notification")
+  public UserNotificationDto checkNotification(
+      @RequestParam(value = "accountId", required = true) Long accountId) {
+    return userService.checkNotification(accountId);
+  }
+
+  // 본인 인증
   @PostMapping("/verify")
   public ResponseEntity<ResponseDto<UserDetailDto>> verify() {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
@@ -83,11 +99,11 @@ public class UserController {
   }
 
   // 사용자 기기 삭제 (사용자 본인만)
-  @DeleteMapping("/devices/{deviceId}")
-  public ResponseEntity<ResponseDto<Void>> deleteUserDevice(@PathVariable String deviceId) {
+  @DeleteMapping("/devices")
+  public ResponseEntity<ResponseDto<Void>> deleteUserDevice() {
     String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     Long accountId = Long.parseLong(currentUserAccountId);
-    userService.deleteUserDevice(accountId, deviceId);
+    userService.deleteUserDevice(accountId);
     return ResponseEntity.ok(ResponseDto.success("기기 삭제 성공"));
   }
 }

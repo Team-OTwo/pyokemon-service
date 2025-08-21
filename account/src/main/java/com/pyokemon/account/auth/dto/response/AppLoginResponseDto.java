@@ -14,4 +14,5 @@ public class AppLoginResponseDto {
   private String role;
   private Long accountId;
   private String deviceStatus;
+  private Boolean isLogin;
 }
