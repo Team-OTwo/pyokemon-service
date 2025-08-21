@@ -30,11 +30,8 @@ spring:
     consumer:
       group-id: ${spring.application.name}
 
-
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-
-
 
 ---
 spring:

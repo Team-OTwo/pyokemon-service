@@ -17,18 +17,24 @@ public class BookingEventListener {
   private final SeatStatusService seatStatusService;
 
   // booking 서비스가 발행하는 예약 상태 이벤트 구독
-  @KafkaListener( topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).BOOKING_STATUS_UPDATED}", groupId = "${spring.application.name}")
+  @KafkaListener(
+      topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).BOOKING_STATUS_UPDATED}", 
+      groupId = "${spring.application.name}")
   public void handleBookingEvent(BookingEventDto event) {
-    if (event == null) return;
+    if (event == null) {
+      log.warn("[booking-status-updated] Received null event");
+      return;
+    }
 
     Long scheduleId = event.getEventScheduleId();
     Long seatId = event.getSeatId();
     String status = event.getStatus();
 
-    log.info("[booking-status-updated] Received event: scheduleId={}, seatId={}, status={}", scheduleId, seatId, status);
+    log.info("[booking-status-updated] Received event: scheduleId={}, seatId={}, status={}, fullEvent={}", 
+        scheduleId, seatId, status, event);
 
     if (scheduleId == null || seatId == null) {
-      log.warn("BookingEventDto missing coordinates: {}", event);
+      log.warn("[booking-status-updated] BookingEventDto missing required fields: {}", event);
       return;
     }
 
@@ -54,10 +60,12 @@ public class BookingEventListener {
           log.info("[booking-status-updated] PENDING received. scheduleId={}, seatId={}", scheduleId, seatId);
           break;
         default:
-          log.info("[booking-events] ignore status: {} payload={} ", status, event);
+          log.info("[booking-status-updated] Ignoring unknown status: {} for payload: {}", status, event);
       }
     } catch (Exception e) {
-      log.error("Error processing BookingEventDto: {}", e.getMessage(), e);
+      log.error("[booking-status-updated] Error processing BookingEventDto: scheduleId={}, seatId={}, status={}, error={}", 
+          scheduleId, seatId, status, e.getMessage(), e);
+      // 에러가 발생해도 메시지 처리를 중단하지 않음
     }
   }
 }
