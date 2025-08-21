@@ -40,6 +40,18 @@ public class BookingBffService {
             .toList();
   }
 
+  public List<BookingDto> getAccountIdBookingsOrderByDate(Long accountId, Integer page, Integer size){
+    List<Booking> bookings = bookingBffRepository.findByAccountIdOrderByDate(accountId, page*size, size);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    return bookings.stream()
+            .map(this::toDto)      // Booking -> BookingDto
+            .toList();
+  }
+
   public BookingDto getBooking(Long bookingId){
     Optional<Booking> bookingOpt = bookingBffRepository.findByBookingId(bookingId);
 
