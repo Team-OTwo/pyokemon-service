@@ -212,6 +212,46 @@ public class BookingService {
     }
   }
 
+  // PENDING 상태의 예약만 상태 업데이트 (결제 이벤트 처리용)
+  @Transactional
+  public void updateBookingStatusIfPending(Long bookingId, Booking.Booked newStatus, Long paymentId) {
+    try {
+      if (bookingId == null) {
+        throw new BusinessException("예약 ID가 필요합니다.", "INVALID_BOOKING_ID");
+      }
+      if (newStatus == null) {
+        throw new BusinessException("예약 상태가 필요합니다.", "INVALID_BOOKING_STATUS");
+      }
+
+      Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+      if (bookingOpt.isEmpty()) {
+        log.warn("예약을 찾을 수 없습니다: bookingId={}", bookingId);
+        return;
+      }
+
+      Booking booking = bookingOpt.get();
+
+      if (booking.getStatus() != Booking.Booked.PENDING) {
+        log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", 
+            bookingId, booking.getStatus());
+        return;
+      }
+
+      booking.setStatus(newStatus);
+      booking.setPaymentId(paymentId);
+      booking.setUpdatedAt(LocalDateTime.now());
+
+      bookingRepository.update(booking);
+
+      bookingEventPublisher.publishBookingStatusUpdate(booking);
+    } catch (BusinessException e) {
+      throw e;
+    } catch (Exception e) {
+      log.error("예약 상태 업데이트를 처리할 수 없습니다: bookingId={}", bookingId, e);
+      throw new BusinessException("예약 상태 업데이트를 처리할 수 없습니다.", "BOOKING_STATUS_UPDATE_ERROR");
+    }
+  }
+
   // PENDING 예약 삭제 스케줄러
   @Transactional(readOnly = false)
   @Scheduled(cron = "0 */5 * * * *")
