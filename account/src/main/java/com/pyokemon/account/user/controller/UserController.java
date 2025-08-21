@@ -1,7 +1,5 @@
 package com.pyokemon.account.user.controller;
 
-import com.pyokemon.account.user.dto.response.UserDuplicateDto;
-import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,8 @@ import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
+import com.pyokemon.account.user.dto.response.UserDuplicateDto;
+import com.pyokemon.account.user.dto.response.UserNotificationDto;
 import com.pyokemon.account.user.service.UserService;
 import com.pyokemon.common.dto.ResponseDto;
 
@@ -39,14 +39,14 @@ public class UserController {
 
   @GetMapping("/check-duplicate")
   public ResponseEntity<ResponseDto<UserDuplicateDto>> checkDuplicate(
-          @RequestParam(value = "loginId", required = true) String loginId) {
+      @RequestParam(value = "loginId", required = true) String loginId) {
     UserDuplicateDto response = userService.checkDuplicate(loginId);
     return ResponseEntity.ok(ResponseDto.success(response, "중복 확인 성공"));
   }
 
   @GetMapping("/notification")
-  public UserNotificationDto checkNotification (
-          @RequestParam(value = "accountId", required = true) Long accountId){
+  public UserNotificationDto checkNotification(
+      @RequestParam(value = "accountId", required = true) Long accountId) {
     return userService.checkNotification(accountId);
   }
 

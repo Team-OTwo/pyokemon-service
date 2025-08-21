@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import com.pyokemon.account.user.entity.UserDevice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +20,7 @@ import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
 import com.pyokemon.account.auth.secret.jwt.TokenGenerator;
 import com.pyokemon.account.user.entity.User;
+import com.pyokemon.account.user.entity.UserDevice;
 import com.pyokemon.account.user.repository.UserDeviceRepository;
 import com.pyokemon.account.user.repository.UserRepository;
 import com.pyokemon.common.exception.BusinessException;
@@ -129,9 +129,10 @@ public class AccountService {
         deviceStatus = "MISMATCHED";
       }
 
-      if (deviceStatus.equals("REGISTERED")){
-        Optional<UserDevice> userDeviceOpt= userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
-        if (userDeviceOpt.isEmpty()){
+      if (deviceStatus.equals("REGISTERED")) {
+        Optional<UserDevice> userDeviceOpt =
+            userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+        if (userDeviceOpt.isEmpty()) {
           throw new BusinessException("존재하지 않는 디바이스 입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
         }
 
@@ -274,18 +275,19 @@ public class AccountService {
 
     Optional<Account> accountOpt = accountRepository.findByAccountId(Long.parseLong(accountId));
 
-    if (accountOpt.isEmpty()){
+    if (accountOpt.isEmpty()) {
       throw new BusinessException("존재하지 않는 계정입니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
     }
 
-    if (accountOpt.get().getRole().equals("USER") || deviceNumber != null){
+    if (accountOpt.get().getRole().equals("USER") || deviceNumber != null) {
       Optional<User> userOpt = userRepository.findByAccountId(Long.parseLong(accountId));
-      if (userOpt.isEmpty()){
+      if (userOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
       }
-      Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByUserIdAndIsValid(userOpt.get().getUserId(), true);
+      Optional<UserDevice> userDeviceOpt =
+          userDeviceRepository.findByUserIdAndIsValid(userOpt.get().getUserId(), true);
 
-      if (userDeviceOpt.isEmpty()){
+      if (userDeviceOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 디바이스입니다", AccountErrorCodes.DEVICE_NOT_FOUND);
       }
 
