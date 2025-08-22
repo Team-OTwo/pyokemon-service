@@ -55,17 +55,17 @@ booking:
 # ACA-Py 설정
 acapy:
   tenant:
-    base-url: http://localhost:8002  # pyokemon-booking-ACA-Py
+    base-url: http://localhost:8003  # pyokemon-booking-ACA-Py
     wallet-id: tenant-wallet
+  user:
+    base-url: http://localhost:8002  # pyokemon-user-ACA-Py
+    wallet-id: user-wallet
   mediator:
     base-url: http://localhost:8001  # pyokemon-mediator-ACA-Py (admin port)
     api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일
     wallet-id: mediator-wallet
   wallet:
     key: MySecretKey123  # Wallet 생성용 키
-  webhook:
-    base-url: http://localhost:8084/did/webhooks
-    topic-prefix: /topic/
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

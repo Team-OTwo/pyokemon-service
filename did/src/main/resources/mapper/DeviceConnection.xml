@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.did.domain.repository.DeviceConnectionRepository">
+
+    <resultMap id="DeviceConnectionResultMap" type="com.pyokemon.did.domain.DeviceConnection">
+        <id column="id" property="id" />
+        <result column="connection_id" property="connectionId" />
+        <result column="invi_msg_id" property="inviMsgId" />
+        <result column="device_id" property="deviceId" />
+        <result column="user_id" property="userId" />
+        <result column="public_did" property="publicDid" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <select id="findById" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE id = #{id}
+    </select>
+
+    <select id="findByConnectionId" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE connection_id = #{connectionId}
+    </select>
+
+    <select id="findByDeviceId" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE device_id = #{deviceId} ORDER BY created_at DESC
+    </select>
+
+    <select id="findByUserId" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE user_id = #{userId} ORDER BY created_at DESC
+    </select>
+
+    <select id="findByPublicDid" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE public_did = #{publicDid}
+    </select>
+
+    <select id="findByStatus" resultMap="DeviceConnectionResultMap">
+        SELECT * FROM tb_device_connection WHERE status = #{status} ORDER BY created_at DESC
+    </select>
+
+    <insert id="save" parameterType="com.pyokemon.did.domain.DeviceConnection" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_device_connection (connection_id, invi_msg_id, device_id, user_id, public_did, status, created_at, updated_at)
+        VALUES (#{connectionId}, #{inviMsgId}, #{deviceId}, #{userId}, #{publicDid}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.pyokemon.did.domain.DeviceConnection">
+        UPDATE tb_device_connection 
+        SET connection_id = #{connectionId}, invi_msg_id = #{inviMsgId}, device_id = #{deviceId}, user_id = #{userId}, public_did = #{publicDid}, status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM tb_device_connection WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByConnectionId">
+        DELETE FROM tb_device_connection WHERE connection_id = #{connectionId}
+    </delete>
+
+    <delete id="deleteByDeviceId">
+        DELETE FROM tb_device_connection WHERE device_id = #{deviceId}
+    </delete>
+
+</mapper> 
