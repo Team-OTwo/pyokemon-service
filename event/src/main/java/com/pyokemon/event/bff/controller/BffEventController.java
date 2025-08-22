@@ -54,6 +54,24 @@ public class BffEventController {
     public List<BffSeatClassDto> getSeatClasses(@RequestBody IdsRequest request) {
         return bffEventService.getSeatClasses(request.getIds());
     }
+
+    @PostMapping("/event-schedules/_batch")
+    public List<BffEventScheduleDto> getEventSchedules(@RequestBody IdsRequest request){
+        return bffEventService.getEventSchedules(request.getIds());
+    }
+
+    @PostMapping("/bff/events/_batch")
+    public List<BffEventDto> getEvents(@RequestBody IdsRequest request){
+        System.out.println(request.getIds().get(0));
+        return bffEventService.getEvents(request.getIds());
+    }
+
+    @PostMapping("/venues/_batch")
+    public List<BffVenueDto> getVenues(@RequestBody IdsRequest request){
+        return bffEventService.getVenues(request.getIds());
+    }
+
+
 }
 
 
