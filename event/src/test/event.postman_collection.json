@@ -404,6 +404,52 @@
 			"response": []
 		},
 		{
+			"name": "공연 등록 거절",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/rejected/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"rejected",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "공연 등록 승인",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/event/api/events/approved/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"event",
+						"api",
+						"events",
+						"approved",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "예매 초기 정보",
 			"request": {
 				"method": "GET",
@@ -435,6 +481,22 @@
 						"VIP"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "redis 전체좌석 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "redis 좌석 hold",
+			"request": {
+				"method": "GET",
+				"header": []
 			},
 			"response": []
 		}
