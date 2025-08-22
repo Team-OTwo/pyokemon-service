@@ -72,7 +72,7 @@ public class EventScheduleService {
     eventScheduleRepository.save(eventSchedule);
     Long eventScheduleId = eventSchedule.getEventScheduleId();
 
-    redisService.initSeatStatuses(eventScheduleId);
+    redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {

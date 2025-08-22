@@ -1,11 +1,10 @@
 package com.pyokemon.event.listener;
 
-import com.pyokemon.event.controller.RedisController;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import com.pyokemon.event.dto.kafka.BookingEventDto;
-import com.pyokemon.event.controller.RedisController;
+import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BookingEventListener {
 
-  private final RedisController rediscontroller;
+  private final RedisService redisService;
 
   @KafkaListener(
       topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).BOOKING_STATUS_UPDATED}", 
@@ -42,17 +41,17 @@ public class BookingEventListener {
       switch (status) {
         case "BOOKED":
           log.info("[booking-status-updated] Processing BOOKED status for scheduleId={}, seatId={}", scheduleId, seatId);
-          rediscontroller.confirmSeat(scheduleId, seatId.intValue());
+          redisService.confirmSeat(scheduleId, seatId);
           log.info("[booking-status-updated] BOOKED → seat confirmed. scheduleId={}, seatId={}", scheduleId, seatId);
           break;
         case "CANCELED":
           log.info("[booking-status-updated] Processing CANCELED status for scheduleId={}, seatId={}", scheduleId, seatId);
-          rediscontroller.cancelSeat(scheduleId, seatId.intValue());
+          redisService.cancelSeat(scheduleId, seatId);
           log.info("[booking-status-updated] CANCELED → seat cleared. scheduleId={}, seatId={}", scheduleId, seatId);
           break;
         case "FAILED":
           log.info("[booking-status-updated] Processing FAILED status for scheduleId={}, seatId={}", scheduleId, seatId);
-          rediscontroller.cancelSeat(scheduleId, seatId.intValue());
+          redisService.cancelSeat(scheduleId, seatId);
           log.info("[booking-status-updated] FAILED → seat cleared. scheduleId={}, seatId={}", scheduleId, seatId);
           break;
         default:
