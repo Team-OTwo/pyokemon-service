@@ -2,6 +2,9 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
+import com.pyokemon.event.dto.*;
+import com.pyokemon.event.repository.TenantEventRepository;
+import com.pyokemon.event.service.TenantEventService;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -11,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
-import com.pyokemon.event.dto.BookingInfoResponseDTO;
-import com.pyokemon.event.dto.EventDetailResponseDTO;
-import com.pyokemon.event.dto.EventItemResponseDTO;
-import com.pyokemon.event.dto.SeatInfoResponseDTO;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
 
@@ -26,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class EventController {
   private final EventService eventService;
   private final EventScheduleService eventScheduleService;
+  private final TenantEventService tenantEventService;
+  private final TenantEventRepository tenantEventRepository;
 
   // 오늘 오픈 티켓
   @GetMapping("/open-today")
@@ -98,4 +99,26 @@ public class EventController {
       @PathVariable String seatGrade) {
     return eventScheduleService.getSeatInfoByGrade(eventScheduleId, seatGrade);
   }
+
+  //공연등록 승인
+  @PostMapping("/approved/{eventId}")
+  public ResponseEntity<CancelEventResponseDTO> updateApprovedStatusEvent(@PathVariable Long eventId){
+    CancelEventResponseDTO dto = new CancelEventResponseDTO();
+    dto.setEventId(eventId);
+    dto.setStatus("APPROVED");
+    tenantEventRepository.cancelEvent(dto);
+    return ResponseEntity.ok().build();
+  }
+
+  //공연등록 거절
+  @PostMapping("/rejected/{eventId}")
+  public ResponseEntity<CancelEventResponseDTO> updateRejectedStatusEvent(@PathVariable Long eventId){
+    CancelEventResponseDTO dto = new CancelEventResponseDTO();
+    dto.setEventId(eventId);
+    dto.setStatus("REJECTED");
+    tenantEventRepository.cancelEvent(dto);
+    return ResponseEntity.ok().build();
+  }
+
+
 }
