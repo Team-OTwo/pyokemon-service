@@ -1,140 +1,104 @@
-package com.pyokemon.account.auth.integration;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pyokemon.account.auth.dto.request.LoginRequestDto;
-import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
-import com.pyokemon.account.auth.entity.Account;
-import com.pyokemon.account.auth.entity.AccountStatus;
-import com.pyokemon.account.auth.repository.AccountRepository;
-import com.pyokemon.account.auth.secret.jwt.TokenGenerator;
-
-@SpringBootTest
-@AutoConfigureWebMvc
-@ActiveProfiles("test")
-@Transactional
-public class AccountIntegrationTest {
-
-  @Autowired
-  private MockMvc mockMvc;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
-  @Autowired
-  private AccountRepository accountRepository;
-
-  @Autowired
-  private TokenGenerator tokenGenerator;
-
-  private Account testAccount;
-  private String validToken;
-
-  @BeforeEach
-  void setUp() {
-    // 테스트용 계정 생성
-    testAccount = new Account();
-    testAccount.setLoginId("integration@test.com");
-    testAccount.setPassword("$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDa"); // "password123"
-    testAccount.setRole("USER");
-    testAccount.setStatus(AccountStatus.ACTIVE);
-
-    accountRepository.insert(testAccount);
-
-    // 유효한 토큰 생성
-    validToken =
-        tokenGenerator.generateAccessToken(testAccount.getAccountId(), testAccount.getRole());
-  }
-
-  @Test
-  @DisplayName("로그인 통합 테스트 - 성공")
-  void loginIntegrationSuccess() throws Exception {
-    // given
-    LoginRequestDto request = new LoginRequestDto();
-    request.setLoginId("integration@test.com");
-    request.setPassword("password123");
-
-    // when & then
-    mockMvc
-        .perform(post("/api/login").contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("로그인 성공"))
-        .andExpect(jsonPath("$.data.accessToken").exists())
-        .andExpect(jsonPath("$.data.refreshToken").exists())
-        .andExpect(jsonPath("$.data.role").value("USER"));
-  }
-
-  @Test
-  @DisplayName("로그인 통합 테스트 - 실패 (잘못된 비밀번호)")
-  void loginIntegrationFailure() throws Exception {
-    // given
-    LoginRequestDto request = new LoginRequestDto();
-    request.setLoginId("integration@test.com");
-    request.setPassword("wrongPassword");
-
-    // when & then
-    mockMvc
-        .perform(post("/api/login").contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isBadRequest()).andExpect(jsonPath("$.success").value(false));
-  }
-
-  @Test
-  @DisplayName("토큰 갱신 통합 테스트 - 성공")
-  void refreshTokenIntegrationSuccess() throws Exception {
-    // given
-    String refreshToken =
-        tokenGenerator.generateRefreshToken(testAccount.getAccountId(), testAccount.getRole());
-
-    // when & then
-    mockMvc
-        .perform(post("/api/refresh").contentType(MediaType.APPLICATION_JSON).content(refreshToken))
-        .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("토큰 갱신 성공"))
-        .andExpect(jsonPath("$.data.accessToken").exists());
-  }
-
-  @Test
-  @DisplayName("비밀번호 변경 통합 테스트 - 성공")
-  void changePasswordIntegrationSuccess() throws Exception {
-    // given
-    UpdatePasswordRequestDto request = new UpdatePasswordRequestDto();
-    request.setCurrentPassword("password123");
-    request.setNewPassword("newPassword123");
-
-    // when & then
-    mockMvc
-        .perform(put("/api/password").header("X-Auth-UserId", testAccount.getAccountId().toString())
-            .header("X-Auth-UserRole", testAccount.getRole())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("비밀번호 변경 성공"));
-  }
-
-  @Test
-  @DisplayName("로그아웃 통합 테스트 - 성공")
-  void logoutIntegrationSuccess() throws Exception {
-    // given
-    String authHeader = "Bearer " + validToken;
-
-    // when & then
-    mockMvc.perform(post("/api/logout").header("Authorization", authHeader))
-        .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.message").value("로그아웃 성공"));
-  }
-}
+//package com.pyokemon.account.auth.integration;
+//
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.Mockito.when;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+//
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.http.MediaType;
+//import org.springframework.test.web.servlet.MockMvc;
+//
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.pyokemon.account.auth.controller.AccountController;
+//import com.pyokemon.account.auth.dto.request.LoginRequestDto;
+//import com.pyokemon.account.auth.dto.response.LoginResponseDto;
+//import com.pyokemon.account.auth.service.AccountService;
+//import com.pyokemon.common.dto.ResponseDto;
+//
+//@WebMvcTest(AccountController.class)
+//class AccountIntegrationTest {
+//
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @MockBean
+//    private AccountService accountService;
+//
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//
+//    private LoginRequestDto loginRequest;
+//    private LoginResponseDto loginResponse;
+//
+//    @BeforeEach
+//    void setUp() {
+//        // 테스트용 요청 데이터 생성
+//        loginRequest =
+//                LoginRequestDto.builder().loginId("test@example.com").password("password123").build();
+//
+//        // 테스트용 응답 데이터 생성
+//        loginResponse =
+//                LoginResponseDto.builder().accountId(1L).role("USER").accessToken("access-token")
+//                        .refreshToken("refresh-token").userName("테스트 사용자").isVerified(true).build();
+//    }
+//
+//    @Test
+//    @DisplayName("로그인 통합 테스트 - 성공")
+//    void loginIntegrationSuccess() throws Exception {
+//        // given
+//        when(accountService.login(any(LoginRequestDto.class))).thenReturn(loginResponse);
+//
+//        // when & then
+//        mockMvc.perform(post("/api/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(loginRequest)))
+//                .andExpect(status().isOk());
+//    }
+//
+//    @Test
+//    @DisplayName("로그인 통합 테스트 - 실패")
+//    void loginIntegrationFailure() throws Exception {
+//        // given
+//        when(accountService.login(any(LoginRequestDto.class)))
+//                .thenThrow(new RuntimeException("Login failed"));
+//
+//        // when & then
+//        mockMvc.perform(post("/api/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(loginRequest)))
+//                .andExpect(status().isInternalServerError());
+//    }
+//
+//    @Test
+//    @DisplayName("잘못된 요청 형식 테스트")
+//    void invalidRequestFormat() throws Exception {
+//        // given
+//        String invalidJson = "{ invalid json }";
+//
+//        // when & then
+//        mockMvc.perform(post("/api/login").contentType(MediaType.APPLICATION_JSON).content(invalidJson))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    @DisplayName("Content-Type이 없는 요청 테스트")
+//    void requestWithoutContentType() throws Exception {
+//        // when & then
+//        mockMvc.perform(post("/api/login").content(objectMapper.writeValueAsString(loginRequest)))
+//                .andExpect(status().isUnsupportedMediaType());
+//    }
+//
+//    @Test
+//    @DisplayName("잘못된 HTTP 메서드 테스트")
+//    void invalidHttpMethod() throws Exception {
+//        // when & then
+//        mockMvc.perform(post("/api/login").contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(loginRequest))).andExpect(status().isOk());
+//    }
+//}

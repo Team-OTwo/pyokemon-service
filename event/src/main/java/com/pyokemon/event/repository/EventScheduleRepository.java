@@ -17,8 +17,6 @@ public interface EventScheduleRepository {
 
   List<EventItemResponseDTO> selectTicketsToBeOpened();
 
-  Optional<EventSchedule> findById(Long id);
-
   Long save(EventSchedule eventSchedule);
 
   List<EventItemResponseDTO> selectEventList(@Param("genre") String genre,
@@ -30,6 +28,8 @@ public interface EventScheduleRepository {
       @Param("limit") int limit, @Param("offset") int offset, @Param("genre") String genre);
 
   int getSearchTotalCount(@Param("keyword") String keyword, @Param("genre") String genre);
+
   int updateEventSchedule(EventSchedule eventSchedule);
-  
+
+  Long findVenueIdByEventScheduleId(Long eventScheduleId);
 }

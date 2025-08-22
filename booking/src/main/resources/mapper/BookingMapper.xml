@@ -13,40 +13,60 @@
     </select>
 
     <select id="findByAccountId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
     </select>
 
     <select id="findAllByEventScheduleIdAndSeatId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId} AND seat_id = #{seatId}
         ORDER BY created_at DESC
     </select>
 
     <select id="findActiveBookingByEventScheduleIdAndAccountId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId} AND account_id = #{accountId}
         AND status IN ('PENDING', 'BOOKED')
         LIMIT 1
     </select>
 
+    <select id="findById" resultType="Booking">
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+        FROM tb_booking
+        WHERE booking_id = #{bookingId}
+    </select>
+
     <select id="findPendingBookings" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE status = 'PENDING'
     </select>
 
+    <select id="findValidBookingsWithEventInfo" resultType="com.pyokemon.booking.dto.response.ValidBookingDetail">
+        SELECT 
+            b.booking_id as bookingId,
+            b.event_schedule_id as eventScheduleId,
+            b.tenant_id as tenantId
+        FROM tb_booking b
+        WHERE b.account_id = #{accountId}
+        AND b.status = 'BOOKED'
+        AND b.booking_id IN
+        <foreach collection="bookingIds" item="bookingId" open="(" separator="," close=")">
+            #{bookingId}
+        </foreach>
+    </select>
+
     <insert id="save" parameterType="Booking" useGeneratedKeys="true" keyProperty="bookingId">
-        INSERT INTO tb_booking (event_schedule_id, seat_id, account_id, payment_id, status, created_at, updated_at)
-        VALUES (#{eventScheduleId}, #{seatId}, #{accountId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt})
+        INSERT INTO tb_booking (event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at)
+        VALUES (#{eventScheduleId}, #{seatId}, #{accountId}, #{tenantId}, #{paymentId}, #{status}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="update" parameterType="Booking">
         UPDATE tb_booking
-        SET status = #{status}, updated_at = #{updatedAt}
+        SET status = #{status}, payment_id = #{paymentId}, updated_at = #{updatedAt}
         WHERE booking_id = #{bookingId}
     </update>
 

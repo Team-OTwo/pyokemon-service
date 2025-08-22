@@ -25,9 +25,18 @@
         </selectKey>
     </insert>
 
+    <update id="updateEventSchedule" parameterType="EventSchedule">
+        UPDATE tb_event_schedule
+        SET
+            venue_id = #{venueId},
+            ticket_open_at = #{ticketOpenAt},
+            event_date = #{eventDate},
+            updated_at = #{updatedAt}
+        WHERE event_schedule_id = #{eventScheduleId}
+    </update>
 
-    <select id="findById" resultType="EventSchedule" parameterType="long">
-        SELECT event_schedule_id, event_id, venue_id, event_date, ticket_open_at, created_at, updated_at
+    <select id="findVenueIdByEventScheduleId" resultType="long" parameterType="long">
+        SELECT venue_id
         FROM tb_event_schedule
         WHERE event_schedule_id = #{param1}
     </select>
@@ -133,7 +142,7 @@
         WHERE
             REPLACE(LOWER(e.title), ' ', '') LIKE CONCAT('%', REPLACE(LOWER(#{keyword}), ' ', ''), '%') AND
         <if test="genre != null and genre != '전체'">
-             e.genre = #{genre} AND
+             
         </if>
             e.status = 'APPROVED'
     </select>

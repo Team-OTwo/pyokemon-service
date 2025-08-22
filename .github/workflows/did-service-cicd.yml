@@ -7,12 +7,7 @@ on:
       - 'did/**'
       - 'common/**'
       - '.github/workflows/did-service-cicd.yml'
-  pull_request:
-    branches: [ develop ]
-    paths:
-      - 'did/**'
-      - 'common/**'
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

@@ -14,6 +14,8 @@ public interface UserDeviceRepository {
 
   List<UserDevice> findByUserId(Long userId);
 
+  Optional<UserDevice> findByUserIdAndIsValid(Long userId, boolean isValid);
+
   Optional<UserDevice> findByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber,
       boolean isValid);
 
@@ -21,7 +23,8 @@ public interface UserDeviceRepository {
 
   boolean existsByDeviceNumberAndIsValid(String deviceNumber, boolean isValid);
 
-  boolean existsByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber, boolean isValid);
+  boolean existsByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber,
+      boolean isValid);
 
   int insert(UserDevice userDevice);
 

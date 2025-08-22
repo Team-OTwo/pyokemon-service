@@ -15,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-// import org.springframework.security.crypto.password.PasswordEncoder;
-import com.pyokemon.common.util.PasswordUtil;
 
 import com.pyokemon.account.auth.entity.Account;
 import com.pyokemon.account.auth.entity.AccountStatus;
@@ -28,6 +26,7 @@ import com.pyokemon.account.tenant.dto.response.TenantProfileResponseDto;
 import com.pyokemon.account.tenant.entity.Tenant;
 import com.pyokemon.account.tenant.repository.TenantRepository;
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.util.PasswordUtil;
 
 @ExtendWith(MockitoExtension.class)
 class TenantServiceTest {
