@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 
-public class WalletMetadataRequest {
+public class TenantWalletRequest {
 
   @Data
   @AllArgsConstructor
