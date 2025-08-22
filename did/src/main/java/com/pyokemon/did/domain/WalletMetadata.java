@@ -12,4 +12,5 @@ public class WalletMetadata extends BaseEntity {
   private String key;
   private String token;
   private Long tenantId;
+  private String walletKey;
 }
