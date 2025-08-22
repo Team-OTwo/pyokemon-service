@@ -28,13 +28,8 @@ public class WalletController {
     public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(@Valid @RequestBody CreateUserWalletRequest request){
         log.info("사용자 지갑 생성 요청: userId={}", request.getUserId());
         
-        ResponseEntity<ResponseDto<Map<String, String>>> response = userWalletService.createUserWallet(request.getUserId());
-        
-        if (response.getStatusCode().is2xxSuccessful()) {
-            Map<String, String> data = response.getBody().getData();
-            log.info("사용자 지갑 생성 완료: userId={}", request.getUserId());
-        }
-        
-        return response;
+        userWalletService.createUserWallet(request.getUserId());
+        log.info("사용자 지갑 생성 완료: userId={}", request.getUserId());
+        return ResponseEntity.ok(ResponseDto.success(Map.of("userId", String.valueOf(request.getUserId())), "사용자 지갑 생성 완료"));
     }
 }

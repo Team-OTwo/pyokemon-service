@@ -8,18 +8,12 @@ import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreate
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
 import com.pyokemon.did.service.UserWalletService;
-import com.pyokemon.common.dto.ResponseDto;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,124 +24,57 @@ public class UserWalletServiceImpl implements UserWalletService {
     private final RemoteUserAcaPyService remoteUserAcaPyService;
 
 
-        @Override
+    @Override
     @Transactional
-    public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(Long userId) {
-        try {
-            // 사전 검증
-            validateWalletCreation(userId);
+    public void createUserWallet(Long userId) {
+        // 기존 지갑 존재 여부 확인
+        Optional<UserWallet> existingWallet = checkExistingUserWallet(userId);
+        if (existingWallet.isPresent()) {
+            log.error("사용자 ID {}에 대한 지갑이 이미 존재합니다.", userId);
+            throw new BusinessException("사용자 지갑이 이미 존재합니다.", DidErrorCodes.WALLET_ALREADY_EXISTS);
+        }
 
-            // 로컬 DB에 이미 존재하는지 먼저 확인
-            if (existsByUserId(userId)) {
-                log.info("로컬 DB에 이미 지갑이 존재: userId={}", userId);
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(ResponseDto.error("이미 지갑이 존재하는 사용자입니다.", DidErrorCodes.WALLET_ALREADY_EXISTS));
+        try {
+            // 1. 지갑 생성 요청
+            log.info("사용자 ID {}에 대한 지갑 생성 요청", userId);
+            AcaPyCreateWalletResponse walletResponse = remoteUserAcaPyService.acaPyCreateWallet(
+                AcaPyCreateWalletRequest.generate(userId)
+            );
+            
+            if (walletResponse == null || walletResponse.getToken() == null) {
+                log.error("사용자 ID {}에 대한 지갑 생성 실패: 응답이 null이거나 토큰이 없음", userId);
+                throw new RuntimeException("지갑 생성에 실패했습니다.");
             }
-            // ACA-Py에 지갑 생성 요청
-            String token = createWalletInAcaPy(userId);
             
-            // 로컬 DB에 저장
-            saveWalletToDatabase(userId, token);
-            
-                           return ResponseEntity.ok(ResponseDto.success(Map.of("userId", String.valueOf(userId)), "사용자 지갑 생성 완료"));
-            
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest()
-                    .body(ResponseDto.error(e.getMessage(), e.getErrorCode()));
-        } catch (Exception e) {
-            log.error("지갑 생성 중 예상치 못한 오류: userId={}, error={}", userId, e.getMessage(), e);
-            return ResponseEntity.internalServerError()
-                    .body(ResponseDto.error("지갑 생성에 실패했습니다.", DidErrorCodes.WALLET_CREATION_FAILED));
-        }
-    }
-    
-
-    private void validateWalletCreation(Long userId) {
-        if (userId == null) {
-            throw new BusinessException("사용자 ID는 필수입니다.", DidErrorCodes.INVALID_REQUEST);
-        }
-    }
-    
-        private String createWalletInAcaPy(Long userId) {
-        try {
-            AcaPyCreateWalletRequest request = AcaPyCreateWalletRequest.generate(userId);
-            log.info("=== ACA-Py 지갑 생성 요청 ===");
-            log.info("userId: {}", userId);
-            log.info("request: {}", request);
-            
-            AcaPyCreateWalletResponse response = remoteUserAcaPyService.acaPyCreateWallet(request);
-            log.info("=== ACA-Py 지갑 생성 응답 ===");
-            log.info("userId: {}", userId);
-            log.info("walletId: {}", response.getWalletId());
-            log.info("token: {}", response.getToken());
-            log.info("createdAt: {}", response.getCreatedAt());
-            log.info("updatedAt: {}", response.getUpdatedAt());
-            log.info("keyManagementMode: {}", response.getKeyManagementMode());
-            
-            return response.getToken();
-            
-        } catch (FeignException.BadRequest e) {
-            log.error("ACA-Py BadRequest 오류: userId={}, status={}, message={}", userId, e.status(), e.getMessage());
-            throw new BusinessException("ACA-Py 지갑 생성 요청이 잘못되었습니다.", DidErrorCodes.INVALID_REQUEST, e);
-            
-        } catch (FeignException.NotFound e) {
-            log.error("ACA-Py NotFound 오류: userId={}, status={}, message={}", userId, e.status(), e.getMessage());
-            throw new BusinessException("ACA-Py 서비스를 찾을 수 없습니다.", DidErrorCodes.ACAPY_SERVICE_ERROR, e);
-            
-        } catch (FeignException.ServiceUnavailable e) {
-            log.error("ACA-Py ServiceUnavailable 오류: userId={}, status={}, message={}", userId, e.status(), e.getMessage());
-            throw new BusinessException("ACA-Py 서비스가 일시적으로 사용할 수 없습니다.", DidErrorCodes.ACAPY_SERVICE_ERROR, e);
-            
-        } catch (FeignException e) {
-            log.error("ACA-Py FeignException 오류: userId={}, status={}, message={}", userId, e.status(), e.getMessage());
-            throw new BusinessException("ACA-Py 서비스 통신 중 오류가 발생했습니다.", DidErrorCodes.ACAPY_SERVICE_ERROR, e);
-            
-        } catch (Exception e) {
-            log.error("ACA-Py 예상치 못한 오류: userId={}, error={}", userId, e.getMessage(), e);
-            throw new BusinessException("ACA-Py 지갑 생성 중 예상치 못한 오류가 발생했습니다.", DidErrorCodes.WALLET_CREATION_FAILED, e);
-        }
-    }
-    
-    private UserWallet saveWalletToDatabase(Long userId, String token) {
-        UserWallet userWallet = UserWallet.builder()
+            // 2. 생성된 지갑 정보 저장
+            log.info("사용자 ID {}에 대한 지갑 정보 저장", userId);
+            UserWallet userWallet = UserWallet.builder()
                 .userId(userId)
-                .token(token)
+                .token(walletResponse.getToken())
                 .build();
-        
-        // INSERT 실행 후 생성된 ID를 가져옴
-        int affectedRows = userWalletRepository.saveAndReturn(userWallet);
-        
-        if (affectedRows == 0) {
-            throw new RuntimeException("지갑 저장에 실패했습니다.");
+                
+            userWalletRepository.saveAndReturn(userWallet);
+            log.info("사용자 ID {}에 대한 지갑 생성 및 저장 완료", userId);
+            
+        } catch (Exception e) {
+            log.error("사용자 ID {}에 대한 지갑 생성 중 오류 발생: {}", userId, e.getMessage(), e);
+            throw new BusinessException("지갑 생성 중 오류가 발생했습니다", DidErrorCodes.WALLET_CREATION_FAILED);
         }
-        
-        // 생성된 ID로 완전한 데이터를 조회하여 반환
-        return userWalletRepository.findById(userWallet.getId())
-                .orElseThrow(() -> new RuntimeException("지갑 저장 후 조회에 실패했습니다."));
+    }
+
+    private Optional<UserWallet> checkExistingUserWallet(Long userId) {
+        try {
+            return userWalletRepository.findByUserId(userId);
+        } catch (Exception e) {
+            log.error("사용자 ID {}에 대한 지갑 조회 중 오류 발생: {}", userId, e.getMessage(), e);
+            throw new RuntimeException("지갑 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
     
 
 
-    @Override
-    public UserWallet getUserWallet(Long userId) {
-        return userWalletRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException("해당 userId의 지갑을 찾을 수 없습니다: " + userId, DidErrorCodes.WALLET_NOTFOUND));
-    }
+    
 
-    @Override
-    public boolean existsByUserId(Long userId) {
-        return userWalletRepository.findByUserId(userId).isPresent();
-    }
 
-    @Override
-    // 모든 사용자 지갑 조회
-    public List<UserWallet> getAllUserWallets() {
-        return userWalletRepository.findAll();
-    }
 
-    @Override
-    public UserWallet getUserWalletByToken(String token) {
-        return userWalletRepository.findByToken(token)
-                .orElseThrow(() -> new BusinessException("토큰에 해당하는 지갑을 찾을 수 없습니다", DidErrorCodes.WALLET_NOTFOUND));
-    }
 }
