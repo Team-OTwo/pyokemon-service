@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.pyokemon.booking.dto.kafka.BookingEventDto;
+import com.pyokemon.booking.dto.kafka.EventKafkaDto;
+import com.pyokemon.common.exception.code.EventErrorCodes;
+import com.pyokemon.common.exception.code.PaymentErrorCodes;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -196,7 +200,6 @@ public class BookingService {
       if (bookingOpt.isEmpty()) {
         throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
       }
-
       Booking booking = bookingOpt.get();
       booking.setStatus(newStatus);
       booking.setPaymentId(paymentId);
@@ -228,6 +231,26 @@ public class BookingService {
       }
     } catch (Exception e) {
       log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
+    }
+  }
+
+  @Transactional
+  public void cancel(EventKafkaDto dto) {
+    try {
+
+      bookingRepository.updateStatus(dto.getEventScheduleId(), "CANCELED");
+
+      List<Booking> bookings = bookingRepository.findAllByEventScheduleId(dto.getEventScheduleId());
+      if(bookings.isEmpty()){
+        throw new BusinessException("Booking not found.", EventErrorCodes.BOOKING_NOT_FOUND);
+      }
+
+      for (Booking booking : bookings) {
+        bookingEventPublisher.publishBookingStatusUpdate(booking);
+      }
+
+    } catch (BusinessException e) {
+      throw e;
     }
   }
 }
