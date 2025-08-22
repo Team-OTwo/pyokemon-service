@@ -38,7 +38,7 @@ public class WalletRequest {
      * @param accountId 계정 식별자
      * @return 구성된 지갑 생성 요청
      */
-    public static AcaPyCreateWalletRequest generate(Long accountId) {
+    public static AcaPyCreateWalletRequest generate(String accountId) {
       return AcaPyCreateWalletRequest.builder()
           .label("{" + accountId + "}")
           .walletKey(UUID.randomUUID().toString())
