@@ -75,4 +75,18 @@
         WHERE booking_id = #{bookingId}
     </delete>
 
+    <update id="updateStatus">
+        UPDATE tb_booking
+        SET status = #{status}, updated_at = NOW()
+        WHERE event_schedule_id = #{eventScheduleId}
+        AND status = 'BOOKED'
+    </update>
+
+    <select id="findAllByEventScheduleId" parameterType="long" resultType="Booking">
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, status
+        FROM tb_booking
+        WHERE event_schedule_id = #{eventScheduleId}
+        AND status = 'BOOKED'
+    </select>
+
 </mapper> 

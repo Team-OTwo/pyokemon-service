@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RequestMapping("/api/invitations")
+@RequestMapping("/api/verifications")
 @RestController
 @AllArgsConstructor
-public class InvitationController {
+public class VerificationController {
 }
