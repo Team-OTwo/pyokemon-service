@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(
     basePackages = {"com.pyokemon.account", "com.pyokemon.common", "com.pyokemon.common.exception"})
 @MapperScan({"com.pyokemon.account.auth.repository", "com.pyokemon.account.tenant.repository",
-    "com.pyokemon.account.user.repository", "com.pyokemon.account.admin.repository", "com.pyokemon.account.user.bff.repository"})
+    "com.pyokemon.account.user.repository", "com.pyokemon.account.admin.repository", "com.pyokemon.account.user.bff.repository", "com.pyokemon.account.tenant.bff.repository"})
 public class AccountApplication {
 
   public static void main(String[] args) {

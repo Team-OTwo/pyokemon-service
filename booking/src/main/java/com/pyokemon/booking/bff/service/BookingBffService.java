@@ -90,6 +90,6 @@ public class BookingBffService {
   private BookingDto toDto(Booking b) {
     return BookingDto.builder().bookingId(b.getBookingId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
-        .status(b.getStatus()).updatedAt(b.getUpdatedAt()).build();
+        .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
   }
 }
