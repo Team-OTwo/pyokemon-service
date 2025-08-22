@@ -30,20 +30,19 @@ public class UserWalletServiceImpl implements UserWalletService {
     private final RemoteUserAcaPyService remoteUserAcaPyService;
 
 
-    @Override
+        @Override
     @Transactional
     public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(String userId) {
-        // 사전 검증
-        validateWalletCreation(userId);
-        
-        // 로컬 DB에 이미 존재하는지 먼저 확인
-        if (existsByUserId(userId)) {
-            log.info("로컬 DB에 이미 지갑이 존재: userId={}", userId);
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ResponseDto.error("이미 지갑이 존재하는 사용자입니다.", DidErrorCodes.WALLET_ALREADY_EXISTS));
-        }
-        
         try {
+            // 사전 검증
+            validateWalletCreation(userId);
+
+            // 로컬 DB에 이미 존재하는지 먼저 확인
+            if (existsByUserId(userId)) {
+                log.info("로컬 DB에 이미 지갑이 존재: userId={}", userId);
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(ResponseDto.error("이미 지갑이 존재하는 사용자입니다.", DidErrorCodes.WALLET_ALREADY_EXISTS));
+            }
             // ACA-Py에 지갑 생성 요청
             String token = createWalletInAcaPy(userId);
             
@@ -119,12 +118,12 @@ public class UserWalletServiceImpl implements UserWalletService {
         int affectedRows = userWalletRepository.saveAndReturn(userWallet);
         
         if (affectedRows == 0) {
-            throw new BusinessException("지갑 저장에 실패했습니다.", DidErrorCodes.WALLET_CREATION_FAILED);
+            throw new RuntimeException("지갑 저장에 실패했습니다.");
         }
         
         // 생성된 ID로 완전한 데이터를 조회하여 반환
         return userWalletRepository.findById(userWallet.getId())
-                .orElseThrow(() -> new BusinessException("지갑 저장 후 조회에 실패했습니다.", DidErrorCodes.WALLET_CREATION_FAILED));
+                .orElseThrow(() -> new RuntimeException("지갑 저장 후 조회에 실패했습니다."));
     }
     
 
