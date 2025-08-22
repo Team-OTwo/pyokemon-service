@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.remote.tenantacapy.RemoteTenantAcaPyService;
-import com.pyokemon.did.remote.tenantacapy.dto.request.WalletRequest;
+import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 

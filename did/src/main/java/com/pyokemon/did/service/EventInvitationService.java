@@ -1,7 +1,7 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.domain.dto.request.EventInvitationRequest.CreateEventInvitationRequest;
-import com.pyokemon.did.remote.mediator.dto.response.CreateMediatorInvitationResponse;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreateWalletRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse;
 
 public interface EventInvitationService {
 
@@ -10,8 +10,8 @@ public interface EventInvitationService {
    *
    * @return 미디에이터 초대장 응답
    */
-  CreateMediatorInvitationResponse getMediatorInvitation();
+  WalletResponse.AcaPyCreateWalletResponse getMediatorInvitation();
 
-  void createEventInvitation(CreateEventInvitationRequest request);
+  void createEventInvitation(AcaPyCreateWalletRequest request);
 
 }
