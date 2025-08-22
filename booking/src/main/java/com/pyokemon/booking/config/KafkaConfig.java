@@ -1,5 +1,6 @@
 package com.pyokemon.booking.config;
 
+import com.pyokemon.booking.dto.kafka.EventKafkaDto;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +34,24 @@ public class KafkaConfig {
   }
 
   @Bean
+  public ConsumerFactory<String, EventKafkaDto> eventKafkaDtoConsumerFactory() {
+    return CommonKafkaConfig.createConsumerFactory(bootstrapServers, applicationName,
+            EventKafkaDto.class, "com.pyokemon.booking.dto.kafka", "com.pyokemon.event.dto.kafka");
+  }
+
+  @Bean
   public ConcurrentKafkaListenerContainerFactory<String, PaymentKafkaDto> kafkaListenerContainerFactory() {
     ConcurrentKafkaListenerContainerFactory<String, PaymentKafkaDto> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(paymentKafkaDtoConsumerFactory());
+    return factory;
+  }
+
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, EventKafkaDto> eventkafkaListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, EventKafkaDto> factory =
+            new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(eventKafkaDtoConsumerFactory());
     return factory;
   }
 
