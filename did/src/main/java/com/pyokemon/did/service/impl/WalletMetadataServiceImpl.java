@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
+import feign.FeignException;
 
 @Slf4j
 @Service
@@ -74,7 +75,7 @@ public class WalletMetadataServiceImpl implements WalletMetadataService {
                     // 임시로 메타데이터 생성 (실제로는 AcaPy API를 통해 조회해야 함)
                     com.pyokemon.did.domain.WalletMetadata walletMetadata = com.pyokemon.did.domain.WalletMetadata.builder()
                             .walletKey(walletKey)
-                            .tenantToken("existing_token_for_" + tenantId) // 실제로는 AcaPy에서 조회해야 함
+                            .token("existing_token_for_" + tenantId) // 실제로는 AcaPy에서 조회해야 함
                             .tenantId(tenantId)
                             .build();
                     

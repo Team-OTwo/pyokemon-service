@@ -8,4 +8,8 @@ public final class DidErrorCodes {
     
     // 초대장 관련 에러
     public static final String INVITATION_CREATION_FAILED = "INVITATION_CREATION_FAILED";
+
+    public static final String INVALID_REQUEST = "INVALID_REQUEST";
+    public static final String DATABASE_ERROR = "DATABASE_ERROR";
+    public static final String ACAPY_SERVICE_ERROR = "ACAPY_SERVICE_ERROR";
 }
