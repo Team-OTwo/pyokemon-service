@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.account.user.bff.repository.UserBffRepository">
+
+    <select id="findByAccountId" resultType="com.pyokemon.account.user.entity.User">
+        SELECT * FROM tb_user WHERE account_id = #{accountId}
+    </select>
+
+    <!-- 다건: ids가 비어 있으면 0행 반환 -->
+    <select id="findAllByAccountIdIn"
+            parameterType="map"
+            resultType="com.pyokemon.account.user.entity.User">
+        SELECT *
+        FROM tb_user
+        WHERE
+        <choose>
+            <when test="ids != null and ids.size() > 0">
+                account_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </when>
+            <otherwise>
+                1 = 0
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper> 
