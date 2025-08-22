@@ -2,9 +2,6 @@ package com.pyokemon.account.user.bff.dto;
 
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
