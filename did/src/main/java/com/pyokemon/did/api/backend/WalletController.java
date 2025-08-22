@@ -1,13 +1,35 @@
 package com.pyokemon.did.api.backend;
 
-import lombok.AllArgsConstructor;
+import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.domain.UserWallet;
+import com.pyokemon.did.domain.dto.request.UserWalletRequest.CreateUserWalletRequest;
+import com.pyokemon.did.service.UserWalletService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @Slf4j
 @RequestMapping("/backend/wallets")
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WalletController {
+
+    private final UserWalletService userWalletService;
+
+    @PostMapping(value = "/user")
+    public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(@Valid @RequestBody CreateUserWalletRequest request){
+        log.info("사용자 지갑 생성 요청: userId={}", request.getUserId());
+        
+        userWalletService.createUserWallet(request.getUserId());
+        log.info("사용자 지갑 생성 완료: userId={}", request.getUserId());
+        return ResponseEntity.ok(ResponseDto.success(Map.of("userId", String.valueOf(request.getUserId())), "사용자 지갑 생성 완료"));
+    }
 }

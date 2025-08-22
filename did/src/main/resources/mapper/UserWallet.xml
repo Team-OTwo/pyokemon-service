@@ -30,6 +30,11 @@
         INSERT INTO tb_user_wallet (user_id, token, created_at, updated_at)
         VALUES (#{userId}, #{token}, NOW(), NOW())
     </insert>
+    
+    <insert id="saveAndReturn" parameterType="com.pyokemon.did.domain.UserWallet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_user_wallet (user_id, token, created_at, updated_at)
+        VALUES (#{userId}, #{token}, NOW(), NOW())
+    </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.UserWallet">
         UPDATE tb_user_wallet 
