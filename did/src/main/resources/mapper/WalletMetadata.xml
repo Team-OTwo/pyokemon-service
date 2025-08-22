@@ -25,6 +25,8 @@
     </select>
 
     <select id="findByTenantId" resultMap="walletMetadataMap">
-        SELECT wallet_metadata_id, wallet_key, tenant_token, tenant_id FROM tb_wallet_metadata WHERE tenant_id = #{tenantId}
+        SELECT wallet_metadata_id, wallet_key, tenant_token, tenant_id 
+        FROM tb_wallet_metadata 
+        WHERE tenant_id = #{tenantId}
     </select>
 </mapper>

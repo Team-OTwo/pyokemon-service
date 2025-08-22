@@ -39,3 +39,5 @@ public record CreateMediatorInvitationResponse(
         String serviceEndpoint
     ) {}
 }
+
+

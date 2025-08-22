@@ -1,4 +1,4 @@
-package com.pyokemon.did.remote.tenant.dto.request;
+package com.pyokemon.did.remote.tenantacapy.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

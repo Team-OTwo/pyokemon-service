@@ -1,4 +1,4 @@
-package com.pyokemon.did.remote.tenant.dto.response;
+package com.pyokemon.did.remote.tenantacapy.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.did.domain.WalletMetadata;
