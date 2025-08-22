@@ -39,7 +39,7 @@ public interface UserWalletRepository {
      * @param userId 조회할 user_id
      * @return UserWallet (Optional)
      */
-    Optional<UserWallet> findByUserId(String userId);
+    Optional<UserWallet> findByUserId(Long userId);
 
     /**
      * token으로 UserWallet을 조회합니다.
@@ -78,7 +78,7 @@ public interface UserWalletRepository {
      * @param userId 삭제할 user_id
      * @return 삭제된 행 수
      */
-    int deleteByUserId(String userId);
+    int deleteByUserId(Long userId);
 
     /**
      * token으로 UserWallet을 삭제합니다.

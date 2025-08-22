@@ -11,11 +11,11 @@ import lombok.*;
 public class UserWallet extends BaseEntity {
 
     private Long id;
-    private String userId;
+    private Long userId;
     private String token;
 
     @Builder
-    public UserWallet(String userId, String token) {
+    public UserWallet(Long userId, String token) {
         this.userId = userId;
         this.token = token;
     }

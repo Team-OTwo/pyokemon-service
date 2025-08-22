@@ -36,7 +36,7 @@ class WalletControllerTest {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
-    private static final String TEST_USER_ID = "test-user-123";
+    private static final Long TEST_USER_ID = 123L;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +49,7 @@ class WalletControllerTest {
     void createUserWallet_Success() throws Exception {
         // given
         CreateUserWalletRequest request = new CreateUserWalletRequest(TEST_USER_ID);
-        Map<String, String> responseData = Map.of("userId", TEST_USER_ID);
+        Map<String, String> responseData = Map.of("userId", String.valueOf(TEST_USER_ID));
         ResponseDto<Map<String, String>> responseDto = ResponseDto.success(responseData, "사용자 지갑 생성 완료");
         ResponseEntity<ResponseDto<Map<String, String>>> responseEntity = ResponseEntity.ok(responseDto);
 
@@ -63,7 +63,7 @@ class WalletControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("사용자 지갑 생성 완료"))
-                .andExpect(jsonPath("$.data.userId").value(TEST_USER_ID))
+                .andExpect(jsonPath("$.data.userId").value(String.valueOf(TEST_USER_ID)))
                 .andExpect(jsonPath("$.errorCode").isEmpty());
     }
 
@@ -89,14 +89,14 @@ class WalletControllerTest {
     }
 
     @Test
-    @DisplayName("빈 userId로 지갑 생성 시도 시 BAD_REQUEST 반환")
-    void createUserWallet_EmptyUserId_ReturnsBadRequest() throws Exception {
+    @DisplayName("null userId로 지갑 생성 시도 시 BAD_REQUEST 반환")
+    void createUserWallet_NullUserId_ReturnsBadRequest() throws Exception {
         // given
-        CreateUserWalletRequest request = new CreateUserWalletRequest("");
+        CreateUserWalletRequest request = new CreateUserWalletRequest(null);
         ResponseDto<Map<String, String>> responseDto = ResponseDto.error("사용자 ID는 필수입니다.", "INVALID_REQUEST");
         ResponseEntity<ResponseDto<Map<String, String>>> responseEntity = ResponseEntity.badRequest().body(responseDto);
 
-        when(userWalletService.createUserWallet("")).thenReturn(responseEntity);
+        when(userWalletService.createUserWallet(null)).thenReturn(responseEntity);
 
         // when & then
         mockMvc.perform(post("/backend/wallets/user")
@@ -156,24 +156,4 @@ class WalletControllerTest {
                 .andExpect(status().isUnsupportedMediaType());
     }
 
-    @Test
-    @DisplayName("null userId로 지갑 생성 시도 시 BAD_REQUEST 반환")
-    void createUserWallet_NullUserId_ReturnsBadRequest() throws Exception {
-        // given
-        CreateUserWalletRequest request = new CreateUserWalletRequest(null);
-        ResponseDto<Map<String, String>> responseDto = ResponseDto.error("사용자 ID는 필수입니다.", "INVALID_REQUEST");
-        ResponseEntity<ResponseDto<Map<String, String>>> responseEntity = ResponseEntity.badRequest().body(responseDto);
-
-        when(userWalletService.createUserWallet(null)).thenReturn(responseEntity);
-
-        // when & then
-        mockMvc.perform(post("/backend/wallets/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("사용자 ID는 필수입니다."))
-                .andExpect(jsonPath("$.errorCode").value("INVALID_REQUEST"));
-    }
 }

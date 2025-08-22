@@ -32,7 +32,7 @@ public class UserWalletServiceImpl implements UserWalletService {
 
         @Override
     @Transactional
-    public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(String userId) {
+    public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(Long userId) {
         try {
             // 사전 검증
             validateWalletCreation(userId);
@@ -49,7 +49,7 @@ public class UserWalletServiceImpl implements UserWalletService {
             // 로컬 DB에 저장
             saveWalletToDatabase(userId, token);
             
-            return ResponseEntity.ok(ResponseDto.success(Map.of("userId", userId), "사용자 지갑 생성 완료"));
+                           return ResponseEntity.ok(ResponseDto.success(Map.of("userId", String.valueOf(userId)), "사용자 지갑 생성 완료"));
             
         } catch (BusinessException e) {
             return ResponseEntity.badRequest()
@@ -62,13 +62,13 @@ public class UserWalletServiceImpl implements UserWalletService {
     }
     
 
-    private void validateWalletCreation(String userId) {
-        if (userId == null || userId.trim().isEmpty()) {
+    private void validateWalletCreation(Long userId) {
+        if (userId == null) {
             throw new BusinessException("사용자 ID는 필수입니다.", DidErrorCodes.INVALID_REQUEST);
         }
     }
     
-        private String createWalletInAcaPy(String userId) {
+        private String createWalletInAcaPy(Long userId) {
         try {
             AcaPyCreateWalletRequest request = AcaPyCreateWalletRequest.generate(userId);
             log.info("=== ACA-Py 지갑 생성 요청 ===");
@@ -108,7 +108,7 @@ public class UserWalletServiceImpl implements UserWalletService {
         }
     }
     
-    private UserWallet saveWalletToDatabase(String userId, String token) {
+    private UserWallet saveWalletToDatabase(Long userId, String token) {
         UserWallet userWallet = UserWallet.builder()
                 .userId(userId)
                 .token(token)
@@ -129,13 +129,13 @@ public class UserWalletServiceImpl implements UserWalletService {
 
 
     @Override
-    public UserWallet getUserWallet(String userId) {
+    public UserWallet getUserWallet(Long userId) {
         return userWalletRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException("해당 userId의 지갑을 찾을 수 없습니다: " + userId, DidErrorCodes.WALLET_NOTFOUND));
     }
 
     @Override
-    public boolean existsByUserId(String userId) {
+    public boolean existsByUserId(Long userId) {
         return userWalletRepository.findByUserId(userId).isPresent();
     }
 

@@ -47,7 +47,7 @@ class UserWalletServiceTest {
     @InjectMocks
     private UserWalletServiceImpl userWalletService;
 
-    private static final String TEST_USER_ID = "test-user-123";
+    private static final Long TEST_USER_ID = 123L;
     private static final String TEST_TOKEN = "test-token-123";
     private static final String TEST_WALLET_ID = "test-wallet-123";
 
@@ -92,7 +92,7 @@ class UserWalletServiceTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getData()).containsEntry("userId", TEST_USER_ID);
+        assertThat(response.getBody().getData()).containsEntry("userId", String.valueOf(TEST_USER_ID));
         assertThat(response.getBody().getMessage()).isEqualTo("사용자 지갑 생성 완료");
 
         verify(userWalletRepository).findByUserId(TEST_USER_ID);
@@ -128,29 +128,10 @@ class UserWalletServiceTest {
     }
 
     @Test
-    @DisplayName("빈 userId로 지갑 생성 시도 시 예외 발생")
-    void createUserWallet_EmptyUserId_ThrowsException() {
-        // given
-        String emptyUserId = "";
-
-        // when & then
-        ResponseEntity<ResponseDto<Map<String, String>>> response = userWalletService.createUserWallet(emptyUserId);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().isSuccess()).isFalse();
-        assertThat(response.getBody().getErrorCode()).isEqualTo(DidErrorCodes.INVALID_REQUEST);
-        assertThat(response.getBody().getMessage()).isEqualTo("사용자 ID는 필수입니다.");
-
-        verify(userWalletRepository, never()).findByUserId(anyString());
-        verify(remoteUserAcaPyService, never()).acaPyCreateWallet(any());
-    }
-
-    @Test
     @DisplayName("null userId로 지갑 생성 시도 시 예외 발생")
     void createUserWallet_NullUserId_ThrowsException() {
         // given
-        String nullUserId = null;
+        Long nullUserId = null;
 
         // when & then
         ResponseEntity<ResponseDto<Map<String, String>>> response = userWalletService.createUserWallet(nullUserId);
@@ -161,7 +142,7 @@ class UserWalletServiceTest {
         assertThat(response.getBody().getErrorCode()).isEqualTo(DidErrorCodes.INVALID_REQUEST);
         assertThat(response.getBody().getMessage()).isEqualTo("사용자 ID는 필수입니다.");
 
-        verify(userWalletRepository, never()).findByUserId(anyString());
+        verify(userWalletRepository, never()).findByUserId(anyLong());
         verify(remoteUserAcaPyService, never()).acaPyCreateWallet(any());
     }
 

@@ -17,7 +17,7 @@ public interface UserWalletService {
      * @param userId 사용자 ID
      * @return ResponseEntity (성공 시 userId, 실패 시 에러 응답)
      */
-    ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(String userId);
+    ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(Long userId);
     
     /**
      * 사용자 지갑 조회
@@ -25,7 +25,7 @@ public interface UserWalletService {
      * @param userId 사용자 ID
      * @return UserWallet 엔티티 (없으면 null)
      */
-    UserWallet getUserWallet(String userId);
+    UserWallet getUserWallet(Long userId);
     
     /**
      * 사용자 지갑 존재 여부 확인
@@ -33,7 +33,7 @@ public interface UserWalletService {
      * @param userId 사용자 ID
      * @return 존재 여부
      */
-    boolean existsByUserId(String userId);
+    boolean existsByUserId(Long userId);
 
     public List<UserWallet> getAllUserWallets();
 

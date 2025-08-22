@@ -13,6 +13,6 @@ public class UserWalletRequest {
     @AllArgsConstructor
     public static class CreateUserWalletRequest {
         @JsonProperty("user_id")
-        private String userId;
+        private Long userId;
     }
 }
