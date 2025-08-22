@@ -13,4 +13,6 @@ public interface SeatRepository {
   List<Seat> findByVenueIdAndSeatClassId(Long venueId, Long seatClassId);
 
   Long countByVenueIdAndSeatClassId(Long venueId, Long seatClassId);
+  
+  List<Seat> findByVenueId(Long venueId);
 }

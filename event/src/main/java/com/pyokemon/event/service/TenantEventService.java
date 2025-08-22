@@ -131,6 +131,9 @@ public class TenantEventService {
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
+        // Redis에 좌석 상태 초기화
+        redisService.initSeatStatuses(eventScheduleId, scheduleDto.getVenueId());
+
         // Save prices if present
         if (scheduleDto.getPrices() != null) {
           for (PriceDto priceDto : scheduleDto.getPrices()) {
@@ -157,7 +160,7 @@ public class TenantEventService {
 
     Long eventScheduleId = saveEventSchedule(eventSchedule);
 
-    redisService.initSeatStatuses(eventScheduleId);
+    redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
     // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
@@ -243,7 +246,7 @@ public class TenantEventService {
     Long newScheduleId = newSchedule.getEventScheduleId();
 
     // 새 스케줄 추가 시 좌석 상태를 Redis에 초기화
-    redisService.initSeatStatuses(newScheduleId);
+    redisService.initSeatStatuses(newScheduleId, scheduleDto.getVenueId());
 
     // 새 가격 정보 추가
     if (scheduleDto.getPrices() != null) {

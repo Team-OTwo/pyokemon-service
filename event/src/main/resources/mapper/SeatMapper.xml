@@ -23,4 +23,10 @@
         WHERE venue_id = #{param1} AND seat_class_id = #{param2}
     </select>
 
+    <select id="findByVenueId" resultType="Seat" parameterType="long">
+        SELECT seat_id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
+        FROM tb_seat
+        WHERE venue_id = #{param1}
+    </select>
+
 </mapper>

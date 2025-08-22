@@ -144,4 +144,39 @@ public class RedisController {
       return ResponseEntity.internalServerError().body("좌석 상태 삭제 실패: " + e.getMessage());
     }
   }
+
+  /**
+   * 특정 공연 스케줄의 모든 좌석 상태를 seatClassName별로 조회합니다.
+   */
+  @GetMapping("/{scheduleId}/status/by-class")
+  public ResponseEntity<Map<String, Map<String, String>>> getAllSeatStatusesBySeatClass(@PathVariable Long scheduleId) {
+    log.info("좌석 클래스별 전체 상태 조회 요청: scheduleId={}", scheduleId);
+
+    try {
+      Map<String, Map<String, String>> seatStatuses = redisService.getAllSeatStatusesBySeatClass(scheduleId);
+      return ResponseEntity.ok(seatStatuses);
+    } catch (Exception e) {
+      log.error("좌석 클래스별 전체 상태 조회 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
+      return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * 특정 seatClassName의 좌석 상태를 조회합니다.
+   */
+  @GetMapping("/{scheduleId}/status/class/{seatClassName}")
+  public ResponseEntity<Map<String, String>> getSeatStatusesBySeatClassName(
+      @PathVariable Long scheduleId,
+      @PathVariable String seatClassName) {
+    log.info("좌석 클래스별 상태 조회 요청: scheduleId={}, seatClassName={}", scheduleId, seatClassName);
+
+    try {
+      Map<String, String> seatStatuses = redisService.getSeatStatusesBySeatClassName(scheduleId, seatClassName);
+      return ResponseEntity.ok(seatStatuses);
+    } catch (Exception e) {
+      log.error("좌석 클래스별 상태 조회 실패: scheduleId={}, seatClassName={}, error={}", 
+                scheduleId, seatClassName, e.getMessage(), e);
+      return ResponseEntity.internalServerError().build();
+    }
+  }
 }
