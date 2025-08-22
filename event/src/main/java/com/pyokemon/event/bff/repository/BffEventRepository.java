@@ -22,4 +22,10 @@ public interface BffEventRepository {
     List<BffSeatDto> findSeatsByIdIn(@Param("ids") List<Long> ids);
 
     List<BffSeatClassDto> findSeatClassesByIdIn(@Param("ids") List<Long> ids);
+
+    List<BffEventScheduleDto> findEventSchedulesByIdIn(@Param("ids") List<Long> ids);
+
+    List<BffEventDto> findEventsByIdIn(@Param("ids") List<Long> ids);
+
+    List<BffVenueDto> findVenuesByIdIn(@Param("ids") List<Long> ids);
 }

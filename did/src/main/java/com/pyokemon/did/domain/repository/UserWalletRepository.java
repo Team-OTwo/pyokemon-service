@@ -16,6 +16,14 @@ public interface UserWalletRepository {
      * @return 저장된 UserWallet의 ID
      */
     Long save(UserWallet userWallet);
+    
+    /**
+     * UserWallet을 저장합니다.
+     *
+     * @param userWallet 저장할 UserWallet
+     * @return 영향받은 행 수
+     */
+    int saveAndReturn(UserWallet userWallet);
 
     /**
      * ID로 UserWallet을 조회합니다.

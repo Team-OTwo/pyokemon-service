@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pyokemon.account.tenant.bff.repository.TenantBffRepository">
+
+    <resultMap id="tenantResultMap" type="com.pyokemon.account.tenant.entity.Tenant">
+        <id property="tenantId" column="tenant_id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <select id="findByTenantId" parameterType="long" resultMap="tenantResultMap">
+        SELECT
+            tenant_id,
+            name
+        FROM
+            tb_tenant
+        WHERE
+            tenant_id = #{tenantId}
+    </select>
+
+</mapper>

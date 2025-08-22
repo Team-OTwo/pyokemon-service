@@ -65,4 +65,44 @@
             </otherwise>
         </choose>
     </select>
+
+
+    <select id="findEventSchedulesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventScheduleDto">
+        SELECT event_schedule_id, event_id, venue_id, event_date
+        FROM tb_event_schedule
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                event_schedule_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findEventsByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventDto">
+        SELECT event_id, title, thumbnail_url
+        FROM tb_event
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                event_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findVenuesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffVenueDto">
+        SELECT venue_id, venue_name
+        FROM tb_venue
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                venue_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>
