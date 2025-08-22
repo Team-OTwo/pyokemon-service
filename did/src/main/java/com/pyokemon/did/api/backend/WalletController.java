@@ -1,6 +1,9 @@
 package com.pyokemon.did.api.backend;
 
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.did.domain.dto.request.TenantWalletRequest;
+import com.pyokemon.did.domain.dto.request.TenantWalletRequest.CreateWalletRequest;
+import com.pyokemon.did.service.TenantWalletService;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.UserWallet;
 import com.pyokemon.did.domain.dto.request.UserWalletRequest.CreateUserWalletRequest;
@@ -21,6 +24,13 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class WalletController {
+    private final TenantWalletService tenantWalletService;
+
+    @PostMapping("/tenant")
+    public ResponseEntity<ResponseDto<Void>> registerTenantWallet(@RequestBody @Valid CreateWalletRequest createWalletRequest) {
+        tenantWalletService.registerTenantWallet(createWalletRequest);
+
+        return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
 
     private final UserWalletService userWalletService;
 

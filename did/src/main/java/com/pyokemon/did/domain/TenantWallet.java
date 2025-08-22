@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

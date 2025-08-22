@@ -38,7 +38,7 @@ public class WalletRequest {
      * @param accountId 계정 식별자
      * @return 구성된 지갑 생성 요청
      */
-    public static AcaPyCreateWalletRequest generate(Long accountId) {
+    public static AcaPyCreateWalletRequest of(Long accountId) {
       return AcaPyCreateWalletRequest.builder()
           .label("{" + accountId + "}")
           .walletKey(UUID.randomUUID().toString())
@@ -71,9 +71,9 @@ public class WalletRequest {
       private String keyType;
     }
 
-    public static AcaPyCreatePublicDidRequest generate() {
+    public static AcaPyCreatePublicDidRequest of(String method) {
       return AcaPyCreatePublicDidRequest.builder()
-          .method("key")
+          .method(method)
           .options(Options.builder()
               .public_(true)
               .keyType("ed25519")

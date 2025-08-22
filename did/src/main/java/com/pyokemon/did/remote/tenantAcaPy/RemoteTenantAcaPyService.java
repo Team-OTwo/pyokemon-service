@@ -1,6 +1,8 @@
 package com.pyokemon.did.remote.tenantAcaPy;
 
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreatePublicDidRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreateWalletRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreatePublicDidResponse;
@@ -21,7 +23,10 @@ public interface RemoteTenantAcaPyService {
     public AcaPyCreateWalletResponse acaPyCreateWallet(@RequestBody AcaPyCreateWalletRequest request);
 
     @PostMapping(value = "/wallet/did/create")
-    public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(@RequestBody AcaPyCreatePublicDidResponse request);
+    public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody AcaPyCreatePublicDidRequest request
+    );
 
     @PostMapping(value="/out-of-band/create-invitation?auto_accept=true&multi_use=true")
     public AcaPyCreateInvitationResponse createInvitation(
