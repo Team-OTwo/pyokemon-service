@@ -5,8 +5,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pyokemon.event.service.SeatStatusInitService;
-import com.pyokemon.event.service.SeatStatusService;
+import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/seats")
 @RequiredArgsConstructor
 @Slf4j
-public class SeatStatusController {
+public class RedisController {
 
-  private final SeatStatusService seatStatusService;
-  private final SeatStatusInitService seatStatusInitService;
+  private final RedisService redisService;
 
   /**
    * 특정 공연 스케줄의 모든 좌석 상태를 조회합니다.
@@ -28,7 +26,7 @@ public class SeatStatusController {
     log.info("좌석 상태 조회 요청: scheduleId={}", scheduleId);
 
     try {
-      Map<String, String> seatStatuses = seatStatusService.getAllSeatStatuses(scheduleId);
+      Map<String, String> seatStatuses = redisService.getAllSeatStatuses(scheduleId);
       return ResponseEntity.ok(seatStatuses);
     } catch (Exception e) {
       log.error("좌석 상태 조회 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
@@ -45,7 +43,7 @@ public class SeatStatusController {
     log.info("좌석 상태 조회 요청: scheduleId={}, seatId={}", scheduleId, seatId);
 
     try {
-      String status = seatStatusService.getSeatStatus(scheduleId, seatId);
+      String status = redisService.getSeatStatus(scheduleId, seatId);
       return ResponseEntity.ok(status);
     } catch (Exception e) {
       log.error("좌석 상태 조회 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
@@ -68,7 +66,7 @@ public class SeatStatusController {
         userId, ttlSeconds);
 
     try {
-      seatStatusService.holdSeat(scheduleId, seatId, userId, ttlSeconds);
+      redisService.holdSeat(scheduleId, seatId, userId, ttlSeconds);
       return ResponseEntity.ok("좌석 홀드 성공");
     } catch (Exception e) {
       log.error("좌석 홀드 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
@@ -86,7 +84,7 @@ public class SeatStatusController {
     log.info("좌석 홀드 해제 요청: scheduleId={}, seatId={}", scheduleId, seatId);
 
     try {
-      seatStatusService.releaseSeatHold(scheduleId, seatId);
+      redisService.releaseSeatHold(scheduleId, seatId);
       return ResponseEntity.ok("좌석 홀드 해제 성공");
     } catch (Exception e) {
       log.error("좌석 홀드 해제 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
@@ -104,7 +102,7 @@ public class SeatStatusController {
     log.info("좌석 예약 확정 요청: scheduleId={}, seatId={}", scheduleId, seatId);
 
     try {
-      seatStatusService.confirmSeat(scheduleId, seatId);
+      redisService.confirmSeat(scheduleId, seatId);
       return ResponseEntity.ok("좌석 예약 확정 성공");
     } catch (Exception e) {
       log.error("좌석 예약 확정 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
@@ -122,30 +120,12 @@ public class SeatStatusController {
     log.info("좌석 예매 취소 요청: scheduleId={}, seatId={}", scheduleId, seatId);
 
     try {
-      seatStatusService.cancelSeat(scheduleId, seatId);
+      redisService.cancelSeat(scheduleId, seatId);
       return ResponseEntity.ok("좌석 예매 취소 성공");
     } catch (Exception e) {
       log.error("좌석 예매 취소 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
           e.getMessage(), e);
       return ResponseEntity.internalServerError().body("좌석 예매 취소 실패: " + e.getMessage());
-    }
-  }
-
-  /**
-   * 좌석을 블록 상태로 설정합니다.
-   */
-  @PostMapping("/{scheduleId}/{seatId}/block")
-  public ResponseEntity<String> blockSeat(@PathVariable Long scheduleId,
-      @PathVariable Integer seatId) {
-    log.info("좌석 블록 요청: scheduleId={}, seatId={}", scheduleId, seatId);
-
-    try {
-      seatStatusService.blockSeat(scheduleId, seatId);
-      return ResponseEntity.ok("좌석 블록 성공");
-    } catch (Exception e) {
-      log.error("좌석 블록 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
-          e.getMessage(), e);
-      return ResponseEntity.internalServerError().body("좌석 블록 실패: " + e.getMessage());
     }
   }
 
@@ -157,46 +137,11 @@ public class SeatStatusController {
     log.info("좌석 상태 삭제 요청: scheduleId={}", scheduleId);
 
     try {
-      seatStatusService.deleteSeatStatuses(scheduleId);
+      redisService.deleteSeatStatuses(scheduleId);
       return ResponseEntity.ok("좌석 상태 삭제 성공");
     } catch (Exception e) {
       log.error("좌석 상태 삭제 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
       return ResponseEntity.internalServerError().body("좌석 상태 삭제 실패: " + e.getMessage());
-    }
-  }
-
-  /**
-   * 수동 초기화(테스트/운영툴용): 좌석 해시가 없으면 1..120을 빈 문자열로 채움.
-   */
-  @PostMapping("/{scheduleId}/init")
-  public ResponseEntity<String> initSeats(@PathVariable Long scheduleId) {
-    try {
-      seatStatusInitService.initSeatStatuses(scheduleId);
-      return ResponseEntity.ok("좌석 초기화 완료");
-    } catch (Exception e) {
-      log.error("좌석 초기화 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
-      return ResponseEntity.internalServerError().body("좌석 초기화 실패: " + e.getMessage());
-    }
-  }
-
-  public static class SeatHoldRequest {
-    private Long userId;
-    private Long ttlSeconds;
-
-    public Long getUserId() {
-      return userId;
-    }
-
-    public void setUserId(Long userId) {
-      this.userId = userId;
-    }
-
-    public Long getTtlSeconds() {
-      return ttlSeconds;
-    }
-
-    public void setTtlSeconds(Long ttlSeconds) {
-      this.ttlSeconds = ttlSeconds;
     }
   }
 }
