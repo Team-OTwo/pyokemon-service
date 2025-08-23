@@ -12,10 +12,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantWallet extends BaseEntity {
+    private Long tenantId;
+    private String token;
+    private String publicDid;
+    private String publicVerkey;
 
-  private Long id;
-  private Long tenantId;
-  private String token;
-  private String publicDid;
-  private String publicVerkey;
 }
