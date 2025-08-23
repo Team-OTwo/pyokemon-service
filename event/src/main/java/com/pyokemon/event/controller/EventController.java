@@ -2,9 +2,6 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
-import com.pyokemon.event.dto.*;
-import com.pyokemon.event.repository.TenantEventRepository;
-import com.pyokemon.event.service.TenantEventService;
 import jakarta.validation.Valid;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -14,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.event.dto.*;
+import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
+import com.pyokemon.event.service.TenantEventService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -100,9 +100,10 @@ public class EventController {
     return eventScheduleService.getSeatInfoByGrade(eventScheduleId, seatGrade);
   }
 
-  //공연등록 승인
+  // 공연등록 승인
   @PostMapping("/approved/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateApprovedStatusEvent(@PathVariable Long eventId){
+  public ResponseEntity<CancelEventResponseDTO> updateApprovedStatusEvent(
+      @PathVariable Long eventId) {
     CancelEventResponseDTO dto = new CancelEventResponseDTO();
     dto.setEventId(eventId);
     dto.setStatus("APPROVED");
@@ -110,9 +111,10 @@ public class EventController {
     return ResponseEntity.ok().build();
   }
 
-  //공연등록 거절
+  // 공연등록 거절
   @PostMapping("/rejected/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateRejectedStatusEvent(@PathVariable Long eventId){
+  public ResponseEntity<CancelEventResponseDTO> updateRejectedStatusEvent(
+      @PathVariable Long eventId) {
     CancelEventResponseDTO dto = new CancelEventResponseDTO();
     dto.setEventId(eventId);
     dto.setStatus("REJECTED");

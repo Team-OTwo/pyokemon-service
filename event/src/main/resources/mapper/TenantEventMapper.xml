@@ -205,6 +205,9 @@
         <if test="cursorDate != null and cursorId != null">
             AND (es.event_date, e.event_id) &gt;= (#{cursorDate}, #{cursorId})
         </if>
+        <if test="genre != null">
+            AND e.genre = #{genre}
+        </if>
         ORDER BY es.event_date ASC, e.event_id ASC
         <if test="limit != null">
             LIMIT #{limit}

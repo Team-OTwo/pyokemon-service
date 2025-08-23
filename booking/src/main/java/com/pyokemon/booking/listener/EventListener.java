@@ -1,14 +1,16 @@
 package com.pyokemon.booking.listener;
 
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.booking.dto.kafka.EventKafkaDto;
 import com.pyokemon.booking.dto.kafka.PaymentKafkaDto;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.service.BookingService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -20,7 +22,8 @@ public class EventListener {
 
   @KafkaListener(
       topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).EVENT_STATUS_UPDATED}",
-      groupId = "${spring.application.name}", containerFactory = "eventkafkaListenerContainerFactory")
+      groupId = "${spring.application.name}",
+      containerFactory = "eventkafkaListenerContainerFactory")
   public void handleEventStatusUpdate(EventKafkaDto evtdto) {
     try {
       log.info("이벤트 상태 업데이트 수신: {}", evtdto);

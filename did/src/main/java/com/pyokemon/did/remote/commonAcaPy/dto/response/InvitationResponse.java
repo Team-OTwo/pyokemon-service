@@ -1,14 +1,15 @@
 package com.pyokemon.did.remote.commonAcaPy.dto.response;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * ACA-PY OOB(Out of Band) 초대장 응답을 위한 DTO 그룹
@@ -89,4 +90,5 @@ public class InvitationResponse {
     public static class AcaPyReceiveInvitationResponse {
         private String state;
     }
+
 }

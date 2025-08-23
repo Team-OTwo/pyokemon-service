@@ -1,9 +1,9 @@
 package com.pyokemon.did.service;
 
+import java.util.Optional;
+
 import com.pyokemon.did.domain.TenantWallet;
 import com.pyokemon.did.domain.dto.request.TenantWalletRequest.CreateWalletRequest;
-
-import java.util.Optional;
 
 public interface TenantWalletService {
     /**
@@ -20,4 +20,5 @@ public interface TenantWalletService {
      * @return 테넌트 지갑 정보 (Optional)
      */
     Optional<TenantWallet> getWalletByTenantId(Long tenantId);
+
 }

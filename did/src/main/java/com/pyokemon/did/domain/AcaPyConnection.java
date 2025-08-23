@@ -2,6 +2,11 @@ package com.pyokemon.did.domain;
 
 import com.pyokemon.common.entity.BaseEntity;
 import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)

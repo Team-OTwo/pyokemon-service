@@ -10,10 +10,10 @@ import com.pyokemon.event.entity.SeatClass;
 @Mapper
 public interface SeatClassRepository {
   Optional<SeatClass> findByClassName(String className);
-  
+
   List<SeatClass> findAll();
-  
+
   List<SeatClass> findByVenueId(Long venueId);
-  
+
   Optional<SeatClass> findById(Long seatClassId);
 }

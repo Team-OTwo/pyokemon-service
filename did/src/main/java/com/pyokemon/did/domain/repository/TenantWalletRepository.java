@@ -46,18 +46,11 @@ public interface TenantWalletRepository {
     int update(TenantWallet tenantWallet);
 
     /**
-     * ID로 TenantWallet을 삭제합니다.
-     *
-     * @param id 삭제할 TenantWallet의 ID
-     * @return 삭제된 행 수
-     */
-    int deleteById(Long id);
-
-    /**
      * 테넌트 ID로 TenantWallet을 삭제합니다.
      *
      * @param tenantId 삭제할 테넌트 ID
      * @return 삭제된 행 수
      */
     int deleteByTenantId(Long tenantId);
+
 }

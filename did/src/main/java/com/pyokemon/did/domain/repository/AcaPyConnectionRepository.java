@@ -53,4 +53,5 @@ public interface AcaPyConnectionRepository {
      * @return 삭제된 행 수
      */
     int deleteById(Long id);
+
 }

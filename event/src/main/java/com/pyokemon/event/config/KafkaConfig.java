@@ -1,7 +1,14 @@
 package com.pyokemon.event.config;
 
-import com.pyokemon.common.config.CommonKafkaConfig;
-import com.pyokemon.event.dto.kafka.BookingEventDto;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -12,20 +19,13 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
-import org.springframework.beans.factory.annotation.Value;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pyokemon.common.config.CommonKafkaConfig;
+import com.pyokemon.event.dto.kafka.BookingEventDto;
 
 @Configuration
 public class KafkaConfig {
@@ -52,14 +52,16 @@ public class KafkaConfig {
     config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
     config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-    
+
     // ErrorHandlingDeserializer 설정
     config.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
     config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
 
-    JsonDeserializer<BookingEventDto> jsonDeserializer = new JsonDeserializer<>(BookingEventDto.class);
+    JsonDeserializer<BookingEventDto> jsonDeserializer =
+        new JsonDeserializer<>(BookingEventDto.class);
     jsonDeserializer.setRemoveTypeHeaders(false);
-    jsonDeserializer.addTrustedPackages("com.pyokemon.booking.dto.kafka", "com.pyokemon.event.dto.kafka");
+    jsonDeserializer.addTrustedPackages("com.pyokemon.booking.dto.kafka",
+        "com.pyokemon.event.dto.kafka");
     jsonDeserializer.setUseTypeMapperForKey(true);
 
     return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), jsonDeserializer);
@@ -69,10 +71,10 @@ public class KafkaConfig {
   @Primary
   public ConcurrentKafkaListenerContainerFactory<String, BookingEventDto> kafkaListenerContainerFactory() {
     ConcurrentKafkaListenerContainerFactory<String, BookingEventDto> factory =
-       new ConcurrentKafkaListenerContainerFactory<>();
-     factory.setConsumerFactory(bookingEventDtoConsumerFactory());
-     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
-     return factory;
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(bookingEventDtoConsumerFactory());
+    factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+    return factory;
   }
 
   @Bean("kafkaTemplate")

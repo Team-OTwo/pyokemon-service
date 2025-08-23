@@ -5,10 +5,17 @@ import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Service;
+
+import com.pyokemon.common.kafka.KafkaTopicConstants;
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -16,15 +23,12 @@ import org.springframework.stereotype.Service;
 public class KafkaMessageConsumer {
     private final AcaPyConnectionService acaPyConnectionService;
 
-    @KafkaListener(
-            topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
-            properties = {
-                    JsonDeserializer.VALUE_DEFAULT_TYPE
-                            + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"
-            },
-            groupId = "${spring.application.name}")
-    void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
-        log.info("Received booking event: {}", event);
+  @KafkaListener(topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
+      properties = {JsonDeserializer.VALUE_DEFAULT_TYPE
+          + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"},
+      groupId = "${spring.application.name}")
+  void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
+    log.info("Received booking event: {}", event);
 
         try {
             if ("BOOKED".equals(event.getStatus())) {
@@ -36,5 +40,7 @@ public class KafkaMessageConsumer {
             log.error("Error processing booking event: {}", event, e);
             // 에러 처리 로직
         }
+
     }
+  }
 }

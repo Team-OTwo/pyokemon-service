@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BffSeatClassDto {
-    private Long seatClassId;
-    private String className;
-    private Integer priority;
+  private Long seatClassId;
+  private String className;
+  private Integer priority;
 }

@@ -1,5 +1,12 @@
 package com.pyokemon.did.service.impl;
 
+import static com.pyokemon.common.exception.code.DidErrorCodes.*;
+
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.TenantWallet;
 import com.pyokemon.did.domain.dto.request.TenantWalletRequest.CreateWalletRequest;
@@ -10,14 +17,9 @@ import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCrea
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.TenantWalletService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
-import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
 
 @Slf4j
@@ -93,5 +95,12 @@ public class TenantWalletServiceImpl implements TenantWalletService {
     @Override
     public Optional<TenantWallet> getWalletByTenantId(Long tenantId) {
         return tenantWalletRepository.findByTenantId(tenantId);
+
     }
+  }
+
+  @Override
+  public Optional<TenantWallet> checkExistingTenantWallet(Long tenantId) {
+    return tenantWalletRepository.findByTenantId(tenantId);
+  }
 }
