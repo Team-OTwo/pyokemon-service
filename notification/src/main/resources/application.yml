@@ -1,20 +1,20 @@
 server:
-  port: 8081
+  port: 8085
   servlet:
-    context-path: /event
+    context-path: /notification
 
 spring:
   application:
-    name: event-service
+    name: notification-service
   profiles:
     include:
       - flyway
       - common
 
   datasource:
-    url: jdbc:mysql://localhost:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3312/pyokemon_notification?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: pyokemon_event
+    username: pyokemon
     password: pyokemon123
     hikari:
       maximum-pool-size: 10
@@ -24,7 +24,7 @@ spring:
       max-lifetime: 1800000
 
   flyway:
-    locations: classpath:db/migration/event
+    locations: classpath:db/migration/notification
 
   kafka:
     consumer:
