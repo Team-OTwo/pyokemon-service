@@ -6,11 +6,9 @@ Configuration:
       - name: log-pattern
         value: "[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [%X{spanId}] - %highlight{%msg%n}"
       - name: log-path
-        value: "${env:LOG_PATH:-logs}"
+        value: "${env:LOG_PATH:-/app/logs}"
       - name: service-name
         value: "${env:SERVICE_NAME:-unknown-service}"
-      - name: enable-file-logging
-        value: "${env:ENABLE_FILE_LOGGING:-false}"
   
   Appenders:
     Console:

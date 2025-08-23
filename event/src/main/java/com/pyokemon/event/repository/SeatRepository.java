@@ -9,10 +9,10 @@ import com.pyokemon.event.entity.Seat;
 @Mapper
 public interface SeatRepository {
   List<Seat> findBySeatClassId(Long seatClassId);
-  
+
   List<Seat> findByVenueIdAndSeatClassId(Long venueId, Long seatClassId);
 
   Long countByVenueIdAndSeatClassId(Long venueId, Long seatClassId);
-  
+
   List<Seat> findByVenueId(Long venueId);
 }

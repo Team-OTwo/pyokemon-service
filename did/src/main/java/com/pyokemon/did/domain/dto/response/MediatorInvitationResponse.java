@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 public class MediatorInvitationResponse {
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class CreateMediatorInvitationResponse {
-        private String invitationUrl;
-    }
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class CreateMediatorInvitationResponse {
+    private String invitationUrl;
+  }
 }

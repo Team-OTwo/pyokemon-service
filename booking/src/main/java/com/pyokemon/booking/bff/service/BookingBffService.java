@@ -59,9 +59,9 @@ public class BookingBffService {
   }
 
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
-                                                                  Integer size) {
+      Integer size) {
     List<Booking> bookings =
-            bookingBffRepository.findByEventScheduleIdOrderByDate(eventScheduleId, page * size, size);
+        bookingBffRepository.findByEventScheduleIdOrderByDate(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {
@@ -69,7 +69,7 @@ public class BookingBffService {
     }
 
     List<BookingDto> dtoList = bookings.stream().map(this::toDto) // Booking -> BookingDto
-            .toList();
+        .toList();
 
 
     return new PageResponse<>(dtoList, page, totalCount);

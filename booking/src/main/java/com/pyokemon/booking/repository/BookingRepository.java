@@ -36,8 +36,7 @@ public interface BookingRepository {
 
   void delete(@Param("bookingId") Long bookingId);
 
-  Long updateStatus(@Param("eventScheduleId") Long eventScheduleId,
-                    @Param("status") String status);
+  Long updateStatus(@Param("eventScheduleId") Long eventScheduleId, @Param("status") String status);
 
   List<Booking> findAllByEventScheduleId(Long eventScheduleId);
 }
