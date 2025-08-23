@@ -13,5 +13,7 @@ public interface SeatClassRepository {
   
   List<SeatClass> findAll();
   
+  List<SeatClass> findByVenueId(Long venueId);
+  
   Optional<SeatClass> findById(Long seatClassId);
 }
