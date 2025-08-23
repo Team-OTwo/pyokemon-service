@@ -98,7 +98,15 @@ public class RedisService {
     
     try {
       Map<String, Map<String, String>> result = new LinkedHashMap<>();
-      List<SeatClass> seatClasses = seatClassRepository.findAll();
+      
+      Long venueId = getVenueIdByScheduleId(scheduleId);
+      List<SeatClass> seatClasses = seatClassRepository.findByVenueId(venueId);
+      
+      // 해당 venue의 모든 좌석 정보를 가져옴
+      List<Seat> venueSeats = seatRepository.findByVenueId(venueId);
+      Set<Long> venueSeatIds = venueSeats.stream()
+          .map(Seat::getSeatId)
+          .collect(Collectors.toSet());
       
       for (SeatClass seatClass : seatClasses) {
         String className = seatClass.getClassName();
@@ -109,10 +117,17 @@ public class RedisService {
           Map<String, String> classStatuses = new LinkedHashMap<>();
           for (Map.Entry<Object, Object> entry : statusMap.entrySet()) {
             String seatId = (String) entry.getKey();
+            Long seatIdLong = Long.parseLong(seatId);
+            
+            // 해당 venue의 좌석인지 확인
+            if (!venueSeatIds.contains(seatIdLong)) {
+              continue; // 다른 venue의 좌석이면 스킵
+            }
+            
             String status = (String) entry.getValue();
             
             // hold 상태 확인
-            String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, Integer.parseInt(seatId));
+            String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatIdLong.intValue());
             String holdValue = redis.opsForValue().get(holdKey);
             if (holdValue != null) {
               classStatuses.put(seatId, "HELD");
@@ -135,15 +150,30 @@ public class RedisService {
     log.info("좌석 클래스별 상태 조회: scheduleId={}, seatClassName={}", scheduleId, seatClassName);
     
     try {
+      Long venueId = getVenueIdByScheduleId(scheduleId);
+      
+      // 해당 venue의 모든 좌석 정보를 가져옴
+      List<Seat> venueSeats = seatRepository.findByVenueId(venueId);
+      Set<Long> venueSeatIds = venueSeats.stream()
+          .map(Seat::getSeatId)
+          .collect(Collectors.toSet());
+      
       String classKey = String.format(SEAT_CLASS_STATUS_KEY_PATTERN, scheduleId, seatClassName);
       Map<Object, Object> statusMap = redis.opsForHash().entries(classKey);
       
       Map<String, String> result = new LinkedHashMap<>();
       for (Map.Entry<Object, Object> entry : statusMap.entrySet()) {
         String seatId = (String) entry.getKey();
+        Long seatIdLong = Long.parseLong(seatId);
+        
+        // 해당 venue의 좌석인지 확인
+        if (!venueSeatIds.contains(seatIdLong)) {
+          continue; // 다른 venue의 좌석이면 스킵
+        }
+        
         String status = (String) entry.getValue();
         
-        String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, Integer.parseInt(seatId));
+        String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatIdLong.intValue());
         String holdValue = redis.opsForValue().get(holdKey);
         if (holdValue != null) {
           result.put(seatId, "HELD");
