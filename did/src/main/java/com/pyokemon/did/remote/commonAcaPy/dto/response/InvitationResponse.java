@@ -2,6 +2,7 @@ package com.pyokemon.did.remote.commonAcaPy.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,7 +60,7 @@ public class InvitationResponse {
                     .inviMsgId(inviMsgId)
                     .tenantId(tenantId)
                     .userId(userId)
-                    .status(AcaPyConnection.ConnectionStatus.PENDING)
+                    .status(ConnectionStatus.PENDING)
                     .build();
         }
     }
