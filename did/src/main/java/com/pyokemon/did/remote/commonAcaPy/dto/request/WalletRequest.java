@@ -35,20 +35,18 @@ public class WalletRequest {
     /**
      * 특정 계정을 위한 지갑 요청을 생성하는 팩토리 메서드
      *
-     * @param accountId 계정 식별자
      * @return 구성된 지갑 생성 요청
      */
-    public static AcaPyCreateWalletRequest of(Long accountId) {
+    public static AcaPyCreateWalletRequest of() {
       return AcaPyCreateWalletRequest.builder()
-          .label("{" + accountId + "}")
+          .label("user wallet")
           .walletKey(UUID.randomUUID().toString())
-          .walletName("wallet:" + accountId)
+          .walletName("wallet:" + UUID.randomUUID().toString())
           .walletType("askar")
           .walletDispatchType("default")
           .keyManagementMode("managed")
           .build();
     }
-
   }
 
   @Data

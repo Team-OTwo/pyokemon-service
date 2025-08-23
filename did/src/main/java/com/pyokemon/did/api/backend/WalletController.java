@@ -31,6 +31,7 @@ public class WalletController {
         tenantWalletService.registerTenantWallet(createWalletRequest);
 
         return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
+    }
 
     private final UserWalletService userWalletService;
 

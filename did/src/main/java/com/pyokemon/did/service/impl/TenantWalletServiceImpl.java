@@ -45,7 +45,7 @@ public class TenantWalletServiceImpl implements TenantWalletService {
             // 1. 지갑 생성 요청
             log.info("테넌트 ID {}에 대한 지갑 생성 요청", tenantId);
             AcaPyCreateWalletResponse walletResponse = remoteTenantAcaPyService.acaPyCreateWallet(
-                AcaPyCreateWalletRequest.of(tenantId)
+                AcaPyCreateWalletRequest.of()
             );
             
             if (walletResponse == null || walletResponse.getToken() == null) {
