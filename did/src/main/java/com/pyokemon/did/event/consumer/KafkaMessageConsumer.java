@@ -2,6 +2,7 @@ package com.pyokemon.did.event.consumer;
 
 import com.pyokemon.common.kafka.KafkaTopicConstants;
 import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
+import com.pyokemon.did.service.AcaPyConnectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaMessageConsumer {
-
+    private final AcaPyConnectionService acaPyConnectionService;
 
     @KafkaListener(
             topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
@@ -26,6 +27,9 @@ public class KafkaMessageConsumer {
         log.info("Received booking event: {}", event);
 
         try {
+            if ("BOOKED".equals(event.getStatus())) {
+                acaPyConnectionService.createAcaPyConnection(event.getTenantId(), event.getAccountId());
+            }
 
             ack.acknowledge();
         } catch (Exception e) {
