@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.commonAcaPy.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.domain.AcaPyConnection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,6 +52,16 @@ public class InvitationResponse {
 
         @JsonProperty("invitation_url")
         private String invitationUrl;
+
+        public AcaPyConnection toEntity(Long tenantId, Long userId) {
+            return AcaPyConnection.builder()
+                    .connectionId(null)
+                    .inviMsgId(inviMsgId)
+                    .tenantId(tenantId)
+                    .userId(userId)
+                    .status(AcaPyConnection.ConnectionStatus.PENDING)
+                    .build();
+        }
     }
     
 
@@ -75,22 +86,6 @@ public class InvitationResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AcaPyReceiveInvitationResponse {
-        @JsonProperty("@type")
-        private String type;
-        
-        @JsonProperty("@id")
-        private String id;
-        
-        private String label;
-        
-        @JsonProperty("handshake_protocols")
-        private List<String> handshakeProtocols;
-        
-        private List<String> accept;
-        
-        private List<String> services;
-        
-        @JsonProperty("use_did_method")
-        private String useDidMethod;
+        private String state;
     }
 }

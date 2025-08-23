@@ -3,71 +3,44 @@ package com.pyokemon.did.domain.repository;
 import com.pyokemon.did.domain.TenantWallet;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * 테넌트 지갑 데이터에 접근하기 위한 Repository 인터페이스
+ */
 @Mapper
 public interface TenantWalletRepository {
 
     /**
-     * TenantWallet을 저장합니다.
+     * TenantWallet 객체를 저장합니다.
      *
-     * @param tenantWallet 저장할 TenantWallet
+     * @param tenantWallet 저장할 TenantWallet 객체
      * @return 저장된 TenantWallet의 ID
      */
     Long save(TenantWallet tenantWallet);
 
-    /**
-     * ID로 TenantWallet을 조회합니다.
-     *
-     * @param id 조회할 TenantWallet의 ID
-     * @return TenantWallet (Optional)
-     */
-    Optional<TenantWallet> findById(Long id);
 
     /**
-     * tenant_id로 TenantWallet을 조회합니다.
+     * 테넌트 ID로 TenantWallet을 조회합니다.
      *
-     * @param tenantId 조회할 tenant_id
-     * @return TenantWallet (Optional)
+     * @param tenantId 조회할 테넌트 ID
+     * @return 조회된 TenantWallet (Optional)
      */
     Optional<TenantWallet> findByTenantId(Long tenantId);
 
     /**
-     * token으로 TenantWallet을 조회합니다.
+     * 테넌트 ID로 지갑 존재 여부를 확인합니다.
      *
-     * @param token 조회할 token
-     * @return TenantWallet (Optional)
+     * @param tenantId 확인할 테넌트 ID
+     * @return 지갑 존재 여부 (존재하면 true, 없으면 false)
      */
-    Optional<TenantWallet> findByToken(String token);
+    boolean existsByTenantId(Long tenantId);
+
 
     /**
-     * public_did로 TenantWallet을 조회합니다.
+     * TenantWallet 객체를 업데이트합니다.
      *
-     * @param publicDid 조회할 public_did
-     * @return TenantWallet (Optional)
-     */
-    Optional<TenantWallet> findByPublicDid(String publicDid);
-
-    /**
-     * public_verkey로 TenantWallet을 조회합니다.
-     *
-     * @param publicVerkey 조회할 public_verkey
-     * @return TenantWallet (Optional)
-     */
-    Optional<TenantWallet> findByPublicVerkey(String publicVerkey);
-
-    /**
-     * 모든 TenantWallet 목록을 조회합니다.
-     *
-     * @return TenantWallet 목록
-     */
-    List<TenantWallet> findAll();
-
-    /**
-     * TenantWallet을 업데이트합니다.
-     *
-     * @param tenantWallet 업데이트할 TenantWallet
+     * @param tenantWallet 업데이트할 TenantWallet 객체
      * @return 업데이트된 행 수
      */
     int update(TenantWallet tenantWallet);
@@ -81,18 +54,10 @@ public interface TenantWalletRepository {
     int deleteById(Long id);
 
     /**
-     * tenant_id로 TenantWallet을 삭제합니다.
+     * 테넌트 ID로 TenantWallet을 삭제합니다.
      *
-     * @param tenantId 삭제할 tenant_id
+     * @param tenantId 삭제할 테넌트 ID
      * @return 삭제된 행 수
      */
     int deleteByTenantId(Long tenantId);
-
-    /**
-     * token으로 TenantWallet을 삭제합니다.
-     *
-     * @param token 삭제할 token
-     * @return 삭제된 행 수
-     */
-    int deleteByToken(String token);
 }

@@ -11,8 +11,6 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantWallet extends BaseEntity {
-
-    private Long id;
     private Long tenantId;
     private String token;
     private String publicDid;

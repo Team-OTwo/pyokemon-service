@@ -1,19 +1,15 @@
 package com.pyokemon.did.domain;
 
 import com.pyokemon.common.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AcaPyConnection extends BaseEntity {
 
-    private Long id;
     private String connectionId;
     private String inviMsgId;
     private Long tenantId;
@@ -21,14 +17,8 @@ public class AcaPyConnection extends BaseEntity {
     private ConnectionStatus status;
 
     public enum ConnectionStatus {
-        INITIAL,
-        INVITATION_SENT,
-        INVITATION_RECEIVED,
-        REQUEST_SENT,
-        REQUEST_RECEIVED,
-        RESPONSE_SENT,
-        RESPONSE_RECEIVED,
-        COMPLETED,
-        ABANDONED
+        PENDING,
+        ACTIVE,
+        REVOKED
     }
 }

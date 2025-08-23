@@ -30,18 +30,17 @@ public class TenantWalletServiceImpl implements TenantWalletService {
 
     @Override
     @Transactional
-    public void registerTenantWallet(CreateWalletRequest createWalletRequest) {
+    public void registerTenantWallet(CreateWalletRequest createWalletRequest) throws BusinessException {
         Long tenantId = createWalletRequest.getTenantId();
-        
-        // 기존 지갑 존재 여부 확인
-        Optional<TenantWallet> existingWallet = checkExistingTenantWallet(tenantId);
-        if (existingWallet.isPresent()) {
-            log.error("테넌트 ID {}에 대한 지갑이 이미 존재합니다.", tenantId);
-            throw new BusinessException("테넌트 지갑이 이미 존재합니다.", WALLET_ALREADY_EXISTS);
-        }
-
 
         try {
+            // 기존 지갑 존재 여부 확인
+            boolean exists = tenantWalletRepository.existsByTenantId(tenantId);
+            if (exists) {
+                log.error("테넌트 ID {}에 대한 지갑이 이미 존재합니다.", tenantId);
+                throw new BusinessException("테넌트 지갑이 이미 존재합니다.", WALLET_ALREADY_EXISTS);
+            }
+
             // 1. 지갑 생성 요청
             log.info("테넌트 ID {}에 대한 지갑 생성 요청", tenantId);
             AcaPyCreateWalletResponse walletResponse = remoteTenantAcaPyService.acaPyCreateWallet(
@@ -92,7 +91,7 @@ public class TenantWalletServiceImpl implements TenantWalletService {
     }
 
     @Override
-    public Optional<TenantWallet> checkExistingTenantWallet(Long tenantId) {
+    public Optional<TenantWallet> getWalletByTenantId(Long tenantId) {
         return tenantWalletRepository.findByTenantId(tenantId);
     }
 }

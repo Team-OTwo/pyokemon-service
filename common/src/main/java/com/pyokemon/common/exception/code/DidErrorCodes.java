@@ -13,6 +13,7 @@ public final class DidErrorCodes {
 
     // 초대장 관련 에러
     public static final String INVITATION_CREATION_FAILED = "INVITATION_CREATION_FAILED";
+    public static final String INVITATION_RECEIVE_FAILED = "INVITATION_RECEIVE_FAILED";
     public static final String INVITATION_INVALID = "INVITATION_INVALID";
 
     // Connection 관련 에러

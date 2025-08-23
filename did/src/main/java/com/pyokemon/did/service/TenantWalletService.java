@@ -14,11 +14,10 @@ public interface TenantWalletService {
     void registerTenantWallet(CreateWalletRequest createWalletRequest);
     
     /**
-     * 테넌트 ID로 테넌트 지갑 존재 여부를 확인합니다.
-     * 지갑 생성 전 기존 지갑이 있는지 검증하는 용도로 사용됩니다.
+     * 테넌트 ID로 테넌트 지갑을 조회합니다.
      *
-     * @param tenantId 확인할 테넌트 ID
+     * @param tenantId 조회할 테넌트 ID
      * @return 테넌트 지갑 정보 (Optional)
      */
-    Optional<TenantWallet> checkExistingTenantWallet(Long tenantId);
+    Optional<TenantWallet> getWalletByTenantId(Long tenantId);
 }

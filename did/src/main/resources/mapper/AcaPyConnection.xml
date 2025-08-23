@@ -13,24 +13,12 @@
         <result column="updated_at" property="updatedAt" />
     </resultMap>
 
-    <select id="findById" resultMap="AcaPyConnectionResultMap">
-        SELECT * FROM tb_acapy_connection WHERE id = #{id}
+    <select id="findByTenantIdAndUserId" resultMap="AcaPyConnectionResultMap">
+        SELECT * FROM tb_acapy_connection WHERE tenant_id = #{tenantId} AND user_id = #{userId} ORDER BY created_at DESC
     </select>
-
-    <select id="findByConnectionId" resultMap="AcaPyConnectionResultMap">
-        SELECT * FROM tb_acapy_connection WHERE connection_id = #{connectionId}
-    </select>
-
-    <select id="findByTenantId" resultMap="AcaPyConnectionResultMap">
-        SELECT * FROM tb_acapy_connection WHERE tenant_id = #{tenantId} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByUserId" resultMap="AcaPyConnectionResultMap">
-        SELECT * FROM tb_acapy_connection WHERE user_id = #{userId} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByStatus" resultMap="AcaPyConnectionResultMap">
-        SELECT * FROM tb_acapy_connection WHERE status = #{status} ORDER BY created_at DESC
+    
+    <select id="existsByTenantIdAndUserId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_acapy_connection WHERE tenant_id = #{tenantId} AND user_id = #{userId} AND status = 'ACTIVE'
     </select>
 
     <insert id="save" parameterType="com.pyokemon.did.domain.AcaPyConnection" useGeneratedKeys="true" keyProperty="id">
@@ -46,10 +34,6 @@
 
     <delete id="deleteById">
         DELETE FROM tb_acapy_connection WHERE id = #{id}
-    </delete>
-
-    <delete id="deleteByConnectionId">
-        DELETE FROM tb_acapy_connection WHERE connection_id = #{connectionId}
     </delete>
 
 </mapper> 
