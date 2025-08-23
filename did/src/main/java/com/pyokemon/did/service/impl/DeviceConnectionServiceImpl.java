@@ -76,9 +76,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
         AcaPyCreateInvitationResponse mediatorAcapyResponse = remoteMediatorAcaPyService.acaPyCreateInvitation(mediatorRequest);
 
-        // 5. DeviceConnection 저장 (connection_id는 임시로 UUID 생성, webhook에서 나중에 업데이트)
+        // 5. DeviceConnection 저장 (connection_id는 null로 설정, webhook에서 나중에 업데이트)
         DeviceConnection deviceConnection = DeviceConnection.builder()
-                .connectionId(java.util.UUID.randomUUID().toString())  // 임시 UUID
+                .connectionId(null)  // webhook에서 실제 connection_id로 업데이트 예정
                 .inviMsgId(userAcapyResponse.getInviMsgId())
                 .deviceId(deviceId)  // Gateway 헤더에서 받은 device_id
                 .userId(userId)      // userId도 함께 저장

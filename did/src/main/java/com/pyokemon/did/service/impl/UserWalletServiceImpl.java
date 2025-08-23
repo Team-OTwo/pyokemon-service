@@ -70,11 +70,5 @@ public class UserWalletServiceImpl implements UserWalletService {
             throw new RuntimeException("지갑 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
-    
-
-
-    
-
-
 
 }
