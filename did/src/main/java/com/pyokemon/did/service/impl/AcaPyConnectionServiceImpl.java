@@ -51,21 +51,20 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
             TenantWallet tenantWallet = tenantWalletService.getWalletByTenantId(tenantId)
                     .orElseThrow(() -> new BusinessException("테넌트 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
-            // 2. 테넌트 AcaPy 에서 초대장 생성
-            AcaPyCreateInvitationResponse invitation = createInvitation(tenantWallet, tenantId, userId);
-
-            // 3. 사용자 지갑 조회
+            // 2. 사용자 지갑 조회
             log.info("사용자 ID {}에 대한 지갑 조회", userId);
             UserWallet userWallet = userWalletRepository.findByUserId(userId)
                     .orElseThrow(() -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
+            // 3. 테넌트 AcaPy 에서 초대장 생성
+            AcaPyCreateInvitationResponse invitation = createInvitation(tenantWallet, tenantId, userId);
 
             // 4. 연결 정보 저장
             log.info("테넌트 ID {} 및 사용자 ID {}에 대한 연결 정보 저장", tenantId, userId);
             acaPyConnectionRepository.save(invitation.toEntity(tenantId, userId));
 
             // 5. 사용자 AcaPy 에서 초대장 수락
-            acceptInvitation(userWallet, invitation, tenantId, userId);
+            receiveInvitation(userWallet, invitation, tenantId, userId);
 
             log.info("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 완료", tenantId, userId);
         } catch (BusinessException e) {
@@ -89,7 +88,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
      */
     private AcaPyCreateInvitationResponse createInvitation(TenantWallet tenantWallet, Long tenantId, Long userId) {
         log.info("테넌트 ID {}에서 사용자 ID {}로의 초대장 생성 요청", tenantId, userId);
-        AcaPyCreateInvitationResponse invitation = remoteTenantAcaPyService.createInvitation(
+        AcaPyCreateInvitationResponse invitation = remoteTenantAcaPyService.acaPyCreateInvitation(
                 tenantWallet.getToken(),
                 AcaPyCreateInvitationRequest.of(
                         "Invitation to USER AcaPy from TENANT AcaPy",
@@ -113,7 +112,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
      * @param tenantId 테넌트 ID
      * @param userId 사용자 ID
      */
-    private void acceptInvitation(UserWallet userWallet, AcaPyCreateInvitationResponse invitation, Long tenantId, Long userId) {
+    private void receiveInvitation(UserWallet userWallet, AcaPyCreateInvitationResponse invitation, Long tenantId, Long userId) {
         log.info("사용자 ID {}가 테넌트 ID {}의 초대장 수락 요청", userId, tenantId);
         AcaPyReceiveInvitationResponse receivedInvitation = remoteUserAcaPyService.acaPyReceiveInvitation(
                 userWallet.getToken(),

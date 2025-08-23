@@ -99,7 +99,7 @@ class AcaPyConnectionServiceTest {
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
                 .thenReturn(createInvitationResponse);
         when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class)))
                 .thenReturn(receivedInvitationResponse);
@@ -111,7 +111,7 @@ class AcaPyConnectionServiceTest {
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(userWalletRepository).findByUserId(USER_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
 
         ArgumentCaptor<AcaPyConnection> acaPyConnectionCaptor = ArgumentCaptor.forClass(AcaPyConnection.class);
         verify(acaPyConnectionRepository).save(acaPyConnectionCaptor.capture());
@@ -139,7 +139,7 @@ class AcaPyConnectionServiceTest {
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService, never()).getWalletByTenantId(anyLong());
         verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(remoteTenantAcaPyService, never()).createInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
+        verify(remoteTenantAcaPyService, never()).acaPyCreateInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
@@ -161,59 +161,7 @@ class AcaPyConnectionServiceTest {
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(remoteTenantAcaPyService, never()).createInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
-        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
-    }
-
-    @Test
-    @DisplayName("초대장 생성 실패 테스트 - null 응답")
-    void createAcaPyConnection_InvitationCreationFailed_NullResponse() {
-        // Given
-        when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
-        when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(null);
-
-        // When & Then
-        BusinessException exception = assertThrows(BusinessException.class, () ->
-                acaPyConnectionService.createAcaPyConnection(TENANT_ID, USER_ID));
-
-        assertEquals("초대장이 생성에 실패했습니다.", exception.getMessage());
-        assertEquals(INVITATION_CREATION_FAILED, exception.getErrorCode());
-
-        verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
-        verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
-        verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
-    }
-
-    @Test
-    @DisplayName("초대장 생성 실패 테스트 - null 초대장")
-    void createAcaPyConnection_InvitationCreationFailed_NullInvitation() {
-        // Given
-        when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
-        when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        
-        AcaPyCreateInvitationResponse nullInvitationResponse = new AcaPyCreateInvitationResponse();
-        nullInvitationResponse.setInvitation(null);
-        
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(nullInvitationResponse);
-
-        // When & Then
-        BusinessException exception = assertThrows(BusinessException.class, () ->
-                acaPyConnectionService.createAcaPyConnection(TENANT_ID, USER_ID));
-
-        assertEquals("초대장이 생성에 실패했습니다.", exception.getMessage());
-        assertEquals(INVITATION_CREATION_FAILED, exception.getErrorCode());
-
-        verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
-        verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
-        verify(userWalletRepository, never()).findByUserId(anyLong());
+        verify(remoteTenantAcaPyService, never()).acaPyCreateInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
@@ -224,8 +172,6 @@ class AcaPyConnectionServiceTest {
         // Given
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(createInvitationResponse);
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
 
         // When & Then
@@ -237,8 +183,62 @@ class AcaPyConnectionServiceTest {
 
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService, never()).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
+        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
+    }
+
+    @Test
+    @DisplayName("초대장 생성 실패 테스트 - null 응답")
+    void createAcaPyConnection_InvitationCreationFailed_NullResponse() {
+        // Given
+        when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
+        when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
+        when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(null);
+
+        // When & Then
+        BusinessException exception = assertThrows(BusinessException.class, () ->
+                acaPyConnectionService.createAcaPyConnection(TENANT_ID, USER_ID));
+
+        assertEquals("초대장이 생성에 실패했습니다.", exception.getMessage());
+        assertEquals(INVITATION_CREATION_FAILED, exception.getErrorCode());
+
+        verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
+        verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
+        verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
+        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
+    }
+
+    @Test
+    @DisplayName("초대장 생성 실패 테스트 - null 초대장")
+    void createAcaPyConnection_InvitationCreationFailed_NullInvitation() {
+        // Given
+        when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
+        when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
+        when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+
+        AcaPyCreateInvitationResponse nullInvitationResponse = new AcaPyCreateInvitationResponse();
+        nullInvitationResponse.setInvitation(null);
+        
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(nullInvitationResponse);
+
+        // When & Then
+        BusinessException exception = assertThrows(BusinessException.class, () ->
+                acaPyConnectionService.createAcaPyConnection(TENANT_ID, USER_ID));
+
+        assertEquals("초대장이 생성에 실패했습니다.", exception.getMessage());
+        assertEquals(INVITATION_CREATION_FAILED, exception.getErrorCode());
+
+        verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
+        verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
+        verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
@@ -249,9 +249,9 @@ class AcaPyConnectionServiceTest {
         // Given
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(createInvitationResponse);
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(createInvitationResponse);
         when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class)))
                 .thenReturn(null);
 
@@ -264,8 +264,8 @@ class AcaPyConnectionServiceTest {
 
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
     }
@@ -276,10 +276,10 @@ class AcaPyConnectionServiceTest {
         // Given
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(createInvitationResponse);
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
-        
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(createInvitationResponse);
+
         AcaPyReceiveInvitationResponse invalidStateResponse = new AcaPyReceiveInvitationResponse();
         invalidStateResponse.setState("failed");
         
@@ -295,8 +295,8 @@ class AcaPyConnectionServiceTest {
 
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
     }
@@ -307,9 +307,9 @@ class AcaPyConnectionServiceTest {
         // Given
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
-                .thenReturn(createInvitationResponse);
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(createInvitationResponse);
         when(acaPyConnectionRepository.save(any(AcaPyConnection.class)))
                 .thenThrow(new RuntimeException("DB 저장 실패"));
 
@@ -322,19 +322,20 @@ class AcaPyConnectionServiceTest {
 
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
     }
 
     @Test
-    @DisplayName("외부 API 호출 중 예외 발생 테스트")
-    void createAcaPyConnection_ExternalApiException() {
+    @DisplayName("remoteTenantAcaPyService API 호출 중 예외 발생 테스트")
+    void remoteTenantAcaPyService_ExternalApiException() {
         // Given
         when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
         when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
-        when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+        when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
                 .thenThrow(new RuntimeException("외부 API 호출 실패"));
 
         // When & Then
@@ -346,9 +347,36 @@ class AcaPyConnectionServiceTest {
 
         verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
-        verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
-        verify(userWalletRepository, never()).findByUserId(anyLong());
+        verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
+    }
+
+    @Test
+    @DisplayName("remoteUserAcaPyService API 호출 중 예외 발생 테스트")
+    void remoteUserAcaPyService_ExternalApiException() {
+        // Given
+        when(acaPyConnectionRepository.existsByTenantIdAndUserId(TENANT_ID, USER_ID)).thenReturn(false);
+        when(tenantWalletService.getWalletByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
+        when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
+        when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
+                .thenReturn(createInvitationResponse);
+        when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class)))
+                .thenThrow(new RuntimeException("외부 API 호출 실패"));
+
+        // When & Then
+        BusinessException exception = assertThrows(BusinessException.class, () ->
+                acaPyConnectionService.createAcaPyConnection(TENANT_ID, USER_ID));
+
+        assertEquals("AcaPy간 연결 생성에 실패했습니다.", exception.getMessage());
+        assertEquals(CONNECTION_CREATION_FAILED, exception.getErrorCode());
+
+        verify(acaPyConnectionRepository).existsByTenantIdAndUserId(TENANT_ID, USER_ID);
+        verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
+        verify(userWalletRepository).findByUserId(USER_ID);
+        verify(remoteTenantAcaPyService).acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
+        verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 }

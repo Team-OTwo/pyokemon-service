@@ -29,7 +29,7 @@ public interface RemoteTenantAcaPyService {
     );
 
     @PostMapping(value="/out-of-band/create-invitation?auto_accept=true&multi_use=false")
-    public AcaPyCreateInvitationResponse createInvitation(
+    public AcaPyCreateInvitationResponse acaPyCreateInvitation(
         @RequestHeader("Authorization") String authorization,
         @RequestBody AcaPyCreateInvitationRequest request
     );
