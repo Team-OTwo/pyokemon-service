@@ -48,6 +48,8 @@ Configuration:
       level: INFO
       AppenderRef:
         - ref: Console
+        - ref: JsonFile
+          level: DEBUG
     Logger:
       - name: com.pyokemon
         level: DEBUG
