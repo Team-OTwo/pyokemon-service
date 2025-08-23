@@ -1,10 +1,9 @@
 package com.pyokemon.did.event.consumer;
 
 import com.pyokemon.common.kafka.KafkaTopicConstants;
-import com.pyokemon.did.event.consumer.message.booking.dto.BookingEvent;
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -20,7 +19,7 @@ public class KafkaMessageConsumer {
             topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
             properties = {
                     JsonDeserializer.VALUE_DEFAULT_TYPE
-                            + ":com.pyokemon.did.event.consumer.message.booking.dto.BookingEvent"
+                            + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"
             },
             groupId = "${spring.application.name}")
     void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
