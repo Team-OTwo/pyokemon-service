@@ -1,9 +1,11 @@
 package com.pyokemon.did.remote.config;
 
-import feign.RequestInterceptor;
+import java.util.Collection;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.Collection;
+
+import feign.RequestInterceptor;
 
 @Configuration
 public class FeignConfig {
@@ -13,7 +15,7 @@ public class FeignConfig {
         return template -> {
             // Content-Type 헤더 설정
             template.header("Content-Type", "application/json");
-            
+
             // Authorization 헤더를 Bearer 토큰 형태로 설정
             Collection<String> authorizationHeaders = template.headers().get("Authorization");
             if (authorizationHeaders != null && !authorizationHeaders.isEmpty()) {
@@ -28,4 +30,4 @@ public class FeignConfig {
             }
         };
     }
-} 
+}

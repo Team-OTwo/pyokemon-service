@@ -42,6 +42,12 @@ spring:
           max-idle: 8
           min-idle: 0
 
+  # Feign 클라이언트 설정
+  cloud:
+    openfeign:
+      client:
+        default-to-properties: false
+
 # 로그 레벨 설정
 logging:
   level:
@@ -81,3 +87,4 @@ spring:
       on-profile: "dev"
     import:
       - classpath:dev-config.yml
+

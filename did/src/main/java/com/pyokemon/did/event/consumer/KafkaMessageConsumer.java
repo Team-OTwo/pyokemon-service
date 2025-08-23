@@ -1,10 +1,9 @@
 package com.pyokemon.did.event.consumer;
 
 import com.pyokemon.common.kafka.KafkaTopicConstants;
-import com.pyokemon.did.event.consumer.message.booking.dto.BookingEvent;
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -15,27 +14,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaMessageConsumer {
 
-
     @KafkaListener(
             topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
             properties = {
                     JsonDeserializer.VALUE_DEFAULT_TYPE
-                            + ":com.pyokemon.did.event.consumer.message.booking.dto.BookingEvent"
-            },
-            groupId = "${spring.application.name}")
+                            + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"
+            })
     void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
         log.info("Received booking event: {}", event);
 
-        try {
-            switch (event.getStatus()) {
-                //case "BOOKED" -> bookedEventProcessor.process(event);
-                //case "CONFIRMED" -> confirmedEventProcessor.process(event);
-                default -> log.warn("Unknown booking status: {}", event.getStatus());
-            }
-            ack.acknowledge();
-        } catch (Exception e) {
-            log.error("Error processing booking event: {}", event, e);
-            // 에러 처리 로직
+        if ("BOOKED".equals(event.getStatus())) {
+            // TODO: BOOKED 상태 처리 로직
+            log.info("Processing BOOKED event for booking: {}", event.getBookingId());
         }
+        else if ("CONFIRMED".equals(event.getStatus())) {
+            // TODO: CONFIRMED 상태 처리 로직
+            log.info("Processing CONFIRMED event for booking: {}", event.getBookingId());
+        }
+
+        ack.acknowledge();
     }
 }

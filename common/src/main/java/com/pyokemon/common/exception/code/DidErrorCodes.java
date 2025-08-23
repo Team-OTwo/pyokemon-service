@@ -43,6 +43,10 @@ public final class DidErrorCodes {
     public static final String ACAPY_SERVICE_ERROR = "ACAPY_SERVICE_ERROR";
     public static final String ACAPY_SERVICE_UNAVAILABLE = "ACAPY_SERVICE_UNAVAILABLE";
 
+    // 인증 관련 에러
+    public static final String ACCESS_DENIED = "ACCESS_DENIED";
+    public static final String PERMISSION_DENIED = "PERMISSION_DENIED";
+
     // 일반적인 에러
     public static final String INVALID_REQUEST = "INVALID_REQUEST";
     public static final String DATABASE_ERROR = "DATABASE_ERROR";

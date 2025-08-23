@@ -15,8 +15,6 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class DeviceConnection extends BaseEntity {
 
-
-    private Long id;
     private String connectionId;
     private String inviMsgId;
     private String deviceId;
@@ -25,14 +23,12 @@ public class DeviceConnection extends BaseEntity {
     private DeviceConnectionStatus status;
 
     public enum DeviceConnectionStatus {
-        INITIAL,
         INVITATION_SENT,
         INVITATION_RECEIVED,
         REQUEST_SENT,
         REQUEST_RECEIVED,
         RESPONSE_SENT,
         RESPONSE_RECEIVED,
-        COMPLETED,
-        ABANDONED
+        COMPLETED
     }
 }

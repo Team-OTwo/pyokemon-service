@@ -26,6 +26,7 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.WALLET_CREATION_F
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TenantWalletServiceImpl implements TenantWalletService {
+
     private final RemoteTenantAcaPyService remoteTenantAcaPyService;
     private final TenantWalletRepository tenantWalletRepository;
 
