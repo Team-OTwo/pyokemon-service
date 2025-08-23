@@ -16,12 +16,11 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
-import com.pyokemon.event.repository.EventRepository;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.repository.VenueRepository;
-import com.pyokemon.event.service.SeatStatusInitService;
+import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 //@Transactional(readOnly = true)
 public class TenantEventService {
-  private final EventRepository eventRepository;
   private final TenantEventRepository tenantEventRepository;
   private final EventScheduleRepository eventScheduleRepository;
   private final VenueRepository venueRepository;
   private final PriceRepository priceRepository;
   private final ObjectMapper objectMapper;
-  private final SeatStatusInitService seatStatusInitService;
+  private final RedisService redisService;
   private final KafkaMessageProducer kafkaMessageProducer;
 
 
@@ -55,7 +53,6 @@ public class TenantEventService {
   }
 
   public MonthlyEventSummaryResponse getMonthlyEventSummary(Long accountId, int year, int month) {
-    // 월의 시작일과 종료일 계산
     String startDate = String.format("%04d-%02d-01 00:00:00", year, month);
     String endDate = String.format("%04d-%02d-%02d 23:59:59", year, month,
         java.time.YearMonth.of(year, month).lengthOfMonth());
@@ -70,7 +67,6 @@ public class TenantEventService {
 
   @Transactional
   public EventResponseDto updateEvent(EventUpdateDto eventUpdateDto) {
-    // 기존 이벤트 존재 여부 확인
     Event existingEvent = findEventById(eventUpdateDto.getEventId());
     if (existingEvent == null) {
       throw new BusinessException("Event not found with id: " + eventUpdateDto.getEventId(),
@@ -135,6 +131,9 @@ public class TenantEventService {
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
+        // Redis에 좌석 상태 초기화
+        redisService.initSeatStatuses(eventScheduleId, scheduleDto.getVenueId());
+
         // Save prices if present
         if (scheduleDto.getPrices() != null) {
           for (PriceDto priceDto : scheduleDto.getPrices()) {
@@ -161,8 +160,7 @@ public class TenantEventService {
 
     Long eventScheduleId = saveEventSchedule(eventSchedule);
 
-    // 공연 등록 시 좌석 상태를 Redis에 초기화
-    seatStatusInitService.initSeatStatuses(eventScheduleId);
+    redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
     // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
@@ -248,7 +246,7 @@ public class TenantEventService {
     Long newScheduleId = newSchedule.getEventScheduleId();
 
     // 새 스케줄 추가 시 좌석 상태를 Redis에 초기화
-    seatStatusInitService.initSeatStatuses(newScheduleId);
+    redisService.initSeatStatuses(newScheduleId, scheduleDto.getVenueId());
 
     // 새 가격 정보 추가
     if (scheduleDto.getPrices() != null) {

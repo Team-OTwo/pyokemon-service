@@ -11,4 +11,16 @@
         WHERE class_name = #{param1}
     </select>
 
+    <select id="findAll" resultType="SeatClass">
+        SELECT seat_class_id, class_name, priority, created_at, updated_at
+        FROM tb_seat_class
+        ORDER BY priority ASC
+    </select>
+
+    <select id="findById" resultType="SeatClass" parameterType="long">
+        SELECT seat_class_id, class_name, priority, created_at, updated_at
+        FROM tb_seat_class
+        WHERE seat_class_id = #{param1}
+    </select>
+
 </mapper>
