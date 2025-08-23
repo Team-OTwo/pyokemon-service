@@ -332,8 +332,8 @@ public class TenantEventService {
   }
 
   // 앱 커서 기반 공연 조회
-  public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit){
-    return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit);
+  public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit, String genre){
+    return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit, genre);
   }
   
   public void updateStatus(Long eventId, String status) {
