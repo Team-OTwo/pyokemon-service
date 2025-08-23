@@ -38,7 +38,7 @@ public class UserWalletServiceImpl implements UserWalletService {
             // 1. 지갑 생성 요청
             log.info("사용자 ID {}에 대한 지갑 생성 요청", userId);
             AcaPyCreateWalletResponse walletResponse = remoteUserAcaPyService.acaPyCreateWallet(
-                AcaPyCreateWalletRequest.generate(userId)
+                AcaPyCreateWalletRequest.of()
             );
             
             if (walletResponse == null || walletResponse.getToken() == null) {

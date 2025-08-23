@@ -26,6 +26,10 @@ spring:
   flyway:
     locations: classpath:db/migration/did
 
+  kafka:
+    consumer:
+      group-id: ${spring.application.name}
+
   # Redis 설정
   data:
     redis:
