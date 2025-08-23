@@ -25,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WalletController {
     private final TenantWalletService tenantWalletService;
+    private final UserWalletService userWalletService;
 
     @PostMapping("/tenant")
     public ResponseEntity<ResponseDto<Void>> registerTenantWallet(@RequestBody @Valid CreateWalletRequest createWalletRequest) {
@@ -32,8 +33,6 @@ public class WalletController {
 
         return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
     }
-
-    private final UserWalletService userWalletService;
 
     @PostMapping(value = "/user")
     public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(@Valid @RequestBody CreateUserWalletRequest request){
