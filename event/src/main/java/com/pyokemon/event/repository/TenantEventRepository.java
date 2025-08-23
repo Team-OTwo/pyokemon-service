@@ -32,6 +32,6 @@ public interface TenantEventRepository {
   Long findEventScheduleId (Long eventId);
 
   // 앱 커서 기반 공연 조회
-  List<TenantEventDetailDtoForApp> findEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit);
+  List<TenantEventDetailDtoForApp> findEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit, String genre);
 
 }
