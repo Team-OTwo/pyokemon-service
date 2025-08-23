@@ -112,7 +112,6 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(userWalletRepository).findByUserId(USER_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
-        verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
 
         ArgumentCaptor<AcaPyConnection> acaPyConnectionCaptor = ArgumentCaptor.forClass(AcaPyConnection.class);
         verify(acaPyConnectionRepository).save(acaPyConnectionCaptor.capture());
@@ -123,6 +122,8 @@ class AcaPyConnectionServiceTest {
         assertEquals(USER_ID, savedConnection.getUserId());
         assertEquals(ConnectionStatus.PENDING, savedConnection.getStatus());
         assertNull(savedConnection.getConnectionId());
+
+        verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
     }
 
     @Test
@@ -139,8 +140,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService, never()).getWalletByTenantId(anyLong());
         verify(userWalletRepository, never()).findByUserId(anyLong());
         verify(remoteTenantAcaPyService, never()).createInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 
     @Test
@@ -161,8 +162,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(userWalletRepository, never()).findByUserId(anyLong());
         verify(remoteTenantAcaPyService, never()).createInvitation(anyString(), any(AcaPyCreateInvitationRequest.class));
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 
     @Test
@@ -185,8 +186,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 
     @Test
@@ -213,8 +214,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 
     @Test
@@ -238,8 +239,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 
     @Test
@@ -265,8 +266,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
-        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
     }
 
     @Test
@@ -296,8 +297,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
+        verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
-        verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
     }
 
     @Test
@@ -309,8 +310,6 @@ class AcaPyConnectionServiceTest {
         when(remoteTenantAcaPyService.createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
                 .thenReturn(createInvitationResponse);
         when(userWalletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userWallet));
-        when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class)))
-                .thenReturn(receivedInvitationResponse);
         when(acaPyConnectionRepository.save(any(AcaPyConnection.class)))
                 .thenThrow(new RuntimeException("DB 저장 실패"));
 
@@ -325,8 +324,8 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository).findByUserId(USER_ID);
-        verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
         verify(acaPyConnectionRepository).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(eq(TOKEN), any(Invitation.class));
     }
 
     @Test
@@ -349,7 +348,7 @@ class AcaPyConnectionServiceTest {
         verify(tenantWalletService).getWalletByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).createInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class));
         verify(userWalletRepository, never()).findByUserId(anyLong());
-        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
         verify(acaPyConnectionRepository, never()).save(any(AcaPyConnection.class));
+        verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(Invitation.class));
     }
 }

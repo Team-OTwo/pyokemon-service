@@ -26,11 +26,7 @@ public class KafkaMessageConsumer {
         log.info("Received booking event: {}", event);
 
         try {
-            switch (event.getStatus()) {
-                //case "BOOKED" -> bookedEventProcessor.process(event);
-                //case "CONFIRMED" -> confirmedEventProcessor.process(event);
-                default -> log.warn("Unknown booking status: {}", event.getStatus());
-            }
+
             ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing booking event: {}", event, e);

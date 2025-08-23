@@ -59,13 +59,14 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
             UserWallet userWallet = userWalletRepository.findByUserId(userId)
                     .orElseThrow(() -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
-            // 4. 사용자 AcaPy 에서 초대장 수락
-            acceptInvitation(userWallet, invitation, tenantId, userId);
 
-            // 5. 연결 정보 저장
+            // 4. 연결 정보 저장
             log.info("테넌트 ID {} 및 사용자 ID {}에 대한 연결 정보 저장", tenantId, userId);
             acaPyConnectionRepository.save(invitation.toEntity(tenantId, userId));
-            
+
+            // 5. 사용자 AcaPy 에서 초대장 수락
+            acceptInvitation(userWallet, invitation, tenantId, userId);
+
             log.info("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 완료", tenantId, userId);
         } catch (BusinessException e) {
             log.error("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 중 비즈니스 예외 발생: {}", 
