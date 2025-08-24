@@ -43,12 +43,20 @@ public interface DeviceConnectionRepository {
   List<DeviceConnection> findByDeviceId(String deviceId);
 
   /**
-   * user_id로 DeviceConnection 목록을 조회합니다.
+   * user_id로 DeviceConnection을 조회합니다. 한 사용자당 하나의 DeviceConnection만 존재합니다.
    *
    * @param userId 조회할 user_id
-   * @return DeviceConnection 목록
+   * @return DeviceConnection (Optional)
    */
-  List<DeviceConnection> findByUserId(Long userId);
+  Optional<DeviceConnection> findByUserId(Long userId);
+
+  /**
+   * alias로 DeviceConnection을 조회합니다.
+   *
+   * @param alias 조회할 alias (Tracking ID)
+   * @return DeviceConnection (Optional)
+   */
+  Optional<DeviceConnection> findByAlias(String alias);
 
   /**
    * public_did로 DeviceConnection을 조회합니다.
@@ -65,6 +73,13 @@ public interface DeviceConnectionRepository {
    * @return DeviceConnection 목록
    */
   List<DeviceConnection> findByStatus(DeviceConnection.DeviceConnectionStatus status);
+
+  /**
+   * 모든 DeviceConnection을 조회합니다.
+   *
+   * @return DeviceConnection 목록
+   */
+  List<DeviceConnection> findAll();
 
   /**
    * DeviceConnection을 업데이트합니다.
@@ -97,4 +112,6 @@ public interface DeviceConnectionRepository {
    * @return 삭제된 행 수
    */
   int deleteByDeviceId(String deviceId);
+
+
 }
