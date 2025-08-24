@@ -13,12 +13,15 @@ public final class DidErrorCodes {
 
     // 초대장 관련 에러
     public static final String INVITATION_CREATION_FAILED = "INVITATION_CREATION_FAILED";
+    public static final String INVITATION_INVALID = "INVITATION_INVALID";
     public static final String INVITATION_ALREADY_SENT = "INVITATION_ALREADY_SENT";
 
 
     // Connection 관련 에러
+    public static final String CONNECTION_CREATION_FAILED = "CONNECTION_CREATION_FAILED";
     public static final String CONNECTION_NOT_FOUND = "CONNECTION_NOT_FOUND";
     public static final String CONNECTION_ALREADY_ACTIVE = "CONNECTION_ALREADY_ACTIVE";
+    public static final String CONNECTION_INVALID_STATE = "CONNECTION_INVALID_STATE";
 
     // Webhook 관련 에러
     public static final String WEBHOOK_PROCESSING_FAILED = "WEBHOOK_PROCESSING_FAILED";

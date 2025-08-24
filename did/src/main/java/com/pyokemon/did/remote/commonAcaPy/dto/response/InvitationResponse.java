@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +54,16 @@ public class InvitationResponse {
 
     @JsonProperty("invitation_url")
     private String invitationUrl;
+
+    public AcaPyConnection toEntity(Long tenantId, Long userId) {
+      return AcaPyConnection.builder()
+              .connectionId(null)
+              .inviMsgId(inviMsgId)
+              .tenantId(tenantId)
+              .userId(userId)
+              .status(ConnectionStatus.PENDING)
+              .build();
+    }
   }
 
 
@@ -76,6 +88,9 @@ public class InvitationResponse {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class AcaPyReceiveInvitationResponse {
+
+    private String state;
+
     @JsonProperty("@type")
     private String type;
 

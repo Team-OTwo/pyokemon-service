@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class WalletController {
   private final TenantWalletService tenantWalletService;
+  private final UserWalletService userWalletService;
 
   @PostMapping("/tenant")
   public ResponseEntity<ResponseDto<Void>> registerTenantWallet(
@@ -36,8 +37,6 @@ public class WalletController {
 
     return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
   }
-
-  private final UserWalletService userWalletService;
 
   @PostMapping(value = "/user")
   public ResponseEntity<ResponseDto<Void>> createUserWallet(
