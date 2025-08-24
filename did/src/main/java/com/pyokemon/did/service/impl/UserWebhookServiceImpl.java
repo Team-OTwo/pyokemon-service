@@ -1,6 +1,7 @@
 package com.pyokemon.did.service.impl;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.api.backend.dto.BasicMessageWebhookDto;
 import com.pyokemon.did.api.backend.dto.ConnectionWebhookDto;
 import com.pyokemon.did.api.backend.dto.OutOfBandWebhookDto;
 import com.pyokemon.did.domain.DeviceConnection;
@@ -101,6 +102,40 @@ public class UserWebhookServiceImpl implements UserWebhookService {
         } catch (Exception e) {
             log.error("❌ Error processing OOB webhook: {}", e.getMessage(), e);
             throw e; // 재시도를 위해 예외를 다시 던짐
+        }
+
+        log.info("================================");
+    }
+
+    @Override
+    public void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto) {
+        log.info("=== User ACA-Py Basic Message Webhook ===");
+        log.info("Payload: {}", webhookDto);
+
+        try {
+            String state = webhookDto.getState();
+            String connectionId = webhookDto.getConnectionId();
+            String content = webhookDto.getContent();
+
+            log.info("Basic Message webhook - state: {}, connection_id: {}, content: {}", state, connectionId, content);
+
+            // connectionId로 DeviceConnection 찾기
+            DeviceConnection deviceConnection = deviceConnectionRepository.findByConnectionId(connectionId)
+                    .orElseThrow(() -> new BusinessException("DeviceConnection not found for connection_id: " + connectionId, "DEVICE_CONNECTION_NOT_FOUND"));
+
+            log.info("✅ DeviceConnection found by connectionId: {}, current publicDid: {}", connectionId, deviceConnection.getPublicDid());
+
+            // content를 publicDid에 저장 (임시로 전체 content 사용)
+            deviceConnection.setPublicDid(content);
+            int updateResult = deviceConnectionRepository.update(deviceConnection);
+            
+            log.info("Updated publicDid to '{}', update result: {}", content, updateResult);
+
+            log.info("Basic Message webhook processed for connectionId: {}, state: {}", connectionId, state);
+
+        } catch (Exception e) {
+            log.error("❌ Error processing Basic Message webhook: {}", e.getMessage(), e);
+            throw e;
         }
 
         log.info("================================");

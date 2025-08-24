@@ -1,5 +1,6 @@
 package com.pyokemon.did.service;
 
+import com.pyokemon.did.api.backend.dto.BasicMessageWebhookDto;
 import com.pyokemon.did.api.backend.dto.ConnectionWebhookDto;
 import com.pyokemon.did.api.backend.dto.OutOfBandWebhookDto;
 
@@ -21,4 +22,11 @@ public interface UserWebhookService {
      * @param webhookDto Out of Band webhook 데이터
      */
     void handleOutOfBandWebhook(OutOfBandWebhookDto webhookDto);
+
+    /**
+     * Basic Message webhook을 처리합니다.
+     *
+     * @param webhookDto Basic Message webhook 데이터
+     */
+    void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto);
 }

@@ -1,5 +1,6 @@
 package com.pyokemon.did.api.backend;
 
+import com.pyokemon.did.api.backend.dto.BasicMessageWebhookDto;
 import com.pyokemon.did.service.UserWebhookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,7 @@ public class UserWebhookController {
   private final UserWebhookService userWebhookService;
 
   @PostMapping({"/user/topic/connections", "/user/topic/connections/"})
-  public ResponseEntity<Void> handleConnectionWebhook(
-      @RequestBody ConnectionWebhookDto webhookDto) {
+  public ResponseEntity<Void> handleConnectionWebhook(@RequestBody ConnectionWebhookDto webhookDto) {
     userWebhookService.handleConnectionWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
@@ -35,10 +35,9 @@ public class UserWebhookController {
   }
 
   @PostMapping({"/user/topic/basicmessages", "/user/topic/basicmessages/"})
-  public ResponseEntity<Void> handleBasicMessage(@RequestBody String payload) {
-    log.info("=== User ACA-Py BasicMessages Webhook ===");
-    log.info("Payload: {}", payload);
-
+  public ResponseEntity<Void> handleBasicMessage(@RequestBody BasicMessageWebhookDto webhookDto) {
+    log.info("Payload: {}", webhookDto);
+    userWebhookService.handleBasicMessageWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
 }
