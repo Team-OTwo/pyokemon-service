@@ -39,316 +39,316 @@ import io.jsonwebtoken.Claims;
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
 
-    @Mock
-    private AccountRepository accountRepository;
+  @Mock
+  private AccountRepository accountRepository;
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock
+  private UserRepository userRepository;
 
-    @Mock
-    private UserDeviceRepository userDeviceRepository;
+  @Mock
+  private UserDeviceRepository userDeviceRepository;
 
-    @Mock
-    private PasswordUtil passwordUtil;
+  @Mock
+  private PasswordUtil passwordUtil;
 
-    @Mock
-    private TokenGenerator tokenGenerator;
+  @Mock
+  private TokenGenerator tokenGenerator;
 
-    @Mock
-    private RedisTemplate<String, String> redisTemplate;
+  @Mock
+  private RedisTemplate<String, String> redisTemplate;
 
-    @Mock
-    private ValueOperations<String, String> valueOperations;
+  @Mock
+  private ValueOperations<String, String> valueOperations;
 
-    @InjectMocks
-    private AccountService accountService;
+  @InjectMocks
+  private AccountService accountService;
 
-    private Account testAccount;
-    private User testUser;
-    private UserDevice testUserDevice;
+  private Account testAccount;
+  private User testUser;
+  private UserDevice testUserDevice;
 
-    @BeforeEach
-    void setUp() {
-        // 테스트용 계정 데이터 생성
-        testAccount = new Account();
-        testAccount.setAccountId(1L);
-        testAccount.setLoginId("test@example.com");
-        testAccount.setPassword("encodedPassword");
-        testAccount.setRole("USER");
-        testAccount.setStatus(AccountStatus.ACTIVE);
+  @BeforeEach
+  void setUp() {
+    // 테스트용 계정 데이터 생성
+    testAccount = new Account();
+    testAccount.setAccountId(1L);
+    testAccount.setLoginId("test@example.com");
+    testAccount.setPassword("encodedPassword");
+    testAccount.setRole("USER");
+    testAccount.setStatus(AccountStatus.ACTIVE);
 
-        // 테스트용 사용자 데이터 생성
-        testUser = new User();
-        testUser.setUserId(1L);
-        testUser.setAccountId(1L);
-        testUser.setName("테스트 사용자");
-        testUser.setIsVerified(true);
+    // 테스트용 사용자 데이터 생성
+    testUser = new User();
+    testUser.setUserId(1L);
+    testUser.setAccountId(1L);
+    testUser.setName("테스트 사용자");
+    testUser.setIsVerified(true);
 
-        // 테스트용 디바이스 데이터 생성
-        testUserDevice = new UserDevice();
-        testUserDevice.setUserDeviceId(1L);
-        testUserDevice.setUserId(1L);
-        testUserDevice.setDeviceNumber("device123");
-        testUserDevice.setIsValid(true);
-        testUserDevice.setIsLogin(false);
-    }
+    // 테스트용 디바이스 데이터 생성
+    testUserDevice = new UserDevice();
+    testUserDevice.setUserDeviceId(1L);
+    testUserDevice.setUserId(1L);
+    testUserDevice.setDeviceNumber("device123");
+    testUserDevice.setIsValid(true);
+    testUserDevice.setIsLogin(false);
+  }
 
-    @Test
-    @DisplayName("로그인 성공 테스트 - USER 역할")
-    void loginSuccess_UserRole() {
-        // given
-        LoginRequestDto request = new LoginRequestDto();
-        request.setLoginId("test@example.com");
-        request.setPassword("password123");
+  @Test
+  @DisplayName("로그인 성공 테스트 - USER 역할")
+  void loginSuccess_UserRole() {
+    // given
+    LoginRequestDto request = new LoginRequestDto();
+    request.setLoginId("test@example.com");
+    request.setPassword("password123");
 
-        when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE))
-                .thenReturn(Optional.of(testAccount));
-        when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
-        when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("access-token");
-        when(tokenGenerator.generateRefreshToken(1L, "USER")).thenReturn("refresh-token");
-        when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
+    when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE))
+        .thenReturn(Optional.of(testAccount));
+    when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
+    when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("access-token");
+    when(tokenGenerator.generateRefreshToken(1L, "USER")).thenReturn("refresh-token");
+    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
 
-        // when
-        LoginResponseDto response = accountService.login(request);
+    // when
+    LoginResponseDto response = accountService.login(request);
 
-        // then
-        assertNotNull(response);
-        assertEquals("access-token", response.getAccessToken());
-        assertEquals("refresh-token", response.getRefreshToken());
-        assertEquals("USER", response.getRole());
-        assertEquals(1L, response.getAccountId());
-        assertEquals("테스트 사용자", response.getUserName());
-        assertTrue(response.getIsVerified());
+    // then
+    assertNotNull(response);
+    assertEquals("access-token", response.getAccessToken());
+    assertEquals("refresh-token", response.getRefreshToken());
+    assertEquals("USER", response.getRole());
+    assertEquals(1L, response.getAccountId());
+    assertEquals("테스트 사용자", response.getUserName());
+    assertTrue(response.getIsVerified());
 
-        verify(accountRepository).findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE);
-        verify(passwordUtil).matches("password123", "encodedPassword");
-        verify(userRepository).findByAccountId(1L);
-        verify(tokenGenerator).generateAccessToken(1L, "USER");
-        verify(tokenGenerator).generateRefreshToken(1L, "USER");
-    }
+    verify(accountRepository).findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE);
+    verify(passwordUtil).matches("password123", "encodedPassword");
+    verify(userRepository).findByAccountId(1L);
+    verify(tokenGenerator).generateAccessToken(1L, "USER");
+    verify(tokenGenerator).generateRefreshToken(1L, "USER");
+  }
 
-    @Test
-    @DisplayName("로그인 성공 테스트 - ADMIN 역할")
-    void loginSuccess_AdminRole() {
-        // given
-        testAccount.setRole("ADMIN");
-        LoginRequestDto request = new LoginRequestDto();
-        request.setLoginId("admin@example.com");
-        request.setPassword("password123");
+  @Test
+  @DisplayName("로그인 성공 테스트 - ADMIN 역할")
+  void loginSuccess_AdminRole() {
+    // given
+    testAccount.setRole("ADMIN");
+    LoginRequestDto request = new LoginRequestDto();
+    request.setLoginId("admin@example.com");
+    request.setPassword("password123");
 
-        when(accountRepository.findByLoginIdAndStatus("admin@example.com", AccountStatus.ACTIVE))
-                .thenReturn(Optional.of(testAccount));
-        when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
-        when(tokenGenerator.generateAccessToken(1L, "ADMIN")).thenReturn("access-token");
-        when(tokenGenerator.generateRefreshToken(1L, "ADMIN")).thenReturn("refresh-token");
+    when(accountRepository.findByLoginIdAndStatus("admin@example.com", AccountStatus.ACTIVE))
+        .thenReturn(Optional.of(testAccount));
+    when(passwordUtil.matches("password123", "encodedPassword")).thenReturn(true);
+    when(tokenGenerator.generateAccessToken(1L, "ADMIN")).thenReturn("access-token");
+    when(tokenGenerator.generateRefreshToken(1L, "ADMIN")).thenReturn("refresh-token");
 
-        // when
-        LoginResponseDto response = accountService.login(request);
+    // when
+    LoginResponseDto response = accountService.login(request);
 
-        // then
-        assertNotNull(response);
-        assertEquals("access-token", response.getAccessToken());
-        assertEquals("refresh-token", response.getRefreshToken());
-        assertEquals("ADMIN", response.getRole());
-        assertEquals(1L, response.getAccountId());
-        assertNull(response.getUserName());
-        assertNull(response.getIsVerified());
+    // then
+    assertNotNull(response);
+    assertEquals("access-token", response.getAccessToken());
+    assertEquals("refresh-token", response.getRefreshToken());
+    assertEquals("ADMIN", response.getRole());
+    assertEquals(1L, response.getAccountId());
+    assertNull(response.getUserName());
+    assertNull(response.getIsVerified());
 
-        verify(accountRepository).findByLoginIdAndStatus("admin@example.com", AccountStatus.ACTIVE);
-        verify(passwordUtil).matches("password123", "encodedPassword");
-        verify(tokenGenerator).generateAccessToken(1L, "ADMIN");
-        verify(tokenGenerator).generateRefreshToken(1L, "ADMIN");
-        verifyNoInteractions(userRepository);
-    }
+    verify(accountRepository).findByLoginIdAndStatus("admin@example.com", AccountStatus.ACTIVE);
+    verify(passwordUtil).matches("password123", "encodedPassword");
+    verify(tokenGenerator).generateAccessToken(1L, "ADMIN");
+    verify(tokenGenerator).generateRefreshToken(1L, "ADMIN");
+    verifyNoInteractions(userRepository);
+  }
 
-    @Test
-    @DisplayName("로그인 실패 - 계정 없음")
-    void loginFailure_AccountNotFound() {
-        // given
-        LoginRequestDto request = new LoginRequestDto();
-        request.setLoginId("nonexistent@example.com");
-        request.setPassword("password123");
+  @Test
+  @DisplayName("로그인 실패 - 계정 없음")
+  void loginFailure_AccountNotFound() {
+    // given
+    LoginRequestDto request = new LoginRequestDto();
+    request.setLoginId("nonexistent@example.com");
+    request.setPassword("password123");
 
-        when(accountRepository.findByLoginIdAndStatus("nonexistent@example.com", AccountStatus.ACTIVE))
-                .thenReturn(Optional.empty());
+    when(accountRepository.findByLoginIdAndStatus("nonexistent@example.com", AccountStatus.ACTIVE))
+        .thenReturn(Optional.empty());
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            accountService.login(request);
-        });
+    // when & then
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      accountService.login(request);
+    });
 
-        assertEquals("계정을 찾을 수 없습니다.", exception.getMessage());
-        verify(accountRepository).findByLoginIdAndStatus("nonexistent@example.com",
-                AccountStatus.ACTIVE);
-        verifyNoInteractions(passwordUtil, tokenGenerator, userRepository);
-    }
+    assertEquals("계정을 찾을 수 없습니다.", exception.getMessage());
+    verify(accountRepository).findByLoginIdAndStatus("nonexistent@example.com",
+        AccountStatus.ACTIVE);
+    verifyNoInteractions(passwordUtil, tokenGenerator, userRepository);
+  }
 
-    @Test
-    @DisplayName("로그인 실패 - 비밀번호 불일치")
-    void loginFailure_InvalidPassword() {
-        // given
-        LoginRequestDto request = new LoginRequestDto();
-        request.setLoginId("test@example.com");
-        request.setPassword("wrongpassword");
+  @Test
+  @DisplayName("로그인 실패 - 비밀번호 불일치")
+  void loginFailure_InvalidPassword() {
+    // given
+    LoginRequestDto request = new LoginRequestDto();
+    request.setLoginId("test@example.com");
+    request.setPassword("wrongpassword");
 
-        when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE))
-                .thenReturn(Optional.of(testAccount));
-        when(passwordUtil.matches("wrongpassword", "encodedPassword")).thenReturn(false);
+    when(accountRepository.findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE))
+        .thenReturn(Optional.of(testAccount));
+    when(passwordUtil.matches("wrongpassword", "encodedPassword")).thenReturn(false);
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            accountService.login(request);
-        });
+    // when & then
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      accountService.login(request);
+    });
 
-        assertEquals("로그인 ID 또는 비밀번호가 올바르지 않습니다.", exception.getMessage());
-        verify(accountRepository).findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE);
-        verify(passwordUtil).matches("wrongpassword", "encodedPassword");
-        verifyNoInteractions(tokenGenerator, userRepository);
-    }
+    assertEquals("로그인 ID 또는 비밀번호가 올바르지 않습니다.", exception.getMessage());
+    verify(accountRepository).findByLoginIdAndStatus("test@example.com", AccountStatus.ACTIVE);
+    verify(passwordUtil).matches("wrongpassword", "encodedPassword");
+    verifyNoInteractions(tokenGenerator, userRepository);
+  }
 
-    @Test
-    @DisplayName("토큰 갱신 성공 테스트")
-    void refreshTokenSuccess() {
-        // given
-        String refreshToken = "valid-refresh-token";
-        Claims claims = mock(Claims.class);
+  @Test
+  @DisplayName("토큰 갱신 성공 테스트")
+  void refreshTokenSuccess() {
+    // given
+    String refreshToken = "valid-refresh-token";
+    Claims claims = mock(Claims.class);
 
-        when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
-        when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(false);
-        when(tokenGenerator.parseToken(refreshToken)).thenReturn(claims);
-        when(claims.getSubject()).thenReturn("1");
-        when(claims.get("role", String.class)).thenReturn("USER");
-        when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-        when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("new-access-token");
+    when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
+    when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(false);
+    when(tokenGenerator.parseToken(refreshToken)).thenReturn(claims);
+    when(claims.getSubject()).thenReturn("1");
+    when(claims.get("role", String.class)).thenReturn("USER");
+    when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
+    when(tokenGenerator.generateAccessToken(1L, "USER")).thenReturn("new-access-token");
 
-        // when
-        TokenResponseDto response = accountService.refreshToken(refreshToken);
+    // when
+    TokenResponseDto response = accountService.refreshToken(refreshToken);
 
-        // then
-        assertNotNull(response);
-        assertEquals("new-access-token", response.getAccessToken());
+    // then
+    assertNotNull(response);
+    assertEquals("new-access-token", response.getAccessToken());
 
-        verify(tokenGenerator).validateToken(refreshToken);
-        verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
-        verify(tokenGenerator).parseToken(refreshToken);
-        verify(accountRepository).findByAccountId(1L);
-        verify(tokenGenerator).generateAccessToken(1L, "USER");
-    }
+    verify(tokenGenerator).validateToken(refreshToken);
+    verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
+    verify(tokenGenerator).parseToken(refreshToken);
+    verify(accountRepository).findByAccountId(1L);
+    verify(tokenGenerator).generateAccessToken(1L, "USER");
+  }
 
-    @Test
-    @DisplayName("토큰 갱신 실패 - 유효하지 않은 토큰")
-    void refreshTokenFailure_InvalidToken() {
-        // given
-        String refreshToken = "invalid-refresh-token";
-        when(tokenGenerator.validateToken(refreshToken)).thenReturn(false);
+  @Test
+  @DisplayName("토큰 갱신 실패 - 유효하지 않은 토큰")
+  void refreshTokenFailure_InvalidToken() {
+    // given
+    String refreshToken = "invalid-refresh-token";
+    when(tokenGenerator.validateToken(refreshToken)).thenReturn(false);
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            accountService.refreshToken(refreshToken);
-        });
+    // when & then
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      accountService.refreshToken(refreshToken);
+    });
 
-        assertEquals("유효하지 않은 리프레시 토큰입니다.", exception.getMessage());
-        verify(tokenGenerator).validateToken(refreshToken);
-        verifyNoInteractions(redisTemplate, accountRepository);
-    }
+    assertEquals("유효하지 않은 리프레시 토큰입니다.", exception.getMessage());
+    verify(tokenGenerator).validateToken(refreshToken);
+    verifyNoInteractions(redisTemplate, accountRepository);
+  }
 
-    @Test
-    @DisplayName("토큰 갱신 실패 - 블랙리스트된 토큰")
-    void refreshTokenFailure_BlacklistedToken() {
-        // given
-        String refreshToken = "blacklisted-token";
-        when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
-        when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(true);
+  @Test
+  @DisplayName("토큰 갱신 실패 - 블랙리스트된 토큰")
+  void refreshTokenFailure_BlacklistedToken() {
+    // given
+    String refreshToken = "blacklisted-token";
+    when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
+    when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(true);
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            accountService.refreshToken(refreshToken);
-        });
+    // when & then
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      accountService.refreshToken(refreshToken);
+    });
 
-        assertEquals("로그아웃된 토큰입니다.", exception.getMessage());
-        verify(tokenGenerator).validateToken(refreshToken);
-        verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
-        verifyNoInteractions(accountRepository);
-    }
+    assertEquals("로그아웃된 토큰입니다.", exception.getMessage());
+    verify(tokenGenerator).validateToken(refreshToken);
+    verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
+    verifyNoInteractions(accountRepository);
+  }
 
-    @Test
-    @DisplayName("토큰 갱신 실패 - 삭제된 계정")
-    void refreshTokenFailure_DeletedAccount() {
-        // given
-        String refreshToken = "valid-refresh-token";
-        Claims claims = mock(Claims.class);
-        testAccount.setStatus(AccountStatus.DELETED);
+  @Test
+  @DisplayName("토큰 갱신 실패 - 삭제된 계정")
+  void refreshTokenFailure_DeletedAccount() {
+    // given
+    String refreshToken = "valid-refresh-token";
+    Claims claims = mock(Claims.class);
+    testAccount.setStatus(AccountStatus.DELETED);
 
-        when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
-        when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(false);
-        when(tokenGenerator.parseToken(refreshToken)).thenReturn(claims);
-        when(claims.getSubject()).thenReturn("1");
-        when(claims.get("role", String.class)).thenReturn("USER");
-        when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
+    when(tokenGenerator.validateToken(refreshToken)).thenReturn(true);
+    when(redisTemplate.hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken)).thenReturn(false);
+    when(tokenGenerator.parseToken(refreshToken)).thenReturn(claims);
+    when(claims.getSubject()).thenReturn("1");
+    when(claims.get("role", String.class)).thenReturn("USER");
+    when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            accountService.refreshToken(refreshToken);
-        });
+    // when & then
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      accountService.refreshToken(refreshToken);
+    });
 
-        assertEquals("삭제된 계정입니다.", exception.getMessage());
-        verify(tokenGenerator).validateToken(refreshToken);
-        verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
-        verify(tokenGenerator).parseToken(refreshToken);
-        verify(accountRepository).findByAccountId(1L);
-    }
+    assertEquals("삭제된 계정입니다.", exception.getMessage());
+    verify(tokenGenerator).validateToken(refreshToken);
+    verify(redisTemplate).hasKey(AuthConstants.BLACKLIST_PREFIX + refreshToken);
+    verify(tokenGenerator).parseToken(refreshToken);
+    verify(accountRepository).findByAccountId(1L);
+  }
 
-    @Test
-    @DisplayName("로그아웃 성공 테스트")
-    void logoutSuccess() {
-        // given
-        String token = "Bearer valid-token";
-        String accountId = "1";
-        String deviceNumber = "device123";
-        Claims claims = mock(Claims.class);
-        Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1시간 후
+  @Test
+  @DisplayName("로그아웃 성공 테스트")
+  void logoutSuccess() {
+    // given
+    String token = "Bearer valid-token";
+    String accountId = "1";
+    String deviceNumber = "device123";
+    Claims claims = mock(Claims.class);
+    Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1시간 후
 
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
-        when(claims.getExpiration()).thenReturn(expiration);
-        when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-        when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
-        when(userDeviceRepository.findByUserIdAndIsValid(1L, true))
-                .thenReturn(Optional.of(testUserDevice));
+    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
+    when(claims.getExpiration()).thenReturn(expiration);
+    when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
+    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
+    when(userDeviceRepository.findByUserIdAndIsValid(1L, true))
+        .thenReturn(Optional.of(testUserDevice));
 
-        // when
-        assertDoesNotThrow(() -> {
-            accountService.logout(token, accountId, deviceNumber);
-        });
+    // when
+    assertDoesNotThrow(() -> {
+      accountService.logout(token, accountId, deviceNumber);
+    });
 
-        // then
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).set(eq(AuthConstants.BLACKLIST_PREFIX + "valid-token"),
-                eq("blacklisted"), anyLong(), eq(TimeUnit.SECONDS));
-        verify(accountRepository).findByAccountId(1L);
-        verify(userRepository).findByAccountId(1L);
-        verify(userDeviceRepository).findByUserIdAndIsValid(1L, true);
-        verify(userDeviceRepository).update(any(UserDevice.class));
-    }
+    // then
+    verify(redisTemplate).opsForValue();
+    verify(valueOperations).set(eq(AuthConstants.BLACKLIST_PREFIX + "valid-token"),
+        eq("blacklisted"), anyLong(), eq(TimeUnit.SECONDS));
+    verify(accountRepository).findByAccountId(1L);
+    verify(userRepository).findByAccountId(1L);
+    verify(userDeviceRepository).findByUserIdAndIsValid(1L, true);
+    verify(userDeviceRepository).update(any(UserDevice.class));
+  }
 
-    @Test
-    @DisplayName("로그아웃 성공 테스트 - 토큰 없음")
-    void logoutSuccess_NoToken() {
-        // given
-        String token = null;
-        String accountId = "1";
-        String deviceNumber = "device123";
+  @Test
+  @DisplayName("로그아웃 성공 테스트 - 토큰 없음")
+  void logoutSuccess_NoToken() {
+    // given
+    String token = null;
+    String accountId = "1";
+    String deviceNumber = "device123";
 
-        // when
-        assertDoesNotThrow(() -> {
-            accountService.logout(token, accountId, deviceNumber);
-        });
+    // when
+    assertDoesNotThrow(() -> {
+      accountService.logout(token, accountId, deviceNumber);
+    });
 
-        // then
-        verifyNoInteractions(tokenGenerator, redisTemplate);
-    }
+    // then
+    verifyNoInteractions(tokenGenerator, redisTemplate);
+  }
 
-    @Test
+  @Test
     @DisplayName("계정 삭제 성공 테스트")
     void deleteAccountSuccess() {
         // given

@@ -19,7 +19,7 @@ public interface BookingBffRepository {
       @Param("offset") Integer offset, @Param("size") Integer size);
 
   List<Booking> findByEventScheduleIdOrderByDate(@Param("eventScheduleId") Long eventScheduleId,
-                                           @Param("offset") Integer offset, @Param("size") Integer size);
+      @Param("offset") Integer offset, @Param("size") Integer size);
 
   Long countByAccountId(@Param("accountId") Long accountId);
 

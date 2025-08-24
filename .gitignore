@@ -69,11 +69,6 @@ application-*.yml
 docker/volumes/
 docker/data/
 
-### Local configuration file (security sensitive) ###
-*-local.properties
-*-local.yml
-*-local.yaml
-
 ### Node ###
 node_modules/
 npm-debug.log

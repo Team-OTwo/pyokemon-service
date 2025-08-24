@@ -10,9 +10,11 @@ booking:
 # ACA-Py 설정
 acapy:
   tenant:
-    base-url: http://pyokemon-booking-aca-py-issuer-1:8002  # pyokemon-booking-ACA-Py
-    api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일
+    base-url: http://pyokemon-tenant-aca-py-main-tenant-1:8003  # pyokemon-booking-ACA-Py
     wallet-id: tenant-wallet
+  user:
+    base-url: http://pyokemon-user-aca-py-main-user-1:8002  # pyokemon-user-ACA-Py
+    wallet-id: user-wallet
   mediator:
     base-url: http://pyokemon-mediator-aca-py-mediator-1:8001  # pyokemon-mediator-ACA-Py (admin port)
     api-key: secure-key  # Docker 환경변수 ADMIN_API_KEY와 동일

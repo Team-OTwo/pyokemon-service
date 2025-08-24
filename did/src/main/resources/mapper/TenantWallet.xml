@@ -19,22 +19,11 @@
     <select id="findByTenantId" resultMap="TenantWalletResultMap">
         SELECT * FROM tb_tenant_wallet WHERE tenant_id = #{tenantId}
     </select>
-
-    <select id="findByToken" resultMap="TenantWalletResultMap">
-        SELECT * FROM tb_tenant_wallet WHERE token = #{token}
+    
+    <select id="existsByTenantId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_tenant_wallet WHERE tenant_id = #{tenantId}
     </select>
 
-    <select id="findByPublicDid" resultMap="TenantWalletResultMap">
-        SELECT * FROM tb_tenant_wallet WHERE public_did = #{publicDid}
-    </select>
-
-    <select id="findByPublicVerkey" resultMap="TenantWalletResultMap">
-        SELECT * FROM tb_tenant_wallet WHERE public_verkey = #{publicVerkey}
-    </select>
-
-    <select id="findAll" resultMap="TenantWalletResultMap">
-        SELECT * FROM tb_tenant_wallet ORDER BY created_at DESC
-    </select>
 
     <insert id="save" parameterType="com.pyokemon.did.domain.TenantWallet" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_tenant_wallet (tenant_id, token, public_did, public_verkey, created_at, updated_at)
@@ -53,10 +42,6 @@
 
     <delete id="deleteByTenantId">
         DELETE FROM tb_tenant_wallet WHERE tenant_id = #{tenantId}
-    </delete>
-
-    <delete id="deleteByToken">
-        DELETE FROM tb_tenant_wallet WHERE token = #{token}
     </delete>
 
 </mapper> 
