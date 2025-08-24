@@ -151,49 +151,33 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   /**
-   * DeviceConnection을 찾습니다. connectionId를 우선으로 하고, 실패 시 alias에서 추출하여 찾습니다.
+   * DeviceConnection을 찾습니다. connectionId가 있으면 우선으로 하고, 없거나 실패 시 alias에서 추출하여 찾습니다.
    */
   private DeviceConnection findDeviceConnection(String connectionId, String alias) {
-    // 1. connectionId로 먼저 찾기
-    Optional<DeviceConnection> byConnectionId =
-        deviceConnectionRepository.findByConnectionId(connectionId);
-    if (byConnectionId.isPresent()) {
-      return byConnectionId.get();
+    // 1. connectionId가 있고, 해당 connectionId로 찾기
+    if (connectionId != null && !connectionId.trim().isEmpty()) {
+      Optional<DeviceConnection> byConnectionId =
+          deviceConnectionRepository.findByConnectionId(connectionId);
+      if (byConnectionId.isPresent()) {
+        log.info("✅ DeviceConnection found by connectionId: {}", connectionId);
+        return byConnectionId.get();
+      }
+      log.warn("DeviceConnection not found by connectionId: {}, trying alias...", connectionId);
+    } else {
+      log.info("connectionId is null or empty, trying alias...");
     }
 
     // 2. connectionId로 찾지 못한 경우, alias에서 추출하여 찾기
     try {
-      // "[userId:333, deviceId:asdfsdfsdfasdf]" 부분에서 userId와 deviceId 추출
-      int startIndex = alias.indexOf("[");
-      int endIndex = alias.indexOf("]");
-
-      if (startIndex == -1 || endIndex == -1) {
-        throw new IllegalArgumentException("Invalid ACA-Py alias format: " + alias);
-      }
-
-      String params = alias.substring(startIndex + 1, endIndex);
+      // credo:user:123#device:abc123 형식 파싱
       String userId = null;
       String deviceId = null;
 
-      String[] pairs = params.split(", ");
-      for (String pair : pairs) {
-        if (pair.startsWith("userId:")) {
-          userId = pair.substring("userId:".length());
-        } else if (pair.startsWith("deviceId:")) {
-          deviceId = pair.substring("deviceId:".length());
-        }
-      }
+      log.info("Searching DeviceConnection by alias: '{}'", alias);
 
-      if (userId == null || deviceId == null) {
-        throw new IllegalArgumentException("Could not extract userId or deviceId from: " + alias);
-      }
-
-      String systemAlias = userId + "#" + deviceId;
-      log.info("Extracted system alias from ACA-Py alias: '{}' -> '{}'", alias, systemAlias);
-
-      return deviceConnectionRepository.findByAlias(systemAlias).orElseThrow(
-          () -> new BusinessException("❌ DeviceConnection not found for connection_id: "
-              + connectionId + " or alias: " + systemAlias, "DEVICE_CONNECTION_NOT_FOUND"));
+      return deviceConnectionRepository.findByAlias(alias).orElseThrow(() -> new BusinessException(
+          "❌ DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
+          "DEVICE_CONNECTION_NOT_FOUND"));
 
     } catch (Exception e) {
       log.error("Failed to parse ACA-Py alias: {}", alias, e);

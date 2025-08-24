@@ -25,7 +25,7 @@ public interface RemoteTenantAcaPyService {
       @RequestHeader("Authorization") String authorization,
       @RequestBody AcaPyCreatePublicDidRequest request);
 
-  @PostMapping(value="/out-of-band/create-invitation?auto_accept=true&multi_use=false")
+  @PostMapping(value = "/out-of-band/create-invitation?auto_accept=true&multi_use=false")
   public AcaPyCreateInvitationResponse acaPyCreateInvitation(
       @RequestHeader("Authorization") String authorization,
       @RequestBody AcaPyCreateInvitationRequest request);

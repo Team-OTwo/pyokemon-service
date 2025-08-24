@@ -296,7 +296,7 @@ class TenantWalletServiceTest {
         verify(tenantWalletRepository).save(any(TenantWallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 조회 테스트 - 존재하는 경우")
     void getTenantWalletByTenantId_Exists() {
         // Given
@@ -311,7 +311,7 @@ class TenantWalletServiceTest {
         verify(tenantWalletRepository).findByTenantId(TENANT_ID);
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 조회 테스트 - 존재하지 않는 경우")
     void getTenantWalletByTenantId_NotExists() {
 
@@ -326,4 +326,3 @@ class TenantWalletServiceTest {
         verify(tenantWalletRepository).findByTenantId(TENANT_ID);
     }
 }
-
