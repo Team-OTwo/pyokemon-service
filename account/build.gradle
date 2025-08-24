@@ -1,7 +1,3 @@
-plugins {
-    id 'org.flywaydb.flyway' version '9.22.3'
-}
-
 dependencies {
     implementation project(':common')
     
