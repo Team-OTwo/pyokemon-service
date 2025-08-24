@@ -25,7 +25,6 @@ public class UserWalletServiceImpl implements UserWalletService {
   private final UserWalletRepository userWalletRepository;
   private final RemoteUserAcaPyService remoteUserAcaPyService;
 
-
   @Override
   @Transactional
   public void createUserWallet(Long userId) {
@@ -61,6 +60,41 @@ public class UserWalletServiceImpl implements UserWalletService {
     }
   }
 
+  /**
+   * 사용자 지갑을 조회하고 토큰을 검증합니다.
+   * 
+   * @param userId 사용자 ID
+   * @return 사용자 지갑 토큰
+   * @throws BusinessException 지갑이 없거나 토큰이 유효하지 않은 경우
+   */
+  public String getUserWalletToken(Long userId) {
+    try {
+      Optional<UserWallet> userWalletOpt = userWalletRepository.findByUserId(userId);
+      if (userWalletOpt.isEmpty()) {
+        throw new BusinessException("사용자 지갑을 찾을 수 없습니다. userId: " + userId,
+            DidErrorCodes.WALLET_NOT_FOUND);
+      }
+
+      UserWallet userWallet = userWalletOpt.get();
+      String userToken = userWallet.getToken();
+
+      if (userToken == null || userToken.isEmpty()) {
+        log.error("사용자 토큰이 유효하지 않음: userId={}", userId);
+        throw new BusinessException("사용자 지갑 토큰이 없습니다. userId: " + userId,
+            DidErrorCodes.WALLET_NOT_FOUND);
+      }
+
+      log.info("사용자 지갑 토큰 조회 완료: userId={}", userId);
+      return userToken;
+
+    } catch (BusinessException e) {
+      throw e;
+    } catch (Exception e) {
+      log.error("사용자 지갑 조회 중 오류 발생: userId={}, error={}", userId, e.getMessage(), e);
+      throw new BusinessException("사용자 지갑 조회 중 오류가 발생했습니다", DidErrorCodes.WALLET_NOT_FOUND);
+    }
+  }
+
   private Optional<UserWallet> checkExistingUserWallet(Long userId) {
     try {
       return userWalletRepository.findByUserId(userId);
@@ -69,7 +103,4 @@ public class UserWalletServiceImpl implements UserWalletService {
       throw new RuntimeException("지갑 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
     }
   }
-
-
-
 }
