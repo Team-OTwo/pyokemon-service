@@ -1,15 +1,8 @@
 package com.pyokemon.did.remote.userAcaPy;
 
-import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse;
-import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyReceiveInvitationResponse;
-import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreateWalletRequest;
-import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-
-import static com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.*;
 
 import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreateWalletRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyReceiveInvitationResponse;
@@ -22,10 +15,7 @@ public interface RemoteUserAcaPyService {
   @PostMapping(value = "/multitenancy/wallet")
   public AcaPyCreateWalletResponse acaPyCreateWallet(@RequestBody AcaPyCreateWalletRequest request);
 
-    @PostMapping(value="/out-of-band/receive-invitation")
-    public AcaPyReceiveInvitationResponse acaPyReceiveInvitation(
-            @RequestHeader("Authorization") String authorization,
-            @RequestBody Invitation invitation
-    );
+  @PostMapping(value = "/out-of-band/receive-invitation")
+  public AcaPyReceiveInvitationResponse acaPyReceiveInvitation();
 
 }

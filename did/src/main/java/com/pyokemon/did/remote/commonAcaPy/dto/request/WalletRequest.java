@@ -71,4 +71,6 @@ public class WalletRequest {
           .options(Options.builder().public_(true).keyType("ed25519").build()).build();
     }
   }
+
+
 }
