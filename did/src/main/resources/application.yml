@@ -25,7 +25,6 @@ spring:
       
   flyway:
     locations: classpath:db/migration/did
-    repair-on-migrate: true
 
   kafka:
     consumer:
@@ -42,12 +41,6 @@ spring:
           max-active: 8
           max-idle: 8
           min-idle: 0
-
-  # Feign 클라이언트 설정
-  cloud:
-    openfeign:
-      client:
-        default-to-properties: false
 
 # 로그 레벨 설정
 logging:
@@ -88,4 +81,3 @@ spring:
       on-profile: "dev"
     import:
       - classpath:dev-config.yml
-
