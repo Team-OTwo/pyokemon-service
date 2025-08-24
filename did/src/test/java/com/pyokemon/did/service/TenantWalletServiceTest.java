@@ -76,7 +76,7 @@ class TenantWalletServiceTest {
     @DisplayName("테넌트 지갑 등록 성공 테스트")
     void registerTenantWallet_Success() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         when(remoteTenantAcaPyService.acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class))).thenReturn(publicDidResponse);
         when(tenantWalletRepository.save(any(TenantWallet.class))).thenReturn(1L);
@@ -85,7 +85,7 @@ class TenantWalletServiceTest {
         assertDoesNotThrow(() -> tenantWalletService.registerTenantWallet(createWalletRequest));
 
         // Then
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository).save(any(TenantWallet.class));
@@ -95,7 +95,7 @@ class TenantWalletServiceTest {
     @DisplayName("이미 존재하는 테넌트 지갑 등록 시 예외 발생 테스트")
     void registerTenantWallet_WalletAlreadyExists() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(true);
 
         // When & Then
         BusinessException exception = assertThrows(BusinessException.class, 
@@ -104,7 +104,7 @@ class TenantWalletServiceTest {
         assertEquals("테넌트 지갑이 이미 존재합니다.", exception.getMessage());
         assertEquals(WALLET_ALREADY_EXISTS, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService, never()).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService, never()).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -114,7 +114,7 @@ class TenantWalletServiceTest {
     @DisplayName("지갑 생성 응답이 null인 경우 예외 발생 테스트")
     void registerTenantWallet_WalletResponseNull() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(null);
 
         // When & Then
@@ -124,7 +124,7 @@ class TenantWalletServiceTest {
         assertEquals("지갑 생성에 실패했습니다.", exception.getMessage());
         assertEquals(WALLET_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService, never()).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -134,7 +134,7 @@ class TenantWalletServiceTest {
     @DisplayName("지갑 생성 응답의 토큰이 null인 경우 예외 발생 테스트")
     void registerTenantWallet_WalletTokenNull() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         
         AcaPyCreateWalletResponse nullTokenResponse = new AcaPyCreateWalletResponse();
         nullTokenResponse.setToken(null);
@@ -148,7 +148,7 @@ class TenantWalletServiceTest {
         assertEquals("지갑 생성에 실패했습니다.", exception.getMessage());
         assertEquals(WALLET_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService, never()).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -158,7 +158,7 @@ class TenantWalletServiceTest {
     @DisplayName("DID 생성 응답이 null인 경우 예외 발생 테스트")
     void registerTenantWallet_PublicDidResponseNull() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         when(remoteTenantAcaPyService.acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class))).thenReturn(null);
 
@@ -169,7 +169,7 @@ class TenantWalletServiceTest {
         assertEquals("공개 DID 생성에 실패했습니다.", exception.getMessage());
         assertEquals(DID_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -179,7 +179,7 @@ class TenantWalletServiceTest {
     @DisplayName("DID 생성 응답의 결과가 null인 경우 예외 발생 테스트")
     void registerTenantWallet_PublicDidResultNull() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
 
         AcaPyCreatePublicDidResponse nullResultResponse = new AcaPyCreatePublicDidResponse();
@@ -195,7 +195,7 @@ class TenantWalletServiceTest {
         assertEquals("공개 DID 생성에 실패했습니다.", exception.getMessage());
         assertEquals(DID_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -205,7 +205,7 @@ class TenantWalletServiceTest {
     @DisplayName("DID 생성 응답의 DID가 null인 경우 예외 발생 테스트")
     void registerTenantWallet_PublicDidNull() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         
         Result nullDidResult = new Result();
@@ -225,7 +225,7 @@ class TenantWalletServiceTest {
         assertEquals("공개 DID 생성에 실패했습니다.", exception.getMessage());
         assertEquals(DID_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -235,7 +235,7 @@ class TenantWalletServiceTest {
     @DisplayName("지갑 생성 API 호출 중 예외 발생 테스트")
     void registerTenantWallet_WalletApiException() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class)))
             .thenThrow(new RuntimeException("API 호출 실패"));
 
@@ -246,7 +246,7 @@ class TenantWalletServiceTest {
         assertEquals("외부 시스템 연동 중 오류가 발생했습니다", exception.getMessage());
         assertEquals(WALLET_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService, never()).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -256,7 +256,7 @@ class TenantWalletServiceTest {
     @DisplayName("DID 생성 API 호출 중 예외 발생 테스트")
     void registerTenantWallet_DidApiException() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         when(remoteTenantAcaPyService.acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class)))
             .thenThrow(new RuntimeException("API 호출 실패"));
@@ -268,7 +268,7 @@ class TenantWalletServiceTest {
         assertEquals("외부 시스템 연동 중 오류가 발생했습니다", exception.getMessage());
         assertEquals(WALLET_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository, never()).save(any(TenantWallet.class));
@@ -278,7 +278,7 @@ class TenantWalletServiceTest {
     @DisplayName("DB 저장 중 예외 발생 테스트")
     void registerTenantWallet_DbSaveException() {
         // Given
-        when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
+        when(tenantWalletRepository.existsByTenantId(TENANT_ID)).thenReturn(false);
         when(remoteTenantAcaPyService.acaPyCreateWallet(any(AcaPyCreateWalletRequest.class))).thenReturn(walletResponse);
         when(remoteTenantAcaPyService.acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class))).thenReturn(publicDidResponse);
         when(tenantWalletRepository.save(any(TenantWallet.class))).thenThrow(new RuntimeException("DB 저장 실패"));
@@ -290,20 +290,20 @@ class TenantWalletServiceTest {
         assertEquals("외부 시스템 연동 중 오류가 발생했습니다", exception.getMessage());
         assertEquals(WALLET_CREATION_FAILED, exception.getErrorCode());
         
-        verify(tenantWalletRepository).findByTenantId(TENANT_ID);
+        verify(tenantWalletRepository).existsByTenantId(TENANT_ID);
         verify(remoteTenantAcaPyService).acaPyCreateWallet(any(AcaPyCreateWalletRequest.class));
         verify(remoteTenantAcaPyService).acaPyCreatePublicDid(anyString(), any(AcaPyCreatePublicDidRequest.class));
         verify(tenantWalletRepository).save(any(TenantWallet.class));
     }
 
-  @Test
-    @DisplayName("테넌트 지갑 존재 여부 확인 테스트 - 존재하는 경우")
-    void checkExistingTenantWallet_Exists() {
+    @Test
+    @DisplayName("테넌트 지갑 조회 테스트 - 존재하는 경우")
+    void getTenantWalletByTenantId_Exists() {
         // Given
         when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.of(tenantWallet));
 
         // When
-        Optional<TenantWallet> result = tenantWalletService.checkExistingTenantWallet(TENANT_ID);
+        Optional<TenantWallet> result = tenantWalletService.getWalletByTenantId(TENANT_ID);
 
         // Then
         assertTrue(result.isPresent());
@@ -311,17 +311,19 @@ class TenantWalletServiceTest {
         verify(tenantWalletRepository).findByTenantId(TENANT_ID);
     }
 
-  @Test
-    @DisplayName("테넌트 지갑 존재 여부 확인 테스트 - 존재하지 않는 경우")
-    void checkExistingTenantWallet_NotExists() {
+    @Test
+    @DisplayName("테넌트 지갑 조회 테스트 - 존재하지 않는 경우")
+    void getTenantWalletByTenantId_NotExists() {
+
         // Given
         when(tenantWalletRepository.findByTenantId(TENANT_ID)).thenReturn(Optional.empty());
 
         // When
-        Optional<TenantWallet> result = tenantWalletService.checkExistingTenantWallet(TENANT_ID);
+        Optional<TenantWallet> result = tenantWalletService.getWalletByTenantId(TENANT_ID);
 
         // Then
         assertFalse(result.isPresent());
         verify(tenantWalletRepository).findByTenantId(TENANT_ID);
     }
 }
+
