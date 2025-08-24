@@ -13,7 +13,7 @@ public interface AcaPyConnectionRepository {
 
     /**
      * AcaPyConnection 객체를 저장합니다.
-     * 
+     *
      * @param acaPyConnection 저장할 AcaPyConnection 객체
      * @return 저장된 AcaPyConnection의 ID
      */
@@ -22,7 +22,7 @@ public interface AcaPyConnectionRepository {
     /**
      * 테넌트 ID와 사용자 ID로 AcaPyConnection을 조회합니다.
      * 생성일 기준 내림차순으로 정렬됩니다.
-     * 
+     *
      * @param tenantId 테넌트 ID
      * @param userId 사용자 ID
      * @return 조회된 AcaPyConnection (Optional)
@@ -39,8 +39,16 @@ public interface AcaPyConnectionRepository {
     boolean existsByTenantIdAndUserId(Long tenantId, Long userId);
 
     /**
+     * alias로 AcaPyConnection을 조회합니다.
+     *
+     * @param alias 조회할 alias (Tracking ID)
+     * @return AcaPyConnection (Optional)
+     */
+    Optional<AcaPyConnection> findByAlias(String alias);
+
+    /**
      * AcaPyConnection 객체를 업데이트합니다.
-     * 
+     *
      * @param acaPyConnection 업데이트할 AcaPyConnection 객체
      * @return 업데이트된 행 수
      */
@@ -48,7 +56,7 @@ public interface AcaPyConnectionRepository {
 
     /**
      * ID로 AcaPyConnection을 삭제합니다.
-     * 
+     *
      * @param id 삭제할 AcaPyConnection의 ID
      * @return 삭제된 행 수
      */

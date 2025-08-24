@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class AcaPyConnection extends BaseEntity {
 
     private String connectionId;
-    private String inviMsgId;
+    private String alias;
     private Long tenantId;
     private Long userId;
     private ConnectionStatus status;

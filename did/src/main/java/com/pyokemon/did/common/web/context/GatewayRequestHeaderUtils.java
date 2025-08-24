@@ -16,7 +16,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * Gateway에서 전달받은 사용자 ID를 Long 타입으로 반환하거나 예외를 발생시킵니다.
-   * 
+   *
    * @return 사용자 ID (Long)
    * @throws BusinessException 인증 정보가 없거나 숫자 형식이 아닌 경우
    */
@@ -31,13 +31,13 @@ public class GatewayRequestHeaderUtils {
       return Long.valueOf(accountId);
     } catch (NumberFormatException e) {
       throw new BusinessException("사용자 ID가 올바른 숫자 형식이 아닙니다: " + accountId,
-          DidErrorCodes.ACCESS_DENIED);
+              DidErrorCodes.ACCESS_DENIED);
     }
   }
 
   /**
    * Gateway에서 전달받은 사용자 역할을 반환하거나 예외를 발생시킵니다.
-   * 
+   *
    * @return 사용자 역할
    * @throws BusinessException 권한 정보가 없는 경우
    */
@@ -52,7 +52,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * 사용자가 테넌트 권한을 가지고 있는지 확인합니다.
-   * 
+   *
    * @return 테넌트 권한 여부
    */
   public static boolean isTenant() {
@@ -62,7 +62,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * 사용자가 일반 사용자 권한을 가지고 있는지 확인합니다.
-   * 
+   *
    * @return 일반 사용자 권한 여부
    */
   public static boolean isUser() {
@@ -72,7 +72,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * 사용자가 관리자 권한을 가지고 있는지 확인합니다.
-   * 
+   *
    * @return 관리자 권한 여부
    */
   public static boolean isAdmin() {
@@ -82,7 +82,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * Gateway에서 전달받은 사용자 ID를 반환합니다. role이 USER인 경우에만 반환합니다.
-   * 
+   *
    * @return 사용자 ID
    * @throws BusinessException role이 USER가 아닌 경우
    */
@@ -105,7 +105,7 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * Gateway에서 전달받은 클라이언트 디바이스 정보를 반환합니다.
-   * 
+   *
    * @return 클라이언트 디바이스
    * @throws BusinessException 디바이스 정보가 없는 경우
    */
@@ -120,13 +120,13 @@ public class GatewayRequestHeaderUtils {
 
   /**
    * 현재 HTTP 요청 객체를 반환합니다.
-   * 
+   *
    * @return HttpServletRequest
    * @throws BusinessException 요청 컨텍스트를 찾을 수 없는 경우
    */
   private static HttpServletRequest getCurrentRequest() {
     ServletRequestAttributes attributes =
-        (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
     if (attributes == null) {
       throw new BusinessException("요청 컨텍스트를 찾을 수 없습니다.", DidErrorCodes.DATABASE_ERROR);
     }

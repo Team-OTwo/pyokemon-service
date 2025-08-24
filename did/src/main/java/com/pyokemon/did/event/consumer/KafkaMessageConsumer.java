@@ -23,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class KafkaMessageConsumer {
     private final AcaPyConnectionService acaPyConnectionService;
 
-  @KafkaListener(topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
-      properties = {JsonDeserializer.VALUE_DEFAULT_TYPE
-          + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"},
-      groupId = "${spring.application.name}")
-  void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
-    log.info("Received booking event: {}", event);
+    @KafkaListener(topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
+            properties = {JsonDeserializer.VALUE_DEFAULT_TYPE
+                    + ":com.pyokemon.did.event.consumer.message.booking.BookingEvent"},
+            groupId = "${spring.application.name}")
+    void handleBookingEvent(BookingEvent event, Acknowledgment ack) {
+        log.info("Received booking event: {}", event);
 
         try {
             if ("BOOKED".equals(event.getStatus())) {
@@ -42,5 +42,4 @@ public class KafkaMessageConsumer {
         }
 
     }
-  }
 }

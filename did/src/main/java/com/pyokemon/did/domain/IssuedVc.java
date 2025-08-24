@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IssuedVc extends BaseEntity {
 
-  private Long id;
   private String credentialExchangeId;
   private Long bookingId;
   private Long tenantId;

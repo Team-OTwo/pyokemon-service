@@ -24,7 +24,7 @@ public class UserWebhookController {
 
   @PostMapping({"/user/topic/connections", "/user/topic/connections/"})
   public ResponseEntity<Void> handleConnectionWebhook(
-      @RequestBody ConnectionWebhookDto webhookDto) {
+          @RequestBody ConnectionWebhookDto webhookDto) {
     userWebhookService.handleConnectionWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }

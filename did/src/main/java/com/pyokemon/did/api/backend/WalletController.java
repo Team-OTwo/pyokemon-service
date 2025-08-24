@@ -32,7 +32,7 @@ public class WalletController {
 
   @PostMapping("/tenant")
   public ResponseEntity<ResponseDto<Void>> registerTenantWallet(
-      @RequestBody @Valid CreateWalletRequest createWalletRequest) {
+          @RequestBody @Valid CreateWalletRequest createWalletRequest) {
     tenantWalletService.registerTenantWallet(createWalletRequest);
 
     return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
@@ -40,7 +40,7 @@ public class WalletController {
 
   @PostMapping(value = "/user")
   public ResponseEntity<ResponseDto<Void>> createUserWallet(
-      @Valid @RequestBody CreateUserWalletRequest request) {
+          @Valid @RequestBody CreateUserWalletRequest request) {
     log.info("사용자 지갑 생성 요청: userId={}", request.getUserId());
 
     userWalletService.createUserWallet(request.getUserId());

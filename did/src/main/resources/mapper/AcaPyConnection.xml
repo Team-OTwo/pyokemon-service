@@ -5,7 +5,7 @@
     <resultMap id="AcaPyConnectionResultMap" type="com.pyokemon.did.domain.AcaPyConnection">
         <id column="id" property="id" />
         <result column="connection_id" property="connectionId" />
-        <result column="invi_msg_id" property="inviMsgId" />
+        <result column="alias" property="alias" />
         <result column="tenant_id" property="tenantId" />
         <result column="user_id" property="userId" />
         <result column="status" property="status" />
@@ -21,14 +21,18 @@
         SELECT COUNT(*) > 0 FROM tb_acapy_connection WHERE tenant_id = #{tenantId} AND user_id = #{userId} AND status = 'ACTIVE'
     </select>
 
+    <select id="findByAlias" resultMap="AcaPyConnectionResultMap">
+        SELECT * FROM tb_acapy_connection WHERE alias = #{alias}
+    </select>
+
     <insert id="save" parameterType="com.pyokemon.did.domain.AcaPyConnection" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_acapy_connection (connection_id, invi_msg_id, tenant_id, user_id, status, created_at, updated_at)
-        VALUES (#{connectionId}, #{inviMsgId}, #{tenantId}, #{userId}, #{status}, NOW(), NOW())
+        INSERT INTO tb_acapy_connection (connection_id, alias, tenant_id, user_id, status, created_at, updated_at)
+        VALUES (#{connectionId}, #{alias}, #{tenantId}, #{userId}, #{status}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.AcaPyConnection">
         UPDATE tb_acapy_connection 
-        SET connection_id = #{connectionId}, invi_msg_id = #{inviMsgId}, tenant_id = #{tenantId}, user_id = #{userId}, status = #{status}, updated_at = NOW()
+        SET connection_id = #{connectionId}, alias = #{alias}, tenant_id = #{tenantId}, user_id = #{userId}, status = #{status}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

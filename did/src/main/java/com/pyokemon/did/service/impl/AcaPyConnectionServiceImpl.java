@@ -36,7 +36,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
     @Transactional
     public void createAcaPyConnection(Long tenantId, Long userId) throws BusinessException {
         log.info("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 시작", tenantId, userId);
-        
+
         try {
             // 기존 연결 존재 여부 확인
             boolean exists = acaPyConnectionRepository.existsByTenantIdAndUserId(tenantId, userId);
@@ -68,16 +68,16 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
 
             log.info("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 완료", tenantId, userId);
         } catch (BusinessException e) {
-            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 중 비즈니스 예외 발생: {}", 
+            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 중 비즈니스 예외 발생: {}",
                     tenantId, userId, e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 중 예외 발생: {}", 
+            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 AcaPy 연결 생성 중 예외 발생: {}",
                     tenantId, userId, e.getMessage(), e);
             throw new BusinessException("AcaPy간 연결 생성에 실패했습니다.", CONNECTION_CREATION_FAILED);
         }
     }
-    
+
     /**
      * 테넌트 AcaPy에서 초대장을 생성합니다.
      *
@@ -90,10 +90,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
         log.info("테넌트 ID {}에서 사용자 ID {}로의 초대장 생성 요청", tenantId, userId);
         AcaPyCreateInvitationResponse invitation = remoteTenantAcaPyService.acaPyCreateInvitation(
                 tenantWallet.getToken(),
-                AcaPyCreateInvitationRequest.of(
-                        "Invitation to USER AcaPy from TENANT AcaPy",
-                        tenantId + ":" + userId
-                )
+                AcaPyCreateInvitationRequest.of(userId, tenantId)
         );
 
         if (invitation == null || invitation.getInvitation() == null) {
@@ -115,14 +112,13 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
     private void receiveInvitation(UserWallet userWallet, AcaPyCreateInvitationResponse invitation, Long tenantId, Long userId) {
         log.info("사용자 ID {}가 테넌트 ID {}의 초대장 수락 요청", userId, tenantId);
         AcaPyReceiveInvitationResponse receivedInvitation = remoteUserAcaPyService.acaPyReceiveInvitation(
-                userWallet.getToken(),
-                invitation.getInvitation()
+                userWallet.getToken()
         );
 
         if (receivedInvitation == null || !"deleted".equals(receivedInvitation.getState())) {
-            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 초대장 수락 실패: {}", 
+            log.error("테넌트 ID {} 및 사용자 ID {}에 대한 초대장 수락 실패: {}",
                     tenantId, userId, receivedInvitation != null ? receivedInvitation.getState() : "null");
-            throw new BusinessException("초대장 수락에 실패했습니다.", INVITATION_RECEIVE_FAILED);
+            throw new BusinessException("초대장 수락에 실패했습니다.", INVITATION_INVALID);
         }
         log.debug("초대장 수락 성공");
     }

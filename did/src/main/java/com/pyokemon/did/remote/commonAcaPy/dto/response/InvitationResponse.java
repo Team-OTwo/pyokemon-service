@@ -44,8 +44,7 @@ public class InvitationResponse {
     private String state;
     private Boolean trace;
 
-    @JsonProperty("invi_msg_id")
-    private String inviMsgId;
+    private String alias;
 
     @JsonProperty("oob_id")
     private String oobId;
@@ -58,7 +57,7 @@ public class InvitationResponse {
     public AcaPyConnection toEntity(Long tenantId, Long userId) {
       return AcaPyConnection.builder()
               .connectionId(null)
-              .inviMsgId(inviMsgId)
+              .alias(alias)
               .tenantId(tenantId)
               .userId(userId)
               .status(ConnectionStatus.PENDING)

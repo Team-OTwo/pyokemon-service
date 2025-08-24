@@ -99,8 +99,3 @@ public class TenantWalletServiceImpl implements TenantWalletService {
     }
   }
 
-  @Override
-  public Optional<TenantWallet> checkExistingTenantWallet(Long tenantId) {
-    return tenantWalletRepository.findByTenantId(tenantId);
-  }
-}
