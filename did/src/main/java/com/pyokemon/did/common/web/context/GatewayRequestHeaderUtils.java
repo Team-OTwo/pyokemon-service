@@ -106,12 +106,16 @@ public class GatewayRequestHeaderUtils {
   /**
    * Gateway에서 전달받은 클라이언트 디바이스 정보를 반환합니다.
    * 
-   * @return 클라이언트 디바이스 (MOBILE, TABLET, WEB, API_CLIENT, unknown)
+   * @return 클라이언트 디바이스 
+   * @throws BusinessException 디바이스 정보가 없는 경우
    */
   public static String getClientDevice() {
     HttpServletRequest request = getCurrentRequest();
     String device = request.getHeader("X-Client-Device");
-    return device != null ? device : "unknown";
+    if (device == null || device.isEmpty()) {
+      throw new BusinessException("디바이스 ID를 찾을 수 없습니다", DidErrorCodes.ACCESS_DENIED);
+    }
+    return device;
   }
 
   /**

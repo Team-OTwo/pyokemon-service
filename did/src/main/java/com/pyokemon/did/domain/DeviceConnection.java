@@ -24,6 +24,6 @@ public class DeviceConnection extends BaseEntity {
   private DeviceConnectionStatus status;
 
   public enum DeviceConnectionStatus {
-    INVITATION_SENT, ACTIVE
+    INVITATION_SENT, ACTIVE, DID_RECEIVED, REVOKED
   }
 }
