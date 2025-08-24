@@ -3,9 +3,9 @@ package com.pyokemon.did.remote.commonAcaPy.dto.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,78 +17,96 @@ import lombok.NoArgsConstructor;
 public class InvitationResponse {
 
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Invitation {
-        @JsonProperty("@type")
-        private String type;
-        
-        @JsonProperty("@id")
-        private String id;
-        
-        private String label;
-        
-        @JsonProperty("handshake_protocols")
-        private List<String> handshakeProtocols;
-        
-        private List<String> services;
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Invitation {
+    @JsonProperty("@type")
+    private String type;
+
+    @JsonProperty("@id")
+    private String id;
+
+    private String label;
+
+    @JsonProperty("handshake_protocols")
+    private List<String> handshakeProtocols;
+
+    private List<String> services;
+  }
+
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class AcaPyCreateInvitationResponse {
+    private String state;
+    private Boolean trace;
+
+    @JsonProperty("invi_msg_id")
+    private String inviMsgId;
+
+    @JsonProperty("oob_id")
+    private String oobId;
+
+    private Invitation invitation;
+
+    @JsonProperty("invitation_url")
+    private String invitationUrl;
+
+    public AcaPyConnection toEntity(Long tenantId, Long userId) {
+      return AcaPyConnection.builder()
+              .connectionId(null)
+              .inviMsgId(inviMsgId)
+              .tenantId(tenantId)
+              .userId(userId)
+              .status(ConnectionStatus.PENDING)
+              .build();
     }
+  }
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AcaPyCreateInvitationResponse {
-        private String state;
-        private Boolean trace;
 
-        @JsonProperty("invi_msg_id")
-        private String inviMsgId;
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class GetOobInvitationResponse {
+    @JsonProperty("oob_id")
+    private String oobId;
 
-        @JsonProperty("oob_id")
-        private String oobId;
+    private Invitation invitation;
 
-        private Invitation invitation;
+    @JsonProperty("invitation_url")
+    private String invitationUrl;
 
-        @JsonProperty("invitation_url")
-        private String invitationUrl;
+    private String state;
+  }
 
-        public AcaPyConnection toEntity(Long tenantId, Long userId) {
-            return AcaPyConnection.builder()
-                    .connectionId(null)
-                    .inviMsgId(inviMsgId)
-                    .tenantId(tenantId)
-                    .userId(userId)
-                    .status(ConnectionStatus.PENDING)
-                    .build();
-        }
-    }
-    
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class AcaPyReceiveInvitationResponse {
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class GetOobInvitationResponse {
-        @JsonProperty("oob_id")
-        private String oobId;
-        
-        private Invitation invitation;
-        
-        @JsonProperty("invitation_url")
-        private String invitationUrl;
-        
-        private String state;
-    }
+    private String state;
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AcaPyReceiveInvitationResponse {
-        private String state;
-    }
+    @JsonProperty("@type")
+    private String type;
 
+    @JsonProperty("@id")
+    private String id;
+
+    private String label;
+
+    @JsonProperty("handshake_protocols")
+    private List<String> handshakeProtocols;
+
+    private List<String> accept;
+
+    private List<String> services;
+
+    @JsonProperty("use_did_method")
+    private String useDidMethod;
+  }
 }
