@@ -5,7 +5,7 @@
     <resultMap id="DeviceConnectionResultMap" type="com.pyokemon.did.domain.DeviceConnection">
         <id column="id" property="id" />
         <result column="connection_id" property="connectionId" />
-        <result column="alias" property="alias" />
+        <result column="invi_msg_id" property="inviMsgId" />
         <result column="device_id" property="deviceId" />
         <result column="user_id" property="userId" />
         <result column="public_did" property="publicDid" />
@@ -27,11 +27,7 @@
     </select>
 
     <select id="findByUserId" resultMap="DeviceConnectionResultMap">
-        SELECT * FROM tb_device_connection WHERE user_id = #{userId} LIMIT 1
-    </select>
-
-    <select id="findByAlias" resultMap="DeviceConnectionResultMap">
-        SELECT * FROM tb_device_connection WHERE alias = #{alias}
+        SELECT * FROM tb_device_connection WHERE user_id = #{userId} ORDER BY created_at DESC
     </select>
 
     <select id="findByPublicDid" resultMap="DeviceConnectionResultMap">
@@ -42,20 +38,14 @@
         SELECT * FROM tb_device_connection WHERE status = #{status} ORDER BY created_at DESC
     </select>
 
-    <select id="findAll" resultMap="DeviceConnectionResultMap">
-        SELECT * FROM tb_device_connection ORDER BY created_at DESC
-    </select>
-
-
-
     <insert id="save" parameterType="com.pyokemon.did.domain.DeviceConnection" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_device_connection (connection_id, device_id, user_id, alias, public_did, status, created_at, updated_at)
-        VALUES (#{connectionId}, #{deviceId}, #{userId}, #{alias}, #{publicDid}, #{status}, NOW(), NOW())
+        INSERT INTO tb_device_connection (connection_id, invi_msg_id, device_id, user_id, public_did, status, created_at, updated_at)
+        VALUES (#{connectionId}, #{inviMsgId}, #{deviceId}, #{userId}, #{publicDid}, #{status}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.DeviceConnection">
         UPDATE tb_device_connection 
-        SET connection_id = #{connectionId}, device_id = #{deviceId}, user_id = #{userId}, alias = #{alias}, public_did = #{publicDid}, status = #{status}, updated_at = NOW()
+        SET connection_id = #{connectionId}, invi_msg_id = #{inviMsgId}, device_id = #{deviceId}, user_id = #{userId}, public_did = #{publicDid}, status = #{status}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

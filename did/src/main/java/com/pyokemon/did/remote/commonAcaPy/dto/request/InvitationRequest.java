@@ -27,6 +27,8 @@ public class InvitationRequest {
     @JsonProperty("handshake_protocols")
     private List<String> handshakeProtocols;
 
+    @JsonProperty("my_label")
+    private String myLabel;
 
     @JsonProperty("protocol_version")
     private String protocolVersion;
@@ -37,13 +39,11 @@ public class InvitationRequest {
     @JsonProperty("use_public_did")
     private Boolean usePublicDid;
 
-    public static AcaPyCreateInvitationRequest of(String baseAlias, Long userId, String deviceId) {
-      String trackingAlias =
-          String.format("%s [userId:%d, deviceId:%s]", baseAlias, userId, deviceId);
+    public static AcaPyCreateInvitationRequest of(String alias, String myLabel) {
       return AcaPyCreateInvitationRequest.builder()
-          .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(trackingAlias)
-          .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).protocolVersion("1.1")
-          .useDidMethod("did:peer:2").usePublicDid(false).build();
+          .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(alias)
+          .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).myLabel(myLabel)
+          .protocolVersion("1.1").useDidMethod("did:peer:2").usePublicDid(false).build();
     }
   }
 

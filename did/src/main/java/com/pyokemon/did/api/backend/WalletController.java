@@ -39,12 +39,13 @@ public class WalletController {
   }
 
   @PostMapping(value = "/user")
-  public ResponseEntity<ResponseDto<Void>> createUserWallet(
+  public ResponseEntity<ResponseDto<Map<String, String>>> createUserWallet(
       @Valid @RequestBody CreateUserWalletRequest request) {
     log.info("사용자 지갑 생성 요청: userId={}", request.getUserId());
 
     userWalletService.createUserWallet(request.getUserId());
     log.info("사용자 지갑 생성 완료: userId={}", request.getUserId());
-    return ResponseEntity.ok(ResponseDto.success("사용자 지갑 생성 완료"));
+    return ResponseEntity.ok(
+        ResponseDto.success(Map.of("userId", String.valueOf(request.getUserId())), "사용자 지갑 생성 완료"));
   }
 }
