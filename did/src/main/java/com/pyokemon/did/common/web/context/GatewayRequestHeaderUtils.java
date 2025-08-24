@@ -106,7 +106,7 @@ public class GatewayRequestHeaderUtils {
   /**
    * Gateway에서 전달받은 클라이언트 디바이스 정보를 반환합니다.
    * 
-   * @return 클라이언트 디바이스 
+   * @return 클라이언트 디바이스
    * @throws BusinessException 디바이스 정보가 없는 경우
    */
   public static String getClientDevice() {

@@ -9,24 +9,24 @@ import com.pyokemon.did.api.backend.dto.OutOfBandWebhookDto;
  */
 public interface UserWebhookService {
 
-    /**
-     * Connection webhook을 처리합니다.
-     *
-     * @param webhookDto Connection webhook 데이터
-     */
-    void handleConnectionWebhook(ConnectionWebhookDto webhookDto);
+  /**
+   * Connection webhook을 처리합니다.
+   *
+   * @param webhookDto Connection webhook 데이터
+   */
+  void handleConnectionWebhook(ConnectionWebhookDto webhookDto);
 
-    /**
-     * Out of Band webhook을 처리합니다.
-     *
-     * @param webhookDto Out of Band webhook 데이터
-     */
-    void handleOutOfBandWebhook(OutOfBandWebhookDto webhookDto);
+  /**
+   * Out of Band webhook을 처리합니다.
+   *
+   * @param webhookDto Out of Band webhook 데이터
+   */
+  void handleOutOfBandWebhook(OutOfBandWebhookDto webhookDto);
 
-    /**
-     * Basic Message webhook을 처리합니다.
-     *
-     * @param webhookDto Basic Message webhook 데이터
-     */
-    void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto);
+  /**
+   * Basic Message webhook을 처리합니다.
+   *
+   * @param webhookDto Basic Message webhook 데이터
+   */
+  void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto);
 }

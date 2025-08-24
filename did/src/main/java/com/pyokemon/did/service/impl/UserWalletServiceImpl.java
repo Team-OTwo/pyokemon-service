@@ -71,8 +71,8 @@ public class UserWalletServiceImpl implements UserWalletService {
     try {
       Optional<UserWallet> userWalletOpt = userWalletRepository.findByUserId(userId);
       if (userWalletOpt.isEmpty()) {
-        throw new BusinessException("사용자 지갑을 찾을 수 없습니다. userId: " + userId, 
-                DidErrorCodes.WALLET_NOT_FOUND);
+        throw new BusinessException("사용자 지갑을 찾을 수 없습니다. userId: " + userId,
+            DidErrorCodes.WALLET_NOT_FOUND);
       }
 
       UserWallet userWallet = userWalletOpt.get();
@@ -80,13 +80,13 @@ public class UserWalletServiceImpl implements UserWalletService {
 
       if (userToken == null || userToken.isEmpty()) {
         log.error("사용자 토큰이 유효하지 않음: userId={}", userId);
-        throw new BusinessException("사용자 지갑 토큰이 없습니다. userId: " + userId, 
-                DidErrorCodes.WALLET_NOT_FOUND);
+        throw new BusinessException("사용자 지갑 토큰이 없습니다. userId: " + userId,
+            DidErrorCodes.WALLET_NOT_FOUND);
       }
-      
+
       log.info("사용자 지갑 토큰 조회 완료: userId={}", userId);
       return userToken;
-      
+
     } catch (BusinessException e) {
       throw e;
     } catch (Exception e) {
