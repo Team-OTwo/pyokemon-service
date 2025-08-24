@@ -31,7 +31,7 @@ public class GatewayRequestHeaderUtils {
       return Long.valueOf(accountId);
     } catch (NumberFormatException e) {
       throw new BusinessException("사용자 ID가 올바른 숫자 형식이 아닙니다: " + accountId,
-              DidErrorCodes.ACCESS_DENIED);
+          DidErrorCodes.ACCESS_DENIED);
     }
   }
 
@@ -126,7 +126,7 @@ public class GatewayRequestHeaderUtils {
    */
   private static HttpServletRequest getCurrentRequest() {
     ServletRequestAttributes attributes =
-            (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
     if (attributes == null) {
       throw new BusinessException("요청 컨텍스트를 찾을 수 없습니다.", DidErrorCodes.DATABASE_ERROR);
     }

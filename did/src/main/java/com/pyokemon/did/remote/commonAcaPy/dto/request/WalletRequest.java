@@ -40,9 +40,9 @@ public class WalletRequest {
      */
     public static AcaPyCreateWalletRequest of() {
       return AcaPyCreateWalletRequest.builder().label("user wallet")
-              .walletKey(UUID.randomUUID().toString())
-              .walletName("wallet:" + UUID.randomUUID().toString()).walletType("askar")
-              .walletDispatchType("default").keyManagementMode("managed").build();
+          .walletKey(UUID.randomUUID().toString())
+          .walletName("wallet:" + UUID.randomUUID().toString()).walletType("askar")
+          .walletDispatchType("default").keyManagementMode("managed").build();
     }
   }
 
@@ -68,7 +68,7 @@ public class WalletRequest {
 
     public static AcaPyCreatePublicDidRequest of(String method) {
       return AcaPyCreatePublicDidRequest.builder().method(method)
-              .options(Options.builder().public_(true).keyType("ed25519").build()).build();
+          .options(Options.builder().public_(true).keyType("ed25519").build()).build();
     }
   }
 }

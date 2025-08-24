@@ -3,9 +3,9 @@ package com.pyokemon.did.remote.commonAcaPy.dto.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,13 +55,8 @@ public class InvitationResponse {
     private String invitationUrl;
 
     public AcaPyConnection toEntity(Long tenantId, Long userId) {
-      return AcaPyConnection.builder()
-              .connectionId(null)
-              .alias(alias)
-              .tenantId(tenantId)
-              .userId(userId)
-              .status(ConnectionStatus.PENDING)
-              .build();
+      return AcaPyConnection.builder().connectionId(null).alias(alias).tenantId(tenantId)
+          .userId(userId).status(ConnectionStatus.PENDING).build();
     }
   }
 

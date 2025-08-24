@@ -40,17 +40,17 @@ public class InvitationRequest {
     public static AcaPyCreateInvitationRequest of(Long userId, String deviceId) {
       String trackingAlias = String.format("credo:user:%d#device:%s", userId, deviceId);
       return AcaPyCreateInvitationRequest.builder()
-              .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(trackingAlias)
-              .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).protocolVersion("1.1")
-              .useDidMethod("did:peer:2").usePublicDid(false).build();
+          .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(trackingAlias)
+          .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).protocolVersion("1.1")
+          .useDidMethod("did:peer:2").usePublicDid(false).build();
     }
 
     public static AcaPyCreateInvitationRequest of(Long userId, Long tenantId) {
       String trackingAlias = String.format("acapy:user:%d#tenant:%d", userId, tenantId);
       return AcaPyCreateInvitationRequest.builder()
-              .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(trackingAlias)
-              .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).protocolVersion("1.1")
-              .useDidMethod("did:peer:2").usePublicDid(false).build();
+          .accept(List.of("didcomm/aip1", "didcomm/aip2;env=rfc19")).alias(trackingAlias)
+          .handshakeProtocols(List.of("https://didcomm.org/didexchange/1.1")).protocolVersion("1.1")
+          .useDidMethod("did:peer:2").usePublicDid(false).build();
     }
   }
 

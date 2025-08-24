@@ -27,75 +27,66 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TenantWalletServiceImpl implements TenantWalletService {
-    private final RemoteTenantAcaPyService remoteTenantAcaPyService;
-    private final TenantWalletRepository tenantWalletRepository;
+  private final RemoteTenantAcaPyService remoteTenantAcaPyService;
+  private final TenantWalletRepository tenantWalletRepository;
 
-    @Override
-    @Transactional
-    public void registerTenantWallet(CreateWalletRequest createWalletRequest) throws BusinessException {
-        Long tenantId = createWalletRequest.getTenantId();
+  @Override
+  @Transactional
+  public void registerTenantWallet(CreateWalletRequest createWalletRequest)
+      throws BusinessException {
+    Long tenantId = createWalletRequest.getTenantId();
 
-        try {
-            // 기존 지갑 존재 여부 확인
-            boolean exists = tenantWalletRepository.existsByTenantId(tenantId);
-            if (exists) {
-                log.error("테넌트 ID {}에 대한 지갑이 이미 존재합니다.", tenantId);
-                throw new BusinessException("테넌트 지갑이 이미 존재합니다.", WALLET_ALREADY_EXISTS);
-            }
+    try {
+      // 기존 지갑 존재 여부 확인
+      boolean exists = tenantWalletRepository.existsByTenantId(tenantId);
+      if (exists) {
+        log.error("테넌트 ID {}에 대한 지갑이 이미 존재합니다.", tenantId);
+        throw new BusinessException("테넌트 지갑이 이미 존재합니다.", WALLET_ALREADY_EXISTS);
+      }
 
-            // 1. 지갑 생성 요청
-            log.info("테넌트 ID {}에 대한 지갑 생성 요청", tenantId);
-            AcaPyCreateWalletResponse walletResponse = remoteTenantAcaPyService.acaPyCreateWallet(
-                    AcaPyCreateWalletRequest.of()
-            );
-            
-            if (walletResponse == null
-                    || walletResponse.getToken() == null
-            ) {
-                log.error("테넌트 ID {}에 대한 지갑 생성 실패: 응답이 null이거나 토큰이 없음", tenantId);
-                throw new BusinessException("지갑 생성에 실패했습니다.", WALLET_CREATION_FAILED);
-            }
-            
-            // 2. 공개 DID 생성 요청
-            log.info("테넌트 ID {}에 대한 공개 DID 생성 요청", tenantId);
-            AcaPyCreatePublicDidResponse publicDidResponse = remoteTenantAcaPyService.acaPyCreatePublicDid(
-                    "Bearer " + walletResponse.getToken(),
-                AcaPyCreatePublicDidRequest.of("key")
-            );
-            
-            if (publicDidResponse == null
-                    || publicDidResponse.getResult() == null
-                    ||publicDidResponse.getResult().getDid() == null
-            ) {
-                log.error("테넌트 ID {}에 대한 공개 DID 생성 실패: 응답이 null이거나 DID가 없음", tenantId);
-                throw new BusinessException("공개 DID 생성에 실패했습니다.", DID_CREATION_FAILED);
-            }
+      // 1. 지갑 생성 요청
+      log.info("테넌트 ID {}에 대한 지갑 생성 요청", tenantId);
+      AcaPyCreateWalletResponse walletResponse =
+          remoteTenantAcaPyService.acaPyCreateWallet(AcaPyCreateWalletRequest.of());
 
-            // 3. 생성된 지갑 정보 저장
-            log.info("테넌트 ID {}에 대한 지갑 정보 저장", tenantId);
-            TenantWallet tenantWallet = TenantWallet.builder()
-                    .tenantId(tenantId)
-                    .token(walletResponse.getToken())
-                    .publicDid(publicDidResponse.getResult().getDid())
-                    .publicVerkey(publicDidResponse.getResult().getVerkey())
-                    .build();
+      if (walletResponse == null || walletResponse.getToken() == null) {
+        log.error("테넌트 ID {}에 대한 지갑 생성 실패: 응답이 null이거나 토큰이 없음", tenantId);
+        throw new BusinessException("지갑 생성에 실패했습니다.", WALLET_CREATION_FAILED);
+      }
 
-            tenantWalletRepository.save(tenantWallet);
-            log.info("테넌트 ID {}에 대한 지갑 생성 및 저장 완료", tenantId);
-        } catch (BusinessException e) {
-            // 비즈니스 예외는 그대로 전파
-            throw e;
-        } catch (Exception e) {
-            // 외부 API 호출 중 발생한 예외 처리
-            log.error("테넌트 ID {}에 대한 외부 API 호출 중 오류 발생: {}", tenantId, e.getMessage(), e);
-            throw new BusinessException("외부 시스템 연동 중 오류가 발생했습니다", WALLET_CREATION_FAILED);
-        }
-    }
+      // 2. 공개 DID 생성 요청
+      log.info("테넌트 ID {}에 대한 공개 DID 생성 요청", tenantId);
+      AcaPyCreatePublicDidResponse publicDidResponse =
+          remoteTenantAcaPyService.acaPyCreatePublicDid("Bearer " + walletResponse.getToken(),
+              AcaPyCreatePublicDidRequest.of("key"));
 
-    @Override
-    public Optional<TenantWallet> getWalletByTenantId(Long tenantId) {
-        return tenantWalletRepository.findByTenantId(tenantId);
+      if (publicDidResponse == null || publicDidResponse.getResult() == null
+          || publicDidResponse.getResult().getDid() == null) {
+        log.error("테넌트 ID {}에 대한 공개 DID 생성 실패: 응답이 null이거나 DID가 없음", tenantId);
+        throw new BusinessException("공개 DID 생성에 실패했습니다.", DID_CREATION_FAILED);
+      }
 
+      // 3. 생성된 지갑 정보 저장
+      log.info("테넌트 ID {}에 대한 지갑 정보 저장", tenantId);
+      TenantWallet tenantWallet = TenantWallet.builder().tenantId(tenantId)
+          .token(walletResponse.getToken()).publicDid(publicDidResponse.getResult().getDid())
+          .publicVerkey(publicDidResponse.getResult().getVerkey()).build();
+
+      tenantWalletRepository.save(tenantWallet);
+      log.info("테넌트 ID {}에 대한 지갑 생성 및 저장 완료", tenantId);
+    } catch (BusinessException e) {
+      // 비즈니스 예외는 그대로 전파
+      throw e;
+    } catch (Exception e) {
+      // 외부 API 호출 중 발생한 예외 처리
+      log.error("테넌트 ID {}에 대한 외부 API 호출 중 오류 발생: {}", tenantId, e.getMessage(), e);
+      throw new BusinessException("외부 시스템 연동 중 오류가 발생했습니다", WALLET_CREATION_FAILED);
     }
   }
 
+  @Override
+  public Optional<TenantWallet> getWalletByTenantId(Long tenantId) {
+    return tenantWalletRepository.findByTenantId(tenantId);
+
+  }
+}

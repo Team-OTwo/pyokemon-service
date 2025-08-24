@@ -172,12 +172,12 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       // credo:user:123#device:abc123 형식 파싱
       String userId = null;
       String deviceId = null;
-      
+
       log.info("Searching DeviceConnection by alias: '{}'", alias);
-      
-      return deviceConnectionRepository.findByAlias(alias).orElseThrow(
-          () -> new BusinessException("❌ DeviceConnection not found for connection_id: "
-              + connectionId + " or alias: " + alias, "DEVICE_CONNECTION_NOT_FOUND"));
+
+      return deviceConnectionRepository.findByAlias(alias).orElseThrow(() -> new BusinessException(
+          "❌ DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
+          "DEVICE_CONNECTION_NOT_FOUND"));
 
     } catch (Exception e) {
       log.error("Failed to parse ACA-Py alias: {}", alias, e);
