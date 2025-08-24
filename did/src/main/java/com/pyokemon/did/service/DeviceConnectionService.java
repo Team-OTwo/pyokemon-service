@@ -4,6 +4,6 @@ import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationR
 
 public interface DeviceConnectionService {
 
-    CreateInvitationResponse createInvitations(Long userId);
+  CreateInvitationResponse createInvitations(Long userId);
 
 }

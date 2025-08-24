@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingEvent {
-    private Long bookingId;
-    private Long eventScheduleId;
-    private Long seatId;
-    private Long accountId;
-    private Long tenantId;
-    private String status;
+  private Long bookingId;
+  private Long eventScheduleId;
+  private Long seatId;
+  private Long accountId;
+  private Long tenantId;
+  private String status;
 }

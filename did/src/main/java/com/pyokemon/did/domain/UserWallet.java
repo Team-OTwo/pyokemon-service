@@ -1,6 +1,7 @@
 package com.pyokemon.did.domain;
 
 import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.*;
 
 
@@ -10,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserWallet extends BaseEntity {
 
-    private Long userId;
-    private String token;
+  private Long userId;
+  private String token;
 
 }

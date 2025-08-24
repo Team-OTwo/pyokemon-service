@@ -1,12 +1,13 @@
 package com.pyokemon.did.remote.commonAcaPy.dto.request;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.UUID;
 
 public class WalletRequest {
 
@@ -38,14 +39,10 @@ public class WalletRequest {
      * @return 구성된 지갑 생성 요청
      */
     public static AcaPyCreateWalletRequest of() {
-      return AcaPyCreateWalletRequest.builder()
-          .label("user wallet")
+      return AcaPyCreateWalletRequest.builder().label("user wallet")
           .walletKey(UUID.randomUUID().toString())
-          .walletName("wallet:" + UUID.randomUUID().toString())
-          .walletType("askar")
-          .walletDispatchType("default")
-          .keyManagementMode("managed")
-          .build();
+          .walletName("wallet:" + UUID.randomUUID().toString()).walletType("askar")
+          .walletDispatchType("default").keyManagementMode("managed").build();
     }
   }
 
@@ -70,13 +67,8 @@ public class WalletRequest {
     }
 
     public static AcaPyCreatePublicDidRequest of(String method) {
-      return AcaPyCreatePublicDidRequest.builder()
-          .method(method)
-          .options(Options.builder()
-              .public_(true)
-              .keyType("ed25519")
-              .build())
-          .build();
+      return AcaPyCreatePublicDidRequest.builder().method(method)
+          .options(Options.builder().public_(true).keyType("ed25519").build()).build();
     }
   }
 
