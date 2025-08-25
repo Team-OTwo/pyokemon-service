@@ -39,11 +39,11 @@ public class NotificationController {
   public ResponseDto sendNotification(@RequestHeader(value = "X-Auth-AccountId") Long accountId,
       @RequestBody NotificationSendRequestDto notificationSendRequest) {
 
-      String result = notificationService.sendNotification(notificationSendRequest, accountId);
-      if(result != null) {
-        return ResponseDto.success("알람이 전송되었습니다.");
-      }
-      return null;
+    String result = notificationService.sendNotification(notificationSendRequest, accountId);
+    if (result != null) {
+      return ResponseDto.success("알람이 전송되었습니다.");
+    }
+    return null;
   }
 
   @PutMapping("/{notificationId}")

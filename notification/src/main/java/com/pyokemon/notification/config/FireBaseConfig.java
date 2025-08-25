@@ -6,10 +6,11 @@ import java.io.InputStream;
 
 import jakarta.annotation.PostConstruct;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Bucket;
@@ -17,9 +18,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,9 +41,9 @@ public class FireBaseConfig {
       Resource resource = resourceLoader.getResource(firebaseSdkJson);
       InputStream serviceAccount = resource.getInputStream();
 
-      FirebaseOptions options = new FirebaseOptions.Builder()
-              .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-              .setStorageBucket(firebaseBucket)  // bucket 설정 추가
+      FirebaseOptions options =
+          new FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(serviceAccount))
+              .setStorageBucket(firebaseBucket) // bucket 설정 추가
               .build();
 
       if (FirebaseApp.getApps().isEmpty()) { // 이미 초기화된 앱이 없는 경우에만 초기화

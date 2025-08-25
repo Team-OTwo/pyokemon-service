@@ -3,16 +3,16 @@ package com.pyokemon.notification.service;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.google.firebase.messaging.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.google.firebase.messaging.*;
 import com.pyokemon.notification.dto.NotificationListResponseDtoApp;
 import com.pyokemon.notification.dto.NotificationResponseDto;
 import com.pyokemon.notification.dto.NotificationSendRequestDto;
 import com.pyokemon.notification.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -47,17 +47,16 @@ public class NotificationService {
     return notificationRepository.updateNotificationReadAllByAccountId(accountId);
   }
 
-  public String sendNotification(NotificationSendRequestDto notificationSendRequest, Long accountId) {
+  public String sendNotification(NotificationSendRequestDto notificationSendRequest,
+      Long accountId) {
     try {
-      Message message = Message.builder()
-              .setToken(notificationSendRequest.getToken())
-              .setNotification(Notification.builder()
-                      .setTitle(notificationSendRequest.getTitle())
-                      .setBody(notificationSendRequest.getMessage()).build())
-              .build();
+      Message message = Message.builder().setToken(notificationSendRequest.getToken())
+          .setNotification(Notification.builder().setTitle(notificationSendRequest.getTitle())
+              .setBody(notificationSendRequest.getMessage()).build())
+          .build();
       String response = FirebaseMessaging.getInstance().sendAsync(message).get();
       return response;
-    }catch (ExecutionException | InterruptedException e) {
+    } catch (ExecutionException | InterruptedException e) {
       log.error(e.getMessage());
       throw new RuntimeException("FCM 멀티캐스트 메세지 전송실패");
     }
