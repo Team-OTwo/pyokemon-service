@@ -1,22 +1,20 @@
-package com.pyokemon.notification.entity;
+package com.pyokemon.notification.dto;
 
 import java.time.LocalDateTime;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 @Builder
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notifications {
-
+public class NotificationResponseDto {
   private Long notificationId;
-  private Long accountId;
   private String title;
   private String message;
   private Boolean isChecked;
   private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
-
 }

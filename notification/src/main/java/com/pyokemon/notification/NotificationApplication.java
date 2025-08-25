@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.annotation.EnableKafka;
 
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
-@MapperScan()
+@MapperScan({"com.pyokemon.notification.repository"})
 @EnableKafka
 public class NotificationApplication {
   public static void main(String[] args) {
