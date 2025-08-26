@@ -36,59 +36,59 @@ import com.pyokemon.did.service.impl.AcaPyConnectionServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class AcaPyConnectionServiceTest {
 
-    @Mock
-    private RemoteTenantAcaPyService remoteTenantAcaPyService;
+  @Mock
+  private RemoteTenantAcaPyService remoteTenantAcaPyService;
 
-    @Mock
-    private RemoteUserAcaPyService remoteUserAcaPyService;
+  @Mock
+  private RemoteUserAcaPyService remoteUserAcaPyService;
 
-    @Mock
-    private AcaPyConnectionRepository acaPyConnectionRepository;
+  @Mock
+  private AcaPyConnectionRepository acaPyConnectionRepository;
 
-    @Mock
-    private TenantWalletService tenantWalletService;
+  @Mock
+  private TenantWalletService tenantWalletService;
 
-    @Mock
-    private UserWalletRepository userWalletRepository;
+  @Mock
+  private UserWalletRepository userWalletRepository;
 
-    @InjectMocks
-    private AcaPyConnectionServiceImpl acaPyConnectionService;
+  @InjectMocks
+  private AcaPyConnectionServiceImpl acaPyConnectionService;
 
-    private final Long TENANT_ID = 1L;
-    private final Long USER_ID = 2L;
-    private final String TOKEN = "test-token";
-    private final String INVITATION_MSG_ID = "test-invitation-msg";
+  private final Long TENANT_ID = 1L;
+  private final Long USER_ID = 2L;
+  private final String TOKEN = "test-token";
+  private final String INVITATION_MSG_ID = "test-invitation-msg";
 
-    private TenantWallet tenantWallet;
-    private UserWallet userWallet;
-    private AcaPyCreateInvitationResponse createInvitationResponse;
-    private AcaPyReceiveInvitationResponse receivedInvitationResponse;
+  private TenantWallet tenantWallet;
+  private UserWallet userWallet;
+  private AcaPyCreateInvitationResponse createInvitationResponse;
+  private AcaPyReceiveInvitationResponse receivedInvitationResponse;
 
-    @BeforeEach
-    void setUp() {
-        // 테넌트 지갑 설정
-        tenantWallet = TenantWallet.builder().tenantId(TENANT_ID).token(TOKEN)
-                .publicDid("test-public-did").publicVerkey("test-public-verkey").build();
+  @BeforeEach
+  void setUp() {
+    // 테넌트 지갑 설정
+    tenantWallet = TenantWallet.builder().tenantId(TENANT_ID).token(TOKEN)
+        .publicDid("test-public-did").publicVerkey("test-public-verkey").build();
 
-        // 사용자 지갑 설정
-        userWallet = UserWallet.builder().userId(USER_ID).token(TOKEN).build();
+    // 사용자 지갑 설정
+    userWallet = UserWallet.builder().userId(USER_ID).token(TOKEN).build();
 
-        // 초대장 응답 설정
-        Invitation invitation = new Invitation();
-        String INVITATION_ID = "test-invitation-id";
-        invitation.setId(INVITATION_ID);
-        invitation.setLabel("Invitation to USER AcaPy from TENANT AcaPy");
+    // 초대장 응답 설정
+    Invitation invitation = new Invitation();
+    String INVITATION_ID = "test-invitation-id";
+    invitation.setId(INVITATION_ID);
+    invitation.setLabel("Invitation to USER AcaPy from TENANT AcaPy");
 
-        createInvitationResponse = new AcaPyCreateInvitationResponse();
-        createInvitationResponse.setInvitation(invitation);
-        createInvitationResponse.setInviMsgId(INVITATION_MSG_ID);
+    createInvitationResponse = new AcaPyCreateInvitationResponse();
+    createInvitationResponse.setInvitation(invitation);
+    createInvitationResponse.setInviMsgId(INVITATION_MSG_ID);
 
-        // 초대장 수락 응답 설정
-        receivedInvitationResponse = new AcaPyReceiveInvitationResponse();
-        receivedInvitationResponse.setState("deleted");
-    }
+    // 초대장 수락 응답 설정
+    receivedInvitationResponse = new AcaPyReceiveInvitationResponse();
+    receivedInvitationResponse.setState("deleted");
+  }
 
-    @Test
+  @Test
     @DisplayName("AcaPy 연결 생성 성공 테스트")
     void createAcaPyConnection_Success() {
         // Given
@@ -122,7 +122,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("이미 존재하는 연결 테스트")
     void createAcaPyConnection_AlreadyExists() {
         // Given
@@ -140,7 +140,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑이 존재하지 않는 경우 예외 발생 테스트")
     void createAcaPyConnection_TenantWalletNotFound() {
         // Given
@@ -162,7 +162,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 지갑이 존재하지 않는 경우 예외 발생 테스트")
     void createAcaPyConnection_UserWalletNotFound() {
         // Given
@@ -185,7 +185,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("초대장 생성 실패 테스트 - null 응답")
     void createAcaPyConnection_InvitationCreationFailed_NullResponse() {
         // Given
@@ -210,7 +210,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("초대장 생성 실패 테스트 - null 초대장")
     void createAcaPyConnection_InvitationCreationFailed_NullInvitation() {
         // Given
@@ -239,7 +239,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("초대장 수락 실패 테스트 - null 응답")
     void createAcaPyConnection_InvitationReceiveFailed_NullResponse() {
         // Given
@@ -266,7 +266,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("초대장 수락 실패 테스트 - 잘못된 상태")
     void createAcaPyConnection_InvitationReceiveFailed_InvalidState() {
         // Given
@@ -297,7 +297,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService).acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("연결 저장 중 예외 발생 테스트")
     void createAcaPyConnection_SaveConnectionFailed() {
         // Given
@@ -324,7 +324,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("remoteTenantAcaPyService API 호출 중 예외 발생 테스트")
     void remoteTenantAcaPyService_ExternalApiException() {
         // Given
@@ -349,7 +349,7 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService, never()).acaPyReceiveInvitation(anyString(), any(AcaPyReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
     @DisplayName("remoteUserAcaPyService API 호출 중 예외 발생 테스트")
     void remoteUserAcaPyService_ExternalApiException() {
         // Given

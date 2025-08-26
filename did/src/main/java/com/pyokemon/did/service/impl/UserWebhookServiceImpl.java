@@ -7,16 +7,16 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.pyokemon.did.api.backend.dto.*;
-import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.repository.IssuedVcRepository;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.api.backend.dto.*;
 import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
+import com.pyokemon.did.domain.repository.IssuedVcRepository;
 import com.pyokemon.did.service.UserWebhookService;
 
 import lombok.RequiredArgsConstructor;
@@ -263,7 +263,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     try {
       // webhook에서 booking_id 추출
       String bookingIdStr = webhookDto.getByFormat().getCredOffer().getLdProof().getCredential()
-              .getCredentialSubject().getBookingId();
+          .getCredentialSubject().getBookingId();
       if (bookingIdStr == null || bookingIdStr.isEmpty()) {
         log.warn("webhook에서 booking_id를 추출할 수 없습니다");
         return;
@@ -287,7 +287,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
       issuedVcRepository.update(issuedVc);
       log.info("VC credential_exchange_id 업데이트 완료 - bookingId: {}, credExId: {}",
-              issuedVc.getBookingId(), credExId);
+          issuedVc.getBookingId(), credExId);
 
     } catch (Exception e) {
       log.error("VC credential_exchange_id 업데이트 중 오류 발생: {}", e.getMessage(), e);
@@ -296,7 +296,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
   private void updateVcStatus(String credExId, String credentialId, IssuedVc.VcStatus status) {
     log.info("VC 상태 업데이트 - credExId: {}, credentialId: {}, status: {}", credExId, credentialId,
-            status);
+        status);
 
     // credential_exchange_id로 IssuedVc 찾기
     var issuedVcOpt = issuedVcRepository.findByCredentialExchangeId(credExId);
@@ -317,6 +317,6 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
     issuedVcRepository.update(issuedVc);
     log.info("VC 상태 업데이트 완료 - bookingId: {}, status: {}, credentialId: {}", issuedVc.getBookingId(),
-            status, credentialId);
+        status, credentialId);
   }
 }

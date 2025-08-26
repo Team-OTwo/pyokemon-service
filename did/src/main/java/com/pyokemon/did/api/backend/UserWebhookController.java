@@ -1,12 +1,12 @@
 package com.pyokemon.did.api.backend;
 
-import com.pyokemon.did.api.backend.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pyokemon.did.api.backend.dto.*;
 import com.pyokemon.did.service.UserWebhookService;
 
 import lombok.AllArgsConstructor;
@@ -42,17 +42,17 @@ public class UserWebhookController {
 
   @PostMapping({"/issue_credential_v2_0", "/issue_credential_v2_0/"})
   public ResponseEntity<Void> handleIssueCredentialWebhook(
-          @RequestBody IssueCredentialWebhookDto webhookDto) {
+      @RequestBody IssueCredentialWebhookDto webhookDto) {
     log.info("일반 Webhook 수신: {}", webhookDto);
-      userWebhookService.handleIssueCredentialWebhook(webhookDto);
-      return ResponseEntity.ok().build();
+    userWebhookService.handleIssueCredentialWebhook(webhookDto);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping({"/issue_credential_v2_0_ld_proof", "/issue_credential_v2_0_ld_proof/"})
   public ResponseEntity<Void> handleIssueCredentialLdProofWebhook(
-          @RequestBody LdProofWebhookDto webhookDto) {
+      @RequestBody LdProofWebhookDto webhookDto) {
     log.info("LD Proof Webhook 수신: {}", webhookDto);
-      userWebhookService.handleLdProofWebhook(webhookDto);
-      return ResponseEntity.ok().build();
+    userWebhookService.handleLdProofWebhook(webhookDto);
+    return ResponseEntity.ok().build();
   }
 }
