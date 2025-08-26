@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.pyokemon.common.kafka.KafkaTopicConstants;
 import com.pyokemon.notification.dto.NotificationSendRequestDto;
 import com.pyokemon.notification.enums.NotificationType;
-import com.pyokemon.notification.event.consumer.message.notification.NotificationEvent;
+import com.pyokemon.notification.event.consumer.message.booking.BookingEvent;
 import com.pyokemon.notification.remote.account.RemoteAccountService;
 import com.pyokemon.notification.remote.account.dto.UserInfoResponseDto;
 import com.pyokemon.notification.service.NotificationService;
@@ -20,16 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class KafkaMessageConsumer {
 
-  @KafkaListener(topics = KafkaTopicConstants.NOTIFICATION_REQUEST,
+  @KafkaListener(topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
       properties = {JsonDeserializer.VALUE_DEFAULT_TYPE
-          + ":com.pyokemon.notification.event.consumer.message.notification.NotificationEvent"},
+          + ":com.pyokemon.notification.event.consumer.message.booking.BookingEvent"},
       groupId = "notification-service")
-  void handleNotificationEvent(NotificationEvent notificationEvent) {
-    log.info("Received notification event {}", notificationEvent);
-    UserInfoResponseDto userInfo = getAccountInfo(notificationEvent.getAccountId());
+  void handleNotificationEvent(BookingEvent bookingEvent) {
+    log.info("Received notification event {}", bookingEvent);
+    UserInfoResponseDto userInfo = getAccountInfo(bookingEvent.getAccountId());
     NotificationSendRequestDto message = new NotificationSendRequestDto();
     message.setToken(userInfo.getFcmToken());
-    NotificationType type = NotificationType.valueOf(notificationEvent.getStatus());
+    NotificationType type = NotificationType.valueOf(bookingEvent.getStatus());
 
     // 임시 테스트를 위한 소스 전체 수정 예정
 
@@ -49,8 +49,8 @@ public class KafkaMessageConsumer {
         log.warn("지원하지 않는 알림 타입입니다: {}", type);
         break;
     }
-    if (notificationEvent.getStatus() != null) {
-      sendNotification(message, notificationEvent.getAccountId());
+    if (bookingEvent.getStatus() != null) {
+      sendNotification(message, bookingEvent.getAccountId());
     }
 
 
