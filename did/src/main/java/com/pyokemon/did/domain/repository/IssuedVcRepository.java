@@ -35,12 +35,30 @@ public interface IssuedVcRepository {
   Optional<IssuedVc> findByCredentialExchangeId(String credentialExchangeId);
 
   /**
+   * credential_exchange_id와 status로 IssuedVc을 조회합니다.
+   *
+   * @param credentialExchangeId 조회할 credential_exchange_id
+   * @param status 조회할 status
+   * @return IssuedVc (Optional)
+   */
+  Optional<IssuedVc> findByCredentialExchangeIdAndStatus(String credentialExchangeId,
+      IssuedVc.VcStatus status);
+
+  /**
+   * credential_id로 IssuedVc을 조회합니다.
+   *
+   * @param credentialId 조회할 credential_id
+   * @return IssuedVc (Optional)
+   */
+  Optional<IssuedVc> findByCredentialId(String credentialId);
+
+  /**
    * booking_id로 IssuedVc 목록을 조회합니다.
    *
    * @param bookingId 조회할 booking_id
    * @return IssuedVc 목록
    */
-  List<IssuedVc> findByBookingId(Long bookingId);
+  Optional<IssuedVc> findByBookingId(Long bookingId);
 
   /**
    * tenant_id로 IssuedVc 목록을 조회합니다.
@@ -49,14 +67,6 @@ public interface IssuedVcRepository {
    * @return IssuedVc 목록
    */
   List<IssuedVc> findByTenantId(Long tenantId);
-
-  /**
-   * credo_conn_id로 IssuedVc 목록을 조회합니다.
-   *
-   * @param credoConnId 조회할 credo_conn_id
-   * @return IssuedVc 목록
-   */
-  List<IssuedVc> findByCredoConnId(String credoConnId);
 
   /**
    * status로 IssuedVc 목록을 조회합니다.
@@ -83,6 +93,14 @@ public interface IssuedVcRepository {
    * @return IssuedVc (Optional)
    */
   Optional<IssuedVc> findByBookingIdAndStatus(Long bookingId, IssuedVc.VcStatus status);
+
+  /**
+   * booking_id로 발급 완료된 VC가 있는지 확인합니다.
+   *
+   * @param bookingId 조회할 booking_id
+   * @return 발급 완료된 VC 존재 여부
+   */
+  boolean existsByBookingIdAndIssued(Long bookingId);
 
   /**
    * IssuedVc을 업데이트합니다.

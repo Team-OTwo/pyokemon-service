@@ -1,8 +1,6 @@
-package com.pyokemon.event.dto;
+package com.pyokemon.event.dto.tenant.app;
 
 import java.time.LocalDateTime;
-
-import com.pyokemon.event.entity.Event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
