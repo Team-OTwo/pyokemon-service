@@ -9,6 +9,8 @@ import com.pyokemon.account.tenant.bff.repository.TenantBffRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TenantBffService {
@@ -20,4 +22,9 @@ public class TenantBffService {
     return tenantBffRepository.findByTenantId(tenantId).map(TenantDto::from)
         .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + tenantId));
   }
+
+  @Transactional(readOnly = true)
+  public List<TenantDto> findTenantsBatch(List<Long> tenantIds) {
+      return tenantBffRepository.findTenantsByIdIn(tenantIds);
+    }
 }

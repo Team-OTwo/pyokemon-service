@@ -2,6 +2,9 @@ package com.pyokemon.booking.bff.controller;
 
 import java.util.List;
 
+import com.pyokemon.booking.bff.dto.CursorPageResponse;
+import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.common.dto.IdsRequest;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.booking.bff.dto.BookingDto;
@@ -45,6 +48,21 @@ public class BookingBffController {
   @GetMapping("/bff/{bookingId}")
   public BookingDto getBooking(@PathVariable Long bookingId) {
     return bookingBffService.getBooking(bookingId);
+  }
+
+  /** 1) 계정 전체(장르 없음) — 예매순 커서 */
+  @GetMapping("/accounts/{accountId}/cursor")
+  public CursorPageResponse<Booking> findByAccountCursor(@PathVariable long accountId,
+                                                         @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size) {
+    return bookingBffService.findByAccountCursor(accountId, cursor, size);
+  }
+
+  /** 2) 특정 스케줄 집합 — 예매순 커서 (IdsRequest: ids = eventScheduleIds) */
+  @PostMapping("/accounts/{accountId}/by-schedules/cursor")
+  public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(@PathVariable long accountId,
+                                                                     @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size,
+                                                                     @RequestBody IdsRequest req) {
+    return bookingBffService.findByAccountAndSchedulesCursor(accountId, req.getIds(), cursor, size);
   }
 
 }

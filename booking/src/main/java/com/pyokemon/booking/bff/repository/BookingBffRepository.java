@@ -26,4 +26,13 @@ public interface BookingBffRepository {
   Long countByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
   Optional<Booking> findByBookingId(@Param("bookingId") Long bookingId);
+
+  // 예매순(booking_id DESC) 커서
+  List<Booking> findByAccountWithCursor(@Param("accountId") long accountId,
+                                        @Param("cursor") Long cursor, @Param("size") int size);
+
+  /** 특정 스케줄 집합 — 예매순(booking_id DESC) 커서 */
+  List<Booking> findByAccountAndSchedulesWithCursor(@Param("accountId") long accountId,
+                                                    @Param("scheduleIds") List<Long> scheduleIds, @Param("cursor") Long cursor,
+                                                    @Param("size") int size);
 }

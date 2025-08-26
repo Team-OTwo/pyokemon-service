@@ -141,4 +141,12 @@ public class BffEventService {
     // 요청 순서/중복 그대로 반환
     return seatClassIds.stream().map(byId::get).toList();
   }
+
+    public List<Long> findEventIdsByGenre(String genre) {
+        return repo.findIdsByGenre(genre);
+    }
+
+    public List<Long> findScheduleIdsByEventIds(List<Long> eventIds) {
+        return repo.findIdsByEventIds(eventIds);
+    }
 }

@@ -30,4 +30,8 @@ public interface BffEventRepository {
   List<BffEventDto> findEventsByIdIn(@Param("ids") List<Long> ids);
 
   List<BffVenueDto> findVenuesByIdIn(@Param("ids") List<Long> ids);
+
+  List<Long> findIdsByGenre(@Param("genre") String genre);
+
+  List<Long> findIdsByEventIds(@Param("eventIds") List<Long> eventIds);
 }

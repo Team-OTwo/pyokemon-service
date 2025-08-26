@@ -18,4 +18,21 @@
             tenant_id = #{tenantId}
     </select>
 
+    <select id="findTenantsByIdIn"
+            parameterType="map"
+            resultType="com.pyokemon.account.tenant.bff.dto.TenantDto">
+        SELECT
+        tenant_id,
+        name
+        FROM tb_tenant
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                tenant_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 </mapper>
