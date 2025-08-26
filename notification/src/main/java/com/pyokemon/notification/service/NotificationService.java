@@ -3,18 +3,18 @@ package com.pyokemon.notification.service;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.pyokemon.notification.entity.Notifications;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.*;
 import com.pyokemon.notification.dto.NotificationListResponseDtoApp;
 import com.pyokemon.notification.dto.NotificationResponseDto;
 import com.pyokemon.notification.dto.NotificationSendRequestDto;
+import com.pyokemon.notification.entity.Notifications;
 import com.pyokemon.notification.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -51,8 +51,8 @@ public class NotificationService {
 
   public String sendNotification(NotificationSendRequestDto notificationSendRequest,
       Long accountId) {
-      log.info("Sending notification to account {}", notificationSendRequest);
-      log.info("Sending notification to account {}", accountId);
+    log.info("Sending notification to account {}", notificationSendRequest);
+    log.info("Sending notification to account {}", accountId);
     try {
       Message message = Message.builder().setToken(notificationSendRequest.getToken())
           .setNotification(Notification.builder().setTitle(notificationSendRequest.getTitle())

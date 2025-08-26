@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum NotificationType {
-    BOOKED("booked"),
-    CANCELLED("cancelled"),
-    PAYMENT_FAILED("payment-failed");
+  BOOKED("booked"), CANCELLED("cancelled"), PAYMENT_FAILED("payment-failed");
 
-    private final String templateKey;
+  private final String templateKey;
 }

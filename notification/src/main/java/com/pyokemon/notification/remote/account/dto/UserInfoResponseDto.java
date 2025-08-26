@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfoResponseDto {
-    private String name;
-    private String fcmToken;
-    private Boolean isLogin;
+  private String name;
+  private String fcmToken;
+  private Boolean isLogin;
 }
