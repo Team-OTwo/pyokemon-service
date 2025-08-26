@@ -148,4 +148,12 @@
     </select>
 
 
+    <select id="findEventScheduleIdTwoHoursLater" resultType="Long">
+        SELECT event_schedule_id
+        FROM tb_event_schedule
+        WHERE event_date BETWEEN CONVERT_TZ(NOW(), '+00:00', '+09:00') + INTERVAL 2 HOUR
+        AND CONVERT_TZ(NOW(), '+00:00', '+09:00') + INTERVAL 2 HOUR + INTERVAL 5 MINUTE;
+    </select>
+
+
 </mapper>
