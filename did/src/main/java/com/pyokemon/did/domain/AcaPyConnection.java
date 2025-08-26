@@ -17,12 +17,21 @@ import lombok.NoArgsConstructor;
 public class AcaPyConnection extends BaseEntity {
 
   private String connectionId;
-  private String alias;
+  private String inviMsgId;
   private Long tenantId;
   private Long userId;
   private ConnectionStatus status;
 
   public enum ConnectionStatus {
     PENDING, ACTIVE, REVOKED
+  }
+
+  public void activate(String connectionId) {
+    this.status = ConnectionStatus.ACTIVE;
+    this.connectionId = connectionId;
+  }
+
+  public void deactivate() {
+    this.status = ConnectionStatus.REVOKED;
   }
 }

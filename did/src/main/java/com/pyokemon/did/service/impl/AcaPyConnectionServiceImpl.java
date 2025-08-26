@@ -12,6 +12,7 @@ import com.pyokemon.did.domain.UserWallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.domain.repository.UserWalletRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyReceiveInvitationResponse;
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
@@ -114,12 +115,13 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
       Long tenantId, Long userId) {
     log.info("사용자 ID {}가 테넌트 ID {}의 초대장 수락 요청", userId, tenantId);
     AcaPyReceiveInvitationResponse receivedInvitation =
-        remoteUserAcaPyService.acaPyReceiveInvitation(userWallet.getToken());
+        remoteUserAcaPyService.acaPyReceiveInvitation(userWallet.getToken(),
+            AcaPyReceiveInvitationRequest.of(invitation.getInvitation()));
 
     if (receivedInvitation == null || !"deleted".equals(receivedInvitation.getState())) {
       log.error("테넌트 ID {} 및 사용자 ID {}에 대한 초대장 수락 실패: {}", tenantId, userId,
           receivedInvitation != null ? receivedInvitation.getState() : "null");
-      throw new BusinessException("초대장 수락에 실패했습니다.", INVITATION_INVALID);
+      throw new BusinessException("초대장 수락에 실패했습니다.", INVITATION_RECEIVE_FAILED);
     }
     log.debug("초대장 수락 성공");
   }
