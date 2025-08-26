@@ -3,6 +3,8 @@ package com.pyokemon.event.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
+import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -10,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.CancelEventResponseDTO;
 import com.pyokemon.event.service.TenantEventService;
 
 import lombok.RequiredArgsConstructor;

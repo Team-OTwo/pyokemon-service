@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.PriceDto;
+import com.pyokemon.event.dto.tenant.EventScheduleDto;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.dto.PriceWithSeatClassDTO;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
