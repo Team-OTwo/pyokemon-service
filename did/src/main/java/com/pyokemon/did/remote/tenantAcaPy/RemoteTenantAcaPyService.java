@@ -1,5 +1,7 @@
 package com.pyokemon.did.remote.tenantAcaPy;
 
+import com.pyokemon.did.remote.tenantAcaPy.dto.request.AcaPyIssueCredentialRequest;
+import com.pyokemon.did.remote.tenantAcaPy.dto.response.AcaPyIssueCredentialResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,4 +31,10 @@ public interface RemoteTenantAcaPyService {
   public AcaPyCreateInvitationResponse acaPyCreateInvitation(
       @RequestHeader("Authorization") String authorization,
       @RequestBody AcaPyCreateInvitationRequest request);
+
+  @PostMapping(value="/issue-credential-2.0/send")
+  public AcaPyIssueCredentialResponse acaPyIssueCredential(
+          @RequestHeader("Authorization") String authorization,
+          @RequestBody AcaPyIssueCredentialRequest request);
+
 }

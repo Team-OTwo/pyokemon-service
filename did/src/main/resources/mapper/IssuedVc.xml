@@ -7,7 +7,7 @@
         <result column="credential_exchange_id" property="credentialExchangeId" />
         <result column="booking_id" property="bookingId" />
         <result column="tenant_id" property="tenantId" />
-        <result column="credo_conn_id" property="credoConnId" />
+        <result column="credential_id" property="credentialId" />
         <result column="status" property="status" />
         <result column="created_at" property="createdAt" />
         <result column="updated_at" property="updatedAt" />
@@ -21,16 +21,20 @@
         SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId}
     </select>
 
+    <select id="findByCredentialExchangeIdAndStatus" resultMap="IssuedVcResultMap">
+        SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId} AND status = #{status}
+    </select>
+
+    <select id="findByCredentialId" resultMap="IssuedVcResultMap">
+        SELECT * FROM tb_issued_vc WHERE credential_id = #{credentialId}
+    </select>
+
     <select id="findByBookingId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} ORDER BY created_at DESC
+        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} ORDER BY created_at DESC LIMIT 1
     </select>
 
     <select id="findByTenantId" resultMap="IssuedVcResultMap">
         SELECT * FROM tb_issued_vc WHERE tenant_id = #{tenantId} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByCredoConnId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credo_conn_id = #{credoConnId} ORDER BY created_at DESC
     </select>
 
     <select id="findByStatus" resultMap="IssuedVcResultMap">
@@ -45,14 +49,22 @@
         SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} AND status = #{status} ORDER BY created_at DESC LIMIT 1
     </select>
 
+    <select id="existsByBookingIdAndIssued" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM tb_issued_vc 
+            WHERE booking_id = #{bookingId} 
+            AND status IN ('CREDENTIAL_ISSUED', 'CREDENTIAL_RECEIVED')
+        )
+    </select>
+
     <insert id="save" parameterType="com.pyokemon.did.domain.IssuedVc" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_issued_vc (credential_exchange_id, booking_id, tenant_id, credo_conn_id, status, created_at, updated_at)
-        VALUES (#{credentialExchangeId}, #{bookingId}, #{tenantId}, #{credoConnId}, #{status}, NOW(), NOW())
+        INSERT INTO tb_issued_vc (credential_exchange_id, booking_id, tenant_id, credential_id, status, created_at, updated_at)
+        VALUES (#{credentialExchangeId}, #{bookingId}, #{tenantId}, #{credentialId}, #{status}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.IssuedVc">
         UPDATE tb_issued_vc 
-        SET credential_exchange_id = #{credentialExchangeId}, booking_id = #{bookingId}, tenant_id = #{tenantId}, credo_conn_id = #{credoConnId}, status = #{status}, updated_at = NOW()
+        SET credential_exchange_id = #{credentialExchangeId}, booking_id = #{bookingId}, tenant_id = #{tenantId}, credential_id = #{credentialId}, status = #{status}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 
