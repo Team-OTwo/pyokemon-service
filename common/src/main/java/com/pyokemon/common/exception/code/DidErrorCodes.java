@@ -15,6 +15,7 @@ public final class DidErrorCodes {
     public static final String INVITATION_CREATION_FAILED = "INVITATION_CREATION_FAILED";
     public static final String INVITATION_INVALID = "INVITATION_INVALID";
     public static final String INVITATION_ALREADY_SENT = "INVITATION_ALREADY_SENT";
+    public static final String INVITATION_RECEIVE_FAILED = "INVITATION_RECEIVE_FAILED";
 
 
     // Connection 관련 에러

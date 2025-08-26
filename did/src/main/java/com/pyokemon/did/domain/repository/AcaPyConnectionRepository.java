@@ -41,10 +41,10 @@ public interface AcaPyConnectionRepository {
   /**
    * alias로 AcaPyConnection을 조회합니다.
    *
-   * @param alias 조회할 alias (Tracking ID)
+   * @param inviMsgId 조회할 inviMsgId
    * @return AcaPyConnection (Optional)
    */
-  Optional<AcaPyConnection> findByAlias(String alias);
+  Optional<AcaPyConnection> findByInviMsgId(String inviMsgId);
 
   /**
    * AcaPyConnection 객체를 업데이트합니다.

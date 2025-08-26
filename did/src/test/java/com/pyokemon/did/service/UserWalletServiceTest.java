@@ -80,7 +80,7 @@ class UserWalletServiceTest {
   void createUserWallet_AlreadyExists_ThrowsException() {
     // given
     UserWallet existingWallet =
-        UserWallet.builder().id(1L).userId(TEST_USER_ID).token(TEST_TOKEN).build();
+        UserWallet.builder().userId(TEST_USER_ID).token(TEST_TOKEN).build();
     when(userWalletRepository.findByUserId(TEST_USER_ID)).thenReturn(Optional.of(existingWallet));
 
     // when & then

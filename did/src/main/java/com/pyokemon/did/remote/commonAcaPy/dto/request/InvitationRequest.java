@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse;
+import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.Invitation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +56,40 @@ public class InvitationRequest {
     }
   }
 
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class AcaPyReceiveInvitationRequest {
+    @JsonProperty("@type")
+    private String type;
+
+    @JsonProperty("@id")
+    private String id;
+
+    private String label;
+
+    @JsonProperty("handshake_protocols")
+    private List<String> handshakeProtocols;
+
+    private List<String> services;
+
+    @JsonProperty("use_did_method")
+    private String useDidMethod;
+
+    public static AcaPyReceiveInvitationRequest of(Invitation invitation) {
+      return AcaPyReceiveInvitationRequest.builder()
+              .type(invitation.getType())
+              .id(invitation.getId())
+              .label(invitation.getLabel())
+              .handshakeProtocols(invitation.getHandshakeProtocols())
+              .services(invitation.getServices())
+              .useDidMethod("did:peer:2")
+              .build();
+
+    }
+  }
 
   @Data
   @Builder
