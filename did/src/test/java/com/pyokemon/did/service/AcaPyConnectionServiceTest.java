@@ -7,8 +7,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest;
-import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +23,9 @@ import com.pyokemon.did.domain.TenantWallet;
 import com.pyokemon.did.domain.UserWallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.domain.repository.UserWalletRepository;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyReceiveInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.Invitation;

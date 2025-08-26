@@ -1,10 +1,12 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.did.domain.AcaPyConnection;
-import com.pyokemon.did.domain.dto.request.TenantWebhookRequest.HandleTenantConnectionsRequest;
-import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
-import com.pyokemon.did.service.impl.TenantWebhookServiceImpl;
+import static com.pyokemon.common.exception.code.DidErrorCodes.CONNECTION_CREATION_FAILED;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,38 +16,37 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.retry.RetryException;
 
-import java.util.Optional;
-
-import static com.pyokemon.common.exception.code.DidErrorCodes.CONNECTION_CREATION_FAILED;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.dto.request.TenantWebhookRequest.HandleTenantConnectionsRequest;
+import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
+import com.pyokemon.did.service.impl.TenantWebhookServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class TenantWebhookServiceTest {
 
-    @Mock
-    private AcaPyConnectionRepository acaPyConnectionRepository;
+  @Mock
+  private AcaPyConnectionRepository acaPyConnectionRepository;
 
-    @InjectMocks
-    private TenantWebhookServiceImpl tenantWebhookService;
+  @InjectMocks
+  private TenantWebhookServiceImpl tenantWebhookService;
 
-    private HandleTenantConnectionsRequest request;
-    private AcaPyConnection connection;
+  private HandleTenantConnectionsRequest request;
+  private AcaPyConnection connection;
 
-    @BeforeEach
-    void setUp() {
-        // 테스트 요청 객체 생성
-        request = new HandleTenantConnectionsRequest();
-        request.setInvitationMsgId("test-invitation-id");
-        request.setConnectionId("test-connection-id");
-        request.setState("active");
+  @BeforeEach
+  void setUp() {
+    // 테스트 요청 객체 생성
+    request = new HandleTenantConnectionsRequest();
+    request.setInvitationMsgId("test-invitation-id");
+    request.setConnectionId("test-connection-id");
+    request.setState("active");
 
-        // 테스트용 AcaPyConnection 객체 생성
-        connection = mock(AcaPyConnection.class);
-    }
+    // 테스트용 AcaPyConnection 객체 생성
+    connection = mock(AcaPyConnection.class);
+  }
 
-    @Test
+  @Test
     @DisplayName("웹훅 처리 성공 테스트")
     void handleTenantConnectionWebhook_Success() {
         // Given
@@ -59,21 +60,21 @@ class TenantWebhookServiceTest {
         verify(acaPyConnectionRepository).update(connection);
     }
 
-    @Test
-    @DisplayName("웹훅 처리 - 비활성 상태 무시 테스트")
-    void handleTenantConnectionWebhook_IgnoreInactiveState() {
-        // Given
-        request.setState("inactive");
+  @Test
+  @DisplayName("웹훅 처리 - 비활성 상태 무시 테스트")
+  void handleTenantConnectionWebhook_IgnoreInactiveState() {
+    // Given
+    request.setState("inactive");
 
-        // When
-        tenantWebhookService.handleTenantConnectionWebhook(request);
+    // When
+    tenantWebhookService.handleTenantConnectionWebhook(request);
 
-        // Then
-        verify(acaPyConnectionRepository, never()).findByInviMsgId(anyString());
-        verify(acaPyConnectionRepository, never()).update(any());
-    }
+    // Then
+    verify(acaPyConnectionRepository, never()).findByInviMsgId(anyString());
+    verify(acaPyConnectionRepository, never()).update(any());
+  }
 
-    @Test
+  @Test
     @DisplayName("웹훅 처리 - 연결 찾기 실패 및 예외 발생 테스트")
     void handleTenantConnectionWebhook_ConnectionNotFoundWithException() {
         // Given
@@ -93,50 +94,53 @@ class TenantWebhookServiceTest {
         verify(acaPyConnectionRepository, never()).update(any(AcaPyConnection.class));
     }
 
-    @Test
-    @DisplayName("복구 처리 - 연결 찾음 테스트")
-    void recoverTenantConnectionWebhook_ConnectionFound() {
-        // Given
-        Exception exception = new RuntimeException("Test Exception");
-        when(acaPyConnectionRepository.findByInviMsgId(anyString())).thenReturn(Optional.of(connection));
+  @Test
+  @DisplayName("복구 처리 - 연결 찾음 테스트")
+  void recoverTenantConnectionWebhook_ConnectionFound() {
+    // Given
+    Exception exception = new RuntimeException("Test Exception");
+    when(acaPyConnectionRepository.findByInviMsgId(anyString()))
+        .thenReturn(Optional.of(connection));
 
-        // When & Then
-        BusinessException businessException = assertThrows(BusinessException.class,
-            () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
-        
-        verify(connection).deactivate();
-        verify(acaPyConnectionRepository).update(connection);
-        assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
-    }
+    // When & Then
+    BusinessException businessException = assertThrows(BusinessException.class,
+        () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
 
-    @Test
-    @DisplayName("복구 처리 - 연결 찾기 실패 테스트")
-    void recoverTenantConnectionWebhook_ConnectionNotFoundInRecover() {
-        // Given
-        Exception exception = new RuntimeException("Test Exception");
-        when(acaPyConnectionRepository.findByInviMsgId(anyString())).thenReturn(Optional.empty());
+    verify(connection).deactivate();
+    verify(acaPyConnectionRepository).update(connection);
+    assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
+  }
 
-        // When & Then
-        BusinessException businessException = assertThrows(BusinessException.class, 
-            () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
-        
-        verify(acaPyConnectionRepository, never()).update(any());
-        assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
-    }
+  @Test
+  @DisplayName("복구 처리 - 연결 찾기 실패 테스트")
+  void recoverTenantConnectionWebhook_ConnectionNotFoundInRecover() {
+    // Given
+    Exception exception = new RuntimeException("Test Exception");
+    when(acaPyConnectionRepository.findByInviMsgId(anyString())).thenReturn(Optional.empty());
 
-    @Test
-    @DisplayName("복구 처리 - 비활성화 중 예외 발생 테스트")
-    void recoverTenantConnectionWebhook_ExceptionDuringDeactivation() {
-        // Given
-        Exception exception = new RuntimeException("Test Exception");
-        when(acaPyConnectionRepository.findByInviMsgId(anyString())).thenReturn(Optional.of(connection));
-        doThrow(new RuntimeException("Test DB error")).when(acaPyConnectionRepository).update(connection);
+    // When & Then
+    BusinessException businessException = assertThrows(BusinessException.class,
+        () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
 
-        // When & Then
-        BusinessException businessException = assertThrows(BusinessException.class, 
-            () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
-        
-        verify(acaPyConnectionRepository).update(any());
-        assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
-    }
+    verify(acaPyConnectionRepository, never()).update(any());
+    assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("복구 처리 - 비활성화 중 예외 발생 테스트")
+  void recoverTenantConnectionWebhook_ExceptionDuringDeactivation() {
+    // Given
+    Exception exception = new RuntimeException("Test Exception");
+    when(acaPyConnectionRepository.findByInviMsgId(anyString()))
+        .thenReturn(Optional.of(connection));
+    doThrow(new RuntimeException("Test DB error")).when(acaPyConnectionRepository)
+        .update(connection);
+
+    // When & Then
+    BusinessException businessException = assertThrows(BusinessException.class,
+        () -> tenantWebhookService.recoverTenantConnectionWebhook(exception, request));
+
+    verify(acaPyConnectionRepository).update(any());
+    assertEquals(CONNECTION_CREATION_FAILED, businessException.getErrorCode());
+  }
 }
