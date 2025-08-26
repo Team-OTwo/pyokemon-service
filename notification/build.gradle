@@ -11,6 +11,8 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.postgresql:postgresql'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
+
     // Flyway (데이터베이스 마이그레이션)
     implementation 'org.flywaydb:flyway-core:9.22.3'
     implementation 'org.flywaydb:flyway-mysql:9.22.3'
