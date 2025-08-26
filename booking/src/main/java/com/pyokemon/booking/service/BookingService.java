@@ -200,26 +200,7 @@ public class BookingService {
     bookingEventPublisher.publishBookingStatusUpdate(booking);
   }
 
-  // PENDING 예약 삭제 스케줄러
-  @Transactional(readOnly = false)
-  @Scheduled(cron = "0 */5 * * * *")
-  public void deletePendingBookings() {
-    try {
-      List<Booking> pendingBookings = bookingRepository.findPendingBookings();
-      
-      pendingBookings.parallelStream()
-          .forEach(booking -> {
-            try {
-              bookingRepository.delete(booking.getBookingId());
-            } catch (Exception e) {
-              log.error("예약 삭제 중 오류 발생: bookingId={}", booking.getBookingId(), e);
-            }
-          });
-    } catch (Exception e) {
-      log.error("PENDING 예약 삭제 작업 중 오류 발생", e);
-    }
-  }
-
+  // 이벤트 취소 시 예약 상태 업데이트
   @Transactional
   public void cancel(EventKafkaDto dto) {
     bookingRepository.updateStatus(dto.getEventScheduleId(), "CANCELED");
@@ -232,4 +213,32 @@ public class BookingService {
     bookings.forEach(bookingEventPublisher::publishBookingStatusUpdate);
   }
 
+  // PENDING 예약 만료 처리 스케줄러 (1분마다 실행)
+  @Transactional(readOnly = false)
+  @Scheduled(cron = "0 */1 * * * *")
+  public void expirePendingBookings() {
+    try {
+      LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+      List<Booking> expiredBookings = bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
+      
+      log.info("만료 처리할 PENDING 예약 수: {}", expiredBookings.size());
+      
+      expiredBookings.parallelStream()
+          .forEach(booking -> {
+            try {
+              booking.setStatus(Booking.Booked.EXPIRED);
+              booking.setUpdatedAt(LocalDateTime.now());
+              bookingRepository.update(booking);
+
+              bookingEventPublisher.publishBookingStatusUpdate(booking);
+              
+              log.info("예약 만료 처리 완료: bookingId={}", booking.getBookingId());
+            } catch (Exception e) {
+              log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getBookingId(), e);
+            }
+          });
+    } catch (Exception e) {
+      log.error("PENDING 예약 만료 처리 작업 중 오류 발생", e);
+    }
+  }
 }

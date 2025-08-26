@@ -27,6 +27,8 @@ public interface BookingRepository {
 
   List<Booking> findPendingBookings();
 
+  List<Booking> findPendingBookingsOlderThan(@Param("createdAt") java.time.LocalDateTime createdAt);
+
   List<ValidBookingDetail> findValidBookingsWithEventInfo(
       @Param("bookingIds") List<Long> bookingIds, @Param("accountId") Long accountId);
 
@@ -36,8 +38,7 @@ public interface BookingRepository {
 
   void delete(@Param("bookingId") Long bookingId);
 
-  Long updateStatus(@Param("eventScheduleId") Long eventScheduleId,
-                    @Param("status") String status);
+  Long updateStatus(@Param("eventScheduleId") Long eventScheduleId, @Param("status") String status);
 
   List<Booking> findAllByEventScheduleId(Long eventScheduleId);
 }
