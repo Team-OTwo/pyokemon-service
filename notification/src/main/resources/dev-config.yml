@@ -4,6 +4,10 @@ spring:
   kafka:
     bootstrap-servers: pyokemon-kafka:29092
 
+account:
+  service:
+    base-url: http://pyokemon-account-service:8080/account
+
   firebase:
     sdk:
       json: classpath:pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
