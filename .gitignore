@@ -92,4 +92,6 @@ target/
 tmp/
 temp/
 *.swp
-*.swo 
+*.swo
+
+notification/src/main/resources/pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
