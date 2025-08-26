@@ -79,8 +79,7 @@ class UserWalletServiceTest {
   @DisplayName("이미 존재하는 사용자 지갑 생성 시도 시 예외 발생")
   void createUserWallet_AlreadyExists_ThrowsException() {
     // given
-    UserWallet existingWallet =
-        UserWallet.builder().userId(TEST_USER_ID).token(TEST_TOKEN).build();
+    UserWallet existingWallet = UserWallet.builder().userId(TEST_USER_ID).token(TEST_TOKEN).build();
     when(userWalletRepository.findByUserId(TEST_USER_ID)).thenReturn(Optional.of(existingWallet));
 
     // when & then

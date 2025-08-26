@@ -41,7 +41,8 @@ public interface IssuedVcRepository {
    * @param status 조회할 status
    * @return IssuedVc (Optional)
    */
-  Optional<IssuedVc> findByCredentialExchangeIdAndStatus(String credentialExchangeId, IssuedVc.VcStatus status);
+  Optional<IssuedVc> findByCredentialExchangeIdAndStatus(String credentialExchangeId,
+      IssuedVc.VcStatus status);
 
   /**
    * credential_id로 IssuedVc을 조회합니다.

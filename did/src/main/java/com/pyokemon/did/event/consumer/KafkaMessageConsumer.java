@@ -1,6 +1,5 @@
 package com.pyokemon.did.event.consumer;
 
-import com.pyokemon.did.service.IssuedVcService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.pyokemon.common.kafka.KafkaTopicConstants;
 import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import com.pyokemon.did.service.AcaPyConnectionService;
+import com.pyokemon.did.service.IssuedVcService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class KafkaMessageConsumer {
       }
 
       if ("CONFIRMED".equals(event.getStatus())) {
-        issuedVcService.issueVC(event.getAccountId(),event.getTenantId(),event.getBookingId());
+        issuedVcService.issueVC(event.getAccountId(), event.getTenantId(), event.getBookingId());
       }
 
       ack.acknowledge();

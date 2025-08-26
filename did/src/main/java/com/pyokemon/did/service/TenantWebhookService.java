@@ -5,8 +5,8 @@ import com.pyokemon.did.api.backend.dto.LdProofWebhookDto;
 
 public interface TenantWebhookService {
 
-    void handleIssueCredentialWebhook(IssueCredentialWebhookDto webhookDto);
-    
-    void handleLdProofWebhook(LdProofWebhookDto webhookDto);
+  void handleIssueCredentialWebhook(IssueCredentialWebhookDto webhookDto);
+
+  void handleLdProofWebhook(LdProofWebhookDto webhookDto);
 
 }
