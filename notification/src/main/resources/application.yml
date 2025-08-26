@@ -1,0 +1,52 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /notification
+
+spring:
+  application:
+    name: notification-service
+  profiles:
+    include:
+      - flyway
+      - common
+
+  datasource:
+    url: jdbc:mysql://localhost:3312/pyokemon_notification?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: pyokemon
+    password: pyokemon123
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  flyway:
+    locations: classpath:db/migration/notification
+
+  kafka:
+    consumer:
+      group-id: ${spring.application.name}
+
+account:
+  service:
+    base-url: http://localhost:8080/account
+
+firebase:
+  sdk:
+    json: classpath:pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
+  storage:
+    bucket: pyokemon-8a667.firebasestorage.app
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml

@@ -25,6 +25,19 @@ services:
     volumes:
       - event_mysql_data:/var/lib/mysql
 
+  notification-mysql:
+    image: mysql:8.0
+    container_name: pyokemon-notification-mysql
+    environment:
+      MYSQL_DATABASE: pyokemon_notification
+      MYSQL_USER: pyokemon
+      MYSQL_PASSWORD: pyokemon123
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3312:3306"
+    volumes:
+      - notification_mysql_data:/var/lib/mysql
+
   did-mysql:
     image: mysql:8.0
     container_name: pyokemon-did-mysql
@@ -117,6 +130,8 @@ volumes:
   booking_mysql_data:
     driver: local
   did_mysql_data:
+    driver: local
+  notification_mysql_data:
     driver: local
   redis_data:
     driver: local
