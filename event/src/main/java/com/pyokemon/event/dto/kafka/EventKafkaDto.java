@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventKafkaDto {
   private Long eventScheduleId;
-  private String status;;
+  private String status;
 }
