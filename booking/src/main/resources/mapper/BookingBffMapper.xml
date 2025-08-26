@@ -22,6 +22,7 @@
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
+        AND status IN ('BOOKED', 'CANCELED')
         ORDER BY created_at DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
