@@ -32,4 +32,6 @@ public interface EventScheduleRepository {
   int updateEventSchedule(EventSchedule eventSchedule);
 
   Long findVenueIdByEventScheduleId(Long eventScheduleId);
+
+  List<Long> findEventScheduleIdTwoHoursLater();
 }

@@ -278,7 +278,6 @@ class AcaPyConnectionServiceTest {
 
         AcaPyReceiveInvitationResponse invalidStateResponse = new AcaPyReceiveInvitationResponse();
         invalidStateResponse.setState("failed");
-
         when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class)))
                 .thenReturn(invalidStateResponse);
 

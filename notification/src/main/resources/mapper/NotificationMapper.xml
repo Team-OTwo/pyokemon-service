@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.pyokemon.notification.repository.NotificationRepository">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="notificationId" keyColumn="notification_id">
+        INSERT INTO tb_notification (
+        account_id,
+        title,
+        message
+        ) VALUES (
+        #{accountId},
+        #{title},
+        #{message}
+        )
+        <selectKey resultType="long" keyProperty="notificationId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
+    <select id="findNotificationListByAccountId" resultType="com.pyokemon.notification.dto.NotificationResponseDto">
+        SELECT
+         e.notification_id,
+         e.title,
+         e.message,
+         e.is_checked,
+         e.created_at
+        FROM tb_notification e
+        WHERE e.account_id = #{accountId}
+        <if test="cursorId != null">
+            AND e.notification_id &lt;= #{cursorId}
+        </if>
+        ORDER BY created_at DESC
+        <if test="size != null">
+            LIMIT #{size}
+        </if>
+    </select>
+    
+    <!-- 전체 알림 개수 조회 -->
+    <select id="countNotificationsByAccountId" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_notification
+        WHERE account_id = #{accountId}
+    </select>
+
+    <select id="findNotificationAppListByAccountId" >
+        SELECT
+            e.notification_id,
+            e.title,
+            e.message,
+            e.is_checked,
+            e.create_at
+        FROM tb_notification e
+        WHERE e.account_id = #{accountId}
+    </select>
+
+    <update id="updateNotificationReadByNotificationId" >
+        UPDATE tb_notification SET
+           is_checked = 1
+        WHERE notification_id = #{notificationId}
+        AND
+            account_id = #{accountId}  AND
+            is_checked = 0
+    </update>
+
+    <update id="updateNotificationReadAllByAccountId">
+        UPDATE tb_notification SET
+            is_checked = 1
+        WHERE account_id = #{accountId} AND
+            is_checked = 0
+    </update>
+</mapper>

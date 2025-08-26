@@ -87,4 +87,15 @@ public class EventService {
     }
     return savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
   }
+
+    // 좌석 상세 정보 조회
+    public SeatDetailResponseDTO getSeatDetail(Long eventScheduleId, Long seatId)
+    throws NotFoundException {
+      SeatDetailResponseDTO dto = eventRepository.findSeatDetailByEventScheduleIdAndSeatId(eventScheduleId, seatId);
+      if (dto == null) {
+        throw new NotFoundException("해당 좌석 정보를 찾을 수 없습니다.");
+      }
+      return dto;
+    }
+    
 }

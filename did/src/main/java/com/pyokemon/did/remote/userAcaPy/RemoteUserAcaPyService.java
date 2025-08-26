@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
+import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreateWalletRequest;
-import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyReceiveInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
@@ -27,6 +26,7 @@ public interface RemoteUserAcaPyService {
 
   @PostMapping(value = "/out-of-band/receive-invitation")
   public AcaPyReceiveInvitationResponse acaPyReceiveInvitation(
-      @RequestHeader("Authorization") String authorization);
+      @RequestHeader("Authorization") String authorization,
+      @RequestBody AcaPyReceiveInvitationRequest request);
 
 }

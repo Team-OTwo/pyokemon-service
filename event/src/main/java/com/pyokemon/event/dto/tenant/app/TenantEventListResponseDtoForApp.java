@@ -1,4 +1,4 @@
-package com.pyokemon.event.dto;
+package com.pyokemon.event.dto.tenant.app;
 
 import java.time.LocalDateTime;
 import java.util.List;

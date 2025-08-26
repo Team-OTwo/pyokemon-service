@@ -17,11 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.event.dto.EventRegisterDto;
-import com.pyokemon.event.dto.EventResponseDto;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.EventUpdateDto;
-import com.pyokemon.event.dto.PriceDto;
+import com.pyokemon.event.dto.tenant.EventRegisterDto;
+import com.pyokemon.event.dto.tenant.EventResponseDto;
+import com.pyokemon.event.dto.tenant.EventScheduleDto;
+import com.pyokemon.event.dto.tenant.EventUpdateDto;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
