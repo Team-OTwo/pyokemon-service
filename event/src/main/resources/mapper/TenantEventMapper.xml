@@ -189,7 +189,7 @@
 
 
     <!--    앱 커서 기반 공연 조회-->
-    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.tenant.TenantEventDetailDtoForApp">
+    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp">
         SELECT
         e.event_id as eventId,
         e.title,
