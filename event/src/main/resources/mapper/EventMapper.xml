@@ -58,4 +58,55 @@
         WHERE event_schedule_id = #{eventScheduleId};
     </select>
 
+    <resultMap id="SeatDetailResultMap" type="com.pyokemon.event.dto.SeatDetailResponseDTO">
+        <result property="event_schedule_id" column="event_schedule_id"/>
+        <result property="seat_id" column="seat_id"/>
+        <association property="event" resultMap="EventInfoResultMap"/>
+        <association property="event_schedule" resultMap="EventScheduleInfoResultMap"/>
+        <association property="seat" resultMap="SeatInfoResultMap"/>
+    </resultMap>
+    
+    <resultMap id="EventInfoResultMap" type="com.pyokemon.event.dto.SeatDetailResponseDTO$EventInfo">
+        <result property="event_id" column="event_id"/>
+        <result property="event_title" column="event_title"/>
+    </resultMap>
+    
+    <resultMap id="EventScheduleInfoResultMap" type="com.pyokemon.event.dto.SeatDetailResponseDTO$EventScheduleInfo">
+        <result property="ticket_open_at" column="ticket_open_at"/>
+        <result property="event_date" column="event_date"/>
+    </resultMap>
+    
+    <resultMap id="SeatInfoResultMap" type="com.pyokemon.event.dto.SeatDetailResponseDTO$SeatInfo">
+        <result property="floor" column="floor"/>
+        <result property="row" column="row"/>
+        <result property="col" column="col"/>
+        <association property="seat_class" resultMap="SeatClassInfoResultMap"/>
+    </resultMap>
+    
+    <resultMap id="SeatClassInfoResultMap" type="com.pyokemon.event.dto.SeatDetailResponseDTO$SeatClassInfo">
+        <result property="seat_class_id" column="seat_class_id"/>
+        <result property="class_name" column="class_name"/>
+    </resultMap>
+
+    <select id="findSeatDetailByEventScheduleIdAndSeatId" resultMap="SeatDetailResultMap">
+        SELECT
+            #{eventScheduleId} as event_schedule_id,
+            #{seatId} as seat_id,
+            e.event_id,
+            e.title as event_title,
+            DATE_FORMAT(es.ticket_open_at, '%Y-%m-%d %H:%i:%s') as ticket_open_at,
+            DATE_FORMAT(es.event_date, '%Y-%m-%d %H:%i:%s') as event_date,
+            s.floor,
+            s.row,
+            s.col,
+            sc.seat_class_id,
+            sc.class_name
+        FROM tb_seat s
+        JOIN tb_seat_class sc ON s.seat_class_id = sc.seat_class_id
+        JOIN tb_venue v ON s.venue_id = v.venue_id
+        JOIN tb_event_schedule es ON es.venue_id = v.venue_id
+        JOIN tb_event e ON es.event_id = e.event_id
+        WHERE es.event_schedule_id = #{eventScheduleId} AND s.seat_id = #{seatId}
+    </select>
+
 </mapper>
