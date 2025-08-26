@@ -189,7 +189,7 @@
 
 
     <!--    앱 커서 기반 공연 조회-->
-    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.TenantEventDetailDtoForApp">
+    <select id="findEventListForApp" resultType="com.pyokemon.event.dto.tenant.TenantEventDetailDtoForApp">
         SELECT
         e.event_id as eventId,
         e.title,
@@ -214,7 +214,7 @@
         </if>
     </select>
 
-    <update id="cancelEvent" parameterType="CancelEventResponseDTO">
+    <update id="cancelEvent" parameterType="com.pyokemon.event.dto.CancelEventResponseDTO">
         UPDATE tb_event
         SET status = #{status}, updated_at = NOW()
         WHERE event_id = #{eventId}

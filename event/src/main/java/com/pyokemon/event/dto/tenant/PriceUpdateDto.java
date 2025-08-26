@@ -1,4 +1,4 @@
-package com.pyokemon.event.dto;
+package com.pyokemon.event.dto.tenant;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

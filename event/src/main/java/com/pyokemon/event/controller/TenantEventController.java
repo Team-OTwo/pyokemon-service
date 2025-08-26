@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.CancelEventResponseDTO;
 import com.pyokemon.event.service.TenantEventService;
 
 import lombok.RequiredArgsConstructor;

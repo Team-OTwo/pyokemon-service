@@ -1,4 +1,4 @@
-package com.pyokemon.event.dto;
+package com.pyokemon.event.dto.tenant;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,12 +22,13 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventUpdateDto {
+public class EventRegisterDto {
 
-  private Long accountId;
-
-  @NotNull(message = "Event ID is required")
   private Long eventId;
+
+  // @NotNull(message = "Account ID is required") // 임시로 주석 처리 (account 서비스 완료 전까지)
+  @NotNull(message = "Account ID is required")
+  private Long accountId;
 
   @NotBlank(message = "Title is required")
   @Size(max = 100, message = "Title must be less than 100 characters")
@@ -46,7 +47,9 @@ public class EventUpdateDto {
   private String thumbnailUrl;
 
   private EventStatus status;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
   @Valid
-  private List<EventScheduleUpdateDto> schedules;
+  private List<EventScheduleDto> schedules;
 }
