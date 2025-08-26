@@ -16,5 +16,4 @@ public class TenantWallet extends BaseEntity {
   private String token;
   private String publicDid;
   private String publicVerkey;
-
 }

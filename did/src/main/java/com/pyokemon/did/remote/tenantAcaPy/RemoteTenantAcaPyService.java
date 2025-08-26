@@ -12,6 +12,8 @@ import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreate
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreatePublicDidResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
+import com.pyokemon.did.remote.tenantAcaPy.dto.request.AcaPyIssueCredentialRequest;
+import com.pyokemon.did.remote.tenantAcaPy.dto.response.AcaPyIssueCredentialResponse;
 
 @FeignClient(name = "remote-AcaPy-tenant-service", url = "${acapy.tenant.base-url}",
     configuration = com.pyokemon.did.remote.config.FeignConfig.class)
@@ -29,4 +31,10 @@ public interface RemoteTenantAcaPyService {
   public AcaPyCreateInvitationResponse acaPyCreateInvitation(
       @RequestHeader("Authorization") String authorization,
       @RequestBody AcaPyCreateInvitationRequest request);
+
+  @PostMapping(value = "/issue-credential-2.0/send")
+  public AcaPyIssueCredentialResponse acaPyIssueCredential(
+      @RequestHeader("Authorization") String authorization,
+      @RequestBody AcaPyIssueCredentialRequest request);
+
 }

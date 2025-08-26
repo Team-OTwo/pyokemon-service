@@ -220,7 +220,7 @@ class AcaPyConnectionServiceTest {
 
         AcaPyCreateInvitationResponse nullInvitationResponse = new AcaPyCreateInvitationResponse();
         nullInvitationResponse.setInvitation(null);
-        
+
         when(remoteTenantAcaPyService.acaPyCreateInvitation(eq(TOKEN), any(AcaPyCreateInvitationRequest.class)))
                 .thenReturn(nullInvitationResponse);
 
@@ -278,7 +278,6 @@ class AcaPyConnectionServiceTest {
 
         AcaPyReceiveInvitationResponse invalidStateResponse = new AcaPyReceiveInvitationResponse();
         invalidStateResponse.setState("failed");
-        
         when(remoteUserAcaPyService.acaPyReceiveInvitation(eq(TOKEN), any(AcaPyReceiveInvitationRequest.class)))
                 .thenReturn(invalidStateResponse);
 
