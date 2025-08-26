@@ -19,6 +19,7 @@ import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingInfo;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
+import com.pyokemon.booking.dto.response.SeatStatusInfo;
 import com.pyokemon.booking.dto.response.ValidBookingDetail;
 import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
@@ -42,8 +43,8 @@ public class BookingService {
       throw new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID");
     }
     
-    List<Long> seatIds = bookingRepository.findSeatIdsByEventScheduleId(eventScheduleId);
-    return new EventScheduleIdResponse(seatIds);
+    List<SeatStatusInfo> seatStatusInfos = bookingRepository.findSeatStatusInfosByEventScheduleId(eventScheduleId);
+    return new EventScheduleIdResponse(seatStatusInfos);
   }
 
   // 계정 ID로 예약 조회
