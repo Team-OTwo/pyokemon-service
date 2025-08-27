@@ -1,4 +1,4 @@
-package com.pyokemon.notification.event.consumer.message.notification;
+package com.pyokemon.notification.event.consumer.message.booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotificationEvent {
+public class BookingEvent {
   private Long bookingId;
   private Long eventScheduleId;
   private Long seatId;
