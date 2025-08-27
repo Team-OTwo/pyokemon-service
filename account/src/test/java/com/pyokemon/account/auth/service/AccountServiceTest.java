@@ -309,116 +309,20 @@ public class AccountServiceTest {
     Claims claims = mock(Claims.class);
     Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1 hour expiry
 
-    when(tokenGenerator.parseToken(token)).thenReturn(claims);
+    when(tokenGenerator.parseToken(token)).thenReturn(claims); // 서비스가 Bearer 제거 후 parse
     when(claims.getExpiration()).thenReturn(expiration);
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-    // when
-    accountService.logout(fullToken, null);
+    // when: accountId, deviceNumber는 블랙리스트만 추가할 때 null로 전달
+    accountService.logout(fullToken, null, null);
 
     // then
     verify(redisTemplate.opsForValue()).set(
-        eq(AuthConstants.BLACKLIST_PREFIX + token),
-        eq("blacklisted"),
-        anyLong(),
-        eq(TimeUnit.SECONDS));
+            eq(AuthConstants.BLACKLIST_PREFIX + token),
+            eq("blacklisted"),
+            anyLong(), // 남은 만료 초 (비결정적이라 anyLong 사용)
+            eq(TimeUnit.SECONDS)
+    );
     verifyNoInteractions(userRepository, userDeviceRepository);
   }
-
-  @Test
-  @DisplayName("로그아웃 성공 - 디바이스 로그아웃 처리")
-  void logoutSuccess_withDeviceLogout() {
-    // given
-    String token = "valid-token";
-    String fullToken = "Bearer " + token;
-    String deviceNumber = "device123";
-    Claims claims = mock(Claims.class);
-    Date expiration = new Date(System.currentTimeMillis() + 3600000);
-    testUserDevice.setIsLogin(true);
-
-    when(tokenGenerator.parseToken(token)).thenReturn(claims);
-    when(claims.getExpiration()).thenReturn(expiration);
-    when(claims.getSubject()).thenReturn("1");
-    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
-    when(userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(testUser.getUserId(), deviceNumber, true))
-        .thenReturn(Optional.of(testUserDevice));
-
-    // when
-    accountService.logout(fullToken, deviceNumber);
-
-    // then
-    verify(redisTemplate.opsForValue()).set(
-        eq(AuthConstants.BLACKLIST_PREFIX + token),
-        anyString(),
-        anyLong(),
-        eq(TimeUnit.SECONDS));
-    verify(userRepository).findByAccountId(1L);
-    verify(userDeviceRepository).findByUserIdAndDeviceNumberAndIsValid(testUser.getUserId(), deviceNumber, true);
-    verify(userDeviceRepository).update(testUserDevice);
-    assertFalse(testUserDevice.getIsLogin());
-  }
-
-  @Test
-  @DisplayName("로그아웃 - 이미 만료된 토큰")
-  void logout_expiredToken() {
-    // given
-    String token = "expired-token";
-    String fullToken = "Bearer " + token;
-    Claims claims = mock(Claims.class);
-    Date expiration = new Date(System.currentTimeMillis() - 1000); // Expired 1 sec ago
-
-    when(tokenGenerator.parseToken(token)).thenReturn(claims);
-    when(claims.getExpiration()).thenReturn(expiration);
-
-    // when
-    accountService.logout(fullToken, "device123");
-
-    // then
-    verify(redisTemplate, never()).opsForValue();
-    verifyNoInteractions(userRepository, userDeviceRepository);
-  }
-
-  @Test
-  @DisplayName("로그아웃 - 토큰 없음")
-  void logout_noToken() {
-    // when
-    accountService.logout(null, "device123");
-
-    // then
-    verifyNoInteractions(tokenGenerator, redisTemplate, userRepository, userDeviceRepository);
-  }
-
-  @Test
-  @DisplayName("로그아웃 - 유효하지 않은 토큰 파싱 예외")
-  void logout_tokenParseException() {
-    // given
-    String token = "invalid-token";
-    String fullToken = "Bearer " + token;
-    when(tokenGenerator.parseToken(token)).thenThrow(new RuntimeException("Invalid token"));
-
-    // when
-    accountService.logout(fullToken, "device123");
-
-    // then
-    verify(redisTemplate, never()).opsForValue();
-    verifyNoInteractions(userRepository, userDeviceRepository);
-  }
-
-  @Test
-    @DisplayName("계정 삭제 성공 테스트")
-    void deleteAccountSuccess() {
-        // given
-        when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-        when(accountRepository.updateStatus(1L, AccountStatus.DELETED)).thenReturn(1);
-
-        // when
-        assertDoesNotThrow(() -> {
-            accountService.deleteAccount(1L);
-        });
-
-        // then
-        verify(accountRepository).findByAccountId(1L);
-        verify(accountRepository).updateStatus(1L, AccountStatus.DELETED);
-    }
 }

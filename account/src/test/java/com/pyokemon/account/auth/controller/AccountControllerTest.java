@@ -143,19 +143,18 @@ public class AccountControllerTest {
   void logoutSuccess_withDevice() {
     // given
     String authHeader = "Bearer valid-token";
-    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber("device123").build();
-    doNothing().when(accountService).logout(authHeader, "device123");
+    doNothing().when(accountService).logout(authHeader, "account123", 1L);
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, request);
+        accountController.logout(authHeader, "account123", 1L);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader, "device123");
+    verify(accountService).logout(authHeader, "account123", 1L);
   }
 
   @Test
@@ -163,18 +162,18 @@ public class AccountControllerTest {
   void logoutSuccess_withoutDevice() {
     // given
     String authHeader = "Bearer valid-token";
-    doNothing().when(accountService).logout(authHeader, null);
+    doNothing().when(accountService).logout(authHeader, "account123",null);
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, null); // request is null
+        accountController.logout(authHeader, "account123",null); // request is null
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader, null);
+    verify(accountService).logout(authHeader, "account123",null);
   }
 
   @Test
@@ -182,19 +181,18 @@ public class AccountControllerTest {
   void logoutSuccess_withoutAuthHeader() {
     // given
     String authHeader = null;
-    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber("device123").build();
-    doNothing().when(accountService).logout(null, "device123");
+    doNothing().when(accountService).logout(authHeader, null,1L);
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, request);
+        accountController.logout(authHeader, null,1L);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(null, "device123");
+    verify(accountService).logout(authHeader, null,1L);
   }
 
   // ========== 토큰 갱신 테스트 ==========
