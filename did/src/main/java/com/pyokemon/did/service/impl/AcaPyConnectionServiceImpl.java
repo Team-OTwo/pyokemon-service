@@ -7,10 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.TenantWallet;
-import com.pyokemon.did.domain.UserWallet;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
-import com.pyokemon.did.domain.repository.UserWalletRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
@@ -18,7 +16,7 @@ import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPy
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
 import com.pyokemon.did.service.AcaPyConnectionService;
-import com.pyokemon.did.service.TenantWalletService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +29,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
   private final RemoteTenantAcaPyService remoteTenantAcaPyService;
   private final RemoteUserAcaPyService remoteUserAcaPyService;
   private final AcaPyConnectionRepository acaPyConnectionRepository;
-  private final TenantWalletService tenantWalletService;
-  // TODO: userWalletRepository.findByUserId -> userWalletService.getWalletByUserId 수정
-  private final UserWalletRepository userWalletRepository;
+  private final WalletService walletService;
 
   @Override
   @Transactional
@@ -51,12 +47,12 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
 
       // 1. 테넌트 지갑 조회
       log.info("테넌트 ID {}에 대한 지갑 조회", tenantId);
-      TenantWallet tenantWallet = tenantWalletService.getWalletByTenantId(tenantId)
+      Wallet tenantWallet = walletService.getWalletByAccountId(tenantId)
           .orElseThrow(() -> new BusinessException("테넌트 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
       // 2. 사용자 지갑 조회
       log.info("사용자 ID {}에 대한 지갑 조회", userId);
-      UserWallet userWallet = userWalletRepository.findByUserId(userId)
+      Wallet userWallet = walletService.getWalletByAccountId(userId)
           .orElseThrow(() -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
       // 3. 테넌트 AcaPy 에서 초대장 생성
@@ -89,7 +85,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
    * @param userId 사용자 ID
    * @return 생성된 초대장 응답
    */
-  private AcaPyCreateInvitationResponse createInvitation(TenantWallet tenantWallet, Long tenantId,
+  private AcaPyCreateInvitationResponse createInvitation(Wallet tenantWallet, Long tenantId,
       Long userId) {
     log.info("테넌트 ID {}에서 사용자 ID {}로의 초대장 생성 요청", tenantId, userId);
     AcaPyCreateInvitationResponse invitation = remoteTenantAcaPyService.acaPyCreateInvitation(
@@ -111,7 +107,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
    * @param tenantId 테넌트 ID
    * @param userId 사용자 ID
    */
-  private void receiveInvitation(UserWallet userWallet, AcaPyCreateInvitationResponse invitation,
+  private void receiveInvitation(Wallet userWallet, AcaPyCreateInvitationResponse invitation,
       Long tenantId, Long userId) {
     log.info("사용자 ID {}가 테넌트 ID {}의 초대장 수락 요청", userId, tenantId);
     AcaPyReceiveInvitationResponse receivedInvitation =

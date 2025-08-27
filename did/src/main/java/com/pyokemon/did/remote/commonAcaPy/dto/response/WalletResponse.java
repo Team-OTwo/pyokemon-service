@@ -1,6 +1,8 @@
 package com.pyokemon.did.remote.commonAcaPy.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.domain.Wallet;
+import com.pyokemon.did.domain.Wallet.AccountRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -73,6 +75,11 @@ public class WalletResponse {
 
       private String method;
       private Object metadata;
+    }
+
+    public Wallet toEntity(Long accountId, AccountRole accountRole, String token) {
+      return Wallet.builder().accountId(accountId).accountRole(accountRole).token(token)
+          .publicDid(result.getDid()).publicVerKey(result.verkey).build();
     }
   }
 }

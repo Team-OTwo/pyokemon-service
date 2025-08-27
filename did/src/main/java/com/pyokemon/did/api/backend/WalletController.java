@@ -1,7 +1,5 @@
 package com.pyokemon.did.api.backend;
 
-import java.util.Map;
-
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -11,13 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.did.domain.UserWallet;
-import com.pyokemon.did.domain.dto.request.TenantWalletRequest;
-import com.pyokemon.did.domain.dto.request.TenantWalletRequest.CreateWalletRequest;
-import com.pyokemon.did.domain.dto.request.UserWalletRequest.CreateUserWalletRequest;
-import com.pyokemon.did.service.TenantWalletService;
-import com.pyokemon.did.service.UserWalletService;
+import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,24 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 public class WalletController {
-  private final TenantWalletService tenantWalletService;
-  private final UserWalletService userWalletService;
+  private final WalletService walletService;
 
-  @PostMapping("/tenant")
-  public ResponseEntity<ResponseDto<Void>> registerTenantWallet(
+  @PostMapping()
+  public ResponseEntity<ResponseDto<Void>> registerWallet(
       @RequestBody @Valid CreateWalletRequest createWalletRequest) {
-    tenantWalletService.registerTenantWallet(createWalletRequest);
+    walletService.registerWallet(createWalletRequest);
 
-    return ResponseEntity.ok(ResponseDto.success("테넌트 지갑 생성 성공"));
-  }
-
-  @PostMapping(value = "/user")
-  public ResponseEntity<ResponseDto<Void>> createUserWallet(
-      @Valid @RequestBody CreateUserWalletRequest request) {
-    log.info("사용자 지갑 생성 요청: userId={}", request.getUserId());
-
-    userWalletService.createUserWallet(request.getUserId());
-    log.info("사용자 지갑 생성 완료: userId={}", request.getUserId());
-    return ResponseEntity.ok(ResponseDto.success("사용자 지갑 생성 완료"));
+    return ResponseEntity.ok(ResponseDto.success("계정 지갑 생성 성공"));
   }
 }
