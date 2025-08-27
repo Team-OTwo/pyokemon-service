@@ -14,4 +14,6 @@ public interface PaymentBffRepository {
   Optional<Payment> findByPaymentId(@Param("paymentId") Long paymentId);
 
   List<Payment> findByPaymentIds(@Param("ids") List<Long> ids);
+
+  Long sumTotalRevenueByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 }
