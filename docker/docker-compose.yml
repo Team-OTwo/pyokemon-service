@@ -59,6 +59,7 @@ services:
       MYSQL_USER: pyokemon
       MYSQL_PASSWORD: pyokemon123
       MYSQL_ROOT_PASSWORD: root_password
+      TZ: Asia/Seoul
     ports:
       - "3308:3306"
     volumes:

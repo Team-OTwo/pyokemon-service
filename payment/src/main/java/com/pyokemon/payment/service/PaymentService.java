@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentService {
   final PaymentRepository paymentRepository;
 
-  public void reserve(PaymentInitiateRequestDto request) {
+  public void reserve(PaymentInitiateRequestDto request, Long eventScheduleId) {
     PaymentDto dto = PaymentDto.builder().bookingId(request.getBookingId())
         .orderId(request.getOrderId()).amount(request.getAmount()).method(request.getMethod())
-        .status("READY").accountId(request.getAccountId()).build();
+        .status("READY").eventScheduleId(eventScheduleId).build();
 
     paymentRepository.insertInitiatePayment(dto);
 
