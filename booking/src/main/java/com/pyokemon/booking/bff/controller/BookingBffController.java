@@ -2,13 +2,12 @@ package com.pyokemon.booking.bff.controller;
 
 import java.util.List;
 
-import com.pyokemon.booking.bff.dto.CursorPageResponse;
+import com.pyokemon.booking.bff.dto.*;
+import org.springframework.http.ResponseEntity;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.dto.IdsRequest;
 import org.springframework.web.bind.annotation.*;
 
-import com.pyokemon.booking.bff.dto.BookingDto;
-import com.pyokemon.booking.bff.dto.PageResponse;
 import com.pyokemon.booking.bff.service.BookingBffService;
 
 import lombok.RequiredArgsConstructor;
@@ -50,6 +49,22 @@ public class BookingBffController {
     return bookingBffService.getBooking(bookingId);
   }
 
+  @GetMapping("/counts")
+  public ResponseEntity<List<BookingCountDto>> getBookingCounts(
+          @RequestParam("scheduleIds") List<Long> scheduleIds) {
+
+    List<BookingCountDto> counts = bookingBffService.getBookingCountsByScheduleIds(scheduleIds);
+    return ResponseEntity.ok(counts);
+  }
+
+  @GetMapping("/summary/sold-count")
+  public ResponseEntity<TotalSoldTicketsResponseDto> getTotalSoldTickets(
+          @RequestParam("scheduleIds") List<Long> scheduleIds) {
+
+    TotalSoldTicketsResponseDto responseDto = bookingBffService.getTotalSoldTickets(scheduleIds);
+    return ResponseEntity.ok(responseDto);
+  }
+  
   /** 1) 계정 전체(장르 없음) — 예매순 커서 */
   @GetMapping("/accounts/{accountId}/cursor")
   public CursorPageResponse<Booking> findByAccountCursor(@PathVariable long accountId,

@@ -1,13 +1,12 @@
 package com.pyokemon.booking.bff.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.pyokemon.booking.bff.dto.CursorPageResponse;
+import com.pyokemon.booking.bff.dto.*;
 import org.springframework.stereotype.Service;
 
-import com.pyokemon.booking.bff.dto.BookingDto;
-import com.pyokemon.booking.bff.dto.PageResponse;
 import com.pyokemon.booking.bff.repository.BookingBffRepository;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.exception.BusinessException;
@@ -124,5 +123,20 @@ public class BookingBffService {
     return BookingDto.builder().bookingId(b.getBookingId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
         .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
+  }
+
+  public List<BookingCountDto> getBookingCountsByScheduleIds(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return bookingBffRepository.findBookingCountsByScheduleIds(scheduleIds);
+  }
+
+  public TotalSoldTicketsResponseDto getTotalSoldTickets(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return new TotalSoldTicketsResponseDto(0L);
+    }
+    Long count = bookingBffRepository.countTotalSoldTicketsByScheduleIds(scheduleIds);
+    return new TotalSoldTicketsResponseDto(count);
   }
 }

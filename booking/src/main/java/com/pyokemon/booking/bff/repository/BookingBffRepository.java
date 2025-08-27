@@ -3,6 +3,7 @@ package com.pyokemon.booking.bff.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.booking.bff.dto.BookingCountDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,6 +27,10 @@ public interface BookingBffRepository {
   Long countByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
   Optional<Booking> findByBookingId(@Param("bookingId") Long bookingId);
+
+  List<BookingCountDto> findBookingCountsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
+
+  Long countTotalSoldTicketsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 
   // 예매순(booking_id DESC) 커서
   List<Booking> findByAccountWithCursor(@Param("accountId") long accountId,
