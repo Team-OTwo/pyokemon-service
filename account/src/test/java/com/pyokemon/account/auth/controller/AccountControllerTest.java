@@ -165,18 +165,19 @@ public class AccountControllerTest {
     // given
     String authHeader = "Bearer valid-token";
     String accountId = "1";
-    doNothing().when(accountService).logout(authHeader, accountId, null);
+    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber(null).build();
+    doNothing().when(accountService).logout(authHeader, accountId, request.getDeviceNumber());
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, accountId, null);
+        accountController.logout(authHeader, accountId, request);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader, accountId, null);
+    verify(accountService).logout(authHeader, accountId, request.getDeviceNumber());
   }
 
   @Test
