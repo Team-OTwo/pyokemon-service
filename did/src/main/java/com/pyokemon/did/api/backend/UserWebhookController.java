@@ -20,38 +20,35 @@ public class UserWebhookController {
 
   private final UserWebhookService userWebhookService;
 
-  @PostMapping({"/connections", "/connections/"})
+  @PostMapping({"/connections/"})
   public ResponseEntity<Void> handleConnectionWebhook(
       @RequestBody ConnectionWebhookDto webhookDto) {
     userWebhookService.handleConnectionWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping({"/out_of_band", "/out_of_band/"})
+  @PostMapping({"/out_of_band/"})
   public ResponseEntity<Void> handleOutOfBandWebhook(@RequestBody OutOfBandWebhookDto webhookDto) {
     userWebhookService.handleOutOfBandWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping({"/basicmessages", "/basicmessages/"})
+  @PostMapping({"/basicmessages/"})
   public ResponseEntity<Void> handleBasicMessage(@RequestBody BasicMessageWebhookDto webhookDto) {
-    log.info("Payload: {}", webhookDto);
     userWebhookService.handleBasicMessageWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping({"/issue_credential_v2_0", "/issue_credential_v2_0/"})
+  @PostMapping({"/issue_credential_v2_0/"})
   public ResponseEntity<Void> handleIssueCredentialWebhook(
       @RequestBody IssueCredentialWebhookDto webhookDto) {
-    log.info("일반 Webhook 수신: {}", webhookDto);
     userWebhookService.handleIssueCredentialWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping({"/issue_credential_v2_0_ld_proof", "/issue_credential_v2_0_ld_proof/"})
+  @PostMapping({"/issue_credential_v2_0_ld_proof/"})
   public ResponseEntity<Void> handleIssueCredentialLdProofWebhook(
       @RequestBody LdProofWebhookDto webhookDto) {
-    log.info("LD Proof Webhook 수신: {}", webhookDto);
     userWebhookService.handleLdProofWebhook(webhookDto);
     return ResponseEntity.ok().build();
   }

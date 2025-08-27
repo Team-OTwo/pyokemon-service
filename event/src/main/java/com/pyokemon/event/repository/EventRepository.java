@@ -16,6 +16,6 @@ public interface EventRepository {
   EventDetailResponseDTO findEventDetailByEventId(Long eventId);
 
   List<SeatPriceResponseDto> findSeatPriceByEventScheduleId(Long eventScheduleId);
-  
+
   SeatDetailResponseDTO findSeatDetailByEventScheduleIdAndSeatId(Long eventScheduleId, Long seatId);
 }

@@ -121,14 +121,13 @@ public class EventController {
     tenantEventRepository.cancelEvent(dto);
     return ResponseEntity.ok().build();
   }
-  
+
   // 좌석 상세 정보 조회
   @GetMapping("/seat-detail")
-  public ResponseEntity<SeatDetailResponseDTO> getSeatDetail(
-    @RequestParam Long eventScheduleId, 
-    @RequestParam Long seatId) throws NotFoundException {
-      SeatDetailResponseDTO dto = eventService.getSeatDetail(eventScheduleId, seatId);
-      return ResponseEntity.ok(dto);
-    }
+  public ResponseEntity<SeatDetailResponseDTO> getSeatDetail(@RequestParam Long eventScheduleId,
+      @RequestParam Long seatId) throws NotFoundException {
+    SeatDetailResponseDTO dto = eventService.getSeatDetail(eventScheduleId, seatId);
+    return ResponseEntity.ok(dto);
+  }
 
 }

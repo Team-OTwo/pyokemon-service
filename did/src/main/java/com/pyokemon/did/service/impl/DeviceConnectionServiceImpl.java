@@ -39,26 +39,27 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   @Override
   @Transactional
   public CreateInvitationResponse createInvitations(Long userId) {
+
+    // 1. 사용자 지갑에서 userId, Token 조회
+    String userToken = userWalletService.getUserWalletToken(userId);
+    log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);
+
+    // 2. Gateway 헤더에서 deviceId 추출
+    String deviceId = GatewayRequestHeaderUtils.getClientDevice();
+    log.info("Gateway 헤더에서 deviceId 추출: deviceId={}", deviceId);
+
+    // 3. tb_device_connection 확인 및 예외처리
+    boolean shouldCreateInvitation = processDeviceConnectionBusinessLogic(userId, deviceId);
+
+    // 4. 사용자 지갑 토큰으로 Authorization 헤더 생성
+    String authorization = "Bearer " + userToken;
+    log.debug("Authorization 헤더 설정: {}", authorization);
+
+    // 5. ACA-Py 초대장 생성 (User + Mediator) - 필요한 경우에만
+    AcaPyCreateInvitationResponse userAcapyResponse;
+    AcaPyCreateInvitationResponse mediatorAcapyResponse;
+
     try {
-      // 1. 사용자 지갑에서 userId, Token 조회
-      String userToken = userWalletService.getUserWalletToken(userId);
-      log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);
-
-      // 2. Gateway 헤더에서 deviceId 추출
-      String deviceId = GatewayRequestHeaderUtils.getClientDevice();
-      log.info("Gateway 헤더에서 deviceId 추출: deviceId={}", deviceId);
-
-      // 3. tb_device_connection 확인 및 예외처리
-      boolean shouldCreateInvitation = processDeviceConnectionBusinessLogic(userId, deviceId);
-
-      // 4. 사용자 지갑 토큰으로 Authorization 헤더 생성
-      String authorization = "Bearer " + userToken;
-      log.debug("Authorization 헤더 설정: {}", authorization);
-
-      // 5. ACA-Py 초대장 생성 (User + Mediator) - 필요한 경우에만
-      AcaPyCreateInvitationResponse userAcapyResponse;
-      AcaPyCreateInvitationResponse mediatorAcapyResponse;
-
       if (shouldCreateInvitation) {
         // User ACA-Py 초대장 생성
         log.info("User ACA-Py 초대장 생성 요청: userId={}", userId);
