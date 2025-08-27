@@ -16,5 +16,4 @@ public class PaymentInitiateRequestDto {
   private String orderId;
   private int amount;
   private String method;
-  private Long accountId;
 }
