@@ -3,11 +3,11 @@ package com.pyokemon.event.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.entity.Event;
 
 @Mapper

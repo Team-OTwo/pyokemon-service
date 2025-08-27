@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pyokemon.did.api.backend.dto.IssueCredentialWebhookDto;
+import com.pyokemon.did.api.backend.dto.LdProofWebhookDto;
 import com.pyokemon.did.domain.dto.request.TenantWebhookRequest.HandleTenantConnectionsRequest;
 import com.pyokemon.did.domain.dto.request.TenantWebhookRequest.HandleTenantOOBRequest;
 import com.pyokemon.did.service.TenantWebhookService;
@@ -31,6 +33,20 @@ public class TenantWebhookController {
   public ResponseEntity<Void> handleTenantOutOfBandWebhook(
       @RequestBody HandleTenantOOBRequest handleTenantOOBRequest) {
     tenantWebhookService.handleTenantOOBWebhook(handleTenantOOBRequest);
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping({"/issue_credential_v2_0/"})
+  public ResponseEntity<Void> handleIssueCredentialWebhook(
+      @RequestBody IssueCredentialWebhookDto webhookDto) {
+    log.info(webhookDto.toString());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping({"/issue_credential_v2_0_ld_proof/"})
+  public ResponseEntity<Void> handleIssueCredentialLdProofWebhook(
+      @RequestBody LdProofWebhookDto webhookDto) {
+    log.info(webhookDto.toString());
     return ResponseEntity.ok().build();
   }
 }
