@@ -62,7 +62,7 @@ public class BookingBffService {
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
       Integer size) {
     List<Booking> bookings =
-        bookingBffRepository.findByEventScheduleIdOrderByDate(eventScheduleId, page * size, size);
+        bookingBffRepository.findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {

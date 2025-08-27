@@ -27,11 +27,11 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <select id="findByEventScheduleIdOrderByDate" resultType="Booking">
+    <select id="findByEventScheduleIdOrderByBookingId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
-        ORDER BY created_at DESC
+        ORDER BY booking_id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
