@@ -18,7 +18,7 @@ public class WalletRequest {
     private Long accountId;
 
     @NotNull
-    @JsonProperty("role")
+    @JsonProperty("account_role")
     private AccountRole accountRole;
   }
 }
