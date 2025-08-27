@@ -1,8 +1,8 @@
 package com.pyokemon.did.service;
 
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
+
 public interface IssuedVcService {
 
-  public void issueVC(Long userId, Long tenantId, Long bookingId);
-
-  public Boolean isIssuedVC(Long bookingId);
+  public void issueCredential(BookingEvent bookingEvent);
 }

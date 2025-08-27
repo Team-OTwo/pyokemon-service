@@ -1,13 +1,13 @@
 package com.pyokemon.did.api.backend;
 
+import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
+import com.pyokemon.did.remote.acapy.service.tenant.RemoteTenantAcaPyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest;
-import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,12 +28,12 @@ public class HealthController {
   public ResponseDto<String> acapyHealth() {
     try {
       // AcaPy 서비스에 간단한 요청을 보내서 연결 상태 확인
-      WalletRequest.AcaPyCreateWalletRequest request =
-          WalletRequest.AcaPyCreateWalletRequest.builder().walletName("health-check-wallet")
+      CreateWalletRequest request =
+          CreateWalletRequest.builder().walletName("health-check-wallet")
               .walletKey("health-check-key").label("health-check").walletType("askar")
               .walletDispatchType("default").keyManagementMode("managed").build();
 
-      remoteTenantAcaPyService.acaPyCreateWallet(request);
+      remoteTenantAcaPyService.createWallet(request);
       return ResponseDto.success("AcaPy Tenant Service is connected");
     } catch (Exception e) {
       log.error("AcaPy 서비스 연결 실패: {}", e.getMessage(), e);

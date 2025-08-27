@@ -4,45 +4,33 @@
 
     <resultMap id="IssuedVcResultMap" type="com.pyokemon.did.domain.IssuedVc">
         <id column="id" property="id" />
-        <result column="credential_exchange_id" property="credentialExchangeId" />
+        <result column="cred_id" property="credId" />
+        <result column="cred_ex_id" property="credExId" />
+        <result column="verify_invi_url" property="verifyInviUrl" />
+        <result column="pres_ex_id" property="presExId" />
         <result column="booking_id" property="bookingId" />
+        <result column="user_id" property="userId" />
         <result column="tenant_id" property="tenantId" />
-        <result column="credential_id" property="credentialId" />
         <result column="status" property="status" />
         <result column="created_at" property="createdAt" />
         <result column="updated_at" property="updatedAt" />
     </resultMap>
 
-    <select id="findById" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE id = #{id}
-    </select>
 
     <select id="findByCredentialExchangeId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId}
-    </select>
-
-    <select id="findByCredentialExchangeIdAndStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId} AND status = #{status}
+        SELECT * FROM tb_issued_vc WHERE cred_ex_id = #{credExId}
     </select>
 
     <select id="findByCredentialId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_id = #{credentialId}
+        SELECT * FROM tb_issued_vc WHERE cred_id = #{credId}
     </select>
 
     <select id="findByBookingId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} ORDER BY created_at DESC LIMIT 1
+        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId}
     </select>
 
     <select id="findByTenantId" resultMap="IssuedVcResultMap">
         SELECT * FROM tb_issued_vc WHERE tenant_id = #{tenantId} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE status = #{status} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByTenantIdAndStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE tenant_id = #{tenantId} AND status = #{status} ORDER BY created_at DESC
     </select>
 
     <select id="findByBookingIdAndStatus" resultMap="IssuedVcResultMap">

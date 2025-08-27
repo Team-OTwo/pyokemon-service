@@ -3,6 +3,7 @@ package com.pyokemon.did.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.did.domain.IssuedVc.VcStatus;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.did.domain.IssuedVc;
@@ -19,14 +20,6 @@ public interface IssuedVcRepository {
   Long save(IssuedVc issuedVc);
 
   /**
-   * ID로 IssuedVc을 조회합니다.
-   *
-   * @param id 조회할 IssuedVc의 ID
-   * @return IssuedVc (Optional)
-   */
-  Optional<IssuedVc> findById(Long id);
-
-  /**
    * credential_exchange_id로 IssuedVc을 조회합니다.
    *
    * @param credentialExchangeId 조회할 credential_exchange_id
@@ -34,15 +27,6 @@ public interface IssuedVcRepository {
    */
   Optional<IssuedVc> findByCredentialExchangeId(String credentialExchangeId);
 
-  /**
-   * credential_exchange_id와 status로 IssuedVc을 조회합니다.
-   *
-   * @param credentialExchangeId 조회할 credential_exchange_id
-   * @param status 조회할 status
-   * @return IssuedVc (Optional)
-   */
-  Optional<IssuedVc> findByCredentialExchangeIdAndStatus(String credentialExchangeId,
-      IssuedVc.VcStatus status);
 
   /**
    * credential_id로 IssuedVc을 조회합니다.
@@ -53,10 +37,10 @@ public interface IssuedVcRepository {
   Optional<IssuedVc> findByCredentialId(String credentialId);
 
   /**
-   * booking_id로 IssuedVc 목록을 조회합니다.
+   * booking_id로 IssuedVc를 조회합니다.
    *
    * @param bookingId 조회할 booking_id
-   * @return IssuedVc 목록
+   * @return IssuedVc (Optional)
    */
   Optional<IssuedVc> findByBookingId(Long bookingId);
 
@@ -69,30 +53,13 @@ public interface IssuedVcRepository {
   List<IssuedVc> findByTenantId(Long tenantId);
 
   /**
-   * status로 IssuedVc 목록을 조회합니다.
-   *
-   * @param status 조회할 status
-   * @return IssuedVc 목록
-   */
-  List<IssuedVc> findByStatus(IssuedVc.VcStatus status);
-
-  /**
-   * tenant_id와 status로 IssuedVc 목록을 조회합니다.
-   *
-   * @param tenantId 조회할 tenant_id
-   * @param status 조회할 status
-   * @return IssuedVc 목록
-   */
-  List<IssuedVc> findByTenantIdAndStatus(Long tenantId, IssuedVc.VcStatus status);
-
-  /**
    * booking_id와 status로 IssuedVc을 조회합니다.
    *
    * @param bookingId 조회할 booking_id
    * @param status 조회할 status
    * @return IssuedVc (Optional)
    */
-  Optional<IssuedVc> findByBookingIdAndStatus(Long bookingId, IssuedVc.VcStatus status);
+  Optional<IssuedVc> findByBookingIdAndStatus(Long bookingId, VcStatus status);
 
   /**
    * booking_id로 발급 완료된 VC가 있는지 확인합니다.
