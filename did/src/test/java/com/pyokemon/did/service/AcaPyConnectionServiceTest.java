@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Wallet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
@@ -61,12 +61,12 @@ class AcaPyConnectionServiceTest {
   @BeforeEach
   void setUp() {
     // 테넌트 지갑 설정
-      tenantWallet= Wallet.builder().accountId(TENANT_ID).token(TOKEN)
-        .publicDid("test-public-did").publicVerKey("test-public-verKey").build();
+    tenantWallet = Wallet.builder().accountId(TENANT_ID).token(TOKEN).publicDid("test-public-did")
+        .publicVerKey("test-public-verKey").build();
 
     // 사용자 지갑 설정
-    userWallet = Wallet.builder().accountId(USER_ID).token(TOKEN)
-            .publicDid("test-public-did").publicVerKey("test-public-verKey").build();
+    userWallet = Wallet.builder().accountId(USER_ID).token(TOKEN).publicDid("test-public-did")
+        .publicVerKey("test-public-verKey").build();
 
     // 초대장 응답 설정
     Invitation invitation = new Invitation();

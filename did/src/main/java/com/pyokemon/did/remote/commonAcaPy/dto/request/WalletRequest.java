@@ -3,8 +3,8 @@ package com.pyokemon.did.remote.commonAcaPy.dto.request;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.pyokemon.did.domain.Wallet.AccountRole;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

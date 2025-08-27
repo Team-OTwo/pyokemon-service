@@ -7,8 +7,6 @@ import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.RE
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.service.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +14,7 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
@@ -23,6 +22,7 @@ import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPy
 import com.pyokemon.did.remote.mediatorAcaPy.RemoteMediatorAcaPyService;
 import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
 import com.pyokemon.did.service.DeviceConnectionService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +43,8 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   public CreateInvitationResponse createInvitations(Long userId) {
 
     // 1. 사용자 지갑에서 userId, Token 조회
-    Wallet wallet = walletService.getWalletByAccountId(userId).orElseThrow(
-            () -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
+    Wallet wallet = walletService.getWalletByAccountId(userId)
+        .orElseThrow(() -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
 
     String userToken = wallet.getToken();
     log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);

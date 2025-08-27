@@ -2,13 +2,12 @@ package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.service.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyReceiveInvitationRequest;
@@ -17,6 +16,7 @@ import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPy
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
 import com.pyokemon.did.service.AcaPyConnectionService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

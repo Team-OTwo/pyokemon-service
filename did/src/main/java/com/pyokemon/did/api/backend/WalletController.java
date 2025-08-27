@@ -1,6 +1,5 @@
 package com.pyokemon.did.api.backend;
 
-import com.pyokemon.did.service.WalletService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

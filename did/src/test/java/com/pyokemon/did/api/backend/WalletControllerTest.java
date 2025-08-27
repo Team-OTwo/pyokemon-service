@@ -4,9 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
-import com.pyokemon.did.service.WalletService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pyokemon.did.domain.Wallet;
+import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
+import com.pyokemon.did.service.WalletService;
 
 @ExtendWith(MockitoExtension.class)
 class WalletControllerTest {

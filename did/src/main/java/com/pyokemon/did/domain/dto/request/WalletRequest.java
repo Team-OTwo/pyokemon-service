@@ -1,9 +1,9 @@
 package com.pyokemon.did.domain.dto.request;
 
-import com.pyokemon.did.domain.Wallet.AccountRole;
 import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.domain.Wallet.AccountRole;
 
 import lombok.*;
 

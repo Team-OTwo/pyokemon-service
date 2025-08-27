@@ -5,7 +5,6 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.CREDENTIAL_SENT;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Wallet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +12,7 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;

@@ -4,14 +4,12 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.domain.Wallet.AccountRole;
-import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
-import com.pyokemon.did.service.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.domain.Wallet;
+import com.pyokemon.did.domain.Wallet.AccountRole;
 import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
 import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreatePublicDidRequest;
@@ -19,6 +17,8 @@ import com.pyokemon.did.remote.commonAcaPy.dto.request.WalletRequest.AcaPyCreate
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreatePublicDidResponse;
 import com.pyokemon.did.remote.commonAcaPy.dto.response.WalletResponse.AcaPyCreateWalletResponse;
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +35,7 @@ public class WalletServiceImpl implements WalletService {
 
   @Override
   @Transactional
-  public void registerWallet(CreateWalletRequest createWalletRequest)
-      throws BusinessException {
+  public void registerWallet(CreateWalletRequest createWalletRequest) throws BusinessException {
     Long accountId = createWalletRequest.getAccountId();
     AccountRole accountRole = createWalletRequest.getAccountRole();
 
@@ -47,31 +46,30 @@ public class WalletServiceImpl implements WalletService {
         log.error("{} ID: {}에 대한 지갑이 이미 존재합니다.", accountRole, accountId);
         throw new BusinessException("계정 지갑이 이미 존재합니다.", WALLET_ALREADY_EXISTS);
       }
-      
+
       // 2. 적절한 AcaPy 서비스 선택
       RemoteAcaPyService remoteService = getRemoteServiceByRole(accountRole);
-      
+
       // 3. 지갑 생성
       log.info("{} ID: {}에 대한 지갑 생성 요청", accountRole, accountId);
-      AcaPyCreateWalletResponse walletResponse = remoteService.acaPyCreateWallet(
-              AcaPyCreateWalletRequest.of(accountRole)
-      );
+      AcaPyCreateWalletResponse walletResponse =
+          remoteService.acaPyCreateWallet(AcaPyCreateWalletRequest.of(accountRole));
       if (walletResponse == null || walletResponse.getToken() == null) {
         throw new BusinessException("지갑 생성에 실패했습니다.", WALLET_CREATION_FAILED);
       }
-      
+
       // 4. 공개 DID 생성
       log.info("{} ID: {}에 대한 공개 DID 생성 요청", accountRole, accountId);
       AcaPyCreatePublicDidResponse publicDidResponse = remoteService.acaPyCreatePublicDid(
-              "Bearer " + walletResponse.getToken(),AcaPyCreatePublicDidRequest.of("key")
-      );
+          "Bearer " + walletResponse.getToken(), AcaPyCreatePublicDidRequest.of("key"));
       if (publicDidResponse == null || publicDidResponse.getResult() == null
-              || publicDidResponse.getResult().getDid() == null) {
+          || publicDidResponse.getResult().getDid() == null) {
         throw new BusinessException("공개 DID 생성에 실패했습니다.", DID_CREATION_FAILED);
       }
-      
+
       // 5. 지갑 정보 저장
-      walletRepository.save(publicDidResponse.toEntity(accountId, accountRole, walletResponse.getToken()));
+      walletRepository
+          .save(publicDidResponse.toEntity(accountId, accountRole, walletResponse.getToken()));
       log.info("{} ID: {}에 대한 지갑 생성 및 저장 완료", accountRole, accountId);
 
     } catch (BusinessException e) {
@@ -83,15 +81,17 @@ public class WalletServiceImpl implements WalletService {
       throw new BusinessException("외부 시스템 연동 중 오류가 발생했습니다", WALLET_CREATION_FAILED);
     }
   }
-  
+
   /**
    * 계정 역할에 따라 적절한 원격 서비스를 반환
    */
   private interface RemoteAcaPyService {
     AcaPyCreateWalletResponse acaPyCreateWallet(AcaPyCreateWalletRequest request);
-    AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken, AcaPyCreatePublicDidRequest request);
+
+    AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken,
+        AcaPyCreatePublicDidRequest request);
   }
-  
+
   /**
    * 계정 역할에 따라 적절한 원격 서비스를 반환
    */
@@ -102,9 +102,10 @@ public class WalletServiceImpl implements WalletService {
         public AcaPyCreateWalletResponse acaPyCreateWallet(AcaPyCreateWalletRequest request) {
           return remoteTenantAcaPyService.acaPyCreateWallet(request);
         }
-        
+
         @Override
-        public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken, AcaPyCreatePublicDidRequest request) {
+        public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken,
+            AcaPyCreatePublicDidRequest request) {
           return remoteTenantAcaPyService.acaPyCreatePublicDid(authToken, request);
         }
       };
@@ -114,9 +115,10 @@ public class WalletServiceImpl implements WalletService {
         public AcaPyCreateWalletResponse acaPyCreateWallet(AcaPyCreateWalletRequest request) {
           return remoteUserAcaPyService.acaPyCreateWallet(request);
         }
-        
+
         @Override
-        public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken, AcaPyCreatePublicDidRequest request) {
+        public AcaPyCreatePublicDidResponse acaPyCreatePublicDid(String authToken,
+            AcaPyCreatePublicDidRequest request) {
           return remoteUserAcaPyService.acaPyCreatePublicDid(authToken, request);
         }
       };
