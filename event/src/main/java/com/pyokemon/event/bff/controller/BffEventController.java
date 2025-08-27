@@ -2,6 +2,7 @@ package com.pyokemon.event.bff.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.IdsRequest;
@@ -73,5 +74,28 @@ public class BffEventController {
     return bffEventService.getVenues(request.getIds());
   }
 
+  @PostMapping("events/schedules/details/_batch")
+  public List<BffScheduleDetailDto> getScheduleDetails(@RequestBody IdsRequest request) {
+    return bffEventService.getScheduleDetailsByIds(request.getIds());
+  }
 
+  @GetMapping("/events/tenant/summary/count")
+  public ResponseEntity<ActiveEventCountResponseDto> getActiveEventCount(
+          @RequestHeader("x-auth-accountId") Long tenantId,
+          @RequestParam("year") int year,
+          @RequestParam("month") int month) {
+
+    ActiveEventCountResponseDto response = bffEventService.getActiveEventCount(tenantId, year, month);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("events/tenant/schedules-by-tenant")
+  public ResponseEntity<ScheduleIdsResponseDto> getScheduleIdsByTenant(
+          @RequestHeader("x-auth-accountId") Long tenantId,
+          @RequestParam("year") int year,
+          @RequestParam("month") int month) {
+
+    ScheduleIdsResponseDto responseDto = bffEventService.getScheduleIdsByTenant(tenantId, year, month);
+    return ResponseEntity.ok(responseDto);
+  }
 }
