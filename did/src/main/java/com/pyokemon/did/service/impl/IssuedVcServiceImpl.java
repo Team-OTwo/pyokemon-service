@@ -5,6 +5,7 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.CREDENTIAL_SENT;
 
 import java.util.Optional;
 
+import com.pyokemon.did.domain.Wallet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +13,10 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.TenantWallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
-import com.pyokemon.did.domain.repository.TenantWalletRepository;
+import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.tenantAcaPy.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.tenantAcaPy.dto.request.AcaPyIssueCredentialRequest;
 import com.pyokemon.did.remote.tenantAcaPy.dto.response.AcaPyIssueCredentialResponse;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class IssuedVcServiceImpl implements IssuedVcService {
 
   private final IssuedVcRepository issuedVcRepository;
-  private final TenantWalletRepository tenantWalletRepository;
+  private final WalletRepository walletRepository;
   private final AcaPyConnectionRepository acaPyConnectionRepository;
   private final DeviceConnectionRepository deviceConnectionRepository;
   private final RemoteTenantAcaPyService remoteTenantAcaPyService;
@@ -57,7 +57,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     }
     String connectionId = connection.get().getConnectionId();
 
-    Optional<TenantWallet> wallet = tenantWalletRepository.findByTenantId(tenantId);
+    Optional<Wallet> wallet = walletRepository.findByAccountId(tenantId);
     if (wallet.isEmpty()) {
       throw new BusinessException("테넌트 지갑을 찾을 수 없습니다.", "WALLET_NOT_FOUND");
     }
@@ -102,7 +102,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
   }
 
   /**
-   * 특정 booking에 대해 VC가 이미 발급되었는지 확인
+   * 특정 booking 에 대해 VC가 이미 발급되었는지 확인
    */
   public Boolean isIssuedVC(Long bookingId) {
     return issuedVcRepository.existsByBookingIdAndIssued(bookingId);
