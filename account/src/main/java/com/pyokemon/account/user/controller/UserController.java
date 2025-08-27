@@ -12,6 +12,7 @@ import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
+import com.pyokemon.account.user.dto.request.VerifyRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
 import com.pyokemon.account.user.dto.response.UserDuplicateDto;
 import com.pyokemon.account.user.dto.response.UserNotificationDto;
@@ -57,6 +58,14 @@ public class UserController {
     Long accountId = Long.parseLong(currentUserAccountId);
     UserDetailDto response = userService.verifyUser(accountId);
     return ResponseEntity.ok(ResponseDto.success(response, "본인 인증 성공"));
+  }
+
+  // MISMATCH 본인 인증
+  @PostMapping("/app/verify")
+  public ResponseEntity<ResponseDto<UserDetailDto>> appVerify(
+      @RequestBody VerifyRequestDto request) {
+    UserDetailDto response = userService.appVerifyUser(request);
+    return ResponseEntity.ok(ResponseDto.success(response, "본인 인증 및 기기 등록 성공"));
   }
 
 
