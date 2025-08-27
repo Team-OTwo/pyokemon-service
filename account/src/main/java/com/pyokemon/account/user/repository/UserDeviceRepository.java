@@ -26,6 +26,8 @@ public interface UserDeviceRepository {
   boolean existsByUserIdAndDeviceNumberAndIsValid(Long userId, String deviceNumber,
       boolean isValid);
 
+  boolean existsByUserIdAndIsValid(Long userId, boolean isValid);
+
   int insert(UserDevice userDevice);
 
   int update(UserDevice userDevice);

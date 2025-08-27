@@ -113,6 +113,9 @@ public class AccountService {
     String role = account.getRole();
     String deviceStatus = "REGISTERED";
 
+    String accessToken = null;
+    String refreshToken = null;
+
     if (role.equals("USER")) {
       Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
 
@@ -122,11 +125,15 @@ public class AccountService {
 
       User user = userOpt.get();
 
-      if (!userDeviceRepository.existsByUserId(user.getUserId())) {
+      if (!userDeviceRepository.existsByUserIdAndIsValid(user.getUserId(), true)) {
         deviceStatus = "NOT_REGISTERED";
+        accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), role);
+        refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), role);
       } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(),
           request.getDeviceNumber(), true)) {
         deviceStatus = "MISMATCHED";
+        return AppLoginResponseDto.builder().accountId(user.getAccountId())
+            .deviceStatus(deviceStatus).build();
       }
 
       if (deviceStatus.equals("REGISTERED")) {
@@ -135,16 +142,15 @@ public class AccountService {
         if (userDeviceOpt.isEmpty()) {
           throw new BusinessException("존재하지 않는 디바이스 입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
         }
-
         UserDevice userDevice = userDeviceOpt.get();
         userDevice.setIsLogin(true);
         userDeviceRepository.update(userDevice);
+        accessToken = tokenGenerator.generateAppAccessToken(account.getAccountId(), role,
+            userDevice.getUserDeviceId());
+        refreshToken = tokenGenerator.generateAppRefreshToken(account.getAccountId(), role,
+            userDevice.getUserDeviceId());
       }
     }
-
-    // JWT 토큰 생성
-    String accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), role);
-    String refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), role);
 
     log.info("로그인 성공: {} (역할: {})", request.getLoginId(), role);
 

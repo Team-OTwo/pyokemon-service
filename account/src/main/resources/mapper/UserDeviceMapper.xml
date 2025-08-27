@@ -26,6 +26,10 @@
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber} AND is_valid = #{isValid}
     </select>
 
+    <select id="existsByUserIdAndIsValid" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId} AND is_valid = #{isValid}
+    </select>
+
     <select id="existsByUserId" resultType="boolean">
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId}
     </select>
