@@ -4,21 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.pyokemon.event.producer.KafkaMessageProducer;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
-import com.pyokemon.event.dto.tenant.EventScheduleDto;
-import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.dto.PriceWithSeatClassDTO;
 import com.pyokemon.event.dto.SeatInfoResponseDTO;
+import com.pyokemon.event.dto.tenant.EventScheduleDto;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.SeatClassRepository;
@@ -26,6 +25,7 @@ import com.pyokemon.event.repository.SeatRepository;
 import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -140,9 +140,9 @@ public class EventScheduleService {
 
 
   @Scheduled(fixedRate = 5 * 60 * 1000)
-  public void publishTwoHoursAheadEvents(){
+  public void publishTwoHoursAheadEvents() {
     List<Long> upcomingIds = eventScheduleRepository.findEventScheduleIdTwoHoursLater();
-    for(Long id:upcomingIds){
+    for (Long id : upcomingIds) {
       log.info("Publishing eventScheduleId={} to Kafka", id);
       kafkaMessageProducer.sendTwoHoursBeforeEvent(id);
     }

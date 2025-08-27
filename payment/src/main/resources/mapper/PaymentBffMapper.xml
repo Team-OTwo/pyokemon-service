@@ -29,4 +29,17 @@
         </choose>
     </select>
 
+    <select id="sumTotalRevenueByScheduleIds" resultType="long">
+        SELECT
+        IFNULL(SUM(amount), 0)
+        FROM
+        tb_payment
+        WHERE
+        status = 'DONE'
+        AND event_schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>

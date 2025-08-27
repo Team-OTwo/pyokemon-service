@@ -105,4 +105,74 @@
             </if>
         </where>
     </select>
+
+    <select id="findScheduleIdsByTenantAndMonth" resultType="long">
+        SELECT
+            DISTINCT es.event_schedule_id
+        FROM
+            tb_event e
+                INNER JOIN
+            tb_event_schedule es ON e.event_id = es.event_id
+        WHERE
+            e.account_id = #{tenantId}
+                AND e.status = 'APPROVED'
+                AND YEAR(es.event_date) = #{year}
+          AND MONTH(es.event_date) = #{month}
+    </select>
+
+    <select id="findScheduleDetailsByIds" resultType="com.pyokemon.event.bff.dto.BffScheduleDetailDto">
+        SELECT
+        es.event_schedule_id AS eventScheduleId,
+        e.title,
+        v.venue_name AS venueName,
+        es.event_date AS eventDate
+        FROM
+        tb_event_schedule es
+        INNER JOIN
+        tb_event e ON es.event_id = e.event_id
+        INNER JOIN
+        tb_venue v ON es.venue_id = v.venue_id
+        WHERE
+        es.event_schedule_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="countActiveEventsByTenant" resultType="long">
+        SELECT
+            -- 한 공연이 해당 월에 여러 일정을 가질 수 있으므로, 고유한 공연의 개수만 셉니다.
+            COUNT(DISTINCT e.event_id)
+        FROM
+            tb_event e
+                INNER JOIN
+            tb_event_schedule es ON e.event_id = es.event_id
+        WHERE
+            e.account_id = #{tenantId}
+                AND e.status = 'APPROVED'
+                -- 공연일시(event_date)를 기준으로 연도와 월을 필터링합니다.
+                AND YEAR(es.event_date) = #{year}
+          AND MONTH(es.event_date) = #{month}
+    </select>
+
+    <!-- 장르로 eventIds 조회 -->
+    <select id="findIdsByGenre" parameterType="string" resultType="long">
+        SELECT event_id
+        FROM tb_event
+        WHERE genre = #{genre}
+    </select>
+
+    <!-- eventIds로 eventScheduleIds 조회 -->
+    <select id="findIdsByEventIds" parameterType="map" resultType="long">
+        SELECT event_schedule_id
+        FROM tb_event_schedule
+        <where>
+            <if test="eventIds != null and eventIds.size() > 0">
+                event_id IN
+                <foreach collection="eventIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>
