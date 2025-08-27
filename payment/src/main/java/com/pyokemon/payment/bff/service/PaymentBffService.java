@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.pyokemon.payment.bff.dto.TotalRevenueResponseDto;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.exception.BusinessException;
@@ -17,6 +18,7 @@ import com.pyokemon.payment.bff.repository.PaymentBffRepository;
 import com.pyokemon.payment.entity.Payment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +68,10 @@ public class PaymentBffService {
     return PaymentDto.builder().paymentId(paymentId).amount(payment.getAmount())
         .method(payment.getMethod()).status(payment.getStatus()).updatedAt(payment.getUpdatedAt())
         .build();
+  }
+
+  public TotalRevenueResponseDto getTotalRevenue(List<Long> scheduleIds) {
+    Long totalRevenue = paymentBffRepository.sumTotalRevenueByScheduleIds(scheduleIds);
+    return new TotalRevenueResponseDto(totalRevenue);
   }
 }
