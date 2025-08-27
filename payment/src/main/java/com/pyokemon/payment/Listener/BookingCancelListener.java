@@ -37,10 +37,7 @@ public class BookingCancelListener {
       log.debug("예약 상태 무시: {}", status);
       return;
     }
-
-    // paymentCancelService.cancelByBookingId(bookingEvent.getBookingId(), "예약 취소 요청");
-    // log.info("예약 취소 처리 완료: {}", bookingEvent.getBookingId());
-
+    
     if ("EXPIRED".equals(status)) {
       paymentExpiredService.expireByBookingId(bookingEvent.getBookingId(), "예약 만료");
       log.info("예약 만료 처리 완료: {}", bookingEvent.getBookingId());
