@@ -36,4 +36,8 @@ public interface BffEventRepository {
   List<BffScheduleDetailDto> findScheduleDetailsByIds(@Param("ids") List<Long> ids);
 
   List<Long> findScheduleIdsByTenantAndMonth(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
+
+  List<Long> findIdsByGenre(@Param("genre") String genre);
+
+  List<Long> findIdsByEventIds(@Param("eventIds") List<Long> eventIds);
 }

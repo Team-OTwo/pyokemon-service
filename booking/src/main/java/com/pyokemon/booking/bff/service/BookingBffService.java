@@ -61,7 +61,7 @@ public class BookingBffService {
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
       Integer size) {
     List<Booking> bookings =
-        bookingBffRepository.findByEventScheduleIdOrderByDate(eventScheduleId, page * size, size);
+        bookingBffRepository.findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {
@@ -85,6 +85,38 @@ public class BookingBffService {
     Booking booking = bookingOpt.get();
 
     return toDto(booking);
+  }
+
+  public CursorPageResponse<Booking> findByAccountCursor(long accountId, Long cursor, int size) {
+    List<Booking> bookings =
+            bookingBffRepository.findByAccountWithCursor(accountId, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+  }
+
+  public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(long accountId,
+                                                                     List<Long> scheduleIds, Long cursor, int size) {
+    List<Booking> bookings = bookingBffRepository.findByAccountAndSchedulesWithCursor(accountId,
+            scheduleIds, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+
   }
 
   private BookingDto toDto(Booking b) {

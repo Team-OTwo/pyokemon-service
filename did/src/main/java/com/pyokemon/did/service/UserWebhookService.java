@@ -1,8 +1,6 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.api.backend.dto.BasicMessageWebhookDto;
-import com.pyokemon.did.api.backend.dto.ConnectionWebhookDto;
-import com.pyokemon.did.api.backend.dto.OutOfBandWebhookDto;
+import com.pyokemon.did.api.backend.dto.*;
 
 /**
  * User ACA-Py webhook 처리를 위한 서비스 인터페이스
@@ -29,4 +27,9 @@ public interface UserWebhookService {
    * @param webhookDto Basic Message webhook 데이터
    */
   void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto);
+
+
+  void handleIssueCredentialWebhook(IssueCredentialWebhookDto webhookDto);
+
+  void handleLdProofWebhook(LdProofWebhookDto webhookDto);
 }

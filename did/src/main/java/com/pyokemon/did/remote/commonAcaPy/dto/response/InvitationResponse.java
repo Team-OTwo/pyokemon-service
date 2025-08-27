@@ -34,6 +34,8 @@ public class InvitationResponse {
     private List<String> handshakeProtocols;
 
     private List<String> services;
+
+
   }
 
   @Data
@@ -44,7 +46,8 @@ public class InvitationResponse {
     private String state;
     private Boolean trace;
 
-    private String alias;
+    @JsonProperty("invi_msg_id")
+    private String inviMsgId;
 
     @JsonProperty("oob_id")
     private String oobId;
@@ -55,7 +58,7 @@ public class InvitationResponse {
     private String invitationUrl;
 
     public AcaPyConnection toEntity(Long tenantId, Long userId) {
-      return AcaPyConnection.builder().connectionId(null).alias(alias).tenantId(tenantId)
+      return AcaPyConnection.builder().connectionId(null).inviMsgId(inviMsgId).tenantId(tenantId)
           .userId(userId).status(ConnectionStatus.PENDING).build();
     }
   }

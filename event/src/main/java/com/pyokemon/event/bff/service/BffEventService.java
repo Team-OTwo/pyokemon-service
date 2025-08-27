@@ -177,4 +177,12 @@ public class BffEventService {
     List<Long> ids = repo.findScheduleIdsByTenantAndMonth(tenantId, year, month);
     return new ScheduleIdsResponseDto(ids);
   }
+
+    public List<Long> findEventIdsByGenre(String genre) {
+        return repo.findIdsByGenre(genre);
+    }
+
+    public List<Long> findScheduleIdsByEventIds(List<Long> eventIds) {
+        return repo.findIdsByEventIds(eventIds);
+    }
 }

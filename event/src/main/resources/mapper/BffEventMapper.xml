@@ -154,4 +154,25 @@
                 AND YEAR(es.event_date) = #{year}
           AND MONTH(es.event_date) = #{month}
     </select>
+
+    <!-- 장르로 eventIds 조회 -->
+    <select id="findIdsByGenre" parameterType="string" resultType="long">
+        SELECT event_id
+        FROM tb_event
+        WHERE genre = #{genre}
+    </select>
+
+    <!-- eventIds로 eventScheduleIds 조회 -->
+    <select id="findIdsByEventIds" parameterType="map" resultType="long">
+        SELECT event_schedule_id
+        FROM tb_event_schedule
+        <where>
+            <if test="eventIds != null and eventIds.size() > 0">
+                event_id IN
+                <foreach collection="eventIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

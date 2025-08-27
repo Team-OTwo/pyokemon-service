@@ -22,15 +22,16 @@
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
+        AND status IN ('BOOKED', 'CANCELED')
         ORDER BY created_at DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <select id="findByEventScheduleIdOrderByDate" resultType="Booking">
+    <select id="findByEventScheduleIdOrderByBookingId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
-        ORDER BY created_at DESC
+        ORDER BY booking_id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -80,4 +81,34 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="findByAccountWithCursor" resultType="Booking">
+        SELECT booking_id, event_schedule_id, tenant_id
+        FROM tb_booking
+        WHERE account_id = #{accountId}
+        <if test="cursor != null">
+            AND booking_id &lt; #{cursor}
+        </if>
+        ORDER BY booking_id DESC
+        LIMIT #{size}
+    </select>
+
+    <!-- 2) 특정 스케줄 집합 + 계정 예매순 커서 -->
+    <select id="findByAccountAndSchedulesWithCursor" resultType="Booking">
+        SELECT booking_id, event_schedule_id, tenant_id
+        FROM tb_booking
+        WHERE account_id = #{accountId}
+        <if test="scheduleIds != null and scheduleIds.size() &gt; 0">
+            AND event_schedule_id IN
+            <foreach collection="scheduleIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="cursor != null">
+            AND booking_id &lt; #{cursor}
+        </if>
+        ORDER BY booking_id DESC
+        LIMIT #{size}
+    </select>
+
 </mapper> 

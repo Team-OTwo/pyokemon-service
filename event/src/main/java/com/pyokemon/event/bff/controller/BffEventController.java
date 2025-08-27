@@ -74,6 +74,7 @@ public class BffEventController {
     return bffEventService.getVenues(request.getIds());
   }
 
+
   @PostMapping("events/schedules/details/_batch")
   public List<BffScheduleDetailDto> getScheduleDetails(@RequestBody IdsRequest request) {
     return bffEventService.getScheduleDetailsByIds(request.getIds());
@@ -94,8 +95,20 @@ public class BffEventController {
           @RequestHeader("x-auth-accountId") Long tenantId,
           @RequestParam("year") int year,
           @RequestParam("month") int month) {
-
     ScheduleIdsResponseDto responseDto = bffEventService.getScheduleIdsByTenant(tenantId, year, month);
     return ResponseEntity.ok(responseDto);
   }
+
+  /** 0) 장르 → 이벤트 ID 목록 */
+  @PostMapping("/events/_ids-by-genre")
+  public List<Long> findEventIdsByGenre(@RequestBody GenreRequest req) {
+    return bffEventService.findEventIdsByGenre(req.getGenre());
+  }
+
+  /** 1) 이벤트 IDs → 스케줄 ID 목록 */
+  @PostMapping("/event-schedules/_ids-by-events")
+  public List<Long> findScheduleIdsByEventIds(@RequestBody IdsRequest req) {
+    return bffEventService.findScheduleIdsByEventIds(req.getIds());
+  }
+    
 }

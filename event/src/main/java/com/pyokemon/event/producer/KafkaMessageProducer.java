@@ -23,4 +23,10 @@ public class KafkaMessageProducer {
         String.valueOf(dto.getEventScheduleId()), dto);
   }
 
+  public void sendTwoHoursBeforeEvent(Long eventScheduleId) {
+    kafkaMessageSender.send(KafkaTopicConstants.EVENT_SCHEDULE_2H_AHEAD,
+        String.valueOf(eventScheduleId), eventScheduleId);
+  }
+
+
 }

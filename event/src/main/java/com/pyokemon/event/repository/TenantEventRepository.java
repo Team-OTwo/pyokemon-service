@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.entity.Event;
 
 @Mapper

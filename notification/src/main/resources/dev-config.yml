@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://pyokemon-notification-mysql:3312/pyokemon_notification?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  kafka:
+    bootstrap-servers: pyokemon-kafka:29092
+
+account:
+  service:
+    base-url: http://pyokemon-account-service:8080/account
+
+  firebase:
+    sdk:
+      json: classpath:pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
+    storage:
+      bucket: pyokemon-8a667.appspot.com
