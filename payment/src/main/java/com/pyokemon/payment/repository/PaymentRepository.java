@@ -18,4 +18,6 @@ public interface PaymentRepository {
   void cancelPayment(String orderId, String status);
 
   Payment selectLatestByBookingId(Long bookingId);
+
+  Payment selectByOrderIdStatus(String orderId);
 }

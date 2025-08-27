@@ -14,6 +14,7 @@ import lombok.*;
 public class PaymentDto {
   private Long paymentId;
   private Long bookingId;
+  private Long eventScheduleId;
   private String orderId;
   private String paymentKey;
   private int amount;
