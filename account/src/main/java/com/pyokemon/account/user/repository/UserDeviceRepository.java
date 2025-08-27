@@ -12,6 +12,8 @@ public interface UserDeviceRepository {
 
   Optional<UserDevice> findByUserDeviceId(Long userDeviceId);
 
+  Optional<UserDevice> findByUserDeviceIdAndIsValid(Long userDeviceId, boolean isValid);
+
   List<UserDevice> findByUserId(Long userId);
 
   Optional<UserDevice> findByUserIdAndIsValid(Long userId, boolean isValid);

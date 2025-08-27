@@ -6,6 +6,10 @@
         SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId}
     </select>
 
+    <select id="findByUserDeviceIdAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
+        SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId} AND is_valid = #{isValid}
+    </select>
+
     <select id="findByUserId" resultType="com.pyokemon.account.user.entity.UserDevice">
         SELECT * FROM tb_user_device WHERE user_id = #{userId}
     </select>

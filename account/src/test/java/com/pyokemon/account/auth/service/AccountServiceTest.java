@@ -298,54 +298,111 @@ public class AccountServiceTest {
     verify(accountRepository).findByAccountId(1L);
   }
 
-  @Test
-  @DisplayName("로그아웃 성공 테스트")
-  void logoutSuccess() {
-    // given
-    String token = "Bearer valid-token";
-    String accountId = "1";
-    String deviceNumber = "device123";
-    Claims claims = mock(Claims.class);
-    Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1시간 후
+  // ========== 로그아웃 테스트 ==========
 
-    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-    when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
+  @Test
+  @DisplayName("로그아웃 성공 - 토큰 블랙리스트 추가")
+  void logoutSuccess_blacklistToken() {
+    // given
+    String token = "valid-token";
+    String fullToken = "Bearer " + token;
+    Claims claims = mock(Claims.class);
+    Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1 hour expiry
+
+    when(tokenGenerator.parseToken(token)).thenReturn(claims);
     when(claims.getExpiration()).thenReturn(expiration);
-    when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
-    when(userDeviceRepository.findByUserIdAndIsValid(1L, true))
-        .thenReturn(Optional.of(testUserDevice));
+    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
     // when
-    assertDoesNotThrow(() -> {
-      accountService.logout(token, accountId, deviceNumber);
-    });
+    accountService.logout(fullToken, null);
 
     // then
-    verify(redisTemplate).opsForValue();
-    verify(valueOperations).set(eq(AuthConstants.BLACKLIST_PREFIX + "valid-token"),
-        eq("blacklisted"), anyLong(), eq(TimeUnit.SECONDS));
-    verify(accountRepository).findByAccountId(1L);
-    verify(userRepository).findByAccountId(1L);
-    verify(userDeviceRepository).findByUserIdAndIsValid(1L, true);
-    verify(userDeviceRepository).update(any(UserDevice.class));
+    verify(redisTemplate.opsForValue()).set(
+        eq(AuthConstants.BLACKLIST_PREFIX + token),
+        eq("blacklisted"),
+        anyLong(),
+        eq(TimeUnit.SECONDS));
+    verifyNoInteractions(userRepository, userDeviceRepository);
   }
 
   @Test
-  @DisplayName("로그아웃 성공 테스트 - 토큰 없음")
-  void logoutSuccess_NoToken() {
+  @DisplayName("로그아웃 성공 - 디바이스 로그아웃 처리")
+  void logoutSuccess_withDeviceLogout() {
     // given
-    String token = null;
-    String accountId = "1";
+    String token = "valid-token";
+    String fullToken = "Bearer " + token;
     String deviceNumber = "device123";
+    Claims claims = mock(Claims.class);
+    Date expiration = new Date(System.currentTimeMillis() + 3600000);
+    testUserDevice.setIsLogin(true);
+
+    when(tokenGenerator.parseToken(token)).thenReturn(claims);
+    when(claims.getExpiration()).thenReturn(expiration);
+    when(claims.getSubject()).thenReturn("1");
+    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
+    when(userDeviceRepository.findByUserIdAndDeviceNumberAndIsValid(testUser.getUserId(), deviceNumber, true))
+        .thenReturn(Optional.of(testUserDevice));
 
     // when
-    assertDoesNotThrow(() -> {
-      accountService.logout(token, accountId, deviceNumber);
-    });
+    accountService.logout(fullToken, deviceNumber);
 
     // then
-    verifyNoInteractions(tokenGenerator, redisTemplate);
+    verify(redisTemplate.opsForValue()).set(
+        eq(AuthConstants.BLACKLIST_PREFIX + token),
+        anyString(),
+        anyLong(),
+        eq(TimeUnit.SECONDS));
+    verify(userRepository).findByAccountId(1L);
+    verify(userDeviceRepository).findByUserIdAndDeviceNumberAndIsValid(testUser.getUserId(), deviceNumber, true);
+    verify(userDeviceRepository).update(testUserDevice);
+    assertFalse(testUserDevice.getIsLogin());
+  }
+
+  @Test
+  @DisplayName("로그아웃 - 이미 만료된 토큰")
+  void logout_expiredToken() {
+    // given
+    String token = "expired-token";
+    String fullToken = "Bearer " + token;
+    Claims claims = mock(Claims.class);
+    Date expiration = new Date(System.currentTimeMillis() - 1000); // Expired 1 sec ago
+
+    when(tokenGenerator.parseToken(token)).thenReturn(claims);
+    when(claims.getExpiration()).thenReturn(expiration);
+
+    // when
+    accountService.logout(fullToken, "device123");
+
+    // then
+    verify(redisTemplate, never()).opsForValue();
+    verifyNoInteractions(userRepository, userDeviceRepository);
+  }
+
+  @Test
+  @DisplayName("로그아웃 - 토큰 없음")
+  void logout_noToken() {
+    // when
+    accountService.logout(null, "device123");
+
+    // then
+    verifyNoInteractions(tokenGenerator, redisTemplate, userRepository, userDeviceRepository);
+  }
+
+  @Test
+  @DisplayName("로그아웃 - 유효하지 않은 토큰 파싱 예외")
+  void logout_tokenParseException() {
+    // given
+    String token = "invalid-token";
+    String fullToken = "Bearer " + token;
+    when(tokenGenerator.parseToken(token)).thenThrow(new RuntimeException("Invalid token"));
+
+    // when
+    accountService.logout(fullToken, "device123");
+
+    // then
+    verify(redisTemplate, never()).opsForValue();
+    verifyNoInteractions(userRepository, userDeviceRepository);
   }
 
   @Test
