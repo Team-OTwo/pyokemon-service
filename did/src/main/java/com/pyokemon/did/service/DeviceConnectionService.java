@@ -6,4 +6,6 @@ public interface DeviceConnectionService {
 
   CreateInvitationResponse createInvitations(Long userId);
 
+  public Long getUserIdByDidOrThrow(String did);
+
 }

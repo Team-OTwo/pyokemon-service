@@ -279,10 +279,11 @@ public class AccountService {
       log.warn("로그아웃 처리 중 예외 발생: {}", e.getMessage());
     }
 
-    if (deviceId != null){
-      Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByUserDeviceIdAndIsValid(deviceId, true);
+    if (deviceId != null) {
+      Optional<UserDevice> userDeviceOpt =
+          userDeviceRepository.findByUserDeviceIdAndIsValid(deviceId, true);
 
-      if (userDeviceOpt.isEmpty()){
+      if (userDeviceOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
       }
       UserDevice userDevice = userDeviceOpt.get();

@@ -31,4 +31,6 @@ public interface WalletService {
    * @throws BusinessException 지갑을 찾을 수 없는 경우
    */
   Wallet getWalletByAccountIdOrThrow(Long accountId);
+
+  String getWalletToken(Long accountId);
 }
