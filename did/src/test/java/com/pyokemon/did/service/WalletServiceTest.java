@@ -75,8 +75,8 @@ class WalletServiceTest {
 
     // DID 응답 객체 생성
     publicDidResponse = new CreatePublicDidResponse();
-    publicDidResponse.setDid("test-did");
-    publicDidResponse.setVerkey("test-ver-key");
+    publicDidResponse.getResult().setDid("test-did");
+    publicDidResponse.getResult().setVerkey("test-ver-key");
 
     // 지갑 객체 생성
     wallet = Wallet.builder().accountId(TENANT_ID).accountRole(Wallet.AccountRole.TENANT)
@@ -310,8 +310,8 @@ class WalletServiceTest {
         when(remoteTenantAcaPyService.createWallet(any(CreateWalletRequest.class))).thenReturn(walletResponse);
 
         CreatePublicDidResponse nullDidResponse = new CreatePublicDidResponse();
-        nullDidResponse.setDid(null);
-        nullDidResponse.setVerkey("test-verkey");
+        nullDidResponse.getResult().setDid(null);
+        nullDidResponse.getResult().setVerkey("test-verkey");
 
         when(remoteTenantAcaPyService.createPublicDid(anyString(), any(CreatePublicDidRequest.class)))
                 .thenReturn(nullDidResponse);
