@@ -70,7 +70,8 @@ public interface IssuedVcRepository {
    * @param status 조회할 status
    * @return IssuedVc (Optional)
    */
-  Optional<IssuedVc> findByUserIdAndTenantIdAndBookingIdAndStatus(Long userId, Long tenantId, Long bookingId, VcStatus status);
+  Optional<IssuedVc> findByUserIdAndTenantIdAndBookingIdAndStatus(Long userId, Long tenantId,
+      Long bookingId, VcStatus status);
 
   /**
    * booking_id로 발급 완료된 VC가 있는지 확인합니다.

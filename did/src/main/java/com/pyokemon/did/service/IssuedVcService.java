@@ -1,8 +1,8 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
-
 import java.util.Map;
+
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 
 public interface IssuedVcService {
 

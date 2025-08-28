@@ -35,10 +35,11 @@ public interface RemoteTenantAcaPyService {
   PresentProofResponse presentProof(@RequestHeader("Authorization") String authorization,
       @RequestBody PresentProofRequest request);
 
-  @PostMapping(value="/wallet/jwt/verify")
+  @PostMapping(value = "/wallet/jwt/verify")
   JwtVerifyResponse jwtVerify(@RequestHeader("Authorization") String authorization,
-                              @RequestBody JwtVerifyRequest request);
+      @RequestBody JwtVerifyRequest request);
 
-  @PostMapping(value="/present-proof-2.0/records/{pres_ex_id}/verify-presentation")
-  VerifyPresentationResponse verifyPresentation(@RequestHeader("Authorization") String authorization, @PathVariable String pres_ex_id);
+  @PostMapping(value = "/present-proof-2.0/records/{pres_ex_id}/verify-presentation")
+  VerifyPresentationResponse verifyPresentation(
+      @RequestHeader("Authorization") String authorization, @PathVariable String pres_ex_id);
 }

@@ -16,7 +16,8 @@ public interface BookingRepository {
 
   List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
-  List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
+  List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(
+      @Param("eventScheduleId") Long eventScheduleId);
 
   List<Booking> findByAccountId(@Param("accountId") Long accountId);
 

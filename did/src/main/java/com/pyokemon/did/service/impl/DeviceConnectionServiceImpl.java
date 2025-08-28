@@ -104,11 +104,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
   @Override
   public Long getUserIdByDidOrThrow(String did) {
-    DeviceConnection deviceConnection = deviceConnectionRepository.findByPublicDid(did)
-            .orElseThrow(() -> new BusinessException(
-                    "public DID: {" + did + "} 에 대한 userId를 찾을 수 없습니다.",
-                    DID_NOT_FOUND
-            ));
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByPublicDid(did).orElseThrow(
+        () -> new BusinessException("public DID: {" + did + "} 에 대한 userId를 찾을 수 없습니다.",
+            DID_NOT_FOUND));
     return deviceConnection.getUserId();
   }
 

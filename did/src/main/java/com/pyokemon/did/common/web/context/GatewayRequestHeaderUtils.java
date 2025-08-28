@@ -36,8 +36,7 @@ public class GatewayRequestHeaderUtils {
   }
 
   /**
-   * Gateway에서 전달받은 테넌트 ID를 Long 타입으로 반환하거나 예외를 발생시킵니다.
-   * role이 TENANT인 경우에만 반환합니다.
+   * Gateway에서 전달받은 테넌트 ID를 Long 타입으로 반환하거나 예외를 발생시킵니다. role이 TENANT인 경우에만 반환합니다.
    *
    * @return 테넌트 ID (Long)
    * @throws BusinessException 인증 정보가 없거나 숫자 형식이 아니거나 TENANT 권한이 아닌 경우
@@ -59,7 +58,7 @@ public class GatewayRequestHeaderUtils {
       return Long.valueOf(tenantId);
     } catch (NumberFormatException e) {
       throw new BusinessException("테넌트 ID가 올바른 숫자 형식이 아닙니다: " + tenantId,
-              DidErrorCodes.ACCESS_DENIED);
+          DidErrorCodes.ACCESS_DENIED);
     }
   }
 

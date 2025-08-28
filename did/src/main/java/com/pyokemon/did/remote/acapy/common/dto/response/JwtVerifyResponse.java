@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtVerifyResponse {
-    
-    private boolean valid;
-    private JwtPayload payload;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class JwtPayload {
-        private String did;
-    }
+  private boolean valid;
+  private JwtPayload payload;
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class JwtPayload {
+    private String did;
+  }
 }

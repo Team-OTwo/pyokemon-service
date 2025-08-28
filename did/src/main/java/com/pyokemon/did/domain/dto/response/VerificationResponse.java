@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 public class VerificationResponse {
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class CreateVerificationResponse {
-        private String VerifyInviUrl;
-        private String presExId;
-    }
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class CreateVerificationResponse {
+    private String VerifyInviUrl;
+    private String presExId;
+  }
 
 }

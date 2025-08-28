@@ -1,4 +1,5 @@
 package com.pyokemon.did.remote.acapy.common.dto.request;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -9,10 +10,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class JwtVerifyRequest {
 
-    private String jwt;
+  private String jwt;
 
-    public static JwtVerifyRequest of(String jwt) {
-        return JwtVerifyRequest.builder().jwt(jwt).build();
-    }
+  public static JwtVerifyRequest of(String jwt) {
+    return JwtVerifyRequest.builder().jwt(jwt).build();
+  }
 
 }
