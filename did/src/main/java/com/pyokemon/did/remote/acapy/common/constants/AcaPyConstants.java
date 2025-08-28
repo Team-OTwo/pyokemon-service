@@ -28,6 +28,7 @@ public class AcaPyConstants {
 
   public static class Credential {
     public static final String PROOF_TYPE_ED25519 = "Ed25519Signature2020";
+    public static final String CREDENTIAL_ID_PREFIX = "urn:booking:";
   }
 
   public static class Context {

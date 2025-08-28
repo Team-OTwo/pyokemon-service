@@ -1,4 +1,4 @@
-package com.pyokemon.common.util;
+package com.pyokemon.did.common.util;
 
 import java.util.UUID;
 

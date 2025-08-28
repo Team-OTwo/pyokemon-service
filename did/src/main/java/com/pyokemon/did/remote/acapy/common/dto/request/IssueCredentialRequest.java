@@ -11,6 +11,7 @@ import com.pyokemon.did.remote.acapy.common.dto.base.BaseCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.*;
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.EvidenceCredential.Evidence;
 
+import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -53,24 +54,24 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
    * 표준 자격 증명 객체 생성
    */
   private static StandardCredential createStandardCredential(String issuerDid,
-      CredentialSubject subject) {
+                                                             CredentialSubject subject) {
     return StandardCredential.builder().context(createBasicContext())
-        .id("urn:booking:" + subject.getBookingId())
-        .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
-        .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(subject)
-        .build();
+            .id(CredentialIdGenerator.generateCredentialId(subject.getBookingId()))
+            .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
+            .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(subject)
+            .build();
   }
 
   /**
    * 증거가 포함된 자격 증명 객체 생성
    */
   private static EvidenceCredential createEvidenceCredential(String issuerDid,
-      CredentialSubject subject, Long bookingId) {
+                                                             CredentialSubject subject, Long bookingId) {
     return EvidenceCredential.builder().context(createExtendedContext())
-        .id("urn:booking:" + subject.getBookingId() + ":delegate:" + UUID.randomUUID())
-        .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
-        .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(subject)
-        .evidence(Collections.singletonList(Evidence.derivedFrom(bookingId))).build();
+            .id(CredentialIdGenerator.generateDelegateCredentialId(subject.getBookingId()))
+            .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
+            .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(subject)
+            .evidence(Collections.singletonList(Evidence.derivedFrom(bookingId))).build();
   }
 
   /**

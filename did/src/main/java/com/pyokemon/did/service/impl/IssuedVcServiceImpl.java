@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.util.UuidGenerator;
+import com.pyokemon.did.common.util.UuidGenerator;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.IssuedProof;
 import com.pyokemon.did.domain.IssuedVc;
