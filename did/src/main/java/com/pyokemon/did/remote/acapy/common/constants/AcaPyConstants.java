@@ -45,8 +45,8 @@ public class AcaPyConstants {
     public static final String VERIFIABLE_CREDENTIAL = "VerifiableCredential";
   }
 
-  public static class EvidenceType {
-    public static final String DERIVED_FROM = "DerivedFrom";
+  public static class Attachment {
+    public static final String ATTACHMENT_TYPE = "present-proof";
   }
 
   public static class Alias {

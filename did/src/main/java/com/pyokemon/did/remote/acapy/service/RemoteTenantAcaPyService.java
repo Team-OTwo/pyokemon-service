@@ -31,7 +31,7 @@ public interface RemoteTenantAcaPyService {
   IssueCredentialResponse issueCredential(@RequestHeader("Authorization") String authorization,
       @RequestBody IssueCredentialRequest request);
 
-  @PostMapping(value = "/present-proof-2.0/send-request")
+  @PostMapping(value = "/present-proof-2.0/create-request")
   PresentProofResponse presentProof(@RequestHeader("Authorization") String authorization,
       @RequestBody PresentProofRequest request);
 
