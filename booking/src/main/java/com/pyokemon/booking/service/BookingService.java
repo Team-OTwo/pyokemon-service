@@ -42,8 +42,9 @@ public class BookingService {
     if (eventScheduleId == null) {
       throw new BusinessException("이벤트 스케줄 ID가 필요합니다.", "INVALID_EVENT_SCHEDULE_ID");
     }
-    
-    List<SeatStatusInfo> seatStatusInfos = bookingRepository.findSeatStatusInfosByEventScheduleId(eventScheduleId);
+
+    List<SeatStatusInfo> seatStatusInfos =
+        bookingRepository.findSeatStatusInfosByEventScheduleId(eventScheduleId);
     return new EventScheduleIdResponse(seatStatusInfos);
   }
 
@@ -55,13 +56,8 @@ public class BookingService {
 
     List<Booking> bookings = bookingRepository.findByAccountId(accountId);
     List<BookingInfo> bookingInfos = bookings.stream()
-        .map(booking -> new BookingInfo(
-            booking.getEventScheduleId(),
-            booking.getPaymentId(),
-            booking.getStatus(),
-            booking.getSeatId(),
-            booking.getCreatedAt()
-        ))
+        .map(booking -> new BookingInfo(booking.getEventScheduleId(), booking.getPaymentId(),
+            booking.getStatus(), booking.getSeatId(), booking.getCreatedAt()))
         .collect(Collectors.toList());
 
     return new AccountIdResponse(accountId, bookingInfos);
@@ -124,19 +120,13 @@ public class BookingService {
     }
 
     // 새 예약 생성
-    Booking newBooking = Booking.builder()
-        .eventScheduleId(request.getEventScheduleId())
-        .seatId(request.getSeatId())
-        .accountId(accountId)
-        .tenantId(request.getTenantId())
-        .paymentId(null)
-        .status(Booking.Booked.PENDING)
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
+    Booking newBooking = Booking.builder().eventScheduleId(request.getEventScheduleId())
+        .seatId(request.getSeatId()).accountId(accountId).tenantId(request.getTenantId())
+        .paymentId(null).status(Booking.Booked.PENDING).createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now()).build();
 
     bookingRepository.save(newBooking);
-    
+
     return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
   }
 
@@ -188,20 +178,14 @@ public class BookingService {
     Booking booking = bookingOpt.get();
 
     if (booking.getStatus() != Booking.Booked.PENDING) {
-      log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", 
-          bookingId, booking.getStatus());
+      log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", bookingId,
+          booking.getStatus());
       return;
     }
 
     booking.setStatus(newStatus);
     booking.setPaymentId(paymentId);
     booking.setUpdatedAt(LocalDateTime.now());
-    
-      if (booking.getStatus() != Booking.Booked.PENDING) {
-        log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", bookingId,
-            booking.getStatus());
-        return;
-      }
 
     bookingRepository.update(booking);
     bookingEventPublisher.publishBookingStatusUpdate(booking);
@@ -226,26 +210,64 @@ public class BookingService {
   public void expirePendingBookings() {
     try {
       LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
-      List<Booking> expiredBookings = bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
-      
-      log.info("만료 처리할 PENDING 예약 수: {}", expiredBookings.size());
-      
-      expiredBookings.parallelStream()
-          .forEach(booking -> {
-            try {
-              booking.setStatus(Booking.Booked.EXPIRED);
-              booking.setUpdatedAt(LocalDateTime.now());
-              bookingRepository.update(booking);
+      List<Booking> expiredBookings =
+          bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
 
-              bookingEventPublisher.publishBookingStatusUpdate(booking);
-              
-              log.info("예약 만료 처리 완료: bookingId={}", booking.getBookingId());
-            } catch (Exception e) {
-              log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getBookingId(), e);
-            }
-          });
+      log.info("만료 처리할 PENDING 예약 수: {}", expiredBookings.size());
+
+      expiredBookings.parallelStream().forEach(booking -> {
+        try {
+          booking.setStatus(Booking.Booked.EXPIRED);
+          booking.setUpdatedAt(LocalDateTime.now());
+          bookingRepository.update(booking);
+
+          bookingEventPublisher.publishBookingStatusUpdate(booking);
+
+          log.info("예약 만료 처리 완료: bookingId={}", booking.getBookingId());
+        } catch (Exception e) {
+          log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getBookingId(), e);
+        }
+      });
     } catch (Exception e) {
       log.error("PENDING 예약 만료 처리 작업 중 오류 발생", e);
+    }
+  }
+
+  // 공연 시작 2시간 전 BOOKED 상태인 예약들을 confirmed로 발행
+  @Transactional
+  public void publishConfirmedBookingsForEventSchedule(Long eventScheduleId) {
+    try {
+      if (eventScheduleId == null) {
+        log.warn("eventScheduleId가 null입니다.");
+        return;
+      }
+
+      List<Booking> bookedBookings =
+          bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, "BOOKED");
+
+      if (bookedBookings.isEmpty()) {
+        log.info("eventScheduleId {}에 대한 BOOKED 상태의 예약이 없습니다.", eventScheduleId);
+        return;
+      }
+
+      for (Booking booking : bookedBookings) {
+        try {
+          BookingEventDto eventDto = BookingEventDto.builder().bookingId(booking.getBookingId())
+              .eventScheduleId(booking.getEventScheduleId()).seatId(booking.getSeatId())
+              .accountId(booking.getAccountId()).tenantId(booking.getTenantId()).status("confirmed")
+              .build();
+
+          bookingEventPublisher.publishBookingEvent(eventDto);
+
+          log.info("Confirmed booking event published: bookingId={}, eventScheduleId={}",
+              booking.getBookingId(), eventScheduleId);
+        } catch (Exception e) {
+          log.error("예약 이벤트 발행 중 오류 발생: bookingId={}, eventScheduleId={}", booking.getBookingId(),
+              eventScheduleId, e);
+        }
+      }
+    } catch (Exception e) {
+      log.error("eventScheduleId {}에 대한 confirmed 예약 발행 중 오류 발생", eventScheduleId, e);
     }
   }
 }

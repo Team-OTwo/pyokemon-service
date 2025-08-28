@@ -16,7 +16,8 @@ public interface BookingRepository {
 
   List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
-  List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
+  List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(
+      @Param("eventScheduleId") Long eventScheduleId);
 
   List<Booking> findByAccountId(@Param("accountId") Long accountId);
 
@@ -44,4 +45,9 @@ public interface BookingRepository {
   Long updateStatus(@Param("eventScheduleId") Long eventScheduleId, @Param("status") String status);
 
   List<Booking> findAllByEventScheduleId(Long eventScheduleId);
+
+  List<Booking> findByEventScheduleIdAndStatus(@Param("eventScheduleId") Long eventScheduleId,
+      @Param("status") String status);
+
+
 }
