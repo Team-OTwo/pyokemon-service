@@ -140,4 +140,10 @@ public class WalletServiceImpl implements WalletService {
         .orElseThrow(() -> new BusinessException("계정 ID: {" + accountId + "} 에 대한 지갑을 찾을 수 없습니다.",
             WALLET_NOT_FOUND));
   }
+
+  @Override
+  public String getWalletToken(Long accountId) {
+    Wallet wallet = getWalletByAccountIdOrThrow(accountId);
+    return wallet.getToken();
+  }
 }

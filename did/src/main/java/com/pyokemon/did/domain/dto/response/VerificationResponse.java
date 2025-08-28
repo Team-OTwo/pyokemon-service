@@ -12,7 +12,8 @@ public class VerificationResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateVerificationResponse {
-        private String inviUrl;
+        private String VerifyInviUrl;
+        private String presExId;
     }
 
 }

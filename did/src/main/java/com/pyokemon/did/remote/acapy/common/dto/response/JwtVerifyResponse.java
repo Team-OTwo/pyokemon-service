@@ -13,14 +13,12 @@ public class JwtVerifyResponse {
     
     private boolean valid;
     private JwtPayload payload;
-    private String kid;
-    
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class JwtPayload {
         private String did;
-        private String exp;
     }
 }

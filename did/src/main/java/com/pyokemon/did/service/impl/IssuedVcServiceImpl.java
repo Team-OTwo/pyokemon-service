@@ -1,7 +1,9 @@
 package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILED;
+import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
 
+import com.pyokemon.did.domain.IssuedVc;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -85,6 +90,18 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     }
   }
 
+  @Override
+  public Map<String, String> sendVerifiyInviUrlOrThrow(Long userId, Long tenantId, Long bookingId) {
+    IssuedVc issuedVc = issuedVcRepository.findByUserIdAndTenantIdAndBookingIdAndStatus(
+            userId, tenantId, bookingId, ISSUED
+    ).orElseThrow(() -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_ISSUANCE_FAILED));
+    
+    return Map.of(
+        "verifyInviUrl", issuedVc.getVerifyInviUrl(),
+        "presExId", issuedVc.getPresExId()
+    );
+  }
+
   /**
    * ACA-Py에 자격 증명 발급을 요청합니다.
    *
@@ -116,4 +133,5 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     log.debug("VC 발급 요청 성공 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
     return response;
   }
+
 }

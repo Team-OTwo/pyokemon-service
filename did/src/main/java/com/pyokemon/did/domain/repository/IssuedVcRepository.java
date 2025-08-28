@@ -62,6 +62,17 @@ public interface IssuedVcRepository {
   Optional<IssuedVc> findByBookingIdAndStatus(Long bookingId, VcStatus status);
 
   /**
+   * user_id, tenant_id, booking_id, status로 IssuedVc을 조회합니다.
+   *
+   * @param userId 조회할 user_id
+   * @param tenantId 조회할 tenant_id
+   * @param bookingId 조회할 booking_id
+   * @param status 조회할 status
+   * @return IssuedVc (Optional)
+   */
+  Optional<IssuedVc> findByUserIdAndTenantIdAndBookingIdAndStatus(Long userId, Long tenantId, Long bookingId, VcStatus status);
+
+  /**
    * booking_id로 발급 완료된 VC가 있는지 확인합니다.
    *
    * @param bookingId 조회할 booking_id
