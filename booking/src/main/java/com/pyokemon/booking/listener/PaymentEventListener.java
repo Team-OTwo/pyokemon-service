@@ -33,7 +33,7 @@ public class PaymentEventListener {
 
   public void processPaymentEvent(PaymentKafkaDto paymentEvent) {
     Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
-    bookingService.updateBookingStatusIfPending(paymentEvent.getBookingId(), newStatus,
+    bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus,
         paymentEvent.getPaymentId());
   }
 

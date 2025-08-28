@@ -12,6 +12,13 @@
         AND status IN ('PENDING', 'BOOKED')
     </select>
 
+    <select id="findSeatStatusInfosByEventScheduleId" resultType="com.pyokemon.booking.dto.response.SeatStatusInfo">
+        SELECT seat_id as seatId, status
+        FROM tb_booking
+        WHERE event_schedule_id = #{eventScheduleId}
+        AND status IN ('PENDING', 'BOOKED')
+    </select>
+
     <select id="findByAccountId" resultType="Booking">
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
@@ -43,6 +50,13 @@
         SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE status = 'PENDING'
+    </select>
+
+    <select id="findPendingBookingsOlderThan" resultType="Booking">
+        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+        FROM tb_booking
+        WHERE status = 'PENDING'
+        AND created_at &lt; #{createdAt}
     </select>
 
     <select id="findValidBookingsWithEventInfo" resultType="com.pyokemon.booking.dto.response.ValidBookingDetail">

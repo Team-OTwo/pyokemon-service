@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.pyokemon.booking.dto.response.SeatStatusInfo;
 import com.pyokemon.booking.dto.response.ValidBookingDetail;
 import com.pyokemon.booking.entity.Booking;
 
@@ -14,6 +15,8 @@ import com.pyokemon.booking.entity.Booking;
 public interface BookingRepository {
 
   List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
+
+  List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
 
   List<Booking> findByAccountId(@Param("accountId") Long accountId);
 
@@ -26,6 +29,8 @@ public interface BookingRepository {
   Optional<Booking> findById(@Param("bookingId") Long bookingId);
 
   List<Booking> findPendingBookings();
+
+  List<Booking> findPendingBookingsOlderThan(@Param("createdAt") java.time.LocalDateTime createdAt);
 
   List<ValidBookingDetail> findValidBookingsWithEventInfo(
       @Param("bookingIds") List<Long> bookingIds, @Param("accountId") Long accountId);
