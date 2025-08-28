@@ -2,14 +2,11 @@ package com.pyokemon.account.user.dto.request;
 
 import java.time.LocalDate;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class VerifyRequestDto {
   private Long accountId;
