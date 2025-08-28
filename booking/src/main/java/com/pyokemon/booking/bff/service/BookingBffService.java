@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.pyokemon.booking.bff.dto.*;
 import org.springframework.stereotype.Service;
 
+import com.pyokemon.booking.bff.dto.*;
 import com.pyokemon.booking.bff.repository.BookingBffRepository;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.exception.BusinessException;
@@ -60,8 +60,8 @@ public class BookingBffService {
 
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
       Integer size) {
-    List<Booking> bookings =
-        bookingBffRepository.findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
+    List<Booking> bookings = bookingBffRepository
+        .findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {
@@ -89,7 +89,7 @@ public class BookingBffService {
 
   public CursorPageResponse<Booking> findByAccountCursor(long accountId, Long cursor, int size) {
     List<Booking> bookings =
-            bookingBffRepository.findByAccountWithCursor(accountId, cursor, size + 1);
+        bookingBffRepository.findByAccountWithCursor(accountId, cursor, size + 1);
 
     boolean hasMore = bookings.size() > size;
 
@@ -103,9 +103,9 @@ public class BookingBffService {
   }
 
   public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(long accountId,
-                                                                     List<Long> scheduleIds, Long cursor, int size) {
+      List<Long> scheduleIds, Long cursor, int size) {
     List<Booking> bookings = bookingBffRepository.findByAccountAndSchedulesWithCursor(accountId,
-            scheduleIds, cursor, size + 1);
+        scheduleIds, cursor, size + 1);
 
     boolean hasMore = bookings.size() > size;
 

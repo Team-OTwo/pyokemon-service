@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class WalletController {
 
   @PostMapping()
   public ResponseEntity<ResponseDto<Void>> registerWallet(
-      @RequestBody @Valid CreateWalletRequest createWalletRequest) {
-    walletService.registerWallet(createWalletRequest);
+      @RequestBody @Valid RegisterWalletRequest registerWalletRequest) {
+    walletService.registerWallet(registerWalletRequest);
 
     return ResponseEntity.ok(ResponseDto.success("계정 지갑 생성 성공"));
   }

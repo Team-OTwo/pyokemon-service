@@ -1,5 +1,6 @@
 package com.pyokemon.did.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -27,7 +28,16 @@ public interface AcaPyConnectionRepository {
    * @param userId 사용자 ID
    * @return 조회된 AcaPyConnection (Optional)
    */
-  Optional<AcaPyConnection> findByTenantIdAndUserId(Long tenantId, Long userId);
+  List<AcaPyConnection> findByTenantIdAndUserId(Long tenantId, Long userId);
+
+  /**
+   * 테넌트 ID와 사용자 ID로 활성화된 AcaPyConnection을 조회합니다.
+   *
+   * @param tenantId 테넌트 ID
+   * @param userId 사용자 ID
+   * @return 조회된 AcaPyConnection (Optional)
+   */
+  Optional<AcaPyConnection> findByTenantIdAndUserIdAndIsActive(Long tenantId, Long userId);
 
   /**
    * 테넌트 ID, 사용자 ID, 상태가 ACTIVE인 AcaPyConnection 존재 여부를 확인합니다.

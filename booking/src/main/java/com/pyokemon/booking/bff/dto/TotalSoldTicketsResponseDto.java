@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TotalSoldTicketsResponseDto {
-    private Long totalTicketsSold;
+  private Long totalTicketsSold;
 }

@@ -12,7 +12,7 @@ public class WalletRequest {
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class CreateWalletRequest {
+  public static class RegisterWalletRequest {
     @NotNull
     @JsonProperty("account_id")
     private Long accountId;

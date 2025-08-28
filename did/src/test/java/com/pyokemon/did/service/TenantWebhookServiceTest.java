@@ -18,7 +18,7 @@ import org.springframework.retry.RetryException;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
-import com.pyokemon.did.domain.dto.request.TenantWebhookRequest.HandleTenantConnectionsRequest;
+import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.service.impl.TenantWebhookServiceImpl;
 
@@ -31,13 +31,13 @@ class TenantWebhookServiceTest {
   @InjectMocks
   private TenantWebhookServiceImpl tenantWebhookService;
 
-  private HandleTenantConnectionsRequest request;
+  private ConnectionWebhookRequest request;
   private AcaPyConnection connection;
 
   @BeforeEach
   void setUp() {
     // 테스트 요청 객체 생성
-    request = new HandleTenantConnectionsRequest();
+    request = new ConnectionWebhookRequest();
     request.setInvitationMsgId("test-invitation-id");
     request.setConnectionId("test-connection-id");
     request.setState("active");

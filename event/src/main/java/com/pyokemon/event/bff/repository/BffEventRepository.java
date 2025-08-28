@@ -10,7 +10,8 @@ import com.pyokemon.event.bff.dto.*;
 
 @Mapper
 public interface BffEventRepository {
-  Long countActiveEventsByTenant(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
+  Long countActiveEventsByTenant(@Param("tenantId") Long tenantId, @Param("year") int year,
+      @Param("month") int month);
 
   Optional<BffEventScheduleDto> findEventScheduleById(
       @Param("eventScheduleId") Long eventScheduleId);
@@ -35,7 +36,8 @@ public interface BffEventRepository {
 
   List<BffScheduleDetailDto> findScheduleDetailsByIds(@Param("ids") List<Long> ids);
 
-  List<Long> findScheduleIdsByTenantAndMonth(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
+  List<Long> findScheduleIdsByTenantAndMonth(@Param("tenantId") Long tenantId,
+      @Param("year") int year, @Param("month") int month);
 
   List<Long> findIdsByGenre(@Param("genre") String genre);
 

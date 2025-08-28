@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.domain.dto.request.WalletRequest.CreateWalletRequest;
+import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import com.pyokemon.did.service.WalletService;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +44,8 @@ class WalletControllerTest {
   @DisplayName("사용자 지갑 생성 성공 테스트")
   void createUserWallet_Success() throws Exception {
     // given
-    CreateWalletRequest request = new CreateWalletRequest(TEST_USER_ID, Wallet.AccountRole.USER);
+    RegisterWalletRequest request =
+        new RegisterWalletRequest(TEST_USER_ID, Wallet.AccountRole.USER);
     doNothing().when(walletService).registerWallet(request);
 
     // when & then

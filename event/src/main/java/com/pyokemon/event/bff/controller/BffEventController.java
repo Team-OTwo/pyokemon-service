@@ -82,20 +82,20 @@ public class BffEventController {
 
   @GetMapping("/events/tenant/summary/count")
   public ResponseEntity<ActiveEventCountResponseDto> getActiveEventCount(
-          @RequestHeader("x-auth-accountId") Long tenantId,
-          @RequestParam("year") int year,
-          @RequestParam("month") int month) {
+      @RequestHeader("x-auth-accountId") Long tenantId, @RequestParam("year") int year,
+      @RequestParam("month") int month) {
 
-    ActiveEventCountResponseDto response = bffEventService.getActiveEventCount(tenantId, year, month);
+    ActiveEventCountResponseDto response =
+        bffEventService.getActiveEventCount(tenantId, year, month);
     return ResponseEntity.ok(response);
   }
 
   @GetMapping("events/tenant/schedules-by-tenant")
   public ResponseEntity<ScheduleIdsResponseDto> getScheduleIdsByTenant(
-          @RequestHeader("x-auth-accountId") Long tenantId,
-          @RequestParam("year") int year,
-          @RequestParam("month") int month) {
-    ScheduleIdsResponseDto responseDto = bffEventService.getScheduleIdsByTenant(tenantId, year, month);
+      @RequestHeader("x-auth-accountId") Long tenantId, @RequestParam("year") int year,
+      @RequestParam("month") int month) {
+    ScheduleIdsResponseDto responseDto =
+        bffEventService.getScheduleIdsByTenant(tenantId, year, month);
     return ResponseEntity.ok(responseDto);
   }
 
@@ -110,5 +110,5 @@ public class BffEventController {
   public List<Long> findScheduleIdsByEventIds(@RequestBody IdsRequest req) {
     return bffEventService.findScheduleIdsByEventIds(req.getIds());
   }
-    
+
 }

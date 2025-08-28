@@ -1,15 +1,15 @@
 package com.pyokemon.account.tenant.bff.controller;
 
-import com.pyokemon.common.dto.IdsRequest;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.account.tenant.bff.dto.TenantDto;
 import com.pyokemon.account.tenant.bff.service.TenantBffService;
+import com.pyokemon.common.dto.IdsRequest;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/bff/tenants")

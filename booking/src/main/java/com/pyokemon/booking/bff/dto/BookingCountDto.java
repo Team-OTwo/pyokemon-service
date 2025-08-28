@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class BookingCountDto {
-    private Long eventScheduleId;
-    private Long ticketCount;
+  private Long eventScheduleId;
+  private Long ticketCount;
 }
