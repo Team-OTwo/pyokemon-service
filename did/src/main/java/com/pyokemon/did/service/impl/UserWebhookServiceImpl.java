@@ -6,12 +6,12 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.pyokemon.did.domain.dto.request.webhook.*;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.did.api.backend.dto.*;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
@@ -33,7 +33,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @Override
   @Retryable(value = {BusinessException.class, IOException.class}, maxAttempts = 3,
       backoff = @Backoff(delay = 2000, multiplier = 2))
-  public void handleConnectionWebhook(ConnectionWebhookDto webhookDto) {
+  public void handleConnectionWebhook(ConnectionWebhookRequest webhookDto) {
     String state = webhookDto.getState();
     String connectionId = webhookDto.getConnectionId();
     String alias = webhookDto.getAlias();
@@ -53,14 +53,14 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     }
   }
 
-  public void handleOutOfBandWebhook(OutOfBandWebhookDto webhookDto) {
+  public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
     log.info("Oob webhook - state: '{}', role: '{}', connection_id: '{}', inviMsgId: '{}'",
         webhookDto.getState(), webhookDto.getRole(), webhookDto.getConnectionId(),
         webhookDto.getInviMsgId());
   }
 
   @Override
-  public void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto) {
+  public void handleBasicMessageWebhook(BasicMessageWebhookRequest webhookDto) {
     try {
       String state = webhookDto.getState();
       String connectionId = webhookDto.getConnectionId();
@@ -90,7 +90,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   @Override
-  public void handleIssueCredentialWebhook(IssueCredentialWebhookDto webhookDto) {
+  public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest webhookDto) {
     try {
       String state = webhookDto.getState();
       String credExId = webhookDto.getCredExId();
@@ -120,7 +120,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   @Override
-  public void handleLdProofWebhook(LdProofWebhookDto webhookDto) {
+  public void handleLdProofWebhook(LdProofWebhookRequest webhookDto) {
     try {
       String credExId = webhookDto.getCredExId();
       String credIdStored = webhookDto.getCredIdStored();
@@ -161,7 +161,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
 
-  private void updateVcCredentialExchangeId(IssueCredentialWebhookDto webhookDto) {
+  private void updateVcCredentialExchangeId(IssueCredentialWebhookRequest webhookDto) {
     String credExId = webhookDto.getCredExId();
     log.info("VC credential_exchange_id 업데이트 - credExId: {}", credExId);
 

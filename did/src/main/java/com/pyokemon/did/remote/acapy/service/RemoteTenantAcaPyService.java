@@ -1,4 +1,4 @@
-package com.pyokemon.did.remote.acapy.service.tenant;
+package com.pyokemon.did.remote.acapy.service;
 
 import com.pyokemon.did.remote.acapy.common.dto.request.*;
 import com.pyokemon.did.remote.acapy.common.dto.response.*;

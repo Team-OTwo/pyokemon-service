@@ -1,13 +1,17 @@
-package com.pyokemon.did.api.backend.dto;
+package com.pyokemon.did.domain.dto.request.webhook;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class IssueCredentialWebhookDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class IssueCredentialWebhookRequest {
 
   @JsonProperty("connection_id")
   private String connectionId;

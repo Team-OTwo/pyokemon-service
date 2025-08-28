@@ -1,9 +1,9 @@
 package com.pyokemon.did.remote.acapy.common.dto.request;
 
-import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.remote.acapy.common.constants.AcaPyConstants;
 import com.pyokemon.did.remote.acapy.common.dto.base.BaseCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.*;
+import com.pyokemon.did.remote.acapy.common.dto.request.credential.EvidenceCredential.Evidence;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -89,7 +89,11 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
         return List.of(
                 AcaPyConstants.Context.CREDENTIALS_V1,
                 AcaPyConstants.Context.ED25519_V1,
-                Map.of("booking_id", AcaPyConstants.Context.SCHEMA_ORG_TEXT)
+                Map.of(
+                        "booking_id", AcaPyConstants.Context.PYOKEMON_BOOKING_ID,
+                        "event_schedule_id", AcaPyConstants.Context.PYOKEMON_EVENT_SCHEDULE_ID,
+                        "seat_id", AcaPyConstants.Context.PYOKEMON_SEAT_ID
+                )
         );
     }
     
@@ -101,9 +105,9 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
                 AcaPyConstants.Context.CREDENTIALS_V1,
                 AcaPyConstants.Context.ED25519_V1,
                 Map.of(
-                        "booking_id", AcaPyConstants.Context.SCHEMA_ORG_TEXT,
+                        "booking_id", AcaPyConstants.Context.PYOKEMON_BOOKING_ID,
                         "event_schedule_id", AcaPyConstants.Context.PYOKEMON_EVENT_SCHEDULE_ID,
-                        "seat_id", AcaPyConstants.Context.EXAMPLE_SEAT_ID,
+                        "seat_id", AcaPyConstants.Context.PYOKEMON_SEAT_ID,
                         "evidence", AcaPyConstants.Context.SCHEMA_ORG_EVIDENCE,
                         "sourceCredentialId", AcaPyConstants.Context.SCHEMA_ORG_IDENTIFIER
                 )

@@ -33,9 +33,9 @@ public class AcaPyConstants {
     public static class Context {
         public static final String CREDENTIALS_V1 = "https://www.w3.org/2018/credentials/v1";
         public static final String ED25519_V1 = "https://w3id.org/security/suites/ed25519-2020/v1";
-        public static final String SCHEMA_ORG_TEXT = "https://schema.org/text";
+        public static final String PYOKEMON_BOOKING_ID = "https://pyokemon.com/booking#booking_id";
         public static final String PYOKEMON_EVENT_SCHEDULE_ID = "https://pyokemon.com/booking#event_schedule_id";
-        public static final String EXAMPLE_SEAT_ID = "https://example.com/booking#seat_id";
+        public static final String PYOKEMON_SEAT_ID = "https://pyokemon.com/booking#seat_id";
         public static final String SCHEMA_ORG_EVIDENCE = "https://schema.org/evidence";
         public static final String SCHEMA_ORG_IDENTIFIER = "https://schema.org/identifier";
     }

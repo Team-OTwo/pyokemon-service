@@ -1,11 +1,15 @@
-package com.pyokemon.did.api.backend.dto;
+package com.pyokemon.did.domain.dto.request.webhook;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class LdProofWebhookDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class LdProofWebhookRequest {
 
   @JsonProperty("created_at")
   private String createdAt;

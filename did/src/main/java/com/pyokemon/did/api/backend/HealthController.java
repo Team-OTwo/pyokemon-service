@@ -1,7 +1,7 @@
 package com.pyokemon.did.api.backend;
 
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.acapy.service.tenant.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

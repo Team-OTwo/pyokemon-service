@@ -17,8 +17,8 @@ import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
-import com.pyokemon.did.remote.acapy.service.mediator.RemoteMediatorAcaPyService;
-import com.pyokemon.did.remote.acapy.service.user.RemoteUserAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteMediatorAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.DeviceConnectionService;
 import com.pyokemon.did.service.WalletService;
 

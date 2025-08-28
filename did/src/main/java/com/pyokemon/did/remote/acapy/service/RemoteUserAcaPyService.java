@@ -1,4 +1,4 @@
-package com.pyokemon.did.remote.acapy.service.user;
+package com.pyokemon.did.remote.acapy.service;
 
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;

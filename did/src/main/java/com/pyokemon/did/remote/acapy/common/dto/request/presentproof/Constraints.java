@@ -18,4 +18,20 @@ import java.util.List;
 public class Constraints {
     @JsonProperty("fields")
     private List<Field> fields;
+
+    /**
+     * 증명 제시 필드
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Field {
+        @JsonProperty("path")
+        private List<String> path;
+
+        @JsonProperty("filter")
+        private Filter filter;
+    }
+
 }

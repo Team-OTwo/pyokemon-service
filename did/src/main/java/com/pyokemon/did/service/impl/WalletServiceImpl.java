@@ -17,8 +17,8 @@ import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreateWalletResponse;
-import com.pyokemon.did.remote.acapy.service.tenant.RemoteTenantAcaPyService;
-import com.pyokemon.did.remote.acapy.service.user.RemoteUserAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;

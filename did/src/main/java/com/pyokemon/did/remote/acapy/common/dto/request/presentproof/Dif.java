@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * DIF(Decentralized Identity Foundation) 증명 제시
  */
@@ -19,4 +21,34 @@ public class Dif {
     
     @JsonProperty("presentation_definition")
     private PresentationDefinition presentationDefinition;
+
+    /**
+     * 증명 제시 옵션
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Options {
+        @JsonProperty("challenge")
+        private String challenge;
+
+        @JsonProperty("domain")
+        private String domain;
+    }
+
+    /**
+     * 증명 제시 정의
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PresentationDefinition {
+        @JsonProperty("id")
+        private String id;
+
+        @JsonProperty("input_descriptors")
+        private List<InputDescriptor> inputDescriptors;
+    }
 }

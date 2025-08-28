@@ -1,5 +1,6 @@
 package com.pyokemon.did.api.backend;
 
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,16 @@ public class TestController {
 
   @PostMapping
   public void hello() {
-    acaPyConnectionService.createAcaPyConnection(2L, 37L);
+    //acaPyConnectionService.createAcaPyConnection(2L, 37L);
+    BookingEvent bookingEvent = new BookingEvent();
+    bookingEvent.setBookingId(1L);
+    bookingEvent.setAccountId(37L);
+    bookingEvent.setTenantId(2L);
+    bookingEvent.setEventScheduleId(4L);
+    bookingEvent.setSeatId(5L);
+    bookingEvent.setStatus("CONFIRM");
+
+    issuedVcService.issueCredential(bookingEvent);
   }
 
   @PostMapping("/issue-vc")

@@ -12,8 +12,8 @@ import com.pyokemon.did.remote.acapy.common.dto.request.ReceiveInvitationRequest
 import com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.Invitation;
 import com.pyokemon.did.remote.acapy.common.dto.response.ReceiveInvitationResponse;
-import com.pyokemon.did.remote.acapy.service.tenant.RemoteTenantAcaPyService;
-import com.pyokemon.did.remote.acapy.service.user.RemoteUserAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

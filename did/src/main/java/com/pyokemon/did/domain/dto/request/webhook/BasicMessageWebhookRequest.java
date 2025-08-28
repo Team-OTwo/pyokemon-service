@@ -1,4 +1,4 @@
-package com.pyokemon.did.api.backend.dto;
+package com.pyokemon.did.domain.dto.request.webhook;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-public class BasicMessageWebhookDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class BasicMessageWebhookRequest {
 
   @JsonProperty("connection_id")
   private String connectionId;

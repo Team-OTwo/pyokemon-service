@@ -1,5 +1,7 @@
 package com.pyokemon.did.service.impl;
 
+import com.pyokemon.did.domain.IssuedProof;
+import com.pyokemon.did.domain.repository.IssuedProofRepository;
 import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
 import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
@@ -13,7 +15,7 @@ import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
 import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
-import com.pyokemon.did.remote.acapy.service.tenant.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.IssuedVcService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILE
 @RequiredArgsConstructor
 public class IssuedVcServiceImpl implements IssuedVcService {
   private final IssuedVcRepository issuedVcRepository;
+  private final IssuedProofRepository issuedProofRepository;
   private final WalletService walletService;
   private final AcaPyConnectionService acaPyConnectionService;
   private final RemoteTenantAcaPyService remoteTenantAcaPyService;
@@ -70,9 +73,10 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
       //TODO: 증명 요청 레코드 생성 요청
       //TODO: 증명 요청 첨부 초대장 생성 요청
+      issuedProofRepository.save(IssuedProof.of("test-pres-ex-id", "123-456-789", 10000000L));
 
       // 4. VC 발급 정보 저장
-      issuedVcRepository.save(response.toEntity(tenantId, userId, bookingId));
+//      issuedVcRepository.save(response.toEntity(tenantId, userId, bookingId));
       log.info("VC 발급 완료 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
 
     } catch (BusinessException e) {
@@ -105,6 +109,11 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
     log.info("VC 발급 요청 전송 - bookingId: {}, connectionId: {}", bookingId, connectionId);
 
+    log.info("request={}",             IssueCredentialRequest.createStandard(
+            connectionId,
+            tenantPublicDid,
+            credentialSubject
+    ).toString());
     IssueCredentialResponse response = remoteTenantAcaPyService.issueCredential(
             tenantToken,
             IssueCredentialRequest.createStandard(
