@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.acapy.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,4 +34,11 @@ public interface RemoteTenantAcaPyService {
   @PostMapping(value = "/present-proof-2.0/send-request")
   PresentProofResponse presentProof(@RequestHeader("Authorization") String authorization,
       @RequestBody PresentProofRequest request);
+
+  @PostMapping(value="/wallet/jwt/verify")
+  JwtVerifyResponse jwtVerify(@RequestHeader("Authorization") String authorization,
+                              @RequestBody JwtVerifyRequest request);
+
+  @PostMapping(value="/present-proof-2.0/records/{pres_ex_id}/verify-presentation")
+  VerifyPresentationResponse verifyPresentation(@RequestHeader("Authorization") String authorization, @PathVariable String pres_ex_id);
 }
