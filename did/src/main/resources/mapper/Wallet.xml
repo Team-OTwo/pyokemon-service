@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pyokemon.did.domain.repository.WalletRepository">
+
+    <resultMap id="WalletResultMap" type="com.pyokemon.did.domain.Wallet">
+        <id column="id" property="id" />
+        <result column="account_id" property="accountId" />
+        <result column="account_role" property="accountRole" />
+        <result column="token" property="token" />
+        <result column="public_did" property="publicDid" />
+        <result column="public_verkey" property="publicVerKey" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <select id="findById" resultMap="WalletResultMap">
+        SELECT * FROM tb_wallet WHERE id = #{id}
+    </select>
+
+    <select id="findByAccountId" resultMap="WalletResultMap">
+        SELECT * FROM tb_wallet WHERE account_id = #{accountId}
+    </select>
+    
+    <select id="existsByAccountId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_wallet WHERE account_id = #{accountId}
+    </select>
+
+
+    <insert id="save" parameterType="com.pyokemon.did.domain.Wallet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_wallet (account_id, account_role, token, public_did, public_verkey, created_at, updated_at)
+        VALUES (#{accountId}, #{accountRole}, #{token}, #{publicDid}, #{publicVerKey}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.pyokemon.did.domain.Wallet">
+        UPDATE tb_wallet
+        SET account_id = #{accountId}, account_role = #{accountRole}, token = #{token}, public_did = #{publicDid}, public_verkey = #{publicVerKey}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM tb_wallet WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByAccountId">
+        DELETE FROM tb_wallet WHERE account_id = #{accountId}
+    </delete>
+
+</mapper> 

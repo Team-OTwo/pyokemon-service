@@ -113,6 +113,9 @@ public class AccountService {
     String role = account.getRole();
     String deviceStatus = "REGISTERED";
 
+    String accessToken = null;
+    String refreshToken = null;
+
     if (role.equals("USER")) {
       Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
 
@@ -122,11 +125,15 @@ public class AccountService {
 
       User user = userOpt.get();
 
-      if (!userDeviceRepository.existsByUserId(user.getUserId())) {
+      if (!userDeviceRepository.existsByUserIdAndIsValid(user.getUserId(), true)) {
         deviceStatus = "NOT_REGISTERED";
+        accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), role);
+        refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), role);
       } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(),
           request.getDeviceNumber(), true)) {
         deviceStatus = "MISMATCHED";
+        return AppLoginResponseDto.builder().accountId(user.getAccountId())
+            .deviceStatus(deviceStatus).build();
       }
 
       if (deviceStatus.equals("REGISTERED")) {
@@ -135,16 +142,15 @@ public class AccountService {
         if (userDeviceOpt.isEmpty()) {
           throw new BusinessException("존재하지 않는 디바이스 입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
         }
-
         UserDevice userDevice = userDeviceOpt.get();
         userDevice.setIsLogin(true);
         userDeviceRepository.update(userDevice);
+        accessToken = tokenGenerator.generateAppAccessToken(account.getAccountId(), role,
+            userDevice.getUserDeviceId());
+        refreshToken = tokenGenerator.generateAppRefreshToken(account.getAccountId(), role,
+            userDevice.getUserDeviceId());
       }
     }
-
-    // JWT 토큰 생성
-    String accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), role);
-    String refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), role);
 
     log.info("로그인 성공: {} (역할: {})", request.getLoginId(), role);
 
@@ -240,7 +246,7 @@ public class AccountService {
   }
 
   @Transactional
-  public void logout(String token, String accountId, String deviceNumber) {
+  public void logout(String token, String accountId, Long deviceId) {
     log.info("로그아웃 시도");
 
     // 토큰이 null인 경우 처리
@@ -273,31 +279,18 @@ public class AccountService {
       log.warn("로그아웃 처리 중 예외 발생: {}", e.getMessage());
     }
 
-    Optional<Account> accountOpt = accountRepository.findByAccountId(Long.parseLong(accountId));
+    if (deviceId != null){
+      Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByUserDeviceIdAndIsValid(deviceId, true);
 
-    if (accountOpt.isEmpty()) {
-      throw new BusinessException("존재하지 않는 계정입니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
-    }
-
-    if (accountOpt.get().getRole().equals("USER") && deviceNumber != null) {
-      Optional<User> userOpt = userRepository.findByAccountId(Long.parseLong(accountId));
-      if (userOpt.isEmpty()) {
-        throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
+      if (userDeviceOpt.isEmpty()){
+        throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
       }
-      Optional<UserDevice> userDeviceOpt =
-          userDeviceRepository.findByUserIdAndIsValid(userOpt.get().getUserId(), true);
-
-      if (userDeviceOpt.isEmpty()) {
-        throw new BusinessException("존재하지 않는 디바이스입니다", AccountErrorCodes.DEVICE_NOT_FOUND);
-      }
-
       UserDevice userDevice = userDeviceOpt.get();
 
       userDevice.setIsLogin(false);
 
       userDeviceRepository.update(userDevice);
     }
-
   }
 
   @Transactional

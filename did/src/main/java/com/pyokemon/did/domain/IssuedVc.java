@@ -1,6 +1,7 @@
 package com.pyokemon.did.domain;
 
 import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,24 +14,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IssuedVc extends BaseEntity {
 
-    private Long id;
-    private String credentialExchangeId;
-    private Long bookingId;
-    private Long tenantId;
-    private String credoConnId;
-    private VcStatus status;
+  private String credentialId;
+  private String credentialExchangeId;
+  private Long bookingId;
+  private Long tenantId;
+  private VcStatus status;
 
-    public enum VcStatus {
-        PROPOSAL_SENT,
-        PROPOSAL_RECEIVED,
-        OFFER_SENT,
-        OFFER_RECEIVED,
-        REQUEST_SENT,
-        REQUEST_RECEIVED,
-        CREDENTIAL_ISSUED,
-        CREDENTIAL_RECEIVED,
-        CREDENTIAL_ACKED,
-        FAILED,
-        ABANDONED
-    }
+  public enum VcStatus {
+    CREDENTIAL_ISSUED, CREDENTIAL_SENT, CREDENTIAL_RECEIVED
+  }
 }

@@ -12,6 +12,7 @@ import com.pyokemon.account.auth.repository.AccountRepository;
 import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
+import com.pyokemon.account.user.dto.request.VerifyRequestDto;
 import com.pyokemon.account.user.dto.response.UserDetailDto;
 import com.pyokemon.account.user.dto.response.UserDuplicateDto;
 import com.pyokemon.account.user.dto.response.UserNotificationDto;
@@ -103,7 +104,8 @@ public class UserService {
         () -> new BusinessException("사용자를 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     if (user.getIsVerified()) {
-      throw new BusinessException("이미 본인 인증이 완료되었습니다.", AccountErrorCodes.USER_ALREADY_VERIFIED);
+      return UserDetailDto.builder().name(user.getName()).phone(user.getPhone())
+          .birth(user.getBirth()).isVerified(true).build();
     }
 
     user.setIsVerified(true);
@@ -112,6 +114,43 @@ public class UserService {
 
     return UserDetailDto.builder().name(user.getName()).phone(user.getPhone())
         .birth(user.getBirth()).isVerified(true).build();
+  }
+
+  public UserDetailDto appVerifyUser(VerifyRequestDto request) {
+    Optional<User> userOpt = userRepository.findByAccountId(request.getAccountId());
+    if (userOpt.isEmpty()) {
+      throw new BusinessException("존재하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    User user = userOpt.get();
+
+    if (!user.getName().equals(request.getName()) || !user.getBirth().equals(request.getBirth())) {
+      throw new BusinessException("일치하지 않는 사용자입니다.", AccountErrorCodes.USER_NOT_MATCHED);
+    }
+
+    Optional<UserDevice> userDeviceOpt =
+        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+
+    if (userDeviceOpt.isEmpty()) {
+      throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
+    }
+
+    user.setPhone(request.getPhoneNumber());
+    userRepository.update(user);
+
+    UserDevice currentUserDevice = userDeviceOpt.get();
+
+    currentUserDevice.setIsValid(false);
+
+    userDeviceRepository.update(currentUserDevice);
+
+    UserDevice userDevice = UserDevice.builder().userId(user.getUserId())
+        .deviceNumber(request.getDeviceNumber()).fcmToken(request.getFcmToken())
+        .osType(request.getOsType()).isValid(true).isLogin(true).build();
+
+    userDeviceRepository.insert(userDevice);
+
+    return UserDetailDto.builder().accountId(request.getAccountId()).isVerified(true).build();
   }
 
   // 사용자 정보 조회

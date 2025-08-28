@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.pyokemon.booking.dto.kafka.BookingEventDto;
-import com.pyokemon.booking.dto.kafka.EventKafkaDto;
-import com.pyokemon.common.exception.code.EventErrorCodes;
-import com.pyokemon.common.exception.code.PaymentErrorCodes;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pyokemon.booking.dto.kafka.BookingEventDto;
+import com.pyokemon.booking.dto.kafka.EventKafkaDto;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.request.ValidBookingRequest;
 import com.pyokemon.booking.dto.response.AccountIdResponse;
@@ -25,6 +23,8 @@ import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.EventErrorCodes;
+import com.pyokemon.common.exception.code.PaymentErrorCodes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -196,6 +196,12 @@ public class BookingService {
     booking.setStatus(newStatus);
     booking.setPaymentId(paymentId);
     booking.setUpdatedAt(LocalDateTime.now());
+    
+      if (booking.getStatus() != Booking.Booked.PENDING) {
+        log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", bookingId,
+            booking.getStatus());
+        return;
+      }
 
     bookingRepository.update(booking);
     bookingEventPublisher.publishBookingStatusUpdate(booking);

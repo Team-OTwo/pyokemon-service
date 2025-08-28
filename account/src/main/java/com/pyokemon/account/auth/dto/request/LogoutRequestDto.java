@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogoutRequestDto {
-    private String deviceNumber;
+  private String deviceNumber;
 }

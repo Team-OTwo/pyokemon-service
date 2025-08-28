@@ -12,7 +12,7 @@ spring:
       - common
   
   datasource:
-    url: jdbc:mysql://localhost:3308/pyokemon_payment?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/pyokemon_payment?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root_password
@@ -40,7 +40,7 @@ mybatis:
     default-statement-timeout: 30
 
 toss:
-  toss-secret-key: 
+  toss-secret-key:
 
 
 ---

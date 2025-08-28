@@ -1,12 +1,12 @@
 package com.pyokemon.booking.bff.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.booking.bff.dto.*;
 import org.springframework.stereotype.Service;
 
-import com.pyokemon.booking.bff.dto.BookingDto;
-import com.pyokemon.booking.bff.dto.PageResponse;
 import com.pyokemon.booking.bff.repository.BookingBffRepository;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.exception.BusinessException;
@@ -59,9 +59,9 @@ public class BookingBffService {
   }
 
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
-                                                                  Integer size) {
+      Integer size) {
     List<Booking> bookings =
-            bookingBffRepository.findByEventScheduleIdOrderByDate(eventScheduleId, page * size, size);
+        bookingBffRepository.findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {
@@ -69,7 +69,7 @@ public class BookingBffService {
     }
 
     List<BookingDto> dtoList = bookings.stream().map(this::toDto) // Booking -> BookingDto
-            .toList();
+        .toList();
 
 
     return new PageResponse<>(dtoList, page, totalCount);
@@ -87,9 +87,56 @@ public class BookingBffService {
     return toDto(booking);
   }
 
+  public CursorPageResponse<Booking> findByAccountCursor(long accountId, Long cursor, int size) {
+    List<Booking> bookings =
+            bookingBffRepository.findByAccountWithCursor(accountId, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+  }
+
+  public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(long accountId,
+                                                                     List<Long> scheduleIds, Long cursor, int size) {
+    List<Booking> bookings = bookingBffRepository.findByAccountAndSchedulesWithCursor(accountId,
+            scheduleIds, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+
+  }
+
   private BookingDto toDto(Booking b) {
     return BookingDto.builder().bookingId(b.getBookingId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
         .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
+  }
+
+  public List<BookingCountDto> getBookingCountsByScheduleIds(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return bookingBffRepository.findBookingCountsByScheduleIds(scheduleIds);
+  }
+
+  public TotalSoldTicketsResponseDto getTotalSoldTickets(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return new TotalSoldTicketsResponseDto(0L);
+    }
+    Long count = bookingBffRepository.countTotalSoldTicketsByScheduleIds(scheduleIds);
+    return new TotalSoldTicketsResponseDto(count);
   }
 }

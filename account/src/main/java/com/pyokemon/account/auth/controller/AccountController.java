@@ -1,6 +1,5 @@
 package com.pyokemon.account.auth.controller;
 
-import com.pyokemon.account.auth.dto.request.LogoutRequestDto;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -8,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
+import com.pyokemon.account.auth.dto.request.LogoutRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import com.pyokemon.account.auth.dto.response.LoginResponseDto;
@@ -47,9 +47,8 @@ public class AccountController {
   public ResponseEntity<ResponseDto<Void>> logout(
       @RequestHeader(value = "Authorization", required = false) String authHeader,
       @RequestHeader(value = "X-Auth-AccountId", required = false) String accountId,
-      @RequestBody(required = false) LogoutRequestDto request) {
-    String deviceNumber = request.getDeviceNumber();
-    accountService.logout(authHeader, accountId, deviceNumber);
+      @RequestHeader(value = "X-Auth-DeviceId", required = false) Long deviceId) {
+    accountService.logout(authHeader, accountId, deviceId);
     return ResponseEntity.ok(ResponseDto.success("로그아웃 성공"));
   }
 

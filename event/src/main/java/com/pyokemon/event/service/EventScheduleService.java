@@ -4,18 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.event.dto.BookingInfoResponseDTO;
 import com.pyokemon.event.dto.EventItemResponseDTO;
-import com.pyokemon.event.dto.EventScheduleDto;
-import com.pyokemon.event.dto.PriceDto;
 import com.pyokemon.event.dto.PriceWithSeatClassDTO;
 import com.pyokemon.event.dto.SeatInfoResponseDTO;
+import com.pyokemon.event.dto.tenant.EventScheduleDto;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
 import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.SeatClassRepository;
@@ -23,7 +25,9 @@ import com.pyokemon.event.repository.SeatRepository;
 import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventScheduleService {
@@ -33,6 +37,7 @@ public class EventScheduleService {
   private final SeatRepository seatRepository;
   private final SeatClassRepository seatClassRepository;
   private final RedisService redisService;
+  private final KafkaMessageProducer kafkaMessageProducer;
 
   public List<EventItemResponseDTO> getTodayOpenedTickets() {
     return eventScheduleRepository.selectTodayOpenedTickets();
@@ -66,7 +71,7 @@ public class EventScheduleService {
 
     return events;
   }
-  
+
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);
     eventScheduleRepository.save(eventSchedule);
@@ -120,16 +125,28 @@ public class EventScheduleService {
 
   public List<SeatInfoResponseDTO> getSeatInfoByGrade(Long eventScheduleId, String seatGradeName) {
     Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
-    
+
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
-    List<Seat> seats = seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getSeatClassId());
+    List<Seat> seats =
+        seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getSeatClassId());
 
     return seats.stream()
         .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getSeatId()).col(seat.getCol())
             .row(seat.getRow()).seatGrade(seatClass.getClassName()).build())
         .collect(Collectors.toList());
   }
+
+
+  @Scheduled(fixedRate = 5 * 60 * 1000)
+  public void publishTwoHoursAheadEvents() {
+    List<Long> upcomingIds = eventScheduleRepository.findEventScheduleIdTwoHoursLater();
+    for (Long id : upcomingIds) {
+      log.info("Publishing eventScheduleId={} to Kafka", id);
+      kafkaMessageProducer.sendTwoHoursBeforeEvent(id);
+    }
+  }
+
 
 }

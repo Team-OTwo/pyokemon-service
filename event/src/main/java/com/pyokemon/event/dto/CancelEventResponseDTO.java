@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CancelEventResponseDTO {
-    private Long eventId;
-    private String status;
+  private Long eventId;
+  private String status;
 }

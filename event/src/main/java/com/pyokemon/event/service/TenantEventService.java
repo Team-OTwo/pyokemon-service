@@ -3,19 +3,20 @@ package com.pyokemon.event.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.pyokemon.common.exception.code.EventErrorCodes;
-import com.pyokemon.event.dto.*;
-import com.pyokemon.event.dto.tenant.*;
-import com.pyokemon.event.dto.kafka.EventKafkaDto;
-import com.pyokemon.event.producer.KafkaMessageProducer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.EventErrorCodes;
+import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.kafka.EventKafkaDto;
+import com.pyokemon.event.dto.tenant.*;
+import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.TenantEventRepository;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class TenantEventService {
   private final TenantEventRepository tenantEventRepository;
   private final EventScheduleRepository eventScheduleRepository;
@@ -332,24 +333,22 @@ public class TenantEventService {
   }
 
   // 앱 커서 기반 공연 조회
-  public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId, LocalDateTime cursorDate, Long cursorId, int limit, String genre){
+  public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId,
+      LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
     return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit, genre);
   }
-  
+
   public void updateStatus(Long eventId, String status) {
-    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
-            .eventId(eventId)
-            .status(status)
-                    .build();
+    CancelEventResponseDTO dto =
+        CancelEventResponseDTO.builder().eventId(eventId).status(status).build();
     tenantEventRepository.cancelEvent(dto);
 
     Long scheduleId = tenantEventRepository.findEventScheduleId(eventId);
-    if(scheduleId == null) {
+    if (scheduleId == null) {
       throw new BusinessException("Event not fount.", EventErrorCodes.EVENT_NOT_FOUND);
     }
 
-    EventKafkaDto kafkaDto =
-            new EventKafkaDto(scheduleId, dto.getStatus());
+    EventKafkaDto kafkaDto = new EventKafkaDto(scheduleId, dto.getStatus());
     kafkaMessageProducer.sendEventConfirmed(kafkaDto);
 
   }

@@ -69,11 +69,6 @@ application-*.yml
 docker/volumes/
 docker/data/
 
-### Local configuration file (security sensitive) ###
-*-local.properties
-*-local.yml
-*-local.yaml
-
 ### Node ###
 node_modules/
 npm-debug.log
@@ -97,4 +92,6 @@ target/
 tmp/
 temp/
 *.swp
-*.swo 
+*.swo
+
+notification/src/main/resources/pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json

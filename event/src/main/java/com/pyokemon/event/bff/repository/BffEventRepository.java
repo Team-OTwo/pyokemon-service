@@ -1,31 +1,43 @@
 package com.pyokemon.event.bff.repository;
 
-import com.pyokemon.event.bff.dto.*;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.pyokemon.event.bff.dto.*;
+
 @Mapper
 public interface BffEventRepository {
-    Optional<BffEventScheduleDto> findEventScheduleById(@Param("eventScheduleId") Long eventScheduleId);
+  Long countActiveEventsByTenant(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
 
-    Optional<BffVenueDto>        findVenueById(@Param("venueId") Long venueId);
+  Optional<BffEventScheduleDto> findEventScheduleById(
+      @Param("eventScheduleId") Long eventScheduleId);
 
-    Optional<BffSeatDto>         findSeatById(@Param("seatId") Long seatId);
+  Optional<BffVenueDto> findVenueById(@Param("venueId") Long venueId);
 
-    Optional<BffEventDto>        findEventById(@Param("eventId") Long eventId);
+  Optional<BffSeatDto> findSeatById(@Param("seatId") Long seatId);
 
-    Optional<BffSeatClassDto>    findSeatClassById(@Param("seatClassId") Long seatClassId);
+  Optional<BffEventDto> findEventById(@Param("eventId") Long eventId);
 
-    List<BffSeatDto> findSeatsByIdIn(@Param("ids") List<Long> ids);
+  Optional<BffSeatClassDto> findSeatClassById(@Param("seatClassId") Long seatClassId);
 
-    List<BffSeatClassDto> findSeatClassesByIdIn(@Param("ids") List<Long> ids);
+  List<BffSeatDto> findSeatsByIdIn(@Param("ids") List<Long> ids);
 
-    List<BffEventScheduleDto> findEventSchedulesByIdIn(@Param("ids") List<Long> ids);
+  List<BffSeatClassDto> findSeatClassesByIdIn(@Param("ids") List<Long> ids);
 
-    List<BffEventDto> findEventsByIdIn(@Param("ids") List<Long> ids);
+  List<BffEventScheduleDto> findEventSchedulesByIdIn(@Param("ids") List<Long> ids);
 
-    List<BffVenueDto> findVenuesByIdIn(@Param("ids") List<Long> ids);
+  List<BffEventDto> findEventsByIdIn(@Param("ids") List<Long> ids);
+
+  List<BffVenueDto> findVenuesByIdIn(@Param("ids") List<Long> ids);
+
+  List<BffScheduleDetailDto> findScheduleDetailsByIds(@Param("ids") List<Long> ids);
+
+  List<Long> findScheduleIdsByTenantAndMonth(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
+
+  List<Long> findIdsByGenre(@Param("genre") String genre);
+
+  List<Long> findIdsByEventIds(@Param("eventIds") List<Long> eventIds);
 }
