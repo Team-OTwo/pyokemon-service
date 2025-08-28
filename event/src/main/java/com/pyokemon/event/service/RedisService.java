@@ -5,16 +5,19 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
+import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.repository.SeatClassRepository;
 import com.pyokemon.event.repository.SeatRepository;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -24,20 +27,22 @@ public class RedisService {
   private final RedisTemplate<String, String> redis;
   private final SeatRepository seatRepository;
   private final SeatClassRepository seatClassRepository;
+  private final EventScheduleRepository eventScheduleRepository;
 
   public RedisService(@Qualifier("redisTemplate") RedisTemplate<String, String> redis,
-      SeatRepository seatRepository, SeatClassRepository seatClassRepository) {
+      SeatRepository seatRepository, SeatClassRepository seatClassRepository,
+      EventScheduleRepository eventScheduleRepository) {
     this.redis = redis;
     this.seatRepository = seatRepository;
     this.seatClassRepository = seatClassRepository;
+    this.eventScheduleRepository = eventScheduleRepository;
   }
 
-  private static final String SEAT_CLASS_STATUS_KEY_PATTERN = "seat:class:status:%d:%s"; // scheduleId:seatClassName
-  private static final String VENUE_SCHEDULE_KEY_PATTERN = "venue:schedule:%d:%d"; // venueId:scheduleId
-  private static final String SEAT_HOLD_KEY_PATTERN = "seat:hold:%d:%d"; // scheduleId:seatId
+  private static final String SEAT_CLASS_STATUS_KEY_PATTERN = "seat:class:status:%d:%s";
+  private static final String VENUE_SCHEDULE_KEY_PATTERN = "venue:schedule:%d:%d";
+  private static final String SEAT_HOLD_KEY_PATTERN = "seat:hold:%d:%d";
 
   public void initSeatStatuses(Long scheduleId, Long venueId) {
-    log.info("좌석 상태 초기화 시작: scheduleId={}, venueId={}", scheduleId, venueId);
 
     try {
       String venueScheduleKey = String.format(VENUE_SCHEDULE_KEY_PATTERN, venueId, scheduleId);
@@ -67,9 +72,9 @@ public class RedisService {
 
         Long existingSize = redis.opsForHash().size(classKey);
         if (existingSize != null && existingSize > 0) {
-          log.info("좌석 클래스 상태가 이미 초기화됨: scheduleId={}, className={}, existingSeats={}", scheduleId,
+          log.info("기존 Redis 데이터 삭제: scheduleId={}, className={}, existingSeats={}", scheduleId,
               className, existingSize);
-          continue;
+          redis.delete(classKey);
         }
 
         Map<String, String> initMap = new LinkedHashMap<>();
@@ -78,13 +83,7 @@ public class RedisService {
         }
 
         redis.opsForHash().putAll(classKey, initMap);
-
-        log.info("좌석 클래스 상태 초기화 완료: scheduleId={}, className={}, seats={}", scheduleId, className,
-            classSeats.size());
       }
-
-      log.info("전체 좌석 상태 초기화 완료: scheduleId={}, venueId={}, totalSeats={}", scheduleId, venueId,
-          seats.size());
     } catch (Exception e) {
       log.error("좌석 상태 초기화 실패: scheduleId={}, venueId={}, error={}", scheduleId, venueId,
           e.getMessage(), e);
@@ -93,17 +92,27 @@ public class RedisService {
   }
 
   public Map<String, Map<String, String>> getAllSeatStatusesBySeatClass(Long scheduleId) {
-    log.info("좌석 클래스별 전체 상태 조회: scheduleId={}", scheduleId);
-
     try {
       Map<String, Map<String, String>> result = new LinkedHashMap<>();
 
       Long venueId = getVenueIdByScheduleId(scheduleId);
       List<SeatClass> seatClasses = seatClassRepository.findByVenueId(venueId);
 
-      // 해당 venue의 모든 좌석 정보를 가져옴
-      List<Seat> venueSeats = seatRepository.findByVenueId(venueId);
-      Set<Long> venueSeatIds = venueSeats.stream().map(Seat::getSeatId).collect(Collectors.toSet());
+      String holdKeyPattern = String.format("seat:hold:%d:*", scheduleId);
+      Set<String> holdKeys = redis.keys(holdKeyPattern);
+      Map<String, String> holdStatuses = new HashMap<>();
+
+      if (!holdKeys.isEmpty()) {
+        List<String> holdValues = redis.opsForValue().multiGet(holdKeys);
+        for (int i = 0; i < holdKeys.size(); i++) {
+          String key = holdKeys.toArray(new String[0])[i];
+          String value = holdValues.get(i);
+          if (value != null) {
+            String seatId = key.substring(key.lastIndexOf(":") + 1);
+            holdStatuses.put(seatId, "HELD");
+          }
+        }
+      }
 
       for (SeatClass seatClass : seatClasses) {
         String className = seatClass.getClassName();
@@ -114,20 +123,9 @@ public class RedisService {
           Map<String, String> classStatuses = new LinkedHashMap<>();
           for (Map.Entry<Object, Object> entry : statusMap.entrySet()) {
             String seatId = (String) entry.getKey();
-            Long seatIdLong = Long.parseLong(seatId);
-
-            // 해당 venue의 좌석인지 확인
-            if (!venueSeatIds.contains(seatIdLong)) {
-              continue; // 다른 venue의 좌석이면 스킵
-            }
-
             String status = (String) entry.getValue();
 
-            // hold 상태 확인
-            String holdKey =
-                String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatIdLong.intValue());
-            String holdValue = redis.opsForValue().get(holdKey);
-            if (holdValue != null) {
+            if (holdStatuses.containsKey(seatId)) {
               classStatuses.put(seatId, "HELD");
             } else {
               classStatuses.put(seatId, status != null ? status : "");
@@ -148,31 +146,36 @@ public class RedisService {
     log.info("좌석 클래스별 상태 조회: scheduleId={}, seatClassName={}", scheduleId, seatClassName);
 
     try {
-      Long venueId = getVenueIdByScheduleId(scheduleId);
-
-      // 해당 venue의 모든 좌석 정보를 가져옴
-      List<Seat> venueSeats = seatRepository.findByVenueId(venueId);
-      Set<Long> venueSeatIds = venueSeats.stream().map(Seat::getSeatId).collect(Collectors.toSet());
-
       String classKey = String.format(SEAT_CLASS_STATUS_KEY_PATTERN, scheduleId, seatClassName);
       Map<Object, Object> statusMap = redis.opsForHash().entries(classKey);
+
+      if (statusMap.isEmpty()) {
+        return new LinkedHashMap<>();
+      }
+
+      String holdKeyPattern = String.format("seat:hold:%d:*", scheduleId);
+      Set<String> holdKeys = redis.keys(holdKeyPattern);
+      Map<String, String> holdStatuses = new HashMap<>();
+
+      if (!holdKeys.isEmpty()) {
+        List<String> holdValues = redis.opsForValue().multiGet(holdKeys);
+        for (int i = 0; i < holdKeys.size(); i++) {
+          String key = holdKeys.toArray(new String[0])[i];
+          String value = holdValues.get(i);
+          if (value != null) {
+            String seatId = key.substring(key.lastIndexOf(":") + 1);
+            holdStatuses.put(seatId, "HOLD");
+          }
+        }
+      }
 
       Map<String, String> result = new LinkedHashMap<>();
       for (Map.Entry<Object, Object> entry : statusMap.entrySet()) {
         String seatId = (String) entry.getKey();
-        Long seatIdLong = Long.parseLong(seatId);
-
-        // 해당 venue의 좌석인지 확인
-        if (!venueSeatIds.contains(seatIdLong)) {
-          continue; // 다른 venue의 좌석이면 스킵
-        }
-
         String status = (String) entry.getValue();
 
-        String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatIdLong.intValue());
-        String holdValue = redis.opsForValue().get(holdKey);
-        if (holdValue != null) {
-          result.put(seatId, "HELD");
+        if (holdStatuses.containsKey(seatId)) {
+          result.put(seatId, "HOLD");
         } else {
           result.put(seatId, status != null ? status : "");
         }
@@ -207,9 +210,6 @@ public class RedisService {
       String classKey = String.format(SEAT_CLASS_STATUS_KEY_PATTERN, scheduleId, className);
 
       redis.opsForHash().put(classKey, String.valueOf(seatId), status);
-
-      log.info("좌석 상태 업데이트: scheduleId={}, seatId={}, className={}, status={}", scheduleId, seatId,
-          className, status);
     } catch (Exception e) {
       log.error("좌석 상태 업데이트 실패: scheduleId={}, seatId={}, status={}, error={}", scheduleId, seatId,
           status, e.getMessage(), e);
@@ -217,18 +217,48 @@ public class RedisService {
     }
   }
 
-  private Long getVenueIdByScheduleId(Long scheduleId) {
-    Set<String> keys = redis.keys(String.format("venue:schedule:*:%d", scheduleId));
-    if (keys.isEmpty()) {
-      throw new IllegalArgumentException("해당 스케줄의 venue 정보를 찾을 수 없습니다: scheduleId=" + scheduleId);
-    }
+  @PostConstruct
+  @Transactional(readOnly = true)
+  public void initializeRedisOnStartup() {
+    try {
+      List<Map<String, Object>> eventSchedules = eventScheduleRepository.findAllEventSchedules();
+      if (eventSchedules.isEmpty()) {
+        log.info("Redis 초기화할 이벤트 스케줄이 없습니다.");
+        return;
+      }
 
-    String key = keys.iterator().next();
-    String[] parts = key.split(":");
-    return Long.parseLong(parts[2]);
+      for (Map<String, Object> eventSchedule : eventSchedules) {
+        try {
+          Long eventScheduleId = ((Number) eventSchedule.get("event_schedule_id")).longValue();
+          Long venueId = ((Number) eventSchedule.get("venue_id")).longValue();
+          initSeatStatuses(eventScheduleId, venueId);
+        } catch (Exception e) {
+          log.error("Redis 초기화 실패: eventScheduleId={}, venueId={}, error={}",
+              eventSchedule.get("event_schedule_id"), eventSchedule.get("venue_id"), e.getMessage(), e);
+          continue;
+        }
+      }
+    } catch (Exception e) {
+      log.error("Redis 초기화 중 오류 발생: {}", e.getMessage(), e);
+      e.printStackTrace();
+    }
   }
 
-  // 좌석 홀드 관련 메서드들
+  private Long getVenueIdByScheduleId(Long scheduleId) {
+    try {
+      Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(scheduleId);
+      if (venueId == null) {
+        throw new IllegalArgumentException("해당 스케줄의 venue 정보를 찾을 수 없습니다: scheduleId=" + scheduleId);
+      }
+      log.debug("스케줄 ID {}에 대한 venue ID 조회 완료: {}", scheduleId, venueId);
+      return venueId;
+    } catch (Exception e) {
+      log.error("스케줄 ID {}에 대한 venue ID 조회 실패: {}", scheduleId, e.getMessage(), e);
+      throw new IllegalArgumentException("해당 스케줄의 venue 정보를 찾을 수 없습니다: scheduleId=" + scheduleId,
+          e);
+    }
+  }
+
   public void holdSeat(Long scheduleId, Long seatId, Long userId, long ttlSeconds) {
     String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatId);
     redis.opsForValue().set(holdKey, String.valueOf(userId), ttlSeconds, TimeUnit.SECONDS);
@@ -242,7 +272,7 @@ public class RedisService {
     log.info("좌석 홀드 해제: scheduleId={}, seatId={}", scheduleId, seatId);
   }
 
-  // 좌석 상태 변경 메서드들 (Kafka에서 사용)
+
   public void confirmSeat(Long scheduleId, Long seatId) {
     String holdKey = String.format(SEAT_HOLD_KEY_PATTERN, scheduleId, seatId);
     redis.delete(holdKey);

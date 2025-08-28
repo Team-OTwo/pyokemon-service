@@ -2,6 +2,7 @@ package com.pyokemon.event.repository;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -34,4 +35,6 @@ public interface EventScheduleRepository {
   Long findVenueIdByEventScheduleId(Long eventScheduleId);
 
   List<Long> findEventScheduleIdTwoHoursLater();
+
+  List<Map<String, Object>> findAllEventSchedules();
 }
