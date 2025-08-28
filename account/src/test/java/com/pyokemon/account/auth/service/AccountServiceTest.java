@@ -317,12 +317,9 @@ public class AccountServiceTest {
     accountService.logout(fullToken, null, null);
 
     // then
-    verify(redisTemplate.opsForValue()).set(
-            eq(AuthConstants.BLACKLIST_PREFIX + token),
-            eq("blacklisted"),
-            anyLong(), // 남은 만료 초 (비결정적이라 anyLong 사용)
-            eq(TimeUnit.SECONDS)
-    );
+    verify(redisTemplate.opsForValue()).set(eq(AuthConstants.BLACKLIST_PREFIX + token),
+        eq("blacklisted"), anyLong(), // 남은 만료 초 (비결정적이라 anyLong 사용)
+        eq(TimeUnit.SECONDS));
     verifyNoInteractions(userRepository, userDeviceRepository);
   }
 }

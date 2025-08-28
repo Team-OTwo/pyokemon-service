@@ -15,6 +15,6 @@ CREATE TABLE tb_issued_vc
     updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX           idx_cred_ex_id (cred_ex_id),
-    INDEX           idx_booking (booking_id)
-    INDEX           idx_created_at (created_at),
+    INDEX           idx_booking (booking_id),
+    INDEX           idx_created_at (created_at)
 );

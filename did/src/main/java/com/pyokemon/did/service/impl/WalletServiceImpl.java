@@ -62,14 +62,14 @@ public class WalletServiceImpl implements WalletService {
       log.info("{} ID: {}에 대한 공개 DID 생성 요청", accountRole, accountId);
       CreatePublicDidResponse publicDidResponse = remoteService
           .acaPyCreatePublicDid(walletResponse.getToken(), CreatePublicDidRequest.forMethod("key"));
-      if (publicDidResponse == null || publicDidResponse.getDid() == null) {
+      if (publicDidResponse == null || publicDidResponse.getResult() == null) {
         throw new BusinessException("공개 DID 생성에 실패했습니다.", DID_CREATION_FAILED);
       }
 
       // 5. 지갑 정보 저장
       Wallet wallet = Wallet.builder().accountId(accountId).accountRole(accountRole)
-          .token(walletResponse.getToken()).publicDid(publicDidResponse.getDid())
-          .publicVerKey(publicDidResponse.getVerkey()).build();
+          .token(walletResponse.getToken()).publicDid(publicDidResponse.getResult().getDid())
+          .publicVerKey(publicDidResponse.getResult().getVerkey()).build();
 
       walletRepository.save(wallet);
       log.info("{} ID: {}에 대한 지갑 생성 및 저장 완료", accountRole, accountId);

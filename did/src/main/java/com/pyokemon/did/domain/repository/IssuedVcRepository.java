@@ -77,21 +77,6 @@ public interface IssuedVcRepository {
    */
   int update(IssuedVc issuedVc);
 
-  /**
-   * ID로 IssuedVc을 삭제합니다.
-   *
-   * @param id 삭제할 IssuedVc의 ID
-   * @return 삭제된 행 수
-   */
-  int deleteById(Long id);
-
-  /**
-   * credential_exchange_id로 IssuedVc을 삭제합니다.
-   *
-   * @param credentialExchangeId 삭제할 credential_exchange_id
-   * @return 삭제된 행 수
-   */
-  int deleteByCredentialExchangeId(String credentialExchangeId);
 
   /**
    * booking_id로 IssuedVc을 삭제합니다.

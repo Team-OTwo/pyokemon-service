@@ -33,8 +33,10 @@ public class IssueCredentialResponse implements AcaPyResponse {
   /**
    * IssuedVc 엔티티로 변환
    */
-  public IssuedVc toEntity(Long tenantId, Long userId, Long bookingId) {
-    return IssuedVc.builder().credId(null).credExId(credExId).verifyInviUrl(null).presExId(null)
-        .bookingId(bookingId).userId(userId).tenantId(tenantId).status(VcStatus.ISSUED).build();
+  public IssuedVc toEntity(Long tenantId, Long userId, Long bookingId, String presExId,
+      String verifyInviUrl) {
+    return IssuedVc.builder().credId(null).credExId(credExId).verifyInviUrl(verifyInviUrl)
+        .presExId(presExId).bookingId(bookingId).userId(userId).tenantId(tenantId)
+        .status(VcStatus.ISSUED).build();
   }
 }
