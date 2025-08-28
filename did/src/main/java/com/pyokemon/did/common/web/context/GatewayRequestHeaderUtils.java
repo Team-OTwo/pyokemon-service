@@ -36,6 +36,33 @@ public class GatewayRequestHeaderUtils {
   }
 
   /**
+   * Gateway에서 전달받은 테넌트 ID를 Long 타입으로 반환하거나 예외를 발생시킵니다. role이 TENANT인 경우에만 반환합니다.
+   *
+   * @return 테넌트 ID (Long)
+   * @throws BusinessException 인증 정보가 없거나 숫자 형식이 아니거나 TENANT 권한이 아닌 경우
+   */
+  public static Long getTenantIdOrThrowException() {
+    HttpServletRequest request = getCurrentRequest();
+    String tenantId = request.getHeader("X-Auth-TenantId");
+    if (tenantId == null || tenantId.isEmpty()) {
+      throw new BusinessException("테넌트 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
+    }
+
+    // role이 TENANT인지 확인
+    String role = getUserRoleOrThrowException();
+    if (!"TENANT".equals(role)) {
+      throw new BusinessException("테넌트만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
+    }
+
+    try {
+      return Long.valueOf(tenantId);
+    } catch (NumberFormatException e) {
+      throw new BusinessException("테넌트 ID가 올바른 숫자 형식이 아닙니다: " + tenantId,
+          DidErrorCodes.ACCESS_DENIED);
+    }
+  }
+
+  /**
    * Gateway에서 전달받은 사용자 역할을 반환하거나 예외를 발생시킵니다.
    *
    * @return 사용자 역할
