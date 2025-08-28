@@ -51,14 +51,26 @@ public class VerificationServiceImpl implements VerificationService {
             }
             credoPublicDid = jwtVerifyResponse.getPayload().getDid();
         }
-        catch (FeignException e){
-            log.error("ACA-Py JWT 검증 API 호출 실패. Status: {}, Body: {}", e.status(), e.contentUTF8());
-            throw new BusinessException("JWT 서명 검증에 실패했습니다: " + e.getMessage(), ACAPY_SERVICE_ERROR);
+        catch (BusinessException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            log.error("JWT 검증 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+            throw new BusinessException("JWT 검증 중 오류가 발생했습니다.", ACAPY_SERVICE_ERROR);
         }
 
         //invi_url, pres_ex_id 조회
         Long userId = deviceConnectionService.getUserIdByDidOrThrow(credoPublicDid);
         Map<String, String> stringMap = issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, bookingId);
-        return new CreateVerificationResponse(stringMap.get("verifyInviUrl"), stringMap.get("presExId"));
+        
+        // Map 값 안전성 개선
+        String verifyInviUrl = stringMap.get("verifyInviUrl");
+        String presExId = stringMap.get("presExId");
+        
+        if (verifyInviUrl == null || presExId == null) {
+            throw new BusinessException("VC 정보에서 필요한 데이터를 찾을 수 없습니다.", "VC_DATA_NOT_FOUND");
+        }
+        
+        return new CreateVerificationResponse(verifyInviUrl, presExId);
     }
-    }
+}
