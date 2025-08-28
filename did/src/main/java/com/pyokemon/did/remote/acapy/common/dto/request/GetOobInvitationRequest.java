@@ -2,6 +2,7 @@ package com.pyokemon.did.remote.acapy.common.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.did.remote.acapy.common.dto.base.AcaPyRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetOobInvitationRequest implements AcaPyRequest {
-    
-    @JsonProperty("invitation_id")
-    private String invitationId;
+
+  @JsonProperty("invitation_id")
+  private String invitationId;
 }

@@ -4,8 +4,6 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.CONNECTION_CREATI
 
 import java.io.IOException;
 
-import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
-import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
@@ -16,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
+import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.service.TenantWebhookService;
 

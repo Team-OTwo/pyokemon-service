@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.acapy.common.dto.request.presentproof;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Filter {
-    @JsonProperty("type")
-    private String type;
-    
-    @JsonProperty("const")
-    private String constant;
+  @JsonProperty("type")
+  private String type;
+
+  @JsonProperty("const")
+  private String constant;
 }

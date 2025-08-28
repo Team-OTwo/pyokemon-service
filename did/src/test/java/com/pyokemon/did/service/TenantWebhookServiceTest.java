@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.springframework.retry.RetryException;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.service.impl.TenantWebhookServiceImpl;
 

@@ -4,11 +4,10 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 
 /**
- * ACA-Py 연결 관리를 위한 서비스 인터페이스
- * 테넌트와 사용자 간의 연결 생성 및 조회 기능을 제공합니다.
+ * ACA-Py 연결 관리를 위한 서비스 인터페이스 테넌트와 사용자 간의 연결 생성 및 조회 기능을 제공합니다.
  */
 public interface AcaPyConnectionService {
-  
+
   /**
    * 테넌트와 사용자 간의 ACA-Py 연결을 생성합니다.
    *
@@ -19,8 +18,7 @@ public interface AcaPyConnectionService {
   void createAcaPyConnection(Long tenantId, Long userId);
 
   /**
-   * 테넌트와 사용자 간의 활성화된 ACA-Py 연결을 조회합니다.
-   * 활성화된 연결이 없는 경우 예외를 발생시킵니다.
+   * 테넌트와 사용자 간의 활성화된 ACA-Py 연결을 조회합니다. 활성화된 연결이 없는 경우 예외를 발생시킵니다.
    *
    * @param tenantId 테넌트 ID
    * @param userId 사용자 ID

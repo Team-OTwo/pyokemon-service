@@ -1,8 +1,8 @@
 package com.pyokemon.did.domain.dto.request.webhook;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.pyokemon.did.remote.acapy.common.dto.response.Invitation;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

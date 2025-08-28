@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.Wallet;
+import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;

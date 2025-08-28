@@ -2,12 +2,12 @@ package com.pyokemon.payment.bff.controller;
 
 import java.util.List;
 
-import com.pyokemon.payment.bff.dto.TotalRevenueResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.IdsRequest;
 import com.pyokemon.payment.bff.dto.PaymentDto;
+import com.pyokemon.payment.bff.dto.TotalRevenueResponseDto;
 import com.pyokemon.payment.bff.service.PaymentBffService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class PaymentBffController {
 
   @GetMapping("/summary/revenue")
   public ResponseEntity<TotalRevenueResponseDto> getTotalRevenue(
-          @RequestParam("scheduleIds") List<Long> scheduleIds) {
+      @RequestParam("scheduleIds") List<Long> scheduleIds) {
 
     TotalRevenueResponseDto responseDto = paymentBffService.getTotalRevenue(scheduleIds);
     return ResponseEntity.ok(responseDto);

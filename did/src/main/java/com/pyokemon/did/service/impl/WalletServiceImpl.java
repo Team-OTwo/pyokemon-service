@@ -4,14 +4,13 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.Wallet.AccountRole;
-
+import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
@@ -61,21 +60,17 @@ public class WalletServiceImpl implements WalletService {
 
       // 4. 공개 DID 생성
       log.info("{} ID: {}에 대한 공개 DID 생성 요청", accountRole, accountId);
-      CreatePublicDidResponse publicDidResponse = remoteService.acaPyCreatePublicDid(
-          walletResponse.getToken(), CreatePublicDidRequest.forMethod("key"));
+      CreatePublicDidResponse publicDidResponse = remoteService
+          .acaPyCreatePublicDid(walletResponse.getToken(), CreatePublicDidRequest.forMethod("key"));
       if (publicDidResponse == null || publicDidResponse.getDid() == null) {
         throw new BusinessException("공개 DID 생성에 실패했습니다.", DID_CREATION_FAILED);
       }
 
       // 5. 지갑 정보 저장
-      Wallet wallet = Wallet.builder()
-          .accountId(accountId)
-          .accountRole(accountRole)
-          .token(walletResponse.getToken())
-          .publicDid(publicDidResponse.getDid())
-          .publicVerKey(publicDidResponse.getVerkey())
-          .build();
-      
+      Wallet wallet = Wallet.builder().accountId(accountId).accountRole(accountRole)
+          .token(walletResponse.getToken()).publicDid(publicDidResponse.getDid())
+          .publicVerKey(publicDidResponse.getVerkey()).build();
+
       walletRepository.save(wallet);
       log.info("{} ID: {}에 대한 지갑 생성 및 저장 완료", accountRole, accountId);
 
@@ -95,8 +90,7 @@ public class WalletServiceImpl implements WalletService {
   private interface RemoteAcaPyService {
     CreateWalletResponse acaPyCreateWallet(CreateWalletRequest request);
 
-    CreatePublicDidResponse acaPyCreatePublicDid(String authToken,
-        CreatePublicDidRequest request);
+    CreatePublicDidResponse acaPyCreatePublicDid(String authToken, CreatePublicDidRequest request);
   }
 
   /**
@@ -143,6 +137,7 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public Wallet getWalletByAccountIdOrThrow(Long accountId) {
     return walletRepository.findByAccountId(accountId)
-            .orElseThrow(() -> new BusinessException("계정 ID: {" + accountId + "} 에 대한 지갑을 찾을 수 없습니다.", WALLET_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("계정 ID: {" + accountId + "} 에 대한 지갑을 찾을 수 없습니다.",
+            WALLET_NOT_FOUND));
   }
 }

@@ -6,7 +6,6 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.pyokemon.did.domain.dto.request.webhook.*;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
+import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
 import com.pyokemon.did.service.UserWebhookService;
@@ -188,7 +188,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       IssuedVc issuedVc = issuedVcOpt.get();
 
       // credential_exchange_id 업데이트
-      //issuedVc.setCredentialExchangeId(credExId);
+      // issuedVc.setCredentialExchangeId(credExId);
 
       issuedVcRepository.update(issuedVc);
       log.info("VC credential_exchange_id 업데이트 완료 - bookingId: {}, credExId: {}",
@@ -210,9 +210,9 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     issuedVc.setStatus(status);
 
     // credential_id가 있으면 업데이트
-//    if (credentialId != null && !credentialId.isEmpty()) {
-//      issuedVc.setCredentialId(credentialId);
-//    }
+    // if (credentialId != null && !credentialId.isEmpty()) {
+    // issuedVc.setCredentialId(credentialId);
+    // }
     issuedVcRepository.update(issuedVc);
   }
 

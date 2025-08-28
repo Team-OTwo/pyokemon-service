@@ -144,6 +144,7 @@ public class BffEventService {
 
   /**
    * 여러 공연일정 ID를 기반으로 상세 정보(공연명, 공연장명, 날짜) 목록을 조회합니다. (Bulk)
+   * 
    * @param scheduleIds 조회할 event_schedule_id 목록
    * @return 상세 정보 DTO 목록
    */
@@ -155,13 +156,14 @@ public class BffEventService {
     List<BffScheduleDetailDto> rows = repo.findScheduleDetailsByIds(scheduleIds);
     // ID 기준 Map으로 정리 (누락된 ID 체크 및 순서 보장용)
     Map<Long, BffScheduleDetailDto> byId = rows.stream()
-            .collect(Collectors.toMap(BffScheduleDetailDto::getEventScheduleId, Function.identity()));
+        .collect(Collectors.toMap(BffScheduleDetailDto::getEventScheduleId, Function.identity()));
 
     // 요청한 ID 중 DB에 없는 ID가 있는지 확인
     List<Long> missing =
-            scheduleIds.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
+        scheduleIds.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
     if (!missing.isEmpty()) {
-      throw new BusinessException("일부 일정 정보를 조회할 수 없습니다. ids=" + missing, "SCHEDULE_DETAILS_NOT_FOUND");
+      throw new BusinessException("일부 일정 정보를 조회할 수 없습니다. ids=" + missing,
+          "SCHEDULE_DETAILS_NOT_FOUND");
     }
 
     // 요청받은 ID 목록의 순서와 중복을 그대로 유지하여 반환
@@ -178,11 +180,11 @@ public class BffEventService {
     return new ScheduleIdsResponseDto(ids);
   }
 
-    public List<Long> findEventIdsByGenre(String genre) {
-        return repo.findIdsByGenre(genre);
-    }
+  public List<Long> findEventIdsByGenre(String genre) {
+    return repo.findIdsByGenre(genre);
+  }
 
-    public List<Long> findScheduleIdsByEventIds(List<Long> eventIds) {
-        return repo.findIdsByEventIds(eventIds);
-    }
+  public List<Long> findScheduleIdsByEventIds(List<Long> eventIds) {
+    return repo.findIdsByEventIds(eventIds);
+  }
 }

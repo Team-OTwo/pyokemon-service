@@ -3,10 +3,10 @@ package com.pyokemon.account.tenant.bff.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.pyokemon.account.tenant.bff.dto.TenantDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.pyokemon.account.tenant.bff.dto.TenantDto;
 import com.pyokemon.account.tenant.entity.Tenant;
 
 @Mapper

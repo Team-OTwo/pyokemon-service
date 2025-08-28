@@ -1,5 +1,7 @@
 package com.pyokemon.account.tenant.bff.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,8 +10,6 @@ import com.pyokemon.account.tenant.bff.exception.ResourceNotFoundException;
 import com.pyokemon.account.tenant.bff.repository.TenantBffRepository;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,6 @@ public class TenantBffService {
 
   @Transactional(readOnly = true)
   public List<TenantDto> findTenantsBatch(List<Long> tenantIds) {
-      return tenantBffRepository.findTenantsByIdIn(tenantIds);
-    }
+    return tenantBffRepository.findTenantsByIdIn(tenantIds);
+  }
 }

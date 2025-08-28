@@ -13,5 +13,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class StandardCredential extends BaseCredential {
-    // 기본 구현만 사용
+  // 기본 구현만 사용
 }

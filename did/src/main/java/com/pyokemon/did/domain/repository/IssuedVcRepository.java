@@ -3,10 +3,10 @@ package com.pyokemon.did.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.pyokemon.did.domain.IssuedVc.VcStatus;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.pyokemon.did.domain.IssuedVc;
+import com.pyokemon.did.domain.IssuedVc.VcStatus;
 
 @Mapper
 public interface IssuedVcRepository {

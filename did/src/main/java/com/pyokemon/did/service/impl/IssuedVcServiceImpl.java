@@ -1,27 +1,27 @@
 package com.pyokemon.did.service.impl;
 
-import com.pyokemon.did.domain.IssuedProof;
-import com.pyokemon.did.domain.repository.IssuedProofRepository;
-import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
-import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
-import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
-import com.pyokemon.did.service.AcaPyConnectionService;
-import com.pyokemon.did.service.WalletService;
+import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILED;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.domain.IssuedProof;
 import com.pyokemon.did.domain.Wallet;
+import com.pyokemon.did.domain.repository.IssuedProofRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
+import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
+import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
+import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
 import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.service.AcaPyConnectionService;
 import com.pyokemon.did.service.IssuedVcService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILED;
 
 @Slf4j
 @Service
@@ -52,7 +52,8 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     }
 
     // 2. 필수 데이터 조회
-    AcaPyConnection connection = acaPyConnectionService.getActiveAcaPyConnectionOrThrow(tenantId, userId);
+    AcaPyConnection connection =
+        acaPyConnectionService.getActiveAcaPyConnectionOrThrow(tenantId, userId);
 
     log.info("테넌트 ID {}에 대한 지갑 조회", tenantId);
     Wallet tenantWallet = walletService.getWalletByAccountIdOrThrow(tenantId);
@@ -62,21 +63,18 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
     try {
       // 3. VC 발급 요청 전송
-      CredentialSubject credentialSubject = CredentialSubject.of(userWallet, bookingId, eventScheduleId, seatId);
+      CredentialSubject credentialSubject =
+          CredentialSubject.of(userWallet, bookingId, eventScheduleId, seatId);
 
-      IssueCredentialResponse response = requestCredentialIssuance(
-          tenantWallet, 
-          connection,
-          credentialSubject, 
-          bookingId
-      );
+      IssueCredentialResponse response =
+          requestCredentialIssuance(tenantWallet, connection, credentialSubject, bookingId);
 
-      //TODO: 증명 요청 레코드 생성 요청
-      //TODO: 증명 요청 첨부 초대장 생성 요청
+      // TODO: 증명 요청 레코드 생성 요청
+      // TODO: 증명 요청 첨부 초대장 생성 요청
       issuedProofRepository.save(IssuedProof.of("test-pres-ex-id", "123-456-789", 10000000L));
 
       // 4. VC 발급 정보 저장
-//      issuedVcRepository.save(response.toEntity(tenantId, userId, bookingId));
+      // issuedVcRepository.save(response.toEntity(tenantId, userId, bookingId));
       log.info("VC 발급 완료 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
 
     } catch (BusinessException e) {
@@ -86,7 +84,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
       throw new BusinessException("VC 발급 중 오류가 발생했습니다.", VC_ISSUANCE_FAILED);
     }
   }
-  
+
   /**
    * ACA-Py에 자격 증명 발급을 요청합니다.
    *
@@ -97,37 +95,24 @@ public class IssuedVcServiceImpl implements IssuedVcService {
    * @return 자격 증명 발급 응답
    * @throws BusinessException 자격 증명 발급 실패 시
    */
-  private IssueCredentialResponse requestCredentialIssuance(
-      Wallet tenantWallet,
-      AcaPyConnection connection,
-      CredentialSubject credentialSubject,
-      Long bookingId
-  ) {
-    String tenantToken =  tenantWallet.getToken();
+  private IssueCredentialResponse requestCredentialIssuance(Wallet tenantWallet,
+      AcaPyConnection connection, CredentialSubject credentialSubject, Long bookingId) {
+    String tenantToken = tenantWallet.getToken();
     String tenantPublicDid = tenantWallet.getPublicDid();
     String connectionId = connection.getConnectionId();
 
     log.info("VC 발급 요청 전송 - bookingId: {}, connectionId: {}", bookingId, connectionId);
 
-    log.info("request={}",             IssueCredentialRequest.createStandard(
-            connectionId,
-            tenantPublicDid,
-            credentialSubject
-    ).toString());
-    IssueCredentialResponse response = remoteTenantAcaPyService.issueCredential(
-            tenantToken,
-            IssueCredentialRequest.createStandard(
-                    connectionId,
-                    tenantPublicDid,
-                    credentialSubject
-            )
-    );
-    
+    log.info("request={}", IssueCredentialRequest
+        .createStandard(connectionId, tenantPublicDid, credentialSubject).toString());
+    IssueCredentialResponse response = remoteTenantAcaPyService.issueCredential(tenantToken,
+        IssueCredentialRequest.createStandard(connectionId, tenantPublicDid, credentialSubject));
+
     if (response == null || response.getCredExId() == null) {
       log.error("VC 발급 실패 - bookingId: {}, connectionId: {}", bookingId, connectionId);
       throw new BusinessException("VC 발급에 실패했습니다.", VC_ISSUANCE_FAILED);
     }
-    
+
     log.debug("VC 발급 요청 성공 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
     return response;
   }

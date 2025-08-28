@@ -7,13 +7,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
-import com.pyokemon.did.remote.acapy.common.dto.request.ReceiveInvitationRequest;
-import com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse;
-import com.pyokemon.did.remote.acapy.common.dto.response.Invitation;
-import com.pyokemon.did.remote.acapy.common.dto.response.ReceiveInvitationResponse;
-import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
-import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +21,13 @@ import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.AcaPyConnection.ConnectionStatus;
 import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
-
+import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
+import com.pyokemon.did.remote.acapy.common.dto.request.ReceiveInvitationRequest;
+import com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse;
+import com.pyokemon.did.remote.acapy.common.dto.response.Invitation;
+import com.pyokemon.did.remote.acapy.common.dto.response.ReceiveInvitationResponse;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.impl.AcaPyConnectionServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -376,19 +375,19 @@ class AcaPyConnectionServiceTest {
         verify(remoteUserAcaPyService).receiveInvitation(anyString(), any(ReceiveInvitationRequest.class));
     }
 
-    @Test
+  @Test
   @DisplayName("활성화된 연결 조회 성공 테스트")
   void getActiveAcaPyConnectionOrThrow_Success() {
     // Given
-    AcaPyConnection connection = AcaPyConnection.builder()
-        .connectionId("test-connection-id")
-        .build();
+    AcaPyConnection connection =
+        AcaPyConnection.builder().connectionId("test-connection-id").build();
 
     when(acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(TENANT_ID, USER_ID))
         .thenReturn(Optional.of(connection));
 
     // When
-    assertDoesNotThrow(() -> acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
+    assertDoesNotThrow(
+        () -> acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
 
 
     // Then
@@ -416,16 +415,15 @@ class AcaPyConnectionServiceTest {
   @DisplayName("연결이 존재하지만 connectionId가 null인 경우 예외 발생 테스트")
   void getActiveAcaPyConnectionOrThrow_ConnectionIdIsNull() {
     // Given
-    AcaPyConnection connection = AcaPyConnection.builder()
-        .connectionId(null) // connectionId가 null
+    AcaPyConnection connection = AcaPyConnection.builder().connectionId(null) // connectionId가 null
         .build();
 
     when(acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(TENANT_ID, USER_ID))
         .thenReturn(Optional.of(connection));
 
     // When & Then
-    BusinessException exception = assertThrows(BusinessException.class, () ->
-        acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
+    BusinessException exception = assertThrows(BusinessException.class,
+        () -> acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
 
     assertEquals("테넌트 ID: 1 사용자 ID: 2 에 대한 활성화된 연결을 찾을 수 없습니다.", exception.getMessage());
     assertEquals(CONNECTION_NOT_FOUND, exception.getErrorCode());
@@ -437,16 +435,15 @@ class AcaPyConnectionServiceTest {
   @DisplayName("연결이 존재하지만 connectionId가 빈 문자열인 경우 예외 발생 테스트")
   void getActiveAcaPyConnectionOrThrow_ConnectionIdIsEmpty() {
     // Given
-    AcaPyConnection connection = AcaPyConnection.builder()
-        .connectionId("") // connectionId가 빈 문자열
+    AcaPyConnection connection = AcaPyConnection.builder().connectionId("") // connectionId가 빈 문자열
         .build();
 
     when(acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(TENANT_ID, USER_ID))
         .thenReturn(Optional.of(connection));
 
     // When & Then
-    BusinessException exception = assertThrows(BusinessException.class, () ->
-        acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
+    BusinessException exception = assertThrows(BusinessException.class,
+        () -> acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID));
 
     assertEquals("테넌트 ID: 1 사용자 ID: 2 에 대한 활성화된 연결을 찾을 수 없습니다.", exception.getMessage());
     assertEquals(CONNECTION_NOT_FOUND, exception.getErrorCode());

@@ -63,7 +63,8 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
       if (shouldCreateInvitation) {
         // User ACA-Py 초대장 생성
         log.info("User ACA-Py 초대장 생성 요청: userId={}", userId);
-        CreateInvitationRequest userRequest = CreateInvitationRequest.forUserDevice(userId, deviceId);
+        CreateInvitationRequest userRequest =
+            CreateInvitationRequest.forUserDevice(userId, deviceId);
         userAcapyResponse = remoteUserAcaPyService.createInvitation(userToken, userRequest);
 
         if (userAcapyResponse == null || userAcapyResponse.getInvitationUrl() == null) {
@@ -74,7 +75,8 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
         // Mediator ACA-Py 초대장 생성
         log.info("Mediator ACA-Py 초대장 생성 요청: userId={}", userId);
-        CreateInvitationRequest mediatorRequest = CreateInvitationRequest.forUserDevice(userId, deviceId);
+        CreateInvitationRequest mediatorRequest =
+            CreateInvitationRequest.forUserDevice(userId, deviceId);
         mediatorAcapyResponse = remoteMediatorAcaPyService.createInvitation(mediatorRequest);
 
         if (mediatorAcapyResponse == null || mediatorAcapyResponse.getInvitationUrl() == null) {

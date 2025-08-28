@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.acapy.common.dto.response;
 
 import com.pyokemon.did.remote.acapy.common.dto.base.AcaPyResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReceiveInvitationResponse implements AcaPyResponse {
-    
-    private String state;
+
+  private String state;
 }

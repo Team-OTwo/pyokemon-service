@@ -10,6 +10,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.Wallet;
@@ -19,76 +27,69 @@ import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.impl.IssuedVcServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class IssuedVcServiceTest {
 
-    @Mock
-    private IssuedVcRepository issuedVcRepository;
+  @Mock
+  private IssuedVcRepository issuedVcRepository;
 
-    @Mock
-    private WalletService walletService;
+  @Mock
+  private WalletService walletService;
 
-    @Mock
-    private AcaPyConnectionService acaPyConnectionService;
+  @Mock
+  private AcaPyConnectionService acaPyConnectionService;
 
-    @Mock
-    private RemoteTenantAcaPyService remoteTenantAcaPyService;
+  @Mock
+  private RemoteTenantAcaPyService remoteTenantAcaPyService;
 
-    @InjectMocks
-    private IssuedVcServiceImpl issuedVcService;
+  @InjectMocks
+  private IssuedVcServiceImpl issuedVcService;
 
-    private BookingEvent bookingEvent;
-    private Wallet tenantWallet;
-    private Wallet userWallet;
-    private AcaPyConnection connection;
-    private IssueCredentialResponse credentialResponse;
+  private BookingEvent bookingEvent;
+  private Wallet tenantWallet;
+  private Wallet userWallet;
+  private AcaPyConnection connection;
+  private IssueCredentialResponse credentialResponse;
 
-    private static final Long TENANT_ID = 1L;
-    private static final Long USER_ID = 2L;
-    private static final Long BOOKING_ID = 3L;
-    private static final Long EVENT_SCHEDULE_ID = 4L;
-    private static final Long SEAT_ID = 5L;
+  private static final Long TENANT_ID = 1L;
+  private static final Long USER_ID = 2L;
+  private static final Long BOOKING_ID = 3L;
+  private static final Long EVENT_SCHEDULE_ID = 4L;
+  private static final Long SEAT_ID = 5L;
 
-    @BeforeEach
-    void setUp() {
-        // BookingEvent 설정
-        bookingEvent = new BookingEvent();
-        bookingEvent.setAccountId(USER_ID);
-        bookingEvent.setTenantId(TENANT_ID);
-        bookingEvent.setBookingId(BOOKING_ID);
-        bookingEvent.setEventScheduleId(EVENT_SCHEDULE_ID);
-        bookingEvent.setSeatId(SEAT_ID);
+  @BeforeEach
+  void setUp() {
+    // BookingEvent 설정
+    bookingEvent = new BookingEvent();
+    bookingEvent.setAccountId(USER_ID);
+    bookingEvent.setTenantId(TENANT_ID);
+    bookingEvent.setBookingId(BOOKING_ID);
+    bookingEvent.setEventScheduleId(EVENT_SCHEDULE_ID);
+    bookingEvent.setSeatId(SEAT_ID);
 
-        // 테넌트 지갑 설정
-        tenantWallet = new Wallet();
-        tenantWallet.setAccountId(TENANT_ID);
-        tenantWallet.setToken("tenant-token");
-        tenantWallet.setPublicDid("tenant-did");
+    // 테넌트 지갑 설정
+    tenantWallet = new Wallet();
+    tenantWallet.setAccountId(TENANT_ID);
+    tenantWallet.setToken("tenant-token");
+    tenantWallet.setPublicDid("tenant-did");
 
-        // 사용자 지갑 설정
-        userWallet = new Wallet();
-        userWallet.setAccountId(USER_ID);
-        userWallet.setToken("user-token");
-        userWallet.setPublicDid("user-did");
+    // 사용자 지갑 설정
+    userWallet = new Wallet();
+    userWallet.setAccountId(USER_ID);
+    userWallet.setToken("user-token");
+    userWallet.setPublicDid("user-did");
 
-        // 연결 설정
-        connection = new AcaPyConnection();
-        connection.setConnectionId("test-connection-id");
+    // 연결 설정
+    connection = new AcaPyConnection();
+    connection.setConnectionId("test-connection-id");
 
-        // 자격 증명 응답 설정
-        credentialResponse = new IssueCredentialResponse();
-        credentialResponse.setCredExId("test-cred-ex-id");
-    }
+    // 자격 증명 응답 설정
+    credentialResponse = new IssueCredentialResponse();
+    credentialResponse.setCredExId("test-cred-ex-id");
+  }
 
-    @Test
+  @Test
     @DisplayName("자격 증명 발급 성공 테스트")
     void issueCredential_Success() throws BusinessException {
         // Given
@@ -112,7 +113,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("이미 발급된 자격 증명이 있는 경우 테스트")
     void issueCredential_AlreadyIssued() throws BusinessException {
         // Given
@@ -129,7 +130,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("자격 증명 발급 응답이 null인 경우 예외 발생 테스트")
     void issueCredential_NullResponse() {
         // Given
@@ -155,7 +156,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("자격 증명 발급 응답의 credExId가 null인 경우 예외 발생 테스트")
     void issueCredential_NullCredExId() {
         // Given
@@ -185,7 +186,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("연결 조회 중 예외 발생 테스트")
     void issueCredential_ConnectionException() {
         // Given
@@ -206,7 +207,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("지갑 조회 중 예외 발생 테스트")
     void issueCredential_WalletException() {
         // Given
@@ -229,7 +230,7 @@ class IssuedVcServiceTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("자격 증명 발급 API 호출 중 예외 발생 테스트")
     void issueCredential_ApiException() {
         // Given

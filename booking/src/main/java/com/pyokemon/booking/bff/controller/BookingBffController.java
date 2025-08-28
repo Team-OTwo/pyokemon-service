@@ -2,13 +2,13 @@ package com.pyokemon.booking.bff.controller;
 
 import java.util.List;
 
-import com.pyokemon.booking.bff.dto.*;
 import org.springframework.http.ResponseEntity;
-import com.pyokemon.booking.entity.Booking;
-import com.pyokemon.common.dto.IdsRequest;
 import org.springframework.web.bind.annotation.*;
 
+import com.pyokemon.booking.bff.dto.*;
 import com.pyokemon.booking.bff.service.BookingBffService;
+import com.pyokemon.booking.entity.Booking;
+import com.pyokemon.common.dto.IdsRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,7 +51,7 @@ public class BookingBffController {
 
   @GetMapping("/counts")
   public ResponseEntity<List<BookingCountDto>> getBookingCounts(
-          @RequestParam("scheduleIds") List<Long> scheduleIds) {
+      @RequestParam("scheduleIds") List<Long> scheduleIds) {
 
     List<BookingCountDto> counts = bookingBffService.getBookingCountsByScheduleIds(scheduleIds);
     return ResponseEntity.ok(counts);
@@ -59,24 +59,24 @@ public class BookingBffController {
 
   @GetMapping("/summary/sold-count")
   public ResponseEntity<TotalSoldTicketsResponseDto> getTotalSoldTickets(
-          @RequestParam("scheduleIds") List<Long> scheduleIds) {
+      @RequestParam("scheduleIds") List<Long> scheduleIds) {
 
     TotalSoldTicketsResponseDto responseDto = bookingBffService.getTotalSoldTickets(scheduleIds);
     return ResponseEntity.ok(responseDto);
   }
-  
+
   /** 1) 계정 전체(장르 없음) — 예매순 커서 */
   @GetMapping("/accounts/{accountId}/cursor")
   public CursorPageResponse<Booking> findByAccountCursor(@PathVariable long accountId,
-                                                         @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size) {
+      @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size) {
     return bookingBffService.findByAccountCursor(accountId, cursor, size);
   }
 
   /** 2) 특정 스케줄 집합 — 예매순 커서 (IdsRequest: ids = eventScheduleIds) */
   @PostMapping("/accounts/{accountId}/by-schedules/cursor")
   public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(@PathVariable long accountId,
-                                                                     @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size,
-                                                                     @RequestBody IdsRequest req) {
+      @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "10") int size,
+      @RequestBody IdsRequest req) {
     return bookingBffService.findByAccountAndSchedulesCursor(accountId, req.getIds(), cursor, size);
   }
 
