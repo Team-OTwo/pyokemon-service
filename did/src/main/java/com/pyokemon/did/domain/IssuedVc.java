@@ -29,4 +29,15 @@ public class IssuedVc extends BaseEntity {
   public enum VcStatus {
     PENDING, ISSUED, CONSUMED, REVOKED
   }
+
+  public void verified() {
+    this.status = VcStatus.CONSUMED;
+  }
+
+  /**
+   * 현재 상태가 ISSUED인지 확인하는 메서드
+   */
+  public boolean isIssued() {
+    return VcStatus.ISSUED.equals(status);
+  }
 }

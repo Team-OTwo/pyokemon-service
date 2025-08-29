@@ -31,6 +31,7 @@ public final class DidErrorCodes {
 
   // VC 관련 에러
   public static final String VC_ISSUANCE_FAILED = "VC_ISSUANCE_FAILED";
+  public static final String VC_CONSUMED_OR_REVOKED = "VC_CONSUMED_OR_REVOKED";
   public static final String VC_NOT_FOUND = "VC_NOT_FOUND";
   public static final String VC_INVALID = "VC_INVALID";
   public static final String VC_ALREADY_CONSUMED = "VC_ALREADY_CONSUMED";

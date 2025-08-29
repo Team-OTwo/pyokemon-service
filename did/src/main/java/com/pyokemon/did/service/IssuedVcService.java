@@ -24,5 +24,10 @@ public interface IssuedVcService {
    */
   void updateCredExId(Long bookingId, String credExId) throws RetryException;
 
+  public Map<String, String> sendVerifiyInviUrlOrThrow(Long UserId, Long TenantId, Long BookingId);
+
+  public IssuedVc getIssuedVcByPresExIdOrThrow(String presExId);
+
   Map<String, String> sendVerifiyInviUrlOrThrow(Long UserId, Long TenantId, Long BookingId);
+
 }

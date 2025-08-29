@@ -1,5 +1,7 @@
 package com.pyokemon.did.domain.dto.response;
 
+import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,16 @@ public class VerificationResponse {
   public static class CreateVerificationResponse {
     private String VerifyInviUrl;
     private String presExId;
+  }
+
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class HandleVerificationResponse {
+
+    @NotNull
+    private String status;
   }
 
 }

@@ -14,11 +14,7 @@ public class OutOfBandWebhookRequest {
 
   private String state;
 
-  @JsonProperty("created_at")
-  private String createdAt;
-
-  @JsonProperty("updated_at")
-  private String updatedAt;
+  private String role;
 
   @JsonProperty("oob_id")
   private String oobId;
@@ -26,16 +22,7 @@ public class OutOfBandWebhookRequest {
   @JsonProperty("invi_msg_id")
   private String inviMsgId;
 
-  private Invitation invitation;
-
   @JsonProperty("connection_id")
   private String connectionId;
 
-  @JsonProperty("our_recipient_key")
-  private String ourRecipientKey;
-
-  private String role;
-
-  @JsonProperty("multi_use")
-  private boolean multiUse;
 }
