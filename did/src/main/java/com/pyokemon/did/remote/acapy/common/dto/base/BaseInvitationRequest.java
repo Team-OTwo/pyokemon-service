@@ -18,9 +18,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public abstract class BaseInvitationRequest implements AcaPyRequest {
 
-  private List<String> accept;
 
-  private String alias;
 
   @JsonProperty("handshake_protocols")
   private List<String> handshakeProtocols;

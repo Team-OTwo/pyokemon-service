@@ -1,5 +1,7 @@
 package com.pyokemon.did.remote.acapy.common.dto.response;
 
+import jakarta.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.did.remote.acapy.common.dto.base.AcaPyResponse;
 
@@ -17,20 +19,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreatePublicDidResponse implements AcaPyResponse {
 
-  private String result;
+  private Result result;
 
-  @JsonProperty("did")
-  private String did;
 
-  @JsonProperty("verkey")
-  private String verkey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Result {
+    @NotNull
+    @JsonProperty("did")
+    private String did;
 
-  @JsonProperty("posture")
-  private String posture;
-
-  @JsonProperty("key_type")
-  private String keyType;
-
-  @JsonProperty("method")
-  private String method;
+    @NotNull
+    @JsonProperty("verkey")
+    private String verkey;
+  }
 }

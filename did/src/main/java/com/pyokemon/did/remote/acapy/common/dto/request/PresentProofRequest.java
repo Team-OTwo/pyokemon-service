@@ -37,14 +37,15 @@ public class PresentProofRequest implements AcaPyRequest {
    * 
    * @param challenge 검증 시 사용되는 난수
    * @param userPublicDid 사용자 public DID
-   * @param credentialIdFromTenant 원본 VC 식별자
+   * @param bookingId 원본 VC 식별자
    * @return 구성된 증명 제시 요청
    */
   public static PresentProofRequest forTicketVerification(String challenge, String userPublicDid,
-      String credentialIdFromTenant) {
+      Long bookingId) {
+    String credentialId = "urn:booking:" + bookingId;
     // 1. 필드 생성
     Field issuerField = createField("$.issuer", userPublicDid);
-    Field evidenceField = createField("$.evidence[0].sourceCredentialId", credentialIdFromTenant);
+    Field evidenceField = createField("$.evidence[0].sourceCredentialId", credentialId);
 
     // 2. 제약 조건 생성
     Constraints constraints =

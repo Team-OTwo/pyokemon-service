@@ -62,6 +62,18 @@ public interface IssuedVcRepository {
   Optional<IssuedVc> findByBookingIdAndStatus(Long bookingId, VcStatus status);
 
   /**
+   * user_id, tenant_id, booking_id, status로 IssuedVc을 조회합니다.
+   *
+   * @param userId 조회할 user_id
+   * @param tenantId 조회할 tenant_id
+   * @param bookingId 조회할 booking_id
+   * @param status 조회할 status
+   * @return IssuedVc (Optional)
+   */
+  Optional<IssuedVc> findByUserIdAndTenantIdAndBookingIdAndStatus(Long userId, Long tenantId,
+      Long bookingId, VcStatus status);
+
+  /**
    * booking_id로 발급 완료된 VC가 있는지 확인합니다.
    *
    * @param bookingId 조회할 booking_id
@@ -77,21 +89,6 @@ public interface IssuedVcRepository {
    */
   int update(IssuedVc issuedVc);
 
-  /**
-   * ID로 IssuedVc을 삭제합니다.
-   *
-   * @param id 삭제할 IssuedVc의 ID
-   * @return 삭제된 행 수
-   */
-  int deleteById(Long id);
-
-  /**
-   * credential_exchange_id로 IssuedVc을 삭제합니다.
-   *
-   * @param credentialExchangeId 삭제할 credential_exchange_id
-   * @return 삭제된 행 수
-   */
-  int deleteByCredentialExchangeId(String credentialExchangeId);
 
   /**
    * booking_id로 IssuedVc을 삭제합니다.

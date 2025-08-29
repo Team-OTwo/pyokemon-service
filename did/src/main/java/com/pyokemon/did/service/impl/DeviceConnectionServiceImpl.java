@@ -1,5 +1,6 @@
 package com.pyokemon.did.service.impl;
 
+import static com.pyokemon.common.exception.code.DidErrorCodes.DID_NOT_FOUND;
 import static com.pyokemon.common.exception.code.DidErrorCodes.WALLET_NOT_FOUND;
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.INVITATION_SENT;
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.REVOKED;
@@ -41,10 +42,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   public CreateInvitationResponse createInvitations(Long userId) {
 
     // 1. 사용자 지갑에서 userId, Token 조회
-    Wallet wallet = walletService.getWalletByAccountId(userId)
-        .orElseThrow(() -> new BusinessException("사용자 지갑이 존재하지 않습니다.", WALLET_NOT_FOUND));
-
-    String userToken = wallet.getToken();
+    String userToken = walletService.getWalletToken(userId);
     log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);
 
     // 2. Gateway 헤더에서 deviceId 추출
@@ -102,6 +100,14 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
       log.error("초대장 생성 중 예상치 못한 오류 발생: userId={}, error={}", userId, e.getMessage(), e);
       throw new BusinessException("초대장 생성 중 오류가 발생했습니다", DidErrorCodes.INVITATION_CREATION_FAILED);
     }
+  }
+
+  @Override
+  public Long getUserIdByDidOrThrow(String did) {
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByPublicDid(did).orElseThrow(
+        () -> new BusinessException("public DID: {" + did + "} 에 대한 userId를 찾을 수 없습니다.",
+            DID_NOT_FOUND));
+    return deviceConnection.getUserId();
   }
 
   /**

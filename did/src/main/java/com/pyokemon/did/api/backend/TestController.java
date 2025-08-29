@@ -20,11 +20,12 @@ public class TestController {
 
   @PostMapping
   public void hello() {
-    // acaPyConnectionService.createAcaPyConnection(2L, 37L);
+    acaPyConnectionService.createAcaPyConnection(74L, 73L);
+
     BookingEvent bookingEvent = new BookingEvent();
-    bookingEvent.setBookingId(1L);
-    bookingEvent.setAccountId(37L);
-    bookingEvent.setTenantId(2L);
+    bookingEvent.setBookingId(37373737373733L);
+    bookingEvent.setAccountId(73L);
+    bookingEvent.setTenantId(74L);
     bookingEvent.setEventScheduleId(4L);
     bookingEvent.setSeatId(5L);
     bookingEvent.setStatus("CONFIRM");
