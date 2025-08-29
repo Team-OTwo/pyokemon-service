@@ -6,8 +6,6 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
-import com.pyokemon.did.service.WalletService;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,9 @@ import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.UserWebhookService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +56,9 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
-    log.info("OOB Webhook from User ACA-py - state: {}, oob_id: {}, role: {}, connection_id: {}", 
-        webhookDto.getState(), webhookDto.getOobId(), webhookDto.getRole(), webhookDto.getConnectionId());
+    log.info("OOB Webhook from User ACA-py - state: {}, oob_id: {}, role: {}, connection_id: {}",
+        webhookDto.getState(), webhookDto.getOobId(), webhookDto.getRole(),
+        webhookDto.getConnectionId());
   }
 
   @Override
@@ -68,8 +69,8 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       String content = webhookDto.getContent();
       String messageId = webhookDto.getMessageId();
 
-      log.info("Basic Message webhook - state: {}, content: {}, connection_id: {}, message_id: {}", state,
-          connectionId, content,messageId);
+      log.info("Basic Message webhook - state: {}, content: {}, connection_id: {}, message_id: {}",
+          state, connectionId, content, messageId);
 
       // connectionId로 DeviceConnection 찾기
       DeviceConnection deviceConnection =

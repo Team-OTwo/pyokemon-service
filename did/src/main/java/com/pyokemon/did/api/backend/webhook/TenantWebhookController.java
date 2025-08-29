@@ -1,13 +1,13 @@
 package com.pyokemon.did.api.backend.webhook;
 
-import com.pyokemon.did.domain.dto.request.webhook.*;
-import com.pyokemon.did.remote.acapy.common.dto.request.PresentProofRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pyokemon.did.domain.dto.request.webhook.*;
+import com.pyokemon.did.remote.acapy.common.dto.request.PresentProofRequest;
 import com.pyokemon.did.service.TenantWebhookService;
 
 import lombok.AllArgsConstructor;
@@ -20,14 +20,14 @@ import lombok.extern.slf4j.Slf4j;
 public class TenantWebhookController {
   private final TenantWebhookService tenantWebhookService;
 
-  @PostMapping({ "/connections/"})
+  @PostMapping({"/connections/"})
   public ResponseEntity<Void> handleTenantConnectionWebhook(
       @RequestBody ConnectionWebhookRequest connectionWebhookRequest) {
     tenantWebhookService.handleTenantConnectionWebhook(connectionWebhookRequest);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping({ "/out_of_band/"})
+  @PostMapping({"/out_of_band/"})
   public ResponseEntity<Void> handleTenantOutOfBandWebhook(
       @RequestBody OutOfBandWebhookRequest outOfBandWebhookRequest) {
     tenantWebhookService.handleTenantOOBWebhook(outOfBandWebhookRequest);
@@ -36,7 +36,7 @@ public class TenantWebhookController {
 
   @PostMapping("/present_proof_v2_0/")
   public ResponseEntity<Void> handlePresentProofWebhook(
-          @RequestBody PresentProofWebhookRequest presentProofWebhookRequest){
+      @RequestBody PresentProofWebhookRequest presentProofWebhookRequest) {
     tenantWebhookService.handleTenantPresentProofWebhook(presentProofWebhookRequest);
     return ResponseEntity.ok().build();
   }

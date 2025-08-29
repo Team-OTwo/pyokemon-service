@@ -7,16 +7,17 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.VP_VERIFICATION_F
 import java.util.Map;
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Verification;
-import com.pyokemon.did.domain.Verification.VpStatus;
-import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
-import com.pyokemon.did.domain.repository.VerificationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.domain.Verification;
+import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
+import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
+import com.pyokemon.did.domain.repository.VerificationRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.JwtVerifyRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.JwtVerifyResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
@@ -27,7 +28,6 @@ import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Slf4j
 @Service
@@ -98,7 +98,8 @@ public class VerificationServiceImpl implements VerificationService {
 
   public VpStatus getStatusOrThrow(String presExId) {
     Verification verification = verificationRepository.findByPresExId(presExId)
-            .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId, VP_VERIFICATION_FAILED));
+        .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId,
+            VP_VERIFICATION_FAILED));
     return verification.getStatus();
   }
 }

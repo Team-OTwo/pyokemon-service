@@ -217,7 +217,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
   @Override
   public IssuedVc getIssuedVcByPresExIdOrThrow(String presExId) {
     IssuedVc issuedVc = issuedVcRepository.findByPresExId(presExId)
-            .orElseThrow(() -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_ISSUANCE_FAILED));
+        .orElseThrow(() -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_ISSUANCE_FAILED));
     return issuedVc;
   }
 }

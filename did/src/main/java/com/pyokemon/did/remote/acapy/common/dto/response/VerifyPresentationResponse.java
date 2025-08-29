@@ -1,6 +1,7 @@
 package com.pyokemon.did.remote.acapy.common.dto.response;
 
 import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
