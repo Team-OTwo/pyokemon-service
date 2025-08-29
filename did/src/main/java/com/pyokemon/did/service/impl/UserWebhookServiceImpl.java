@@ -11,6 +11,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.annotation.Recover;
+import com.pyokemon.did.common.annotation.WebhookRetryable;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.exception.BusinessException;
@@ -31,15 +33,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserWebhookServiceImpl implements UserWebhookService {
 
   private final DeviceConnectionRepository deviceConnectionRepository;
-  private final IssuedVcRepository issuedVcRepository;
   private final IssuedVcService issuedVcService;
 
   private static final String ISSUE_CREDENTIAL_STATUS_DONE = "done";
   private static final String ISSUE_CREDENTIAL_ROLE_HOLDER = "holder";
 
   @Override
-  @Retryable(value = {BusinessException.class, IOException.class}, maxAttempts = 3,
-      backoff = @Backoff(delay = 2000, multiplier = 2))
+  @WebhookRetryable // 웹훅 전용 재시도 설정 사용
   public void handleConnectionWebhook(ConnectionWebhookRequest webhookDto) {
     String state = webhookDto.getState();
     String connectionId = webhookDto.getConnectionId();
@@ -58,6 +58,21 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       deviceConnection.setConnectionId(connectionId);
       deviceConnectionRepository.update(deviceConnection);
     }
+  }
+
+  /**
+   * handleConnectionWebhook 재시도 실패 시 복구 메소드
+   */
+  @Recover
+  public void recoverConnectionWebhook(Exception e, ConnectionWebhookRequest webhookDto) {
+    log.error("Connection Webhook 처리 실패 - 최대 재시도 횟수 초과. state: '{}', alias: '{}', connection_id: '{}', error: {}", 
+        webhookDto.getState(), 
+        webhookDto.getAlias(), 
+        webhookDto.getConnectionId(),
+        e.getMessage(), e);
+    
+    // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
+    // 현재는 로그만 남기고 있습니다.
   }
 
   public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
@@ -98,10 +113,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
   @Override
   @Transactional
-  @Retryable(retryFor = {RetryException.class},
-          maxAttempts = 4,
-          backoff = @Backoff(delay = 2000, multiplier = 2) // 2초, 4초, 6초  간격으로 재시도
-  )
+  @WebhookRetryable // 웹훅 전용 재시도 설정 사용
   public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
     // holder webhook 만 처리
     if (!ISSUE_CREDENTIAL_ROLE_HOLDER.equals(issueCredentialWebhookRequest.getRole())) return;
@@ -109,11 +121,31 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     // 완료된 issue credential webhook 만 처리
     if (!ISSUE_CREDENTIAL_STATUS_DONE.equals(issueCredentialWebhookRequest.getState())) return;
 
+    log.info("Issue credential Webhook from User ACA-Py - cred_ex_id: {}, role: {}, state: {}",
+            issueCredentialWebhookRequest.getCredExId(),
+            issueCredentialWebhookRequest.getRole(),
+            issueCredentialWebhookRequest.getState());
+
     // 1. issueCredentialWebhookRequest 에서 bookingId 추출
     Long bookingId = issueCredentialWebhookRequest.extractBookingId();
 
     // 2. IssuedVc 조회 및 credExId 업데이트
     issuedVcService.updateCredExId(bookingId, issueCredentialWebhookRequest.getCredExId());
+  }
+
+  /**
+   * handleIssueCredentialWebhook 재시도 실패 시 복구 메소드
+   */
+  @Recover
+  public void recoverIssueCredentialWebhook(Exception e, IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
+    log.error("Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, role: {}, state: {}, error: {}", 
+        issueCredentialWebhookRequest.getCredExId(),
+        issueCredentialWebhookRequest.getRole(),
+        issueCredentialWebhookRequest.getState(),
+        e.getMessage(), e);
+    
+    // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
+    // 현재는 로그만 남기고 있습니다.
   }
 
   @Override
@@ -146,60 +178,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
 
-  private void updateVcCredentialExchangeId(IssueCredentialWebhookRequest webhookDto) {
-    String credExId = webhookDto.getCredExId();
-    log.info("VC credential_exchange_id 업데이트 - credExId: {}", credExId);
 
-    try {
-      // webhook에서 booking_id 추출
-      String bookingIdStr = webhookDto.getByFormat().getCredOffer().getLdProof().getCredential()
-          .getCredentialSubject().getBookingId();
-      if (bookingIdStr == null || bookingIdStr.isEmpty()) {
-        log.warn("webhook에서 booking_id를 추출할 수 없습니다");
-        return;
-      }
-
-      // "urn:booking:1" 형태에서 "1" 추출
-      String bookingId = bookingIdStr.replace("urn:booking:", "");
-      Long bookingIdLong = Long.parseLong(bookingId);
-
-      // booking_id로 CREDENTIAL_SENT 상태인 VC 찾기
-      var issuedVcOpt = issuedVcRepository.findByBookingIdAndStatus(bookingIdLong, ISSUED);
-      if (issuedVcOpt.isEmpty()) {
-        log.warn("업데이트할 VC를 찾을 수 없습니다 - bookingId: {}, status: CREDENTIAL_SENT", bookingIdLong);
-        return;
-      }
-
-      IssuedVc issuedVc = issuedVcOpt.get();
-
-      // credential_exchange_id 업데이트
-      // issuedVc.setCredentialExchangeId(credExId);
-
-      issuedVcRepository.update(issuedVc);
-      log.info("VC credential_exchange_id 업데이트 완료 - bookingId: {}, credExId: {}",
-          issuedVc.getBookingId(), credExId);
-
-    } catch (Exception e) {
-      log.error("VC credential_exchange_id 업데이트 중 오류 발생: {}", e.getMessage(), e);
-    }
-  }
-
-  private void updateVcStatus(String credExId, String credentialId, IssuedVc.VcStatus status) {
-    // credential_exchange_id로 IssuedVc 찾기
-//    var issuedVcOpt = issuedVcRepository.findByCredentialExchangeId(credExId);
-//    if (issuedVcOpt.isEmpty()) {
-//      log.warn("credential_exchange_id에 해당하는 VC를 찾을 수 없습니다: {}", credExId);
-//      return;
-//    }
-//    IssuedVc issuedVc = issuedVcOpt.get();
-//    issuedVc.setStatus(status);
-
-    // credential_id가 있으면 업데이트
-    // if (credentialId != null && !credentialId.isEmpty()) {
-    // issuedVc.setCredentialId(credentialId);
-    // }
-//    issuedVcRepository.update(issuedVc);
-  }
 
   /**
    * DeviceConnection alias 패턴인지 확인합니다. DeviceConnection은 "credo:user:{userId}#device:{deviceId}"

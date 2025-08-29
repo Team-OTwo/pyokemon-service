@@ -21,7 +21,12 @@ public class IssuedVc extends BaseEntity {
   private Long tenantId;
   private VcStatus status;
 
+  public void activate(String credExId) {
+    this.credExId = credExId;
+    status = VcStatus.ISSUED;
+  }
+
   public enum VcStatus {
-    ISSUED, CONSUMED, REVOKED
+    PENDING, ISSUED, CONSUMED, REVOKED
   }
 }

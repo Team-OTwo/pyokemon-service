@@ -2,6 +2,7 @@ package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
+import static com.pyokemon.did.domain.IssuedVc.VcStatus.PENDING;
 
 import java.util.Map;
 
@@ -83,16 +84,16 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
       // 4. 자격 증명 발급 요청
       IssueCredentialResponse issueCredentialResponse =
-          issueCredential(tenantWallet, connection, credentialSubject, bookingId);
+              requestCredentialIssuance(tenantWallet, connection, credentialSubject, bookingId);
 
       // 5. 자격 증명 검증 요청
       String challenge = UuidGenerator.generateChallenge();
       PresentProofResponse presentProofResponse =
-          presentProof(tenantWallet, userWallet, challenge, bookingId);
+          requestPresentProof(tenantWallet, userWallet, challenge, bookingId);
 
       // 6. 검증 첨부 초대장 요청
       CreateInvitationResponse createInvitationResponse =
-          createInvitationForProof(tenantWallet, presentProofResponse.getPresExId());
+              requestInvitationForProof(tenantWallet, presentProofResponse.getPresExId());
 
       // 7. 검증 증명 정보 저장
       log.info("VC 검증 증명 정보 저장 - presExId: {}", presentProofResponse.getPresExId());
@@ -121,32 +122,21 @@ public class IssuedVcServiceImpl implements IssuedVcService {
   @Transactional
   public void updateCredExId(Long bookingId, String credExId) throws RetryException {
     try {
-      IssuedVc issuedVc = getIssuedVcByBookingId(bookingId);
-      issuedVc.setCredExId(credExId);
+      IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId).orElseThrow(
+              () -> new RetryException("retry - vc not found")
+      );
+
+      // status != PENDING 예외처리
+      if (!issuedVc.getStatus().equals(PENDING)) return;
+
+      issuedVc.activate(credExId);
 
       issuedVcRepository.update(issuedVc);
-    } catch (BusinessException e) {
-      // VC_INVALID 의 경우 재시도 X
-      if (VC_INVALID.equals(e.getErrorCode())) return;
-
-      throw new RetryException("retry - vc not found");
+    } catch (RetryException e) {
+      throw e;
     } catch (Exception e) {
-      throw new RetryException("retry - fail to find vc");
+      throw new RetryException("retry - fail to update vc");
     }
-  }
-
-  @Override
-  public IssuedVc getIssuedVcByBookingId(Long bookingId) throws BusinessException {
-    IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId).orElseThrow(
-            () -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_NOT_FOUND)
-    );
-
-    // status != ISSUED 예외처리
-    if (!issuedVc.getStatus().equals(IssuedVc.VcStatus.ISSUED)) {
-      throw new BusinessException("유효하지 않은 VC - status: " + issuedVc.getStatus(), VC_INVALID);
-    }
-
-    return issuedVc;
   }
 
   @Override
@@ -169,7 +159,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
    * @return 자격 증명 발급 응답
    * @throws BusinessException 자격 증명 발급 실패 시
    */
-  private IssueCredentialResponse issueCredential(Wallet tenantWallet, AcaPyConnection connection,
+  private IssueCredentialResponse requestCredentialIssuance(Wallet tenantWallet, AcaPyConnection connection,
       CredentialSubject credentialSubject, Long bookingId) {
     String tenantToken = tenantWallet.getToken();
     String tenantPublicDid = tenantWallet.getPublicDid();
@@ -204,7 +194,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
    * @return 자격 검증 증명 발급 응답
    * @throws BusinessException 자격 검증 증명 발급 실패 시
    */
-  private PresentProofResponse presentProof(Wallet tenantWallet, Wallet userWallet,
+  private PresentProofResponse requestPresentProof(Wallet tenantWallet, Wallet userWallet,
       String challenge, Long bookingId) {
     String tenantToken = tenantWallet.getToken();
     String userPublicDid = userWallet.getPublicDid();
@@ -233,7 +223,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
    * @return 검증 첨부 초대장 응답
    * @throws BusinessException 검증 첨부 초대장 발급 실패 시
    */
-  private CreateInvitationResponse createInvitationForProof(Wallet tenantWallet,
+  private CreateInvitationResponse requestInvitationForProof(Wallet tenantWallet,
       String presentationExchangeId) {
     String tenantToken = tenantWallet.getToken();
 

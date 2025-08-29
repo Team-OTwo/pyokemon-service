@@ -37,6 +37,6 @@ public class IssueCredentialResponse implements AcaPyResponse {
       String verifyInviUrl) {
     return IssuedVc.builder().verifyInviUrl(verifyInviUrl)
         .presExId(presExId).bookingId(bookingId).userId(userId).tenantId(tenantId)
-        .status(VcStatus.ISSUED).build();
+        .status(VcStatus.PENDING).build();
   }
 }

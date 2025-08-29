@@ -33,6 +33,7 @@ import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse
 import com.pyokemon.did.remote.acapy.common.dto.response.PresentProofResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.impl.IssuedVcServiceImpl;
+import org.springframework.retry.RetryException;
 
 @ExtendWith(MockitoExtension.class)
 class IssuedVcServiceImplTest {
@@ -139,7 +140,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("issueCredential 응답 null이면 예외")
+    @DisplayName("requestCredentialIssuance 응답 null이면 예외")
     void issueCredential_nullIssueResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -160,7 +161,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("issueCredential 응답의 credExId null이면 예외")
+    @DisplayName("requestCredentialIssuance 응답의 credExId null이면 예외")
     void issueCredential_nullCredExId() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -184,7 +185,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("presentProof 응답 null이면 예외")
+    @DisplayName("requestPresentProof 응답 null이면 예외")
     void issueCredential_nullPresentProofResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -212,7 +213,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("presentProof 응답의 presExId null이면 예외")
+    @DisplayName("requestPresentProof 응답의 presExId null이면 예외")
     void issueCredential_nullPresExId() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -242,7 +243,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("createInvitation 응답 null이면 예외")
+    @DisplayName("requestInvitation 응답 null이면 예외")
     void issueCredential_nullCreateInvitationResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -277,7 +278,7 @@ class IssuedVcServiceImplTest {
     }
 
   @Test
-    @DisplayName("createInvitation 응답의 invitationUrl 없으면 예외")
+    @DisplayName("requestInvitation 응답의 invitationUrl 없으면 예외")
     void issueCredential_emptyInvitationUrl() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
         when(acaPyConnectionService.getActiveAcaPyConnectionOrThrow(TENANT_ID, USER_ID)).thenReturn(connection);
@@ -390,6 +391,63 @@ class IssuedVcServiceImplTest {
         assertEquals("VC 발급 중 오류가 발생했습니다.", ex.getMessage());
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
+
+    @Test
+    @DisplayName("updateCredExId 성공")
+    void updateCredExId_success() {
+        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+                .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
+
+        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+        when(issuedVcRepository.update(any(IssuedVc.class))).thenReturn(1);
+
+        assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+
+        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+        verify(issuedVcRepository).update(issued);
+    }
+
+    @Test
+    @DisplayName("updateCredExId 실패 - findByBookingId throws ")
+    void updateCredExId_repositoryThrows() {
+        when(issuedVcRepository.findByBookingId(anyLong())).thenThrow(new RetryException("retry - vc not found"));
+
+        RetryException ex = assertThrows(RetryException.class, () -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+
+        assertEquals(ex.getMessage(), "retry - vc not found");
+        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+    }
+
+    @Test
+    @DisplayName("updateCredExId 실패 - status != pending")
+    void updateCredExId_status_invalid() {
+        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+                .presExId("pres-ex-xyz").status(VcStatus.ISSUED).build();
+
+        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+
+        assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+
+        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+        verify(issuedVcRepository, never()).update(issued);
+    }
+
+    @Test
+    @DisplayName("updateCredExId 실패 - update throws")
+    void updateCredExId_update_fails() {
+        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+                .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
+
+        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+        when(issuedVcRepository.update(any(IssuedVc.class))).thenThrow(new RuntimeException("db fails"));
+
+        RetryException ex = assertThrows(RetryException.class, () -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+
+        assertEquals(ex.getMessage(), "retry - fail to update vc");
+        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+        verify(issuedVcRepository).update(issued);
+    }
+
 
   @Test
   @DisplayName("sendVerifiyInviUrlOrThrow 성공")
