@@ -1,12 +1,40 @@
+INSERT IGNORE INTO tb_price (event_schedule_id, seat_class_id, price) VALUES
+(1, 1, 128000),
+(1, 2, 108000),
+(1, 3, 88000),
+(1, 4, 58000),
 
-INSERT IGNORE INTO tb_price (event_schedule_id, seat_class_id, price)
-SELECT 1, seat_class_id, price FROM (
-                                        SELECT 'VIP' AS class_name, 198000 AS price
-                                        UNION ALL
-                                        SELECT 'R',   178000
-                                        UNION ALL
-                                        SELECT 'A',   148000
-                                        UNION ALL
-                                        SELECT 'B',   128000
-                                    ) AS p
-                                        JOIN tb_seat_class sc ON sc.class_name = p.class_name;
+(2, 1, 150000),
+(2, 2, 130000),
+(2, 3, 100000),
+(2, 4, 80000),
+
+(3, 1, 188000),
+(3, 2, 158000),
+(3, 3, 128000),
+(3, 4, 108000),
+
+(4, 1, 80000),
+(4, 2, 65000),
+(4, 3, 50000),
+(4, 4, 35000),
+
+(5, 1, 88000),
+(5, 2, 65000),
+(5, 3, 52000),
+(5, 4, 45000),
+
+(6, 1, 8000),
+(6, 2, 7000),
+(6, 3, 6000),
+(6, 4, 5000),
+
+(7, 1, 3000),
+(7, 2, 2500),
+(7, 3, 2000),
+(7, 4, 1000),
+
+(8, 1, 25000),
+(8, 2, 20000),
+(8, 3, 18000),
+(8, 4, 12000);

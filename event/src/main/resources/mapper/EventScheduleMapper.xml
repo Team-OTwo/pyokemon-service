@@ -161,5 +161,12 @@
         AND CONVERT_TZ(NOW(), '+00:00', '+09:00') + INTERVAL 2 HOUR + INTERVAL 5 MINUTE;
     </select>
 
+    <select id="findAllEventSchedules" resultType="map">
+        SELECT 
+            event_schedule_id,
+            venue_id
+        FROM tb_event_schedule
+        ORDER BY event_schedule_id ASC
+    </select>
 
 </mapper>

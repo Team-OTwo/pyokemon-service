@@ -9,8 +9,8 @@ import java.io.IOException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
+
 import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -29,6 +29,11 @@ import com.pyokemon.did.domain.repository.VerificationRepository;
 import com.pyokemon.did.remote.acapy.common.dto.response.VerifyPresentationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.*;
+import com.pyokemon.did.common.annotation.WebhookRetryable;
+import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
+import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
+import com.pyokemon.did.service.AcaPyConnectionService;
+import com.pyokemon.did.service.TenantWebhookService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +49,7 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
   private final WalletService walletService;
   private final RemoteTenantAcaPyService remoteTenantAcaPyService;
   private final AcaPyConnectionRepository acaPyConnectionRepository;
+  private final AcaPyConnectionService acaPyConnectionService;
 
 
   private static final String CONNECTION_STATUS_ACTIVE = "active";
@@ -52,26 +58,20 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
 
   @Override
   @Transactional
-  @Retryable(retryFor = {RetryException.class, DataAccessException.class, IOException.class},
-      backoff = @Backoff(delay = 2000, multiplier = 2) // 2초, 4초 간격으로 재시도
-  )
-  public void handleTenantConnectionWebhook(ConnectionWebhookRequest request) {
+  @WebhookRetryable
+  public void handleTenantConnectionWebhook(ConnectionWebhookRequest connectionWebhookRequest) {
     // 1. active 상태인 연결만 처리
-    if (!CONNECTION_STATUS_ACTIVE.equals(request.getState())) {
-      log.debug("[Webhook] 비활성 상태 무시: {}", request.getState());
+    if (!CONNECTION_STATUS_ACTIVE.equals(connectionWebhookRequest.getState()))
       return;
-    }
 
-    // 2. AcaPyConnection 조회
-    AcaPyConnection connection =
-        acaPyConnectionRepository.findByInviMsgId(request.getInvitationMsgId()).orElseThrow(() -> {
-          log.error("[Webhook] 연결 찾기 실패: invitationMsgId={}", request.getInvitationMsgId());
-          return new RetryException("AcaPy Connection NotFound");
-        });
+    log.info(
+        "Connection Webhook from Tenant ACA-py - state: {}, invitation_msg_id: {}, connection_id: {}",
+        connectionWebhookRequest.getState(), connectionWebhookRequest.getInvitationMsgId(),
+        connectionWebhookRequest.getConnectionId());
 
-    // 3. 상태 변경 및 업데이트
-    connection.activate(request.getConnectionId());
-    acaPyConnectionRepository.update(connection);
+    // 2. AcaPyConnection 조회 및 connectionId, status 업데이트
+    acaPyConnectionService.updateConnectionId(connectionWebhookRequest.getInvitationMsgId(),
+        connectionWebhookRequest.getConnectionId());
   }
 
   @Override
@@ -81,31 +81,17 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
   }
 
   /**
-   * 예외 발생 시 복구 처리 - 연결 비활성화 후 예외 발생
+   * handleTenantConnectionWebhook 재시도 실패 시 복구 메소드
    */
   @Recover
-  public void recoverTenantConnectionWebhook(Exception e, ConnectionWebhookRequest request)
-      throws BusinessException {
-    log.error("[Webhook] 재시도 실패 (Exception): msgId={}, error={}", request.getInvitationMsgId(),
-        e.getMessage());
-
-    try {
-      AcaPyConnection connection =
-          acaPyConnectionRepository.findByInviMsgId(request.getInvitationMsgId()).orElse(null);
-
-      if (connection != null) {
-        log.info("[Connection] 실패로 인한 비활성화: id={}", connection.getId());
-        connection.deactivate();
-        acaPyConnectionRepository.update(connection);
-      } else {
-        log.warn("[Connection] 비활성화 실패: 연결 찾을 수 없음");
-      }
-    } catch (Exception ex) {
-      log.error("[Connection] 비활성화 중 오류 발생: {}", ex.getMessage());
-    }
-
-    throw new BusinessException("연결 생성 실패: " + e.getMessage(), CONNECTION_CREATION_FAILED);
+  public void recoverTenantConnectionWebhook(Exception e,
+      ConnectionWebhookRequest connectionWebhookRequest) {
+    log.error(
+        "Tenant Connection Webhook 처리 실패 - 최대 재시도 횟수 초과. state: {}, invitation_msg_id: {}, error: {}",
+        connectionWebhookRequest.getState(), connectionWebhookRequest.getInvitationMsgId(),
+        e.getMessage(), e);
   }
+
 
   @Override
   public void handleTenantPresentProofWebhook(PresentProofWebhookRequest request) {

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RedisController {
 
   private final RedisService redisService;
+  private final EventScheduleRepository eventScheduleRepository;
 
-  /**
-   * 특정 공연 스케줄의 모든 좌석 상태를 seatClassName별로 조회합니다.
-   */
   @GetMapping("/{scheduleId}/status/by-class")
   public ResponseEntity<Map<String, Map<String, String>>> getAllSeatStatusesBySeatClass(
       @PathVariable Long scheduleId) {
@@ -36,9 +35,6 @@ public class RedisController {
     }
   }
 
-  /**
-   * 특정 seatClassName의 좌석 상태를 조회합니다.
-   */
   @GetMapping("/{scheduleId}/status/class/{seatClassName}")
   public ResponseEntity<Map<String, String>> getSeatStatusesBySeatClassName(
       @PathVariable Long scheduleId, @PathVariable String seatClassName) {
@@ -55,13 +51,9 @@ public class RedisController {
     }
   }
 
-  /**
-   * 좌석을 홀드 상태로 설정합니다.
-   */
   @PostMapping("/{scheduleId}/{seatId}/hold")
   public ResponseEntity<String> holdSeat(@PathVariable Long scheduleId, @PathVariable Long seatId,
       @RequestHeader("X-Auth-AccountId") Long userId) {
-    // TTL 고정 300초
     long ttlSeconds = 300L;
     log.info("좌석 홀드 요청: scheduleId={}, seatId={}, userId={}, ttl={}초", scheduleId, seatId, userId,
         ttlSeconds);
@@ -76,9 +68,6 @@ public class RedisController {
     }
   }
 
-  /**
-   * 좌석 홀드를 해제합니다.
-   */
   @DeleteMapping("/{scheduleId}/{seatId}/hold")
   public ResponseEntity<String> releaseSeatHold(@PathVariable Long scheduleId,
       @PathVariable Long seatId) {
@@ -91,6 +80,21 @@ public class RedisController {
       log.error("좌석 홀드 해제 실패: scheduleId={}, seatId={}, error={}", scheduleId, seatId,
           e.getMessage(), e);
       return ResponseEntity.internalServerError().body("좌석 홀드 해제 실패: " + e.getMessage());
+    }
+  }
+
+  @PostMapping("/admin/event-redis/init/{eventScheduleId}")
+  public ResponseEntity<String> initializeSpecificEvent(@PathVariable Long eventScheduleId) {
+    try {
+      Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
+      redisService.initSeatStatuses(eventScheduleId, venueId);
+      return ResponseEntity.ok("특정 이벤트 Redis 초기화 완료: eventScheduleId=" + eventScheduleId);
+      
+    } catch (Exception e) {
+      log.error("특정 이벤트 Redis 초기화 실패: eventScheduleId={}, error={}", eventScheduleId, e.getMessage(), e);
+      e.printStackTrace();
+      return ResponseEntity.internalServerError()
+          .body("Redis 초기화 실패: " + e.getMessage());
     }
   }
 }
