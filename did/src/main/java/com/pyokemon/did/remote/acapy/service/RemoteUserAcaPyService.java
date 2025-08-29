@@ -1,18 +1,14 @@
 package com.pyokemon.did.remote.acapy.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
-import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
-import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
-import com.pyokemon.did.remote.acapy.common.dto.request.ReceiveInvitationRequest;
-import com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse;
-import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse;
-import com.pyokemon.did.remote.acapy.common.dto.response.CreateWalletResponse;
-import com.pyokemon.did.remote.acapy.common.dto.response.ReceiveInvitationResponse;
+import com.pyokemon.did.remote.acapy.common.dto.request.*;
+import com.pyokemon.did.remote.acapy.common.dto.response.*;
 
 /**
  * 사용자 ACA-Py 서비스와의 원격 통신을 위한 인터페이스
@@ -35,4 +31,12 @@ public interface RemoteUserAcaPyService {
   @PostMapping(value = "/out-of-band/receive-invitation")
   ReceiveInvitationResponse receiveInvitation(@RequestHeader("Authorization") String authorization,
       @RequestBody ReceiveInvitationRequest request);
+
+  @GetMapping(value = "/issue-credential-2.0/records/{cred_ex_id}")
+  Object getCredential(@RequestHeader("Authorization") String authorization,
+      @PathVariable String cred_ex_id);
+
+  @PostMapping(value = "/issue-credential-2.0/send")
+  IssueCredentialResponse issueCredential(@RequestHeader("Authorization") String authorization,
+      @RequestBody IssueCredentialRequest request);
 }

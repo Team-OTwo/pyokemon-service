@@ -158,6 +158,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     log.debug("VC 발급 요청 성공 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
     return response;
   }
+
   /**
    * ACA-Py에 자격 검증 증명 발급을 요청합니다.
    *
