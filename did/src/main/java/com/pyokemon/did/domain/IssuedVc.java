@@ -13,16 +13,20 @@ import lombok.*;
 @AllArgsConstructor
 public class IssuedVc extends BaseEntity {
 
-  private String credId;
   private String credExId;
-  private String verifyInviUrl;
   private String presExId;
+  private String verifyInviUrl;
   private Long bookingId;
   private Long userId;
   private Long tenantId;
   private VcStatus status;
 
+  public void activate(String credExId) {
+    this.credExId = credExId;
+    status = VcStatus.ISSUED;
+  }
+
   public enum VcStatus {
-    ISSUED, CONSUMED, REVOKED
+    PENDING, ISSUED, CONSUMED, REVOKED
   }
 }

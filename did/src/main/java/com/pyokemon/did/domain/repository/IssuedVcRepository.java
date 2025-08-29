@@ -20,23 +20,6 @@ public interface IssuedVcRepository {
   Long save(IssuedVc issuedVc);
 
   /**
-   * credential_exchange_id로 IssuedVc을 조회합니다.
-   *
-   * @param credentialExchangeId 조회할 credential_exchange_id
-   * @return IssuedVc (Optional)
-   */
-  Optional<IssuedVc> findByCredentialExchangeId(String credentialExchangeId);
-
-
-  /**
-   * credential_id로 IssuedVc을 조회합니다.
-   *
-   * @param credentialId 조회할 credential_id
-   * @return IssuedVc (Optional)
-   */
-  Optional<IssuedVc> findByCredentialId(String credentialId);
-
-  /**
    * booking_id로 IssuedVc를 조회합니다.
    *
    * @param bookingId 조회할 booking_id

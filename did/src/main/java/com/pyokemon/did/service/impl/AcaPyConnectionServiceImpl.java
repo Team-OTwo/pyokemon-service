@@ -2,6 +2,7 @@ package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,6 +78,49 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
     }
   }
 
+  @Override
+  @Transactional
+  public void updateConnectionId(String inviMsgId, String connectionId) throws RetryException {
+    try {
+      // 1. AcaPyConnection 조회
+      AcaPyConnection connection = acaPyConnectionRepository.findByInviMsgId(inviMsgId)
+          .orElseThrow(() -> new RetryException("retry - connection not found"));
+
+      // 2. 상태 변경 및 업데이트
+      connection.activate(connectionId);
+      acaPyConnectionRepository.update(connection);
+    } catch (Exception e) {
+      throw new RetryException("retry - fail to update connection");
+    }
+  }
+
+  @Override
+  public AcaPyConnection getActiveAcaPyConnectionOrThrow(Long tenantId, Long userId) {
+    log.debug("테넌트 ID: {} 및 사용자 ID: {}에 대한 활성화된 연결 조회", tenantId, userId);
+
+    // 활성화된 연결 조회
+    AcaPyConnection connection =
+        acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(tenantId, userId)
+            .orElseThrow(() -> new BusinessException(
+                String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
+                CONNECTION_NOT_FOUND));
+
+
+    // 연결 ID 유효성 검사
+    if (connection.getConnectionId() == null || connection.getConnectionId().isEmpty()) {
+      log.warn("테넌트 ID: {} 및 사용자 ID: {}에 대한 연결이 존재하지만 connectionId가 null입니다", tenantId, userId);
+      throw new BusinessException(
+          String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
+          CONNECTION_NOT_FOUND);
+    }
+
+    log.debug("테넌트 ID: {} 및 사용자 ID: {}에 대한 활성화된 연결 조회 성공: connectionId={}", tenantId, userId,
+        connection.getConnectionId());
+
+    return connection;
+  }
+
+
   /**
    * 테넌트 AcaPy에서 초대장을 생성합니다.
    *
@@ -121,36 +165,6 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
     log.debug("초대장 수락 성공");
   }
 
-  @Override
-  public AcaPyConnection getActiveAcaPyConnectionOrThrow(Long tenantId, Long userId) {
-    log.debug("테넌트 ID: {} 및 사용자 ID: {}에 대한 활성화된 연결 조회", tenantId, userId);
 
-    // 활성화된 연결 조회
-    AcaPyConnection connection =
-        acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(tenantId, userId)
-            .orElseThrow(() -> createConnectionNotFoundException(tenantId, userId));
 
-    // 연결 ID 유효성 검사
-    if (connection.getConnectionId() == null || connection.getConnectionId().isEmpty()) {
-      log.warn("테넌트 ID: {} 및 사용자 ID: {}에 대한 연결이 존재하지만 connectionId가 null입니다", tenantId, userId);
-      throw createConnectionNotFoundException(tenantId, userId);
-    }
-
-    log.debug("테넌트 ID: {} 및 사용자 ID: {}에 대한 활성화된 연결 조회 성공: connectionId={}", tenantId, userId,
-        connection.getConnectionId());
-    return connection;
-  }
-
-  /**
-   * 연결을 찾을 수 없을 때 발생시킬 예외를 생성합니다.
-   *
-   * @param tenantId 테넌트 ID
-   * @param userId 사용자 ID
-   * @return 생성된 BusinessException
-   */
-  private BusinessException createConnectionNotFoundException(Long tenantId, Long userId) {
-    String errorMessage =
-        String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId);
-    return new BusinessException(errorMessage, CONNECTION_NOT_FOUND);
-  }
 }
