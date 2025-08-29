@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.retry.RetryException;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
@@ -33,7 +34,6 @@ import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse
 import com.pyokemon.did.remote.acapy.common.dto.response.PresentProofResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.impl.IssuedVcServiceImpl;
-import org.springframework.retry.RetryException;
 
 @ExtendWith(MockitoExtension.class)
 class IssuedVcServiceImplTest {
@@ -392,22 +392,22 @@ class IssuedVcServiceImplTest {
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
 
-    @Test
-    @DisplayName("updateCredExId 성공")
-    void updateCredExId_success() {
-        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
-                .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
+  @Test
+  @DisplayName("updateCredExId 성공")
+  void updateCredExId_success() {
+    IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+        .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
 
-        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
-        when(issuedVcRepository.update(any(IssuedVc.class))).thenReturn(1);
+    when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+    when(issuedVcRepository.update(any(IssuedVc.class))).thenReturn(1);
 
-        assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+    assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
 
-        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
-        verify(issuedVcRepository).update(issued);
-    }
+    verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+    verify(issuedVcRepository).update(issued);
+  }
 
-    @Test
+  @Test
     @DisplayName("updateCredExId 실패 - findByBookingId throws ")
     void updateCredExId_repositoryThrows() {
         when(issuedVcRepository.findByBookingId(anyLong())).thenThrow(new RetryException("retry - vc not found"));
@@ -418,35 +418,37 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository).findByBookingId(BOOKING_ID);
     }
 
-    @Test
-    @DisplayName("updateCredExId 실패 - status != pending")
-    void updateCredExId_status_invalid() {
-        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
-                .presExId("pres-ex-xyz").status(VcStatus.ISSUED).build();
+  @Test
+  @DisplayName("updateCredExId 실패 - status != pending")
+  void updateCredExId_status_invalid() {
+    IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+        .presExId("pres-ex-xyz").status(VcStatus.ISSUED).build();
 
-        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+    when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
 
-        assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+    assertDoesNotThrow(() -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
 
-        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
-        verify(issuedVcRepository, never()).update(issued);
-    }
+    verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+    verify(issuedVcRepository, never()).update(issued);
+  }
 
-    @Test
-    @DisplayName("updateCredExId 실패 - update throws")
-    void updateCredExId_update_fails() {
-        IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
-                .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
+  @Test
+  @DisplayName("updateCredExId 실패 - update throws")
+  void updateCredExId_update_fails() {
+    IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+        .presExId("pres-ex-xyz").status(VcStatus.PENDING).build();
 
-        when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
-        when(issuedVcRepository.update(any(IssuedVc.class))).thenThrow(new RuntimeException("db fails"));
+    when(issuedVcRepository.findByBookingId(anyLong())).thenReturn(Optional.of(issued));
+    when(issuedVcRepository.update(any(IssuedVc.class)))
+        .thenThrow(new RuntimeException("db fails"));
 
-        RetryException ex = assertThrows(RetryException.class, () -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
+    RetryException ex = assertThrows(RetryException.class,
+        () -> issuedVcService.updateCredExId(BOOKING_ID, "test-cred-ex-id"));
 
-        assertEquals(ex.getMessage(), "retry - fail to update vc");
-        verify(issuedVcRepository).findByBookingId(BOOKING_ID);
-        verify(issuedVcRepository).update(issued);
-    }
+    assertEquals(ex.getMessage(), "retry - fail to update vc");
+    verify(issuedVcRepository).findByBookingId(BOOKING_ID);
+    verify(issuedVcRepository).update(issued);
+  }
 
 
   @Test

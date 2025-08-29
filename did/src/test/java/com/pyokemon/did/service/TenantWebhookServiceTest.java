@@ -2,7 +2,6 @@ package com.pyokemon.did.service;
 
 import static org.mockito.Mockito.*;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,8 +34,8 @@ class TenantWebhookServiceTest {
   }
 
   @Test
-    @DisplayName("웹훅 처리 성공 테스트")
-    void handleTenantConnectionWebhook_Success() {
+  @DisplayName("웹훅 처리 성공 테스트")
+  void handleTenantConnectionWebhook_Success() {
     // Given
 
     // When

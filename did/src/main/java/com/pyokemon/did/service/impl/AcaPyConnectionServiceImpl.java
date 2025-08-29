@@ -83,9 +83,8 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
   public void updateConnectionId(String inviMsgId, String connectionId) throws RetryException {
     try {
       // 1. AcaPyConnection 조회
-      AcaPyConnection connection =
-              acaPyConnectionRepository.findByInviMsgId(inviMsgId)
-                      .orElseThrow(() -> new RetryException("retry - connection not found"));
+      AcaPyConnection connection = acaPyConnectionRepository.findByInviMsgId(inviMsgId)
+          .orElseThrow(() -> new RetryException("retry - connection not found"));
 
       // 2. 상태 변경 및 업데이트
       connection.activate(connectionId);
@@ -101,21 +100,22 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
 
     // 활성화된 연결 조회
     AcaPyConnection connection =
-            acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(tenantId, userId)
-                    .orElseThrow(() ->
-                            new BusinessException(String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
-                                    CONNECTION_NOT_FOUND)
-                    );
+        acaPyConnectionRepository.findByTenantIdAndUserIdAndIsActive(tenantId, userId)
+            .orElseThrow(() -> new BusinessException(
+                String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
+                CONNECTION_NOT_FOUND));
 
 
     // 연결 ID 유효성 검사
     if (connection.getConnectionId() == null || connection.getConnectionId().isEmpty()) {
       log.warn("테넌트 ID: {} 및 사용자 ID: {}에 대한 연결이 존재하지만 connectionId가 null입니다", tenantId, userId);
-      throw new BusinessException(String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId), CONNECTION_NOT_FOUND);
+      throw new BusinessException(
+          String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
+          CONNECTION_NOT_FOUND);
     }
 
     log.debug("테넌트 ID: {} 및 사용자 ID: {}에 대한 활성화된 연결 조회 성공: connectionId={}", tenantId, userId,
-            connection.getConnectionId());
+        connection.getConnectionId());
 
     return connection;
   }
@@ -164,7 +164,6 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
     }
     log.debug("초대장 수락 성공");
   }
-
 
 
 

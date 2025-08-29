@@ -6,26 +6,26 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.pyokemon.did.service.IssuedVcService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.annotation.Recover;
-import com.pyokemon.did.common.annotation.WebhookRetryable;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.common.annotation.WebhookRetryable;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
+import com.pyokemon.did.service.IssuedVcService;
 import com.pyokemon.did.service.UserWebhookService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -65,12 +65,11 @@ public class UserWebhookServiceImpl implements UserWebhookService {
    */
   @Recover
   public void recoverConnectionWebhook(Exception e, ConnectionWebhookRequest webhookDto) {
-    log.error("Connection Webhook 처리 실패 - 최대 재시도 횟수 초과. state: '{}', alias: '{}', connection_id: '{}', error: {}", 
-        webhookDto.getState(), 
-        webhookDto.getAlias(), 
-        webhookDto.getConnectionId(),
-        e.getMessage(), e);
-    
+    log.error(
+        "Connection Webhook 처리 실패 - 최대 재시도 횟수 초과. state: '{}', alias: '{}', connection_id: '{}', error: {}",
+        webhookDto.getState(), webhookDto.getAlias(), webhookDto.getConnectionId(), e.getMessage(),
+        e);
+
     // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
     // 현재는 로그만 남기고 있습니다.
   }
@@ -114,17 +113,19 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @Override
   @Transactional
   @WebhookRetryable // 웹훅 전용 재시도 설정 사용
-  public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
+  public void handleIssueCredentialWebhook(
+      IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
     // holder webhook 만 처리
-    if (!ISSUE_CREDENTIAL_ROLE_HOLDER.equals(issueCredentialWebhookRequest.getRole())) return;
+    if (!ISSUE_CREDENTIAL_ROLE_HOLDER.equals(issueCredentialWebhookRequest.getRole()))
+      return;
 
     // 완료된 issue credential webhook 만 처리
-    if (!ISSUE_CREDENTIAL_STATUS_DONE.equals(issueCredentialWebhookRequest.getState())) return;
+    if (!ISSUE_CREDENTIAL_STATUS_DONE.equals(issueCredentialWebhookRequest.getState()))
+      return;
 
     log.info("Issue credential Webhook from User ACA-Py - cred_ex_id: {}, role: {}, state: {}",
-            issueCredentialWebhookRequest.getCredExId(),
-            issueCredentialWebhookRequest.getRole(),
-            issueCredentialWebhookRequest.getState());
+        issueCredentialWebhookRequest.getCredExId(), issueCredentialWebhookRequest.getRole(),
+        issueCredentialWebhookRequest.getState());
 
     // 1. issueCredentialWebhookRequest 에서 bookingId 추출
     Long bookingId = issueCredentialWebhookRequest.extractBookingId();
@@ -137,13 +138,13 @@ public class UserWebhookServiceImpl implements UserWebhookService {
    * handleIssueCredentialWebhook 재시도 실패 시 복구 메소드
    */
   @Recover
-  public void recoverIssueCredentialWebhook(Exception e, IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
-    log.error("Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, role: {}, state: {}, error: {}", 
-        issueCredentialWebhookRequest.getCredExId(),
-        issueCredentialWebhookRequest.getRole(),
-        issueCredentialWebhookRequest.getState(),
-        e.getMessage(), e);
-    
+  public void recoverIssueCredentialWebhook(Exception e,
+      IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
+    log.error(
+        "Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, role: {}, state: {}, error: {}",
+        issueCredentialWebhookRequest.getCredExId(), issueCredentialWebhookRequest.getRole(),
+        issueCredentialWebhookRequest.getState(), e.getMessage(), e);
+
     // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
     // 현재는 로그만 남기고 있습니다.
   }
@@ -151,9 +152,9 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @Override
   public void handleLdProofWebhook(LdProofWebhookRequest ldProofWebhookRequest) {
     log.info(
-            "LD Proof Webhook from User ACA-Py - cred_ex_id: {}, cred_id_stored: {}, cred_ex_ld_proof_id: {}"
-            , ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredIdStored(), ldProofWebhookRequest.getCredExLdProofId()
-    );
+        "LD Proof Webhook from User ACA-Py - cred_ex_id: {}, cred_id_stored: {}, cred_ex_ld_proof_id: {}",
+        ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredIdStored(),
+        ldProofWebhookRequest.getCredExLdProofId());
   }
 
   /**
@@ -176,7 +177,6 @@ public class UserWebhookServiceImpl implements UserWebhookService {
             "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
             "DEVICE_CONNECTION_NOT_FOUND"));
   }
-
 
 
 

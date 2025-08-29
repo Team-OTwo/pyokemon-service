@@ -84,7 +84,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
       // 4. 자격 증명 발급 요청
       IssueCredentialResponse issueCredentialResponse =
-              requestCredentialIssuance(tenantWallet, connection, credentialSubject, bookingId);
+          requestCredentialIssuance(tenantWallet, connection, credentialSubject, bookingId);
 
       // 5. 자격 증명 검증 요청
       String challenge = UuidGenerator.generateChallenge();
@@ -93,7 +93,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
       // 6. 검증 첨부 초대장 요청
       CreateInvitationResponse createInvitationResponse =
-              requestInvitationForProof(tenantWallet, presentProofResponse.getPresExId());
+          requestInvitationForProof(tenantWallet, presentProofResponse.getPresExId());
 
       // 7. 검증 증명 정보 저장
       log.info("VC 검증 증명 정보 저장 - presExId: {}", presentProofResponse.getPresExId());
@@ -122,12 +122,12 @@ public class IssuedVcServiceImpl implements IssuedVcService {
   @Transactional
   public void updateCredExId(Long bookingId, String credExId) throws RetryException {
     try {
-      IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId).orElseThrow(
-              () -> new RetryException("retry - vc not found")
-      );
+      IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId)
+          .orElseThrow(() -> new RetryException("retry - vc not found"));
 
       // status != PENDING 예외처리
-      if (!issuedVc.getStatus().equals(PENDING)) return;
+      if (!issuedVc.getStatus().equals(PENDING))
+        return;
 
       issuedVc.activate(credExId);
 
@@ -159,8 +159,8 @@ public class IssuedVcServiceImpl implements IssuedVcService {
    * @return 자격 증명 발급 응답
    * @throws BusinessException 자격 증명 발급 실패 시
    */
-  private IssueCredentialResponse requestCredentialIssuance(Wallet tenantWallet, AcaPyConnection connection,
-      CredentialSubject credentialSubject, Long bookingId) {
+  private IssueCredentialResponse requestCredentialIssuance(Wallet tenantWallet,
+      AcaPyConnection connection, CredentialSubject credentialSubject, Long bookingId) {
     String tenantToken = tenantWallet.getToken();
     String tenantPublicDid = tenantWallet.getPublicDid();
     String connectionId = connection.getConnectionId();
