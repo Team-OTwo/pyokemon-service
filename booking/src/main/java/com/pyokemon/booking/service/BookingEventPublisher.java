@@ -36,4 +36,16 @@ public class BookingEventPublisher {
           booking.getBookingId(), e);
     }
   }
+
+  public void publishBookingEvent(BookingEventDto eventDto) {
+    try {
+      kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED,
+          String.valueOf(eventDto.getBookingId()), eventDto);
+
+      log.info("Published booking event: bookingId={}, status={}, message={}",
+          eventDto.getBookingId(), eventDto.getStatus(), eventDto);
+    } catch (Exception e) {
+      log.error("Failed to publish booking event for booking: {}", eventDto.getBookingId(), e);
+    }
+  }
 }

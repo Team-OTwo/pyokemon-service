@@ -13,7 +13,7 @@
     <select id="findByPaymentIds"
             parameterType="map"
             resultType="com.pyokemon.payment.entity.Payment">
-        SELECT payment_id, account_id, amount, method, status, created_at, updated_at
+        SELECT payment_id, amount, method, status, created_at, updated_at
         FROM tb_payment
         WHERE
         <choose>

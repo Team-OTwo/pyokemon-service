@@ -5,14 +5,13 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-
     implementation 'org.springframework.kafka:spring-kafka'
     
-    // Database
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
+    
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.postgresql:postgresql'
     
-    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
@@ -21,7 +20,6 @@ tasks.named('test') {
     useJUnitPlatform()
 } 
 
-// JAR 파일 이름 설정
 bootJar {
     archiveFileName = "event-0.0.1.jar"
 } 
