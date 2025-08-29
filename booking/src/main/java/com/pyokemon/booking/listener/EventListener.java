@@ -35,12 +35,12 @@ public class EventListener {
       topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).EVENT_SCHEDULE_2H_AHEAD}",
       groupId = "${spring.application.name}",
       containerFactory = "eventkafkaListenerContainerFactory")
-  public void handleEventSchedule2hAhead(Long eventScheduleId) {
+  public void handleEventSchedule2hAhead(EventKafkaDto dto) {
     try {
-      log.info("공연 시작 2시간 전 알림 수신: eventScheduleId={}", eventScheduleId);
-      bookingService.publishConfirmedBookingsForEventSchedule(eventScheduleId);
+      log.info("공연 시작 2시간 전 알림 수신: eventScheduleId={}", dto.getEventScheduleId());
+      bookingService.publishConfirmedBookingsForEventSchedule(dto.getEventScheduleId());
     } catch (Exception e) {
-      log.error("공연 시작 2시간 전 알림 메시지 처리 중 오류 발생: eventScheduleId={}", eventScheduleId, e);
+      log.error("공연 시작 2시간 전 알림 메시지 처리 중 오류 발생: eventScheduleId={}", dto.getEventScheduleId(), e);
     }
   }
 }

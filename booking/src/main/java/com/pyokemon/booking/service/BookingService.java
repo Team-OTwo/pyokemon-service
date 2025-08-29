@@ -177,12 +177,6 @@ public class BookingService {
 
     Booking booking = bookingOpt.get();
 
-    if (booking.getStatus() != Booking.Booked.PENDING) {
-      log.info("PENDING 상태가 아닌 예약은 결제 이벤트를 무시합니다: bookingId={}, currentStatus={}", bookingId,
-          booking.getStatus());
-      return;
-    }
-
     booking.setStatus(newStatus);
     booking.setPaymentId(paymentId);
     booking.setUpdatedAt(LocalDateTime.now());
@@ -213,8 +207,6 @@ public class BookingService {
       List<Booking> expiredBookings =
           bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
 
-      log.info("만료 처리할 PENDING 예약 수: {}", expiredBookings.size());
-
       expiredBookings.parallelStream().forEach(booking -> {
         try {
           booking.setStatus(Booking.Booked.EXPIRED);
@@ -222,8 +214,6 @@ public class BookingService {
           bookingRepository.update(booking);
 
           bookingEventPublisher.publishBookingStatusUpdate(booking);
-
-          log.info("예약 만료 처리 완료: bookingId={}", booking.getBookingId());
         } catch (Exception e) {
           log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getBookingId(), e);
         }
@@ -242,8 +232,7 @@ public class BookingService {
         return;
       }
 
-      List<Booking> bookedBookings =
-          bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, "BOOKED");
+      List<Booking> bookedBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, "BOOKED");
 
       if (bookedBookings.isEmpty()) {
         log.info("eventScheduleId {}에 대한 BOOKED 상태의 예약이 없습니다.", eventScheduleId);
@@ -258,9 +247,6 @@ public class BookingService {
               .build();
 
           bookingEventPublisher.publishBookingEvent(eventDto);
-
-          log.info("Confirmed booking event published: bookingId={}, eventScheduleId={}",
-              booking.getBookingId(), eventScheduleId);
         } catch (Exception e) {
           log.error("예약 이벤트 발행 중 오류 발생: bookingId={}, eventScheduleId={}", booking.getBookingId(),
               eventScheduleId, e);
