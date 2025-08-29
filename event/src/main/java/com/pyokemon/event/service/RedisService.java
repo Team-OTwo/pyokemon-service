@@ -20,6 +20,9 @@ import com.pyokemon.event.repository.SeatRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.pyokemon.event.dto.BookingStatusResponse;
+import com.pyokemon.event.client.BookingServiceClient;
+
 @Service
 @Slf4j
 public class RedisService {
@@ -28,14 +31,16 @@ public class RedisService {
   private final SeatRepository seatRepository;
   private final SeatClassRepository seatClassRepository;
   private final EventScheduleRepository eventScheduleRepository;
+  private final BookingServiceClient bookingServiceClient;
 
   public RedisService(@Qualifier("redisTemplate") RedisTemplate<String, String> redis,
       SeatRepository seatRepository, SeatClassRepository seatClassRepository,
-      EventScheduleRepository eventScheduleRepository) {
+      EventScheduleRepository eventScheduleRepository, BookingServiceClient bookingServiceClient) {
     this.redis = redis;
     this.seatRepository = seatRepository;
     this.seatClassRepository = seatClassRepository;
     this.eventScheduleRepository = eventScheduleRepository;
+    this.bookingServiceClient = bookingServiceClient;
   }
 
   private static final String SEAT_CLASS_STATUS_KEY_PATTERN = "seat:class:status:%d:%s";
@@ -84,10 +89,40 @@ public class RedisService {
 
         redis.opsForHash().putAll(classKey, initMap);
       }
+
+      restoreBookingStatusFromBookingService(scheduleId);
     } catch (Exception e) {
       log.error("좌석 상태 초기화 실패: scheduleId={}, venueId={}, error={}", scheduleId, venueId,
           e.getMessage(), e);
       throw new RuntimeException("좌석 상태 초기화에 실패했습니다: " + e.getMessage(), e);
+    }
+  }
+
+  private void restoreBookingStatusFromBookingService(Long scheduleId) {
+    try {
+      BookingStatusResponse bookingResponse = bookingServiceClient.getBookingStatusByEventScheduleId(scheduleId);
+      if (bookingResponse == null || bookingResponse.getSeatStatusInfos() == null) {
+        log.warn("Booking 서비스에서 예매 상태를 가져올 수 없습니다: scheduleId={}", scheduleId);
+        return;
+      }
+
+      for (BookingStatusResponse.SeatStatusInfo seatInfo : bookingResponse.getSeatStatusInfos()) {
+        try {
+          Long seatId = seatInfo.getSeatId();
+          String status = seatInfo.getStatus();
+
+          if ("BOOKED".equals(status)) {
+            updateSeatStatusByClassName(scheduleId, seatId, "BOOKED");
+          } else if ("PENDING".equals(status)) {
+            holdSeat(scheduleId, seatId, 0L, 300);
+          }
+        } catch (Exception e) {
+          log.error("개별 좌석 상태 복원 실패: scheduleId={}, seatId={}, status={}, error={}", 
+              scheduleId, seatInfo.getSeatId(), seatInfo.getStatus(), e.getMessage(), e);
+        }
+      }
+    } catch (Exception e) {
+      log.error("Booking 서비스에서 예매 상태 복원 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
     }
   }
 
