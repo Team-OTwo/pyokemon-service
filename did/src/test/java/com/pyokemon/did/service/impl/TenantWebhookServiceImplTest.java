@@ -2,7 +2,6 @@ package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 import static com.pyokemon.did.domain.Verification.VpStatus.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,6 @@ import org.springframework.web.client.RestClientException;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.webhook.PresentProofWebhookRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.VerifyPresentationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;

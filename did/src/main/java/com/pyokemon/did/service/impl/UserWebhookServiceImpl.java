@@ -1,30 +1,21 @@
 package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.ACTIVE;
-import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.retry.RetryException;
-import org.springframework.retry.annotation.Backoff;
+import com.pyokemon.did.service.UserWebhookService;
 import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.common.annotation.WebhookRetryable;
 import com.pyokemon.did.domain.DeviceConnection;
-import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
-import com.pyokemon.did.domain.repository.IssuedVcRepository;
-import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.IssuedVcService;
-import com.pyokemon.did.service.UserWebhookService;
-import com.pyokemon.did.service.WalletService;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
