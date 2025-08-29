@@ -1,4 +1,4 @@
-package com.pyokemon.payment.bff.dto;
+package com.pyokemon.payment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

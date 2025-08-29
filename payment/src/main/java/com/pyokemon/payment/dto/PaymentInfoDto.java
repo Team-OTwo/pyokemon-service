@@ -1,4 +1,4 @@
-package com.pyokemon.payment.bff.dto;
+package com.pyokemon.payment.dto;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentDto {
+public class PaymentInfoDto {
   private Long paymentId;
   private Long amount;
   private String method;
