@@ -2,6 +2,7 @@ package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.EventErrorCodes;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -29,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-// @Transactional(readOnly = true)
 public class TenantEventService {
   private final TenantEventRepository tenantEventRepository;
   private final EventScheduleRepository eventScheduleRepository;
@@ -40,14 +42,48 @@ public class TenantEventService {
   private final KafkaMessageProducer kafkaMessageProducer;
 
 
-  public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
-    return tenantEventRepository.findTenantEventDetailByEventId(eventId);
+  public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) { 
+    EventDetailResponseDTO eventInfo = tenantEventRepository.findEventBasicInfo(eventId);
+    if (eventInfo == null) {
+      return null;
+    }
+    EventDetailResponseDTO scheduleInfo = tenantEventRepository.findEventScheduleInfo(eventId);
+    List<PriceDto> priceInfoList = tenantEventRepository.findPriceInfo(eventId);
+    
+    TenantEventDetailResponseDTO dto = new TenantEventDetailResponseDTO();
+    dto.setEventId(eventInfo.getEventId());
+    dto.setTitle(eventInfo.getTitle());
+    dto.setAgeLimit(eventInfo.getAgeLimit());
+    dto.setDescription(eventInfo.getDescription());
+    dto.setGenre(eventInfo.getGenre());
+    dto.setThumbnailUrl(eventInfo.getThumbnailUrl());
+    dto.setStatus(eventInfo.getStatus());
+    
+    if (scheduleInfo != null) {
+      dto.setEventScheduleId(scheduleInfo.getEventScheduleId());
+      dto.setTicketOpenAt(scheduleInfo.getTicketOpenAt());
+      dto.setEventDate(scheduleInfo.getEventDate());
+    }
+    
+    dto.setVenueName(eventInfo.getVenueName());
+    
+    if (priceInfoList != null && !priceInfoList.isEmpty()) {
+      List<TenantEventDetailResponseDTO.PriceInfo> prices = new ArrayList<>();
+      for (PriceDto priceInfo : priceInfoList) {
+        TenantEventDetailResponseDTO.PriceInfo price = new TenantEventDetailResponseDTO.PriceInfo();
+        price.setPriceId(priceInfo.getPriceId());
+        price.setSeatClassId(priceInfo.getSeatClassId());
+        price.setClassName(priceInfo.getClassName());
+        price.setPrice(priceInfo.getPrice());
+        prices.add(price);
+      }
+      dto.setPrices(prices);
+    }
+    
+    return dto;
   }
 
-  public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(
-      Long eventScheduleId) {
-    return tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
-  }
+
 
   public List<TenantEventListDto> getTenantEventListByAccountId(Long accountId) {
     return tenantEventRepository.findTenantEventListByAccountId(accountId);
@@ -176,28 +212,26 @@ public class TenantEventService {
   }
 
   private Event findEventById(Long eventId) {
-    // tenantEventRepository를 사용하여 Event 정보 조회
-    TenantEventDetailResponseDTO eventDetail =
-        tenantEventRepository.findTenantEventDetailByEventId(eventId);
-    if (eventDetail == null) {
+    EventDetailResponseDTO eventInfo = tenantEventRepository.findEventBasicInfo(eventId);
+    if (eventInfo == null) {
       return null;
     }
 
     try {
       // DTO -> Entity
-      Event event = objectMapper.convertValue(eventDetail, Event.class);
+      Event event = objectMapper.convertValue(eventInfo, Event.class);
 
       // status enum 변환 필요
-      if (eventDetail.getStatus() != null) {
-        event.setStatus(Event.EventStatus.valueOf(eventDetail.getStatus()));
+      if (eventInfo.getStatus() != null) {
+        event.setStatus(Event.EventStatus.valueOf(eventInfo.getStatus()));
       }
 
       return event;
     } catch (IllegalArgumentException e) {
-      return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
-          .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
-          .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
-          .status(Event.EventStatus.valueOf(eventDetail.getStatus())).build();
+      return Event.builder().eventId(eventInfo.getEventId()).title(eventInfo.getTitle())
+          .ageLimit(eventInfo.getAgeLimit()).description(eventInfo.getDescription())
+          .genre(eventInfo.getGenre()).thumbnailUrl(eventInfo.getThumbnailUrl())
+          .status(Event.EventStatus.valueOf(eventInfo.getStatus())).build();
     }
   }
 

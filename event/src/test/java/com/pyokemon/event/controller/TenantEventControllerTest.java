@@ -42,7 +42,7 @@ class TenantEventControllerTest {
   private EventResponseDto mockEventResponseDto;
   private TenantEventListDto mockTenantEventList;
   private TenantEventDetailResponseDTO mockTenantEventDetail;
-  private TenantBookingDetailResponseDTO mockTenantBookingDetail;
+
   private MonthlyEventSummaryResponse mockMonthlySummary;
 
   @BeforeEach
@@ -70,8 +70,7 @@ class TenantEventControllerTest {
     mockTenantEventDetail.setEventId(1L);
     mockTenantEventDetail.setTitle("Test Event");
 
-    mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
-    mockTenantBookingDetail.setEventScheduleId(1L);
+
 
     mockMonthlySummary = new MonthlyEventSummaryResponse();
   }
@@ -125,20 +124,7 @@ class TenantEventControllerTest {
     verify(tenantEventService).getTenantEventDetailByEventId(eventId);
   }
 
-  @Test
-  void getTenantBookingDetail_ShouldReturnTenantBookingDetail() throws Exception {
-    Long eventScheduleId = 1L;
 
-    when(tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId))
-        .thenReturn(mockTenantBookingDetail);
-
-    mockMvc.perform(get("/api/events/tenant/booking/{eventScheduleId}/detail", eventScheduleId))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.data.eventScheduleId").value(1));
-
-    verify(tenantEventService).getTenantBookingDetailByEventScheduleId(eventScheduleId);
-  }
 
   @Test
     void registerEvent_ShouldRegisterEventSuccessfully() throws Exception {

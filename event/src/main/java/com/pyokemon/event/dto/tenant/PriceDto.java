@@ -29,6 +29,8 @@ public class PriceDto {
   @Min(value = 0, message = "Price cannot be negative")
   private Integer price;
 
+  private String className; // 좌석 등급명
+
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 

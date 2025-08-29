@@ -87,15 +87,49 @@ public class EventService {
     }
     return savedEventRepository.existsByAccountIdAndEventId(accountId, eventId);
   }
+  
 
-  // 좌석 상세 정보 조회
+  // 좌석 상세 정보 조회 (notification에서 사용)
   public SeatDetailResponseDTO getSeatDetail(Long eventScheduleId, Long seatId)
       throws NotFoundException {
-    SeatDetailResponseDTO dto =
-        eventRepository.findSeatDetailByEventScheduleIdAndSeatId(eventScheduleId, seatId);
-    if (dto == null) {
+    // 좌석 정보 조회
+    SeatInfoResponseDTO seatInfo = eventRepository.findSeatBasicInfo(seatId);
+    if (seatInfo == null) {
       throw new NotFoundException("해당 좌석 정보를 찾을 수 없습니다.");
     }
+    PriceWithSeatClassDTO seatClassInfo = eventRepository.findSeatClassInfo(Long.valueOf(seatInfo.getSeatGrade()));
+    EventDetailResponseDTO scheduleInfo = eventRepository.findEventScheduleInfo(eventScheduleId);
+    EventDetailResponseDTO eventInfo = eventRepository.findEventBasicInfo(eventScheduleId);
+
+    SeatDetailResponseDTO dto = new SeatDetailResponseDTO();
+    dto.setEvent_schedule_id(eventScheduleId);
+    dto.setSeat_id(seatId);
+    
+    // EventInfo 
+    SeatDetailResponseDTO.EventInfo event = new SeatDetailResponseDTO.EventInfo();
+    event.setEvent_id(eventInfo.getEventId());
+    event.setEvent_title(eventInfo.getTitle());
+    dto.setEvent(event);
+    
+    // EventScheduleInfo
+    SeatDetailResponseDTO.EventScheduleInfo schedule = new SeatDetailResponseDTO.EventScheduleInfo();
+    schedule.setTicket_open_at(scheduleInfo.getTicketOpenAt().toString());
+    schedule.setEvent_date(scheduleInfo.getEventDate().toString());
+    dto.setEvent_schedule(schedule);
+    
+    // SeatInfo
+    SeatDetailResponseDTO.SeatInfo seat = new SeatDetailResponseDTO.SeatInfo();
+    seat.setFloor(seatInfo.getFloor());
+    seat.setRow(seatInfo.getRow());
+    seat.setCol(seatInfo.getCol());
+    
+    SeatDetailResponseDTO.SeatClassInfo seatClass = new SeatDetailResponseDTO.SeatClassInfo();
+    seatClass.setSeat_class_id(seatClassInfo.getSeatClassId());
+    seatClass.setClass_name(seatClassInfo.getClassName());
+    seat.setSeat_class(seatClass);
+    
+    dto.setSeat(seat);
+    
     return dto;
   }
 

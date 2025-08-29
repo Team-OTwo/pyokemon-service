@@ -52,14 +52,7 @@ public class TenantEventController {
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
   }
 
-  // 테넌트용 예매 현황 조회 (event_schedule_id 기반)
-  @GetMapping("/booking/{eventScheduleId}/detail")
-  public ResponseDto<TenantBookingDetailResponseDTO> getTenantBookingDetail(
-      @PathVariable Long eventScheduleId) {
-    TenantBookingDetailResponseDTO bookingDetail =
-        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
-    return ResponseDto.success(bookingDetail, "Tenant booking detail retrieved successfully");
-  }
+
 
   // 이벤트 등록 (테넌트용)
   @PostMapping

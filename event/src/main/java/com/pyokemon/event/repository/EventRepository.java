@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Mapper;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.SeatDetailResponseDTO;
 import com.pyokemon.event.dto.SeatPriceResponseDto;
+import com.pyokemon.event.dto.SeatInfoResponseDTO;
+import com.pyokemon.event.dto.PriceWithSeatClassDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.entity.Event;
 
 @Mapper
@@ -17,5 +20,8 @@ public interface EventRepository {
 
   List<SeatPriceResponseDto> findSeatPriceByEventScheduleId(Long eventScheduleId);
 
-  SeatDetailResponseDTO findSeatDetailByEventScheduleIdAndSeatId(Long eventScheduleId, Long seatId);
+  SeatInfoResponseDTO findSeatBasicInfo(Long seatId);
+  PriceWithSeatClassDTO findSeatClassInfo(Long seatClassId);
+  EventDetailResponseDTO findEventScheduleInfo(Long eventScheduleId);
+  EventDetailResponseDTO findEventBasicInfo(Long eventScheduleId);
 }

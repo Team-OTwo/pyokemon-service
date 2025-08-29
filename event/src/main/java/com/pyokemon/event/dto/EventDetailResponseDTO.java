@@ -21,6 +21,7 @@ public class EventDetailResponseDTO {
   private String description;
   private String genre;
   private String thumbnailUrl;
+  private String status;
 
   // event schedule
   private Long eventScheduleId;

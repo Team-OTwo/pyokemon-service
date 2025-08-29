@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
+import com.pyokemon.event.dto.tenant.PriceDto;
 import com.pyokemon.event.entity.Event;
 
 @Mapper
@@ -15,9 +16,11 @@ public interface TenantEventRepository {
 
   List<TenantEventListDto> findTenantEventListByAccountId(Long accountId);
 
-  TenantEventDetailResponseDTO findTenantEventDetailByEventId(Long eventId);
+  EventDetailResponseDTO findEventBasicInfo(Long eventId);
+  EventDetailResponseDTO findEventScheduleInfo(Long eventId);
+  List<PriceDto> findPriceInfo(Long eventId);
 
-  TenantBookingDetailResponseDTO findTenantBookingDetailByEventScheduleId(Long eventScheduleId);
+
 
   List<MonthlyEventDTO> findMonthlyEventsByAccountId(Long accountId, String startDate,
       String endDate);

@@ -60,7 +60,7 @@ class TenantEventServiceTest {
   private EventUpdateDto mockEventUpdateDto;
   private EventScheduleDto mockEventScheduleDto;
   private TenantEventDetailResponseDTO mockTenantEventDetail;
-  private TenantBookingDetailResponseDTO mockTenantBookingDetail;
+
   private TenantEventListDto mockTenantEventList;
   private Event mockEvent;
   private Venue mockVenue;
@@ -88,8 +88,7 @@ class TenantEventServiceTest {
     mockTenantEventDetail.setTitle("Test Event");
     mockTenantEventDetail.setStatus("APPROVED");
 
-    mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
-    mockTenantBookingDetail.setEventScheduleId(1L);
+
 
     mockTenantEventList = new TenantEventListDto();
     mockTenantEventList.setEventId(1L);
@@ -116,20 +115,7 @@ class TenantEventServiceTest {
     verify(tenantEventRepository).findTenantEventDetailByEventId(eventId);
   }
 
-  @Test
-  void getTenantBookingDetailByEventScheduleId_ShouldReturnTenantBookingDetail() {
-    Long eventScheduleId = 1L;
 
-    when(tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
-        .thenReturn(mockTenantBookingDetail);
-
-    TenantBookingDetailResponseDTO result =
-        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
-
-    assertNotNull(result);
-    assertEquals(mockTenantBookingDetail.getEventScheduleId(), result.getEventScheduleId());
-    verify(tenantEventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
-  }
 
   @Test
   void getTenantEventListByAccountId_ShouldReturnTenantEventList() {

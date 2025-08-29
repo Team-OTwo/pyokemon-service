@@ -18,50 +18,32 @@
         ORDER BY es.event_date ASC
     </select>
 
-    <resultMap id="TenantEventDetailResultMap" type="com.pyokemon.event.dto.tenant.TenantEventDetailResponseDTO">
-        <id column="event_id" property="eventId"/>
-        <result column="title" property="title"/>
-        <result column="age_limit" property="ageLimit"/>
-        <result column="description" property="description"/>
-        <result column="genre" property="genre"/>
-        <result column="thumbnail_url" property="thumbnailUrl"/>
-        <result column="status" property="status"/>
-        <result column="event_schedule_id" property="eventScheduleId"/>
-        <result column="ticket_open_at" property="ticketOpenAt"/>
-        <result column="event_date" property="eventDate"/>
-        <result column="venue_name" property="venueName"/>
-        <collection property="prices" ofType="com.pyokemon.event.dto.tenant.TenantEventDetailResponseDTO$PriceInfo">
-            <id column="price_id" property="priceId"/>
-            <result column="seat_class_id" property="seatClassId"/>
-            <result column="class_name" property="className"/>
-            <result column="price" property="price"/>
-        </collection>
-    </resultMap>
-
-    <select id="findTenantEventDetailByEventId" resultMap="TenantEventDetailResultMap">
-        SELECT
-        e.event_id,
-        e.title,
-        e.age_limit,
-        e.description,
-        e.genre,
-        e.thumbnail_url,
-        e.status,
-        es.event_schedule_id,
-        es.ticket_open_at,
-        es.event_date,
-        v.venue_name,
-        p.price_id,
-        p.seat_class_id,
-        sc.class_name,
-        p.price
+    <!-- 공연 기본 정보 조회 (venue 정보 포함) -->
+    <select id="findEventBasicInfo" resultType="com.pyokemon.event.dto.EventDetailResponseDTO">
+        SELECT e.event_id as eventId, e.title, e.age_limit as ageLimit, e.description, e.genre, e.thumbnail_url as thumbnailUrl, e.status, v.venue_name as venueName
         FROM tb_event e
         LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
-        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
-        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id
-        LEFT JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        LEFT JOIN tb_venue v ON es.venue_id = es.venue_id
         WHERE e.event_id = #{eventId}
-        ORDER BY sc.priority ASC
+    </select>
+
+    <!-- 공연 일정 정보 조회 -->
+    <select id="findEventScheduleInfo" resultType="com.pyokemon.event.dto.EventDetailResponseDTO">
+        SELECT event_schedule_id as eventScheduleId, ticket_open_at as ticketOpenAt, event_date as eventDate
+        FROM tb_event_schedule 
+        WHERE event_id = #{eventId}
+    </select>
+
+
+
+        <!-- 가격 정보 조회 -->
+    <select id="findPriceInfo" resultType="com.pyokemon.event.dto.tenant.PriceDto">
+        SELECT p.price_id as priceId, p.seat_class_id as seatClassId, sc.class_name as className, p.price
+        FROM tb_price p
+        JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        JOIN tb_event_schedule es ON p.event_schedule_id = es.event_schedule_id
+        WHERE es.event_id = #{eventId}
+         ORDER BY sc.priority ASC
     </select>
 
     <update id="updateEvent" parameterType="Event">
@@ -104,56 +86,7 @@
         </selectKey>
     </insert>
 
-    <resultMap id="TenantBookingDetailResultMap" type="com.pyokemon.event.dto.tenant.TenantBookingDetailResponseDTO">
-        <id column="event_id" property="eventId"/>
-        <result column="title" property="title"/>
-        <result column="genre" property="genre"/>
-        <result column="status" property="status"/>
-        <result column="event_schedule_id" property="eventScheduleId"/>
-        <result column="ticket_open_at" property="ticketOpenAt"/>
-        <result column="event_date" property="eventDate"/>
-        <result column="venue_name" property="venueName"/>
-        <collection property="bookingStatus"
-                    ofType="com.pyokemon.event.dto.tenant.TenantBookingDetailResponseDTO$BookingStatusInfo">
-            <result column="seat_class_id" property="seatClassId"/>
-            <result column="class_name" property="className"/>
-            <result column="total_seats" property="totalSeats"/>
-            <result column="booked_seats" property="bookedSeats"/>
-            <result column="available_seats" property="availableSeats"/>
-            <result column="price" property="price"/>
-            <result column="booking_rate" property="bookingRate"/>
-        </collection>
-    </resultMap>
 
-    <select id="findTenantBookingDetailByEventScheduleId" resultMap="TenantBookingDetailResultMap">
-        SELECT
-        e.event_id,
-        e.title,
-        e.genre,
-        e.status,
-        es.event_schedule_id,
-        es.ticket_open_at,
-        es.event_date,
-        v.venue_name,
-        sc.seat_class_id,
-        sc.class_name,
-        COUNT(s.seat_id) as total_seats,
-        COUNT(CASE WHEN b.booking_id IS NOT NULL THEN 1 END) as booked_seats,
-        COUNT(CASE WHEN b.booking_id IS NULL THEN 1 END) as available_seats,
-        p.price,
-        ROUND(COUNT(CASE WHEN b.booking_id IS NOT NULL THEN 1 END) * 100.0 / COUNT(s.seat_id), 2) as booking_rate
-        FROM tb_event e
-        JOIN tb_event_schedule es ON e.event_id = es.event_id
-        JOIN tb_venue v ON es.venue_id = v.venue_id
-        JOIN tb_seat s ON v.venue_id = s.venue_id
-        JOIN tb_seat_class sc ON s.seat_class_id = sc.seat_class_id
-        LEFT JOIN tb_price p ON es.event_schedule_id = p.event_schedule_id AND sc.seat_class_id = p.seat_class_id
-        LEFT JOIN tb_booking b ON es.event_schedule_id = b.event_schedule_id AND s.seat_id = b.seat_id AND b.status =
-        'BOOKED'
-        WHERE es.event_schedule_id = #{eventScheduleId}
-        GROUP BY sc.seat_class_id, sc.class_name, p.price
-        ORDER BY sc.priority ASC
-    </select>
 
     <select id="findMonthlyEventsByAccountId" resultType="com.pyokemon.event.dto.tenant.MonthlyEventDTO">
         SELECT
