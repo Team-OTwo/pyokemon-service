@@ -6,6 +6,9 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.pyokemon.did.service.IssuedVcService;
+import org.springframework.dao.DataAccessException;
+import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import com.pyokemon.did.service.UserWebhookService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -28,7 +32,10 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
   private final DeviceConnectionRepository deviceConnectionRepository;
   private final IssuedVcRepository issuedVcRepository;
+  private final IssuedVcService issuedVcService;
 
+  private static final String ISSUE_CREDENTIAL_STATUS_DONE = "done";
+  private static final String ISSUE_CREDENTIAL_ROLE_HOLDER = "holder";
 
   @Override
   @Retryable(value = {BusinessException.class, IOException.class}, maxAttempts = 3,
@@ -90,53 +97,31 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   @Override
-  public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest webhookDto) {
-    try {
-      String state = webhookDto.getState();
-      String credExId = webhookDto.getCredExId();
+  @Transactional
+  @Retryable(retryFor = {RetryException.class},
+          maxAttempts = 4,
+          backoff = @Backoff(delay = 2000, multiplier = 2) // 2초, 4초, 6초  간격으로 재시도
+  )
+  public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
+    // holder webhook 만 처리
+    if (!ISSUE_CREDENTIAL_ROLE_HOLDER.equals(issueCredentialWebhookRequest.getRole())) return;
 
-      if (credExId == null || credExId.isEmpty()) {
-        log.warn("credential_exchange_id가 없습니다");
-        return;
-      }
+    // 완료된 issue credential webhook 만 처리
+    if (!ISSUE_CREDENTIAL_STATUS_DONE.equals(issueCredentialWebhookRequest.getState())) return;
 
-      // 상태에 따른 처리
-      switch (state) {
-        case "credential-received":
-          // credential-received 상태에서 credential_exchange_id 업데이트
-          updateVcCredentialExchangeId(webhookDto);
-          updateVcStatus(credExId, null, ISSUED);
-          break;
-        case "done":
-          //
-          updateVcStatus(credExId, null, ISSUED);
-          break;
-        default:
-          log.info("처리하지 않는 상태: {}", state);
-      }
-    } catch (Exception e) {
-      throw new RuntimeException("일반 Webhook 처리 실패", e);
-    }
+    // 1. issueCredentialWebhookRequest 에서 bookingId 추출
+    Long bookingId = issueCredentialWebhookRequest.extractBookingId();
+
+    // 2. IssuedVc 조회 및 credExId 업데이트
+    issuedVcService.updateCredExId(bookingId, issueCredentialWebhookRequest.getCredExId());
   }
 
   @Override
-  public void handleLdProofWebhook(LdProofWebhookRequest webhookDto) {
-    try {
-      String credExId = webhookDto.getCredExId();
-      String credIdStored = webhookDto.getCredIdStored();
-
-      if (credExId == null || credExId.isEmpty()) {
-        log.warn("credential_exchange_id가 없습니다");
-        return;
-      }
-
-      // LD Proof webhook은 credential_id를 업데이트하고 상태를 CREDENTIAL_ISSUED로 변경
-      updateVcStatus(credExId, credIdStored, ISSUED);
-
-    } catch (Exception e) {
-      log.error("LD Proof Webhook 처리 중 오류 발생: {}", e.getMessage(), e);
-      throw new RuntimeException("LD Proof Webhook 처리 실패", e);
-    }
+  public void handleLdProofWebhook(LdProofWebhookRequest ldProofWebhookRequest) {
+    log.info(
+            "LD Proof Webhook from User ACA-Py - cred_ex_id: {}, cred_id_stored: {}, cred_ex_ld_proof_id: {}"
+            , ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredIdStored(), ldProofWebhookRequest.getCredExLdProofId()
+    );
   }
 
   /**

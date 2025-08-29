@@ -35,7 +35,7 @@ public class IssueCredentialResponse implements AcaPyResponse {
    */
   public IssuedVc toEntity(Long tenantId, Long userId, Long bookingId, String presExId,
       String verifyInviUrl) {
-    return IssuedVc.builder().credId(null).credExId(credExId).verifyInviUrl(verifyInviUrl)
+    return IssuedVc.builder().verifyInviUrl(verifyInviUrl)
         .presExId(presExId).bookingId(bookingId).userId(userId).tenantId(tenantId)
         .status(VcStatus.ISSUED).build();
   }

@@ -1,10 +1,11 @@
 package com.pyokemon.did.service.impl;
 
-import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILED;
+import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
 
 import java.util.Map;
 
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,6 +118,38 @@ public class IssuedVcServiceImpl implements IssuedVcService {
   }
 
   @Override
+  @Transactional
+  public void updateCredExId(Long bookingId, String credExId) throws RetryException {
+    try {
+      IssuedVc issuedVc = getIssuedVcByBookingId(bookingId);
+      issuedVc.setCredExId(credExId);
+
+      issuedVcRepository.update(issuedVc);
+    } catch (BusinessException e) {
+      // VC_INVALID 의 경우 재시도 X
+      if (VC_INVALID.equals(e.getErrorCode())) return;
+
+      throw new RetryException("retry - vc not found");
+    } catch (Exception e) {
+      throw new RetryException("retry - fail to find vc");
+    }
+  }
+
+  @Override
+  public IssuedVc getIssuedVcByBookingId(Long bookingId) throws BusinessException {
+    IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId).orElseThrow(
+            () -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_NOT_FOUND)
+    );
+
+    // status != ISSUED 예외처리
+    if (!issuedVc.getStatus().equals(IssuedVc.VcStatus.ISSUED)) {
+      throw new BusinessException("유효하지 않은 VC - status: " + issuedVc.getStatus(), VC_INVALID);
+    }
+
+    return issuedVc;
+  }
+
+  @Override
   public Map<String, String> sendVerifiyInviUrlOrThrow(Long userId, Long tenantId, Long bookingId) {
     IssuedVc issuedVc = issuedVcRepository
         .findByUserIdAndTenantIdAndBookingIdAndStatus(userId, tenantId, bookingId, ISSUED)
@@ -124,6 +157,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
     return Map.of("verifyInviUrl", issuedVc.getVerifyInviUrl(), "presExId", issuedVc.getPresExId());
   }
+
 
   /**
    * ACA-Py에 자격 증명 발급을 요청합니다.
