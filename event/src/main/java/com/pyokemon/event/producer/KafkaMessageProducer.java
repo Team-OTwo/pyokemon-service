@@ -24,10 +24,8 @@ public class KafkaMessageProducer {
   }
 
   public void sendTwoHoursBeforeEvent(Long eventScheduleId) {
-    EventKafkaDto dto = EventKafkaDto.builder()
-        .eventScheduleId(eventScheduleId)
-        .status("2H_AHEAD")
-        .build();
+    EventKafkaDto dto =
+        EventKafkaDto.builder().eventScheduleId(eventScheduleId).status("2H_AHEAD").build();
     kafkaMessageSender.send(KafkaTopicConstants.EVENT_SCHEDULE_2H_AHEAD,
         String.valueOf(eventScheduleId), dto);
   }

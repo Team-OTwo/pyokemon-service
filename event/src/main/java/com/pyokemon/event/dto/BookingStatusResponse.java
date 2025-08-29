@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookingStatusResponse {
   private List<SeatStatusInfo> seatStatusInfos;
-  
+
   @Data
   @Builder
   @NoArgsConstructor

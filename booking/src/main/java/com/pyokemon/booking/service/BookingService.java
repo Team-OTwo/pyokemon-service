@@ -177,6 +177,12 @@ public class BookingService {
 
     Booking booking = bookingOpt.get();
 
+    if (Booking.Booked.CANCELED.equals(booking.getStatus())) {
+      log.warn("이미 취소된 예매입니다. 상태 변경을 무시합니다: bookingId={}, currentStatus={}, newStatus={}", 
+          bookingId, booking.getStatus(), newStatus);
+      return;
+    }
+
     booking.setStatus(newStatus);
     booking.setPaymentId(paymentId);
     booking.setUpdatedAt(LocalDateTime.now());
@@ -232,7 +238,8 @@ public class BookingService {
         return;
       }
 
-      List<Booking> bookedBookings = bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, "BOOKED");
+      List<Booking> bookedBookings =
+          bookingRepository.findByEventScheduleIdAndStatus(eventScheduleId, "BOOKED");
 
       if (bookedBookings.isEmpty()) {
         log.info("eventScheduleId {}에 대한 BOOKED 상태의 예약이 없습니다.", eventScheduleId);

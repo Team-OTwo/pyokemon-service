@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pyokemon.event.client.BookingServiceClient;
+import com.pyokemon.event.dto.BookingStatusResponse;
 import com.pyokemon.event.entity.Seat;
 import com.pyokemon.event.entity.SeatClass;
 import com.pyokemon.event.repository.EventScheduleRepository;
@@ -19,9 +21,6 @@ import com.pyokemon.event.repository.SeatClassRepository;
 import com.pyokemon.event.repository.SeatRepository;
 
 import lombok.extern.slf4j.Slf4j;
-
-import com.pyokemon.event.dto.BookingStatusResponse;
-import com.pyokemon.event.client.BookingServiceClient;
 
 @Service
 @Slf4j
@@ -100,7 +99,8 @@ public class RedisService {
 
   private void restoreBookingStatusFromBookingService(Long scheduleId) {
     try {
-      BookingStatusResponse bookingResponse = bookingServiceClient.getBookingStatusByEventScheduleId(scheduleId);
+      BookingStatusResponse bookingResponse =
+          bookingServiceClient.getBookingStatusByEventScheduleId(scheduleId);
       if (bookingResponse == null || bookingResponse.getSeatStatusInfos() == null) {
         log.warn("Booking 서비스에서 예매 상태를 가져올 수 없습니다: scheduleId={}", scheduleId);
         return;
@@ -117,12 +117,13 @@ public class RedisService {
             holdSeat(scheduleId, seatId, 0L, 300);
           }
         } catch (Exception e) {
-          log.error("개별 좌석 상태 복원 실패: scheduleId={}, seatId={}, status={}, error={}", 
-              scheduleId, seatInfo.getSeatId(), seatInfo.getStatus(), e.getMessage(), e);
+          log.error("개별 좌석 상태 복원 실패: scheduleId={}, seatId={}, status={}, error={}", scheduleId,
+              seatInfo.getSeatId(), seatInfo.getStatus(), e.getMessage(), e);
         }
       }
     } catch (Exception e) {
-      log.error("Booking 서비스에서 예매 상태 복원 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
+      log.error("Booking 서비스에서 예매 상태 복원 실패: scheduleId={}, error={}", scheduleId, e.getMessage(),
+          e);
     }
   }
 
@@ -269,7 +270,8 @@ public class RedisService {
           initSeatStatuses(eventScheduleId, venueId);
         } catch (Exception e) {
           log.error("Redis 초기화 실패: eventScheduleId={}, venueId={}, error={}",
-              eventSchedule.get("event_schedule_id"), eventSchedule.get("venue_id"), e.getMessage(), e);
+              eventSchedule.get("event_schedule_id"), eventSchedule.get("venue_id"), e.getMessage(),
+              e);
           continue;
         }
       }
