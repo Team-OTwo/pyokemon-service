@@ -33,7 +33,7 @@ public class KafkaMessageConsumer {
       }
 
       if ("CONFIRMED".equals(event.getStatus())) {
-        issuedVcService.issueVC(event.getAccountId(), event.getTenantId(), event.getBookingId());
+        issuedVcService.issueCredential(event);
       }
 
       ack.acknowledge();

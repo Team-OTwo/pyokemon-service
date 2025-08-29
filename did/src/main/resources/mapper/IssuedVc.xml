@@ -3,81 +3,95 @@
 <mapper namespace="com.pyokemon.did.domain.repository.IssuedVcRepository">
 
     <resultMap id="IssuedVcResultMap" type="com.pyokemon.did.domain.IssuedVc">
-        <id column="id" property="id" />
-        <result column="credential_exchange_id" property="credentialExchangeId" />
-        <result column="booking_id" property="bookingId" />
-        <result column="tenant_id" property="tenantId" />
-        <result column="credential_id" property="credentialId" />
-        <result column="status" property="status" />
-        <result column="created_at" property="createdAt" />
-        <result column="updated_at" property="updatedAt" />
+        <id column="id" property="id"/>
+        <result column="cred_id" property="credId"/>
+        <result column="cred_ex_id" property="credExId"/>
+        <result column="verify_invi_url" property="verifyInviUrl"/>
+        <result column="pres_ex_id" property="presExId"/>
+        <result column="booking_id" property="bookingId"/>
+        <result column="user_id" property="userId"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
-    <select id="findById" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE id = #{id}
-    </select>
 
     <select id="findByCredentialExchangeId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId}
-    </select>
-
-    <select id="findByCredentialExchangeIdAndStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId} AND status = #{status}
+        SELECT *
+        FROM tb_issued_vc
+        WHERE cred_ex_id = #{credExId}
     </select>
 
     <select id="findByCredentialId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE credential_id = #{credentialId}
+        SELECT *
+        FROM tb_issued_vc
+        WHERE cred_id = #{credId}
     </select>
 
     <select id="findByBookingId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} ORDER BY created_at DESC LIMIT 1
+        SELECT *
+        FROM tb_issued_vc
+        WHERE booking_id = #{bookingId}
     </select>
 
     <select id="findByTenantId" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE tenant_id = #{tenantId} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE status = #{status} ORDER BY created_at DESC
-    </select>
-
-    <select id="findByTenantIdAndStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE tenant_id = #{tenantId} AND status = #{status} ORDER BY created_at DESC
+        SELECT *
+        FROM tb_issued_vc
+        WHERE tenant_id = #{tenantId}
+        ORDER BY created_at DESC
     </select>
 
     <select id="findByBookingIdAndStatus" resultMap="IssuedVcResultMap">
-        SELECT * FROM tb_issued_vc WHERE booking_id = #{bookingId} AND status = #{status} ORDER BY created_at DESC LIMIT 1
+        SELECT *
+        FROM tb_issued_vc
+        WHERE booking_id = #{bookingId}
+          AND status = #{status}
+        ORDER BY created_at DESC LIMIT 1
+    </select>
+
+    <select id="findByUserIdAndTenantIdAndBookingIdAndStatus" resultMap="IssuedVcResultMap">
+        SELECT * FROM tb_issued_vc 
+        WHERE user_id = #{userId} 
+        AND tenant_id = #{tenantId} 
+        AND booking_id = #{bookingId} 
+        AND status = #{status} 
+        ORDER BY created_at DESC 
+        LIMIT 1
     </select>
 
     <select id="existsByBookingIdAndIssued" resultType="boolean">
-        SELECT EXISTS(
-            SELECT 1 FROM tb_issued_vc 
-            WHERE booking_id = #{bookingId} 
-            AND status IN ('CREDENTIAL_ISSUED', 'CREDENTIAL_RECEIVED')
-        )
+        SELECT EXISTS(SELECT 1
+                      FROM tb_issued_vc
+                      WHERE booking_id = #{bookingId}
+                        AND status = "ISSUED")
     </select>
 
     <insert id="save" parameterType="com.pyokemon.did.domain.IssuedVc" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_issued_vc (credential_exchange_id, booking_id, tenant_id, credential_id, status, created_at, updated_at)
-        VALUES (#{credentialExchangeId}, #{bookingId}, #{tenantId}, #{credentialId}, #{status}, NOW(), NOW())
+        INSERT INTO tb_issued_vc (cred_id, cred_ex_id, verify_invi_url, pres_ex_id, booking_id, user_id, tenant_id,
+                                  status, created_at, updated_at)
+        VALUES (#{credId}, #{credExId}, #{verifyInviUrl}, #{presExId}, #{bookingId}, #{userId}, #{tenantId}, #{status},
+                NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.IssuedVc">
-        UPDATE tb_issued_vc 
-        SET credential_exchange_id = #{credentialExchangeId}, booking_id = #{bookingId}, tenant_id = #{tenantId}, credential_id = #{credentialId}, status = #{status}, updated_at = NOW()
+        UPDATE tb_issued_vc
+        SET cred_id         = #{credId},
+            cred_ex_id      = #{credExId},
+            verify_invi_url = #{verifyInviUrl},
+            pres_ex_id      = #{presExId},
+            booking_id      = #{bookingId},
+            user_id         = #{userId},
+            tenant_id       = #{tenantId},
+            status          = #{status},
+            updated_at      = NOW()
         WHERE id = #{id}
     </update>
 
-    <delete id="deleteById">
-        DELETE FROM tb_issued_vc WHERE id = #{id}
-    </delete>
-
-    <delete id="deleteByCredentialExchangeId">
-        DELETE FROM tb_issued_vc WHERE credential_exchange_id = #{credentialExchangeId}
-    </delete>
-
     <delete id="deleteByBookingId">
-        DELETE FROM tb_issued_vc WHERE booking_id = #{bookingId}
+        DELETE
+        FROM tb_issued_vc
+        WHERE booking_id = #{bookingId}
     </delete>
 
 </mapper> 

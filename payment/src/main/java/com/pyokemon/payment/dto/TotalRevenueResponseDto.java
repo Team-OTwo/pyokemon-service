@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TotalRevenueResponseDto {
-    private Long totalRevenue;
+  private Long totalRevenue;
 }

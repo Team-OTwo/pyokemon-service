@@ -21,6 +21,6 @@ public class Booking {
   private LocalDateTime updatedAt;
 
   public enum Booked {
-    PENDING, BOOKED, CANCELED, FAILED
+    PENDING, BOOKED, CANCELED, FAILED, EXPIRED
   }
 }

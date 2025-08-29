@@ -47,9 +47,8 @@ public class AccountController {
   public ResponseEntity<ResponseDto<Void>> logout(
       @RequestHeader(value = "Authorization", required = false) String authHeader,
       @RequestHeader(value = "X-Auth-AccountId", required = false) String accountId,
-      @RequestBody(required = false) LogoutRequestDto request) {
-    String deviceNumber = request.getDeviceNumber();
-    accountService.logout(authHeader, accountId, deviceNumber);
+      @RequestHeader(value = "X-Auth-DeviceId", required = false) Long deviceId) {
+    accountService.logout(authHeader, accountId, deviceId);
     return ResponseEntity.ok(ResponseDto.success("로그아웃 성공"));
   }
 

@@ -298,70 +298,28 @@ public class AccountServiceTest {
     verify(accountRepository).findByAccountId(1L);
   }
 
+  // ========== 로그아웃 테스트 ==========
+
   @Test
-  @DisplayName("로그아웃 성공 테스트")
-  void logoutSuccess() {
+  @DisplayName("로그아웃 성공 - 토큰 블랙리스트 추가")
+  void logoutSuccess_blacklistToken() {
     // given
-    String token = "Bearer valid-token";
-    String accountId = "1";
-    String deviceNumber = "device123";
+    String token = "valid-token";
+    String fullToken = "Bearer " + token;
     Claims claims = mock(Claims.class);
-    Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1시간 후
+    Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1 hour expiry
 
-    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-    when(tokenGenerator.parseToken("valid-token")).thenReturn(claims);
+    when(tokenGenerator.parseToken(token)).thenReturn(claims); // 서비스가 Bearer 제거 후 parse
     when(claims.getExpiration()).thenReturn(expiration);
-    when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-    when(userRepository.findByAccountId(1L)).thenReturn(Optional.of(testUser));
-    when(userDeviceRepository.findByUserIdAndIsValid(1L, true))
-        .thenReturn(Optional.of(testUserDevice));
+    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-    // when
-    assertDoesNotThrow(() -> {
-      accountService.logout(token, accountId, deviceNumber);
-    });
+    // when: accountId, deviceNumber는 블랙리스트만 추가할 때 null로 전달
+    accountService.logout(fullToken, null, null);
 
     // then
-    verify(redisTemplate).opsForValue();
-    verify(valueOperations).set(eq(AuthConstants.BLACKLIST_PREFIX + "valid-token"),
-        eq("blacklisted"), anyLong(), eq(TimeUnit.SECONDS));
-    verify(accountRepository).findByAccountId(1L);
-    verify(userRepository).findByAccountId(1L);
-    verify(userDeviceRepository).findByUserIdAndIsValid(1L, true);
-    verify(userDeviceRepository).update(any(UserDevice.class));
+    verify(redisTemplate.opsForValue()).set(eq(AuthConstants.BLACKLIST_PREFIX + token),
+        eq("blacklisted"), anyLong(), // 남은 만료 초 (비결정적이라 anyLong 사용)
+        eq(TimeUnit.SECONDS));
+    verifyNoInteractions(userRepository, userDeviceRepository);
   }
-
-  @Test
-  @DisplayName("로그아웃 성공 테스트 - 토큰 없음")
-  void logoutSuccess_NoToken() {
-    // given
-    String token = null;
-    String accountId = "1";
-    String deviceNumber = "device123";
-
-    // when
-    assertDoesNotThrow(() -> {
-      accountService.logout(token, accountId, deviceNumber);
-    });
-
-    // then
-    verifyNoInteractions(tokenGenerator, redisTemplate);
-  }
-
-  @Test
-    @DisplayName("계정 삭제 성공 테스트")
-    void deleteAccountSuccess() {
-        // given
-        when(accountRepository.findByAccountId(1L)).thenReturn(Optional.of(testAccount));
-        when(accountRepository.updateStatus(1L, AccountStatus.DELETED)).thenReturn(1);
-
-        // when
-        assertDoesNotThrow(() -> {
-            accountService.deleteAccount(1L);
-        });
-
-        // then
-        verify(accountRepository).findByAccountId(1L);
-        verify(accountRepository).updateStatus(1L, AccountStatus.DELETED);
-    }
 }

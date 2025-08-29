@@ -2,6 +2,7 @@ package com.pyokemon.event.repository;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.pyokemon.event.dto.EventScheduleInfoDto;
@@ -36,6 +37,8 @@ public interface EventScheduleRepository {
   Long findVenueIdByEventScheduleId(Long eventScheduleId);
 
   List<Long> findEventScheduleIdTwoHoursLater();
+
+  List<Map<String, Object>> findAllEventSchedules();
 
   Optional<EventScheduleInfoDto> findEventScheduleById(
           @Param("eventScheduleId") Long eventScheduleId);

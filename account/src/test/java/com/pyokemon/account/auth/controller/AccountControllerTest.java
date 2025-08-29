@@ -139,66 +139,59 @@ public class AccountControllerTest {
   // ========== 로그아웃 테스트 ==========
 
   @Test
-  @DisplayName("로그아웃 성공 테스트")
-  void logoutSuccess() {
+  @DisplayName("로그아웃 성공 테스트 - 디바이스 정보 포함")
+  void logoutSuccess_withDevice() {
     // given
     String authHeader = "Bearer valid-token";
-    String accountId = "1";
-    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber("deviceNumber").build();
-    doNothing().when(accountService).logout(authHeader, accountId, request.getDeviceNumber());
+    doNothing().when(accountService).logout(authHeader, "account123", 1L);
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, accountId, request);
+        accountController.logout(authHeader, "account123", 1L);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader, accountId, request.getDeviceNumber());
+    verify(accountService).logout(authHeader, "account123", 1L);
   }
 
   @Test
-  @DisplayName("로그아웃 성공 테스트 - deviceNumber 없음")
-  void logoutSuccessWithoutDeviceNumber() {
+  @DisplayName("로그아웃 성공 테스트 - 디바이스 정보 없음 (웹 로그아웃)")
+  void logoutSuccess_withoutDevice() {
     // given
     String authHeader = "Bearer valid-token";
-    String accountId = "1";
-    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber(null).build();
-    doNothing().when(accountService).logout(authHeader, accountId, request.getDeviceNumber());
+    doNothing().when(accountService).logout(authHeader, "account123", null);
 
     // when
     ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, accountId, request);
+        accountController.logout(authHeader, "account123", null); // request is null
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(authHeader, accountId, request.getDeviceNumber());
+    verify(accountService).logout(authHeader, "account123", null);
   }
 
   @Test
-  @DisplayName("로그아웃 성공 테스트 - Authorization 헤더 없음")
-  void logoutSuccessWithoutAuthHeader() {
+  @DisplayName("로그아웃 성공 테스트 - 인증 헤더 없음")
+  void logoutSuccess_withoutAuthHeader() {
     // given
     String authHeader = null;
-    String accountId = "1";
-    LogoutRequestDto request = LogoutRequestDto.builder().deviceNumber("deviceNumber").build();
-    doNothing().when(accountService).logout(null, accountId, request.getDeviceNumber());
+    doNothing().when(accountService).logout(authHeader, null, 1L);
 
     // when
-    ResponseEntity<ResponseDto<Void>> response =
-        accountController.logout(authHeader, accountId, request);
+    ResponseEntity<ResponseDto<Void>> response = accountController.logout(authHeader, null, 1L);
 
     // then
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertEquals("로그아웃 성공", response.getBody().getMessage());
 
-    verify(accountService).logout(null, accountId, request.getDeviceNumber());
+    verify(accountService).logout(authHeader, null, 1L);
   }
 
   // ========== 토큰 갱신 테스트 ==========

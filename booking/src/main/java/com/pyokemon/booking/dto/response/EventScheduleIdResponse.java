@@ -12,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventScheduleIdResponse {
-  private List<Long> seatIds;
+  private List<SeatStatusInfo> seatStatusInfos;
 }

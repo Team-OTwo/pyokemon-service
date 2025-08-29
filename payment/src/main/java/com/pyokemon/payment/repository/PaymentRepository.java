@@ -23,6 +23,8 @@ public interface PaymentRepository {
 
   Payment selectLatestByBookingId(Long bookingId);
 
+  Payment selectByOrderIdStatus(String orderId);
+
   Optional<Payment> findByPaymentId(@Param("paymentId") Long paymentId);
 
   List<Payment> findByPaymentIds(@Param("ids") List<Long> ids);

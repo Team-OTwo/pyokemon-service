@@ -1,15 +1,15 @@
 package com.pyokemon.payment.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.pyokemon.payment.dto.PaymentDto;
 import com.pyokemon.payment.dto.PaymentInitiateRequestDto;
 import com.pyokemon.payment.repository.PaymentRepository;
+import com.pyokemon.payment.service.PaymentService;
 
 class PaymentServiceTest {
 
@@ -23,28 +23,31 @@ class PaymentServiceTest {
   }
 
   @Test
-  void reserve_shouldSavePaymentWithCorrectData() {
+  void reserve_shouldInsertPaymentDto() {
     // given
     PaymentInitiateRequestDto request = new PaymentInitiateRequestDto();
-    request.setBookingId(1L);
-    request.setOrderId("ORDER-123");
+    request.setBookingId(100L);
+    request.setOrderId("ORDER-1234");
     request.setAmount(5000);
-    request.setMethod("간편결제");
-    request.setAccountId(42L);
+    request.setMethod("CARD");
+
+    Long eventScheduleId = 200L;
 
     // when
-    paymentService.reserve(request);
+    paymentService.reserve(request, eventScheduleId);
 
     // then
-    ArgumentCaptor<PaymentDto> captor = ArgumentCaptor.forClass(PaymentDto.class);
+    ArgumentCaptor<com.pyokemon.payment.dto.PaymentDto> captor =
+        ArgumentCaptor.forClass(com.pyokemon.payment.dto.PaymentDto.class);
+
     verify(paymentRepository, times(1)).insertInitiatePayment(captor.capture());
 
-    PaymentDto saved = captor.getValue();
-    assertEquals(1L, saved.getBookingId());
-    assertEquals("ORDER-123", saved.getOrderId());
-    assertEquals(5000, saved.getAmount());
-    assertEquals("간편결제", saved.getMethod());
-    assertEquals("READY", saved.getStatus());
-    assertEquals(42L, saved.getAccountId());
+    var savedDto = captor.getValue();
+    assertThat(savedDto.getBookingId()).isEqualTo(100L);
+    assertThat(savedDto.getOrderId()).isEqualTo("ORDER-1234");
+    assertThat(savedDto.getAmount()).isEqualTo(5000);
+    assertThat(savedDto.getMethod()).isEqualTo("CARD");
+    assertThat(savedDto.getStatus()).isEqualTo("READY");
+    assertThat(savedDto.getEventScheduleId()).isEqualTo(200L);
   }
 }

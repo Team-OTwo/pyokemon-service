@@ -7,9 +7,9 @@
 
     <insert id="insertInitiatePayment" parameterType="com.pyokemon.payment.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO tb_payment (
-            booking_id, order_id, amount, method, status, account_id
+            booking_id, order_id, amount, method, status, event_schedule_id
         ) VALUES (
-                     #{bookingId}, #{orderId}, #{amount}, #{method}, #{status}, #{accountId}
+                     #{bookingId}, #{orderId}, #{amount}, #{method}, #{status}, #{eventScheduleId}
                  )
     </insert>
 
@@ -41,6 +41,12 @@
         SELECT payment_id, booking_id, order_id, payment_key, status
         FROM tb_payment
         WHERE booking_id = #{bookingId}
+    </select>
+
+    <select id="selectByOrderIdStatus" parameterType="string" resultType="Payment">
+        SELECT status
+        FROM tb_payment
+        WHERE order_id = #{orderId}
     </select>
 
     <select id="findByPaymentId" resultType="Payment">

@@ -6,6 +6,10 @@
         SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId}
     </select>
 
+    <select id="findByUserDeviceIdAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
+        SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId} AND is_valid = #{isValid}
+    </select>
+
     <select id="findByUserId" resultType="com.pyokemon.account.user.entity.UserDevice">
         SELECT * FROM tb_user_device WHERE user_id = #{userId}
     </select>
@@ -26,18 +30,22 @@
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber} AND is_valid = #{isValid}
     </select>
 
+    <select id="existsByUserIdAndIsValid" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId} AND is_valid = #{isValid}
+    </select>
+
     <select id="existsByUserId" resultType="boolean">
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId}
     </select>
 
     <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
-        INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_valid)
-        VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isValid})
+        INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_login, is_valid)
+        VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isLogin}, #{isValid})
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.user.entity.UserDevice">
         UPDATE tb_user_device 
-        SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_valid = #{isValid}
+        SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_login = #{isLogin}, is_valid = #{isValid}
         WHERE user_device_id = #{userDeviceId}
     </update>
 

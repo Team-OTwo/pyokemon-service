@@ -26,12 +26,31 @@ public class TokenGenerator {
     return generateToken(accountId, role, jwtConfigProperties.getMobileExpiresIn());
   }
 
+  public String generateAppAccessToken(Long accountId, String role, Long deviceId) {
+    return generateAppToken(accountId, role, deviceId, jwtConfigProperties.getExpiresIn());
+  }
+
+  public String generateAppRefreshToken(Long accountId, String role, Long deviceId) {
+    return generateAppToken(accountId, role, deviceId, jwtConfigProperties.getMobileExpiresIn());
+  }
+
   private String generateToken(Long accountId, String role, long expirationTime) {
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + expirationTime);
 
     return Jwts.builder().setSubject(String.valueOf(accountId)).claim("role", role).setIssuedAt(now)
         .setExpiration(expiryDate)
+        .signWith(Keys.hmacShaKeyFor(jwtConfigProperties.getSecretKey().getBytes()),
+            SignatureAlgorithm.HS256)
+        .compact();
+  }
+
+  private String generateAppToken(Long accountId, String role, Long deviceId, long expirationTime) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + expirationTime);
+
+    return Jwts.builder().setSubject(String.valueOf(accountId)).claim("role", role)
+        .claim("deviceId", deviceId).setIssuedAt(now).setExpiration(expiryDate)
         .signWith(Keys.hmacShaKeyFor(jwtConfigProperties.getSecretKey().getBytes()),
             SignatureAlgorithm.HS256)
         .compact();

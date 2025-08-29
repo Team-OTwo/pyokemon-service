@@ -11,9 +11,9 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.did.api.backend.dto.*;
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.IssuedVc;
+import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
 import com.pyokemon.did.service.UserWebhookService;
@@ -33,7 +33,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @Override
   @Retryable(value = {BusinessException.class, IOException.class}, maxAttempts = 3,
       backoff = @Backoff(delay = 2000, multiplier = 2))
-  public void handleConnectionWebhook(ConnectionWebhookDto webhookDto) {
+  public void handleConnectionWebhook(ConnectionWebhookRequest webhookDto) {
     String state = webhookDto.getState();
     String connectionId = webhookDto.getConnectionId();
     String alias = webhookDto.getAlias();
@@ -53,14 +53,14 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     }
   }
 
-  public void handleOutOfBandWebhook(OutOfBandWebhookDto webhookDto) {
+  public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
     log.info("Oob webhook - state: '{}', role: '{}', connection_id: '{}', inviMsgId: '{}'",
         webhookDto.getState(), webhookDto.getRole(), webhookDto.getConnectionId(),
         webhookDto.getInviMsgId());
   }
 
   @Override
-  public void handleBasicMessageWebhook(BasicMessageWebhookDto webhookDto) {
+  public void handleBasicMessageWebhook(BasicMessageWebhookRequest webhookDto) {
     try {
       String state = webhookDto.getState();
       String connectionId = webhookDto.getConnectionId();
@@ -90,7 +90,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   @Override
-  public void handleIssueCredentialWebhook(IssueCredentialWebhookDto webhookDto) {
+  public void handleIssueCredentialWebhook(IssueCredentialWebhookRequest webhookDto) {
     try {
       String state = webhookDto.getState();
       String credExId = webhookDto.getCredExId();
@@ -105,11 +105,11 @@ public class UserWebhookServiceImpl implements UserWebhookService {
         case "credential-received":
           // credential-received 상태에서 credential_exchange_id 업데이트
           updateVcCredentialExchangeId(webhookDto);
-          updateVcStatus(credExId, null, CREDENTIAL_RECEIVED);
+          updateVcStatus(credExId, null, ISSUED);
           break;
         case "done":
           //
-          updateVcStatus(credExId, null, CREDENTIAL_ISSUED);
+          updateVcStatus(credExId, null, ISSUED);
           break;
         default:
           log.info("처리하지 않는 상태: {}", state);
@@ -120,7 +120,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   @Override
-  public void handleLdProofWebhook(LdProofWebhookDto webhookDto) {
+  public void handleLdProofWebhook(LdProofWebhookRequest webhookDto) {
     try {
       String credExId = webhookDto.getCredExId();
       String credIdStored = webhookDto.getCredIdStored();
@@ -131,7 +131,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       }
 
       // LD Proof webhook은 credential_id를 업데이트하고 상태를 CREDENTIAL_ISSUED로 변경
-      updateVcStatus(credExId, credIdStored, CREDENTIAL_ISSUED);
+      updateVcStatus(credExId, credIdStored, ISSUED);
 
     } catch (Exception e) {
       log.error("LD Proof Webhook 처리 중 오류 발생: {}", e.getMessage(), e);
@@ -161,7 +161,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
 
-  private void updateVcCredentialExchangeId(IssueCredentialWebhookDto webhookDto) {
+  private void updateVcCredentialExchangeId(IssueCredentialWebhookRequest webhookDto) {
     String credExId = webhookDto.getCredExId();
     log.info("VC credential_exchange_id 업데이트 - credExId: {}", credExId);
 
@@ -179,7 +179,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       Long bookingIdLong = Long.parseLong(bookingId);
 
       // booking_id로 CREDENTIAL_SENT 상태인 VC 찾기
-      var issuedVcOpt = issuedVcRepository.findByBookingIdAndStatus(bookingIdLong, CREDENTIAL_SENT);
+      var issuedVcOpt = issuedVcRepository.findByBookingIdAndStatus(bookingIdLong, ISSUED);
       if (issuedVcOpt.isEmpty()) {
         log.warn("업데이트할 VC를 찾을 수 없습니다 - bookingId: {}, status: CREDENTIAL_SENT", bookingIdLong);
         return;
@@ -188,7 +188,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       IssuedVc issuedVc = issuedVcOpt.get();
 
       // credential_exchange_id 업데이트
-      issuedVc.setCredentialExchangeId(credExId);
+      // issuedVc.setCredentialExchangeId(credExId);
 
       issuedVcRepository.update(issuedVc);
       log.info("VC credential_exchange_id 업데이트 완료 - bookingId: {}, credExId: {}",
@@ -210,9 +210,9 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     issuedVc.setStatus(status);
 
     // credential_id가 있으면 업데이트
-    if (credentialId != null && !credentialId.isEmpty()) {
-      issuedVc.setCredentialId(credentialId);
-    }
+    // if (credentialId != null && !credentialId.isEmpty()) {
+    // issuedVc.setCredentialId(credentialId);
+    // }
     issuedVcRepository.update(issuedVc);
   }
 

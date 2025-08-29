@@ -1,6 +1,7 @@
 package com.pyokemon.did.service.impl;
 
-import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.ACTIVE;
+import static com.pyokemon.common.exception.code.DidErrorCodes.DID_NOT_FOUND;
+import static com.pyokemon.common.exception.code.DidErrorCodes.WALLET_NOT_FOUND;
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.INVITATION_SENT;
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.REVOKED;
 
@@ -13,14 +14,14 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
-import com.pyokemon.did.remote.commonAcaPy.dto.request.InvitationRequest.AcaPyCreateInvitationRequest;
-import com.pyokemon.did.remote.commonAcaPy.dto.response.InvitationResponse.AcaPyCreateInvitationResponse;
-import com.pyokemon.did.remote.mediatorAcaPy.RemoteMediatorAcaPyService;
-import com.pyokemon.did.remote.userAcaPy.RemoteUserAcaPyService;
+import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
+import com.pyokemon.did.remote.acapy.service.RemoteMediatorAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.DeviceConnectionService;
-import com.pyokemon.did.service.UserWalletService;
+import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,39 +35,35 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   private final RemoteUserAcaPyService remoteUserAcaPyService;
   private final RemoteMediatorAcaPyService remoteMediatorAcaPyService;
   private final DeviceConnectionRepository deviceConnectionRepository;
-  private final UserWalletService userWalletService;
+  private final WalletService walletService;
 
   @Override
   @Transactional
   public CreateInvitationResponse createInvitations(Long userId) {
 
     // 1. 사용자 지갑에서 userId, Token 조회
-    String userToken = userWalletService.getUserWalletToken(userId);
+    String userToken = walletService.getWalletToken(userId);
     log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);
 
     // 2. Gateway 헤더에서 deviceId 추출
-    String deviceId = GatewayRequestHeaderUtils.getClientDevice();
+    String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
     log.info("Gateway 헤더에서 deviceId 추출: deviceId={}", deviceId);
 
     // 3. tb_device_connection 확인 및 예외처리
     boolean shouldCreateInvitation = processDeviceConnectionBusinessLogic(userId, deviceId);
 
-    // 4. 사용자 지갑 토큰으로 Authorization 헤더 생성
-    String authorization = "Bearer " + userToken;
-    log.debug("Authorization 헤더 설정: {}", authorization);
 
     // 5. ACA-Py 초대장 생성 (User + Mediator) - 필요한 경우에만
-    AcaPyCreateInvitationResponse userAcapyResponse;
-    AcaPyCreateInvitationResponse mediatorAcapyResponse;
+    com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse userAcapyResponse;
+    com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse mediatorAcapyResponse;
 
     try {
       if (shouldCreateInvitation) {
         // User ACA-Py 초대장 생성
         log.info("User ACA-Py 초대장 생성 요청: userId={}", userId);
-        AcaPyCreateInvitationRequest userRequest =
-            AcaPyCreateInvitationRequest.of(userId, deviceId);
-        userAcapyResponse =
-            remoteUserAcaPyService.acaPyCreateInvitation(authorization, userRequest);
+        CreateInvitationRequest userRequest =
+            CreateInvitationRequest.forUserDevice(userId, deviceId);
+        userAcapyResponse = remoteUserAcaPyService.createInvitation(userToken, userRequest);
 
         if (userAcapyResponse == null || userAcapyResponse.getInvitationUrl() == null) {
           log.error("User ACA-Py 초대장 생성 실패: 응답이 null이거나 URL이 없음, userId={}", userId);
@@ -76,9 +73,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
         // Mediator ACA-Py 초대장 생성
         log.info("Mediator ACA-Py 초대장 생성 요청: userId={}", userId);
-        AcaPyCreateInvitationRequest mediatorRequest =
-            AcaPyCreateInvitationRequest.of(userId, deviceId);
-        mediatorAcapyResponse = remoteMediatorAcaPyService.acaPyCreateInvitation(mediatorRequest);
+        CreateInvitationRequest mediatorRequest =
+            CreateInvitationRequest.forUserDevice(userId, deviceId);
+        mediatorAcapyResponse = remoteMediatorAcaPyService.createInvitation(mediatorRequest);
 
         if (mediatorAcapyResponse == null || mediatorAcapyResponse.getInvitationUrl() == null) {
           log.error("Mediator ACA-Py 초대장 생성 실패: 응답이 null이거나 URL이 없음, userId={}", userId);
@@ -103,6 +100,14 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
       log.error("초대장 생성 중 예상치 못한 오류 발생: userId={}, error={}", userId, e.getMessage(), e);
       throw new BusinessException("초대장 생성 중 오류가 발생했습니다", DidErrorCodes.INVITATION_CREATION_FAILED);
     }
+  }
+
+  @Override
+  public Long getUserIdByDidOrThrow(String did) {
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByPublicDid(did).orElseThrow(
+        () -> new BusinessException("public DID: {" + did + "} 에 대한 userId를 찾을 수 없습니다.",
+            DID_NOT_FOUND));
+    return deviceConnection.getUserId();
   }
 
   /**

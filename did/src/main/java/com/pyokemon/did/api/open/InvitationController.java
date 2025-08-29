@@ -24,7 +24,7 @@ public class InvitationController {
 
     // Gateway에서 전달받은 헤더 정보 추출
     Long userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-    String deviceId = GatewayRequestHeaderUtils.getClientDevice();
+    String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
     log.info("초대장 생성 요청: userId={}", userId);
 
     CreateInvitationResponse invitations = deviceConnectionService.createInvitations(userId);
