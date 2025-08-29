@@ -59,4 +59,32 @@ public class PresentProofWebhookRequest {
         }
         return null;
     }
+
+
+
+    /**
+     * challenge 값을 설정하는 편의 메서드
+     */
+    public void setChallenge(String challenge) {
+        if (byFormat == null) {
+            byFormat = new ByFormat();
+        }
+        if (byFormat.presRequest == null) {
+            byFormat.presRequest = new PresRequest();
+        }
+        if (byFormat.presRequest.dif == null) {
+            byFormat.presRequest.dif = new Dif();
+        }
+        if (byFormat.presRequest.dif.options == null) {
+            byFormat.presRequest.dif.options = new Options();
+        }
+        byFormat.presRequest.dif.options.challenge = challenge;
+    }
+
+    /**
+     * 현재 상태가 presentation-received인지 확인하는 메서드
+     */
+    public boolean isPresentationReceived() {
+        return "presentation-received".equals(state);
+    }
 }

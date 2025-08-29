@@ -90,6 +90,12 @@ public class VerificationServiceImpl implements VerificationService {
     return response;
   }
 
+  @Override
+  public void saveVerification(String PresExId, VpStatus status) {
+    Verification verification = Verification.of(PresExId, status);
+    verificationRepository.save(verification);
+  }
+
   public VpStatus getStatusOrThrow(String presExId) {
     Verification verification = verificationRepository.findByPresExId(presExId)
             .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId, VP_VERIFICATION_FAILED));

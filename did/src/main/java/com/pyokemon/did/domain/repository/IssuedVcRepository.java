@@ -82,6 +82,14 @@ public interface IssuedVcRepository {
   boolean existsByBookingIdAndIssued(Long bookingId);
 
   /**
+   * pres_ex_id로 IssuedVc을 조회합니다.
+   *
+   * @param presExId 조회할 pres_ex_id
+   * @return IssuedVc (Optional)
+   */
+  Optional<IssuedVc> findByPresExId(String presExId);
+
+  /**
    * IssuedVc을 업데이트합니다.
    *
    * @param issuedVc 업데이트할 IssuedVc

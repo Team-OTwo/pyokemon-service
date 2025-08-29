@@ -1,5 +1,7 @@
 package com.pyokemon.did.service;
 
+import com.pyokemon.did.domain.Verification;
+import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
@@ -13,4 +15,8 @@ public interface VerificationService {
 
   public HandleVerificationResponse handleVerification(
           Long tenantId, String presExId);
+
+  public void saveVerification(
+          String PresExId, VpStatus status
+  );
 }

@@ -33,4 +33,5 @@ public interface WalletService {
   Wallet getWalletByAccountIdOrThrow(Long accountId);
 
   String getWalletToken(Long accountId);
+
 }

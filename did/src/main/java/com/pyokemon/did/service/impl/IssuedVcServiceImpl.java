@@ -203,19 +203,21 @@ public class IssuedVcServiceImpl implements IssuedVcService {
       String presentationExchangeId) {
     String tenantToken = tenantWallet.getToken();
 
-    log.info("검증 요청 첨부 초대장 요청 전송 - presentationExchangeId:{}", presentationExchangeId);
-
     CreateInvitationRequest request = CreateInvitationRequest.forProof(presentationExchangeId);
     CreateInvitationResponse response =
         remoteTenantAcaPyService.createInvitation(tenantToken, request);
 
     if (response == null || response.getInvitationUrl() == null
         || response.getInvitationUrl().isEmpty()) {
-      log.error("검증 요청 첨부 초대장 발급 실패 - presentationExchangeId:{}", presentationExchangeId);
       throw new BusinessException("VC 발급에 실패했습니다.", VC_ISSUANCE_FAILED);
     }
-
-    log.debug("검증 요청 첨부 초대장 발급 성공 - presentationExchangeId:{}", presentationExchangeId);
     return response;
+  }
+
+  @Override
+  public IssuedVc getIssuedVcByPresExIdOrThrow(String presExId) {
+    IssuedVc issuedVc = issuedVcRepository.findByPresExId(presExId)
+            .orElseThrow(() -> new BusinessException("발급된 VC를 찾을 수 없습니다.", VC_ISSUANCE_FAILED));
+    return issuedVc;
   }
 }
