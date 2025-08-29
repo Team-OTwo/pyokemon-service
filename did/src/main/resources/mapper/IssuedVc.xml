@@ -4,10 +4,9 @@
 
     <resultMap id="IssuedVcResultMap" type="com.pyokemon.did.domain.IssuedVc">
         <id column="id" property="id"/>
-        <result column="cred_id" property="credId"/>
         <result column="cred_ex_id" property="credExId"/>
-        <result column="verify_invi_url" property="verifyInviUrl"/>
         <result column="pres_ex_id" property="presExId"/>
+        <result column="verify_invi_url" property="verifyInviUrl"/>
         <result column="booking_id" property="bookingId"/>
         <result column="user_id" property="userId"/>
         <result column="tenant_id" property="tenantId"/>
@@ -16,18 +15,6 @@
         <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
-
-    <select id="findByCredentialExchangeId" resultMap="IssuedVcResultMap">
-        SELECT *
-        FROM tb_issued_vc
-        WHERE cred_ex_id = #{credExId}
-    </select>
-
-    <select id="findByCredentialId" resultMap="IssuedVcResultMap">
-        SELECT *
-        FROM tb_issued_vc
-        WHERE cred_id = #{credId}
-    </select>
 
     <select id="findByBookingId" resultMap="IssuedVcResultMap">
         SELECT *
@@ -68,18 +55,17 @@
     </select>
 
     <insert id="save" parameterType="com.pyokemon.did.domain.IssuedVc" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_issued_vc (cred_id, cred_ex_id, verify_invi_url, pres_ex_id, booking_id, user_id, tenant_id,
+        INSERT INTO tb_issued_vc (cred_ex_id, verify_invi_url, pres_ex_id, booking_id, user_id, tenant_id,
                                   status, created_at, updated_at)
-        VALUES (#{credId}, #{credExId}, #{verifyInviUrl}, #{presExId}, #{bookingId}, #{userId}, #{tenantId}, #{status},
+        VALUES (#{credExId}, #{verifyInviUrl}, #{presExId}, #{bookingId}, #{userId}, #{tenantId}, #{status},
                 NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.IssuedVc">
         UPDATE tb_issued_vc
-        SET cred_id         = #{credId},
-            cred_ex_id      = #{credExId},
-            verify_invi_url = #{verifyInviUrl},
+        SET cred_ex_id      = #{credExId},
             pres_ex_id      = #{presExId},
+            verify_invi_url = #{verifyInviUrl},
             booking_id      = #{bookingId},
             user_id         = #{userId},
             tenant_id       = #{tenantId},

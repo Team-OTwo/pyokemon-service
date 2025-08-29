@@ -13,10 +13,9 @@ import lombok.*;
 @AllArgsConstructor
 public class IssuedVc extends BaseEntity {
 
-  private String credId;
   private String credExId;
-  private String verifyInviUrl;
   private String presExId;
+  private String verifyInviUrl;
   private Long bookingId;
   private Long userId;
   private Long tenantId;

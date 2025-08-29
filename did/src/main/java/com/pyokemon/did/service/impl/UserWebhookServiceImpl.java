@@ -201,19 +201,19 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
   private void updateVcStatus(String credExId, String credentialId, IssuedVc.VcStatus status) {
     // credential_exchange_id로 IssuedVc 찾기
-    var issuedVcOpt = issuedVcRepository.findByCredentialExchangeId(credExId);
-    if (issuedVcOpt.isEmpty()) {
-      log.warn("credential_exchange_id에 해당하는 VC를 찾을 수 없습니다: {}", credExId);
-      return;
-    }
-    IssuedVc issuedVc = issuedVcOpt.get();
-    issuedVc.setStatus(status);
+//    var issuedVcOpt = issuedVcRepository.findByCredentialExchangeId(credExId);
+//    if (issuedVcOpt.isEmpty()) {
+//      log.warn("credential_exchange_id에 해당하는 VC를 찾을 수 없습니다: {}", credExId);
+//      return;
+//    }
+//    IssuedVc issuedVc = issuedVcOpt.get();
+//    issuedVc.setStatus(status);
 
     // credential_id가 있으면 업데이트
     // if (credentialId != null && !credentialId.isEmpty()) {
     // issuedVc.setCredentialId(credentialId);
     // }
-    issuedVcRepository.update(issuedVc);
+//    issuedVcRepository.update(issuedVc);
   }
 
   /**
