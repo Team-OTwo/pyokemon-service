@@ -41,5 +41,5 @@ public interface RemoteTenantAcaPyService {
 
   @PostMapping(value = "/present-proof-2.0/records/{pres_ex_id}/verify-presentation")
   VerifyPresentationResponse verifyPresentation(
-      @RequestHeader("Authorization") String authorization, @PathVariable String pres_ex_id);
+      @RequestHeader("Authorization") String authorization, @PathVariable (name = "pres_ex_id") String presExId);
 }

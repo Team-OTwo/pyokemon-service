@@ -4,6 +4,9 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.CONNECTION_CREATI
 
 import java.io.IOException;
 
+import com.pyokemon.did.domain.dto.request.webhook.PresentProofWebhookRequest;
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.service.WalletService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Backoff;
@@ -27,8 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TenantWebhookServiceImpl implements TenantWebhookService {
-  private final AcaPyConnectionRepository acaPyConnectionRepository;
 
+  private final AcaPyConnectionRepository acaPyConnectionRepository;
+  private final RemoteTenantAcaPyService remoteTenantAcaPyService;
+  private final WalletService walletService;
   private static final String CONNECTION_STATUS_ACTIVE = "active";
 
   @Override
@@ -83,8 +88,25 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
   }
 
   @Override
-  public void handleTenantOOBWebhook(OutOfBandWebhookRequest handleTenantOOBRequest) {
-    log.info("oob_id: {}, state: {}", handleTenantOOBRequest.getOobId(),
-        handleTenantOOBRequest.getState());
+  public void handleTenantOOBWebhook(OutOfBandWebhookRequest request) {
+    log.info("OOB Webhook from Tenant ACA-py - state: {}, oob_id: {}, role: {}, connection_id: {}", 
+        request.getState(), request.getOobId(), request.getRole(), request.getConnectionId());
+  }
+
+  @Override
+  public void handleTenantPresentProofWebhook(PresentProofWebhookRequest request) {
+    String state = request.getState();
+    String challenge = request.getChallenge();
+    String presExId = request.getPresExId();
+
+    String authorization = walletService.getWalletToken()
+
+    //state="presentation_received"일때, pres_ex_id로 issuedProof 뒤져서 challenge 찾기, challenge 비교하기
+    //pres_ex_id로 issuedVc가서 status=issued인지 확인
+    //POST /present-proof-2.0/records/{pres_ex_id}/verify-presentation 날리기
+    //state가 done으로 나오면
+
+    log.info("Present proof Webhook - state: {}, pres_ex_id: {}, challenge: {}", state, presExId, challenge);
+
   }
 }

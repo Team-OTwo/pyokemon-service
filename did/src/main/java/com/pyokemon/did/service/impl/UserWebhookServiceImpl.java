@@ -6,6 +6,8 @@ import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.service.WalletService;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -54,9 +56,8 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   }
 
   public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
-    log.info("Oob webhook - state: '{}', role: '{}', connection_id: '{}', inviMsgId: '{}'",
-        webhookDto.getState(), webhookDto.getRole(), webhookDto.getConnectionId(),
-        webhookDto.getInviMsgId());
+    log.info("OOB Webhook from User ACA-py - state: {}, oob_id: {}, role: {}, connection_id: {}", 
+        webhookDto.getState(), webhookDto.getOobId(), webhookDto.getRole(), webhookDto.getConnectionId());
   }
 
   @Override
@@ -65,9 +66,10 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       String state = webhookDto.getState();
       String connectionId = webhookDto.getConnectionId();
       String content = webhookDto.getContent();
+      String messageId = webhookDto.getMessageId();
 
-      log.info("Basic Message webhook - state: '{}', connection_id: '{}', content: '{}'", state,
-          connectionId, content);
+      log.info("Basic Message webhook - state: {}, content: {}, connection_id: {}, message_id: {}", state,
+          connectionId, content,messageId);
 
       // connectionId로 DeviceConnection 찾기
       DeviceConnection deviceConnection =
@@ -79,9 +81,6 @@ public class UserWebhookServiceImpl implements UserWebhookService {
       if (content != null && content.startsWith("did:key:")) {
         deviceConnection.setPublicDid(content);
         deviceConnectionRepository.update(deviceConnection);
-        log.info("'{}'에 대한 publicDid = '{}' 추가 완료", connectionId, content);
-      } else {
-        log.debug("content가 did:key로 시작하지 않아 publicDid 업데이트 건너뜀 - content: {}", content);
       }
     } catch (Exception e) {
       log.error("Basic Message webhook 처리 중 오류 발생: {}", e.getMessage(), e);

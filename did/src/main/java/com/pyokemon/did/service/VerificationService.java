@@ -1,9 +1,16 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.domain.dto.request.VerificationRequest;
-import com.pyokemon.did.domain.dto.response.VerificationResponse;
+import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
+import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
+import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 
 public interface VerificationService {
-  public VerificationResponse.CreateVerificationResponse createVerificationUrl(
-      VerificationRequest.CreateVerificationRequest request, Long tenantId);
+
+
+  public CreateVerificationResponse createVerificationUrl(
+      CreateVerificationRequest request, Long tenantId);
+
+
+  public HandleVerificationResponse handleVerification(
+          Long tenantId, String presExId);
 }
