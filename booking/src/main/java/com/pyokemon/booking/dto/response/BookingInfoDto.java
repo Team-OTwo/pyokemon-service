@@ -1,4 +1,4 @@
-package com.pyokemon.booking.bff.dto;
+package com.pyokemon.booking.dto.response;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
+public class BookingInfoDto {
   private Long bookingId;
   private Long accountId;
   private Long eventScheduleId;

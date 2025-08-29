@@ -1,4 +1,4 @@
-package com.pyokemon.booking.bff.dto;
+package com.pyokemon.booking.dto.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

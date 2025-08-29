@@ -1,10 +1,12 @@
 package com.pyokemon.booking.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.pyokemon.booking.dto.response.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +15,6 @@ import com.pyokemon.booking.dto.kafka.BookingEventDto;
 import com.pyokemon.booking.dto.kafka.EventKafkaDto;
 import com.pyokemon.booking.dto.request.BookingRequest;
 import com.pyokemon.booking.dto.request.ValidBookingRequest;
-import com.pyokemon.booking.dto.response.AccountIdResponse;
-import com.pyokemon.booking.dto.response.BookingInfo;
-import com.pyokemon.booking.dto.response.BookingResponse;
-import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
-import com.pyokemon.booking.dto.response.ValidBookingDetail;
-import com.pyokemon.booking.dto.response.ValidBookingResponse;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
@@ -196,7 +192,7 @@ public class BookingService {
         throw new BusinessException("예약 상태가 필요합니다.", "INVALID_BOOKING_STATUS");
       }
 
-      Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+      Optional<Booking> bookingOpt = bookingRepository.findByBookingId(bookingId);
       if (bookingOpt.isEmpty()) {
         throw new BusinessException("예약을 찾을 수 없습니다.", "BOOKING_NOT_FOUND");
       }
@@ -227,7 +223,7 @@ public class BookingService {
         throw new BusinessException("예약 상태가 필요합니다.", "INVALID_BOOKING_STATUS");
       }
 
-      Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+      Optional<Booking> bookingOpt = bookingRepository.findByBookingId(bookingId);
       if (bookingOpt.isEmpty()) {
         log.warn("예약을 찾을 수 없습니다: bookingId={}", bookingId);
         return;
@@ -293,5 +289,135 @@ public class BookingService {
     } catch (BusinessException e) {
       throw e;
     }
+  }
+
+  @Transactional(readOnly = true)
+  public List<BookingInfoDto> getEventScheduleBookings(Long eventScheduleId) {
+    List<Booking> bookings = bookingRepository.findByEventScheduleId(eventScheduleId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    return bookings.stream().map(this::toDto) // Booking -> BookingDto
+            .toList(); // Java 16+면 이거 사용 가능
+  }
+
+  @Transactional(readOnly = true)
+  public List<BookingInfoDto> getAccountIdBookings(Long accountId) {
+    List<Booking> bookings = bookingRepository.findByAccountId(accountId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    return bookings.stream().map(this::toDto) // Booking -> BookingDto
+            .toList();
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<BookingInfoDto> getAccountIdBookingsOrderByDate(Long accountId, Integer page,
+                                                                      Integer size) {
+    List<Booking> bookings =
+            bookingRepository.findByAccountIdOrderByDate(accountId, page * size, size);
+    Long totalCount = bookingRepository.countByAccountId(accountId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    List<BookingInfoDto> dtoList = bookings.stream().map(this::toDto) // Booking -> BookingDto
+            .toList();
+
+
+    return new PageResponse<>(dtoList, page, totalCount);
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<BookingInfoDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
+                                                             Integer size) {
+    List<Booking> bookings =
+            bookingRepository.findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
+    Long totalCount = bookingRepository.countByEventScheduleId(eventScheduleId);
+
+    if (bookings.isEmpty()) {
+      return null;
+    }
+
+    List<BookingInfoDto> dtoList = bookings.stream().map(this::toDto) // Booking -> BookingDto
+            .toList();
+
+
+    return new PageResponse<>(dtoList, page, totalCount);
+  }
+
+  @Transactional(readOnly = true)
+  public BookingInfoDto getBooking(Long bookingId) {
+    Optional<Booking> bookingOpt = bookingRepository.findByBookingId(bookingId);
+
+    if (bookingOpt.isEmpty()) {
+      throw new BusinessException("해당 예약은 존재하지 않습니다.", "BOOKING_NOT_FOUND");
+    }
+
+    Booking booking = bookingOpt.get();
+
+    return toDto(booking);
+  }
+
+  @Transactional(readOnly = true)
+  public CursorPageResponse<Booking> findByAccountCursor(long accountId, Long cursor, int size) {
+    List<Booking> bookings =
+            bookingRepository.findByAccountWithCursor(accountId, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+  }
+
+  @Transactional(readOnly = true)
+  public CursorPageResponse<Booking> findByAccountAndSchedulesCursor(long accountId,
+                                                                     List<Long> scheduleIds, Long cursor, int size) {
+    List<Booking> bookings = bookingRepository.findByAccountAndSchedulesWithCursor(accountId,
+            scheduleIds, cursor, size + 1);
+
+    boolean hasMore = bookings.size() > size;
+
+    if (hasMore) {
+      bookings = bookings.subList(0, size);
+    }
+
+    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+
+    return new CursorPageResponse<>(bookings, nextCursor, hasMore);
+
+  }
+
+  @Transactional(readOnly = true)
+  public List<BookingCountDto> getBookingCountsByScheduleIds(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return bookingRepository.findBookingCountsByScheduleIds(scheduleIds);
+  }
+
+  @Transactional(readOnly = true)
+  public TotalSoldTicketsResponseDto getTotalSoldTickets(List<Long> scheduleIds) {
+    if (scheduleIds == null || scheduleIds.isEmpty()) {
+      return new TotalSoldTicketsResponseDto(0L);
+    }
+    Long count = bookingRepository.countTotalSoldTicketsByScheduleIds(scheduleIds);
+    return new TotalSoldTicketsResponseDto(count);
+  }
+
+  private BookingInfoDto toDto(Booking b) {
+    return BookingInfoDto.builder().bookingId(b.getBookingId()).eventScheduleId(b.getEventScheduleId())
+            .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
+            .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
   }
 }
