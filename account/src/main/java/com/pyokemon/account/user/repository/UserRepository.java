@@ -1,5 +1,6 @@
 package com.pyokemon.account.user.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -10,9 +11,9 @@ import com.pyokemon.account.user.entity.User;
 @Mapper
 public interface UserRepository {
 
-  Optional<User> findByUserId(@Param("userId") Long userId);
-
   Optional<User> findByAccountId(@Param("accountId") Long accountId);
+
+  List<User> findAllByAccountIdIn(@Param("ids") List<Long> ids);
 
   int insert(User user);
 

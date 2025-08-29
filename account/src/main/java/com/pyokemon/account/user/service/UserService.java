@@ -1,8 +1,13 @@
 package com.pyokemon.account.user.service;
 
 // import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.pyokemon.account.user.dto.response.UserInfoDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -179,5 +184,43 @@ public class UserService {
     userDevice.setIsValid(false);
 
     userDeviceRepository.update(userDevice);
+  }
+
+  @Transactional(readOnly = true)
+  public UserInfoDto getUser(Long accountId) {
+    Optional<User> userOpt = userRepository.findByAccountId(accountId);
+
+    if (userOpt.isEmpty()) {
+      throw new BusinessException("사용자를 찾을 수 없습니다.", AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    User user = userOpt.get();
+
+    return UserInfoDto.builder().accountId(accountId).name(user.getName()).build();
+  }
+
+  @Transactional(readOnly = true)
+  public List<UserInfoDto> getUsers(List<Long> accountIds) {
+    if (accountIds == null || accountIds.isEmpty())
+      return List.of();
+
+    // DB 호출은 1번
+    List<User> users = userRepository.findAllByAccountIdIn(accountIds);
+
+    Map<Long, User> byId =
+            users.stream().collect(Collectors.toMap(User::getAccountId, Function.identity()));
+
+    // 요청 순서/중복 그대로 매핑, 누락 시 기존 정책대로 예외
+    List<Long> missing =
+            accountIds.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
+    if (!missing.isEmpty()) {
+      throw new BusinessException("사용자를 찾을 수 없습니다. ids=" + missing,
+              AccountErrorCodes.USER_NOT_FOUND);
+    }
+
+    return accountIds.stream().map(id -> {
+      User u = byId.get(id);
+      return UserInfoDto.builder().accountId(id).name(u.getName()).build();
+    }).toList();
   }
 }

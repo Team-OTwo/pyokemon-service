@@ -1,5 +1,7 @@
 package com.pyokemon.account.user.controller;
 
+import com.pyokemon.account.user.dto.response.UserInfoDto;
+import com.pyokemon.common.dto.IdsRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ import com.pyokemon.account.user.service.UserService;
 import com.pyokemon.common.dto.ResponseDto;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 
 @RestController
@@ -59,6 +63,15 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success(response, "본인 인증 성공"));
   }
 
+  @GetMapping("/{accountId}")
+  public UserInfoDto getUser(@PathVariable Long accountId) {
+    return userService.getUser(accountId);
+  }
+
+  @PostMapping("/_batch")
+  public List<UserInfoDto> getUsers(@RequestBody IdsRequest request) {
+    return userService.getUsers(request.getIds());
+  }
 
   // 사용자 계정 상세 조회 (사용자 본인만)
   @GetMapping("/profile")

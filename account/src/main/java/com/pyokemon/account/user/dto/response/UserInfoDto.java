@@ -1,4 +1,4 @@
-package com.pyokemon.account.user.bff.dto;
+package com.pyokemon.account.user.dto.response;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserInfoDto {
   private Long accountId;
   private String name;
 }
