@@ -2,15 +2,16 @@ package com.pyokemon.did.remote.acapy.common.dto.request;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pyokemon.did.common.util.UuidGenerator;
 import com.pyokemon.did.remote.acapy.common.constants.AcaPyConstants;
 import com.pyokemon.did.remote.acapy.common.dto.base.AcaPyRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.*;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Constraints.Field;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Dif.Options;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Dif.PresentationDefinition;
+import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +43,9 @@ public class PresentProofRequest implements AcaPyRequest {
    */
   public static PresentProofRequest forTicketVerification(String challenge, String userPublicDid,
       Long bookingId) {
-    String credentialId = "urn:booking:" + bookingId;
+    String credentialId = CredentialIdGenerator.generateCredentialId(bookingId);
+    String presDefId = UuidGenerator.generateUuid();
+
     // 1. 필드 생성
     Field issuerField = createField("$.issuer", userPublicDid);
     Field evidenceField = createField("$.evidence[0].sourceCredentialId", credentialId);
@@ -58,9 +61,8 @@ public class PresentProofRequest implements AcaPyRequest {
         .constraints(constraints).build();
 
     // 4. 프레젠테이션 정의 생성
-    PresentationDefinition definition =
-        PresentationDefinition.builder().id(UUID.randomUUID().toString())
-            .inputDescriptors(Collections.singletonList(descriptor)).build();
+    PresentationDefinition definition = PresentationDefinition.builder().id(presDefId)
+        .inputDescriptors(Collections.singletonList(descriptor)).build();
 
     // 5. 옵션 생성
     Options options =

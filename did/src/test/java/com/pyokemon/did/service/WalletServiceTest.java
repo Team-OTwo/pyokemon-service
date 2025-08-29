@@ -23,6 +23,7 @@ import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse;
+import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse.Result;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreateWalletResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
@@ -74,9 +75,11 @@ class WalletServiceTest {
     walletResponse.setWalletId("test-wallet-id");
 
     // DID 응답 객체 생성
+    Result result = new Result();
+    result.setDid("test-did");
+    result.setVerkey("test-ver-key");
     publicDidResponse = new CreatePublicDidResponse();
-    publicDidResponse.setDid("test-did");
-    publicDidResponse.setVerkey("test-ver-key");
+    publicDidResponse.setResult(result);
 
     // 지갑 객체 생성
     wallet = Wallet.builder().accountId(TENANT_ID).accountRole(Wallet.AccountRole.TENANT)
@@ -310,8 +313,6 @@ class WalletServiceTest {
         when(remoteTenantAcaPyService.createWallet(any(CreateWalletRequest.class))).thenReturn(walletResponse);
 
         CreatePublicDidResponse nullDidResponse = new CreatePublicDidResponse();
-        nullDidResponse.setDid(null);
-        nullDidResponse.setVerkey("test-verkey");
 
         when(remoteTenantAcaPyService.createPublicDid(anyString(), any(CreatePublicDidRequest.class)))
                 .thenReturn(nullDidResponse);

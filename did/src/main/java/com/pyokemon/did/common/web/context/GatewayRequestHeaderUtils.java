@@ -7,6 +7,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
+import com.pyokemon.did.common.web.constant.GatewayHeaderConstants;
 
 /**
  * DID 서비스의 /api 경로에서 Gateway를 통해 전달받은 헤더 정보를 안전하게 추출하는 유틸리티 클래스 /api 경로는 Gateway를 거쳐서 사용자 인증 정보를
@@ -22,7 +23,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static Long getUserIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String accountId = request.getHeader("X-Auth-AccountId");
+    String accountId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
     if (accountId == null || accountId.isEmpty()) {
       throw new BusinessException("사용자 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }
@@ -43,14 +44,14 @@ public class GatewayRequestHeaderUtils {
    */
   public static Long getTenantIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String tenantId = request.getHeader("X-Auth-TenantId");
+    String tenantId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_TENANT_ID);
     if (tenantId == null || tenantId.isEmpty()) {
       throw new BusinessException("테넌트 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }
 
     // role이 TENANT인지 확인
     String role = getUserRoleOrThrowException();
-    if (!"TENANT".equals(role)) {
+    if (!GatewayHeaderConstants.Role.ROLE_TENANT.equals(role)) {
       throw new BusinessException("테넌트만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
     }
 
@@ -70,11 +71,26 @@ public class GatewayRequestHeaderUtils {
    */
   public static String getUserRoleOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String role = request.getHeader("X-Auth-Role");
+    String role = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ROLE);
     if (role == null || role.isEmpty()) {
       throw new BusinessException("사용자 권한 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }
     return role;
+  }
+
+  /**
+   * Gateway에서 전달받은 클라이언트 디바이스 정보를 반환합니다.
+   *
+   * @return 클라이언트 디바이스
+   * @throws BusinessException 디바이스 정보가 없는 경우
+   */
+  public static String getUserDeviceOrThrowException() {
+    HttpServletRequest request = getCurrentRequest();
+    String device = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_DEVICE_ID);
+    if (device == null || device.isEmpty()) {
+      throw new BusinessException("디바이스 ID를 찾을 수 없습니다", DidErrorCodes.ACCESS_DENIED);
+    }
+    return device;
   }
 
   /**
@@ -84,7 +100,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static boolean isTenant() {
     String role = getUserRoleOrThrowException();
-    return "TENANT".equals(role);
+    return GatewayHeaderConstants.Role.ROLE_TENANT.equals(role);
   }
 
   /**
@@ -94,7 +110,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static boolean isUser() {
     String role = getUserRoleOrThrowException();
-    return "USER".equals(role);
+    return GatewayHeaderConstants.Role.ROLE_USER.equals(role);
   }
 
   /**
@@ -104,7 +120,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static boolean isAdmin() {
     String role = getUserRoleOrThrowException();
-    return "ADMIN".equals(role);
+    return GatewayHeaderConstants.Role.ROLE_ADMIN.equals(role);
   }
 
   /**
@@ -115,7 +131,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static String getAccountId() {
     HttpServletRequest request = getCurrentRequest();
-    String accountId = request.getHeader("X-Auth-AccountId");
+    String accountId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
 
     if (accountId == null || accountId.isEmpty()) {
       throw new BusinessException("사용자 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
@@ -123,26 +139,11 @@ public class GatewayRequestHeaderUtils {
 
     // role이 USER인지 확인
     String role = getUserRoleOrThrowException();
-    if (!"USER".equals(role)) {
+    if (!GatewayHeaderConstants.Role.ROLE_USER.equals(role)) {
       throw new BusinessException("일반 사용자만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
     }
 
     return accountId;
-  }
-
-  /**
-   * Gateway에서 전달받은 클라이언트 디바이스 정보를 반환합니다.
-   *
-   * @return 클라이언트 디바이스
-   * @throws BusinessException 디바이스 정보가 없는 경우
-   */
-  public static String getClientDevice() {
-    HttpServletRequest request = getCurrentRequest();
-    String device = request.getHeader("X-Client-Device");
-    if (device == null || device.isEmpty()) {
-      throw new BusinessException("디바이스 ID를 찾을 수 없습니다", DidErrorCodes.ACCESS_DENIED);
-    }
-    return device;
   }
 
   /**

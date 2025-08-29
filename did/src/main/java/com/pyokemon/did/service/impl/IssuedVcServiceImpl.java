@@ -4,13 +4,12 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.VC_ISSUANCE_FAILE
 import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.util.UuidGenerator;
+import com.pyokemon.did.common.util.UuidGenerator;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.IssuedProof;
 import com.pyokemon.did.domain.IssuedVc;
@@ -57,7 +56,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     Long eventScheduleId = bookingEvent.getEventScheduleId();
     Long seatId = bookingEvent.getSeatId();
 
-    log.info("VC 발급 시작 - userId: {}, tenantId: {}, bookingId: {}", userId, tenantId, bookingId);
+    log.info("VC 발급 시작 - tenantId: {}, userId: {}, bookingId: {}", tenantId, userId, bookingId);
     // 1. 기존 발급된 VC 있는지 확인
     boolean exists = issuedVcRepository.existsByBookingIdAndIssued(bookingId);
     if (exists) {
@@ -77,34 +76,37 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     Wallet userWallet = walletService.getWalletByAccountIdOrThrow(userId);
 
     try {
-      // 1. 자격 증명 주체 생성
+      // 3. 자격 증명 주체 생성
       CredentialSubject credentialSubject =
           CredentialSubject.of(userWallet, bookingId, eventScheduleId, seatId);
 
-      // 2. 자격 증명 발급 요청
+      // 4. 자격 증명 발급 요청
       IssueCredentialResponse issueCredentialResponse =
           issueCredential(tenantWallet, connection, credentialSubject, bookingId);
 
-      // 3. 자격 증명 검증 요청
+      // 5. 자격 증명 검증 요청
       String challenge = UuidGenerator.generateChallenge();
       PresentProofResponse presentProofResponse =
           presentProof(tenantWallet, userWallet, challenge, bookingId);
 
-      // 4. 검증 첨부 초대장 요청
+      // 6. 검증 첨부 초대장 요청
       CreateInvitationResponse createInvitationResponse =
           createInvitationForProof(tenantWallet, presentProofResponse.getPresExId());
 
-      // 5. 증명 정보 저장
+      // 7. 검증 증명 정보 저장
+      log.info("VC 검증 증명 정보 저장 - presExId: {}", presentProofResponse.getPresExId());
       issuedProofRepository.save(IssuedProof.of(presentProofResponse.getPresExId(), challenge,
           PROOF_TIME_TO_LIVE_SECONDS));
 
-      // 6. 자격 증명 정보 저장
+      // 8. 자격 증명 정보 저장
+      log.info("VC 발급 정보 저장 - bookintId: {}, presExId: {}", bookingId,
+          presentProofResponse.getPresExId());
       issuedVcRepository.save(issueCredentialResponse.toEntity(tenantWallet.getAccountId(),
           userWallet.getAccountId(), bookingId, presentProofResponse.getPresExId(),
           createInvitationResponse.getInvitationUrl()));
 
-      log.info("VC 발급 완료 - bookingId: {}, credExId: {}", bookingId,
-          issueCredentialResponse.getCredExId());
+      log.info("VC 발급 완료 - bookingId: {}, presExId: {}, credExId: {}", bookingId,
+          presentProofResponse.getPresExId(), issueCredentialResponse.getCredExId());
 
     } catch (BusinessException e) {
       throw e;
@@ -141,7 +143,6 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
     log.info("VC 발급 요청 전송 - bookingId: {}, connectionId: {}", bookingId, connectionId);
 
-    // 민감한 정보는 로깅하지 않도록 수정
     log.debug("VC 발급 요청 - bookingId: {}, connectionId: {}", bookingId, connectionId);
 
     IssueCredentialRequest request =
