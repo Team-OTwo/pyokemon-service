@@ -46,7 +46,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
     log.info("사용자 지갑 토큰 조회 완료: userId={}, token={}", userId, userToken);
 
     // 2. Gateway 헤더에서 deviceId 추출
-    String deviceId = GatewayRequestHeaderUtils.getClientDevice();
+    String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
     log.info("Gateway 헤더에서 deviceId 추출: deviceId={}", deviceId);
 
     // 3. tb_device_connection 확인 및 예외처리

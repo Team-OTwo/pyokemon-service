@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import java.util.Map;
 import java.util.Optional;
 
-import com.pyokemon.common.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.IssuedProof;
 import com.pyokemon.did.domain.IssuedVc;
@@ -37,59 +37,59 @@ import com.pyokemon.did.service.impl.IssuedVcServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class IssuedVcServiceImplTest {
 
-    @Mock
-    private IssuedVcRepository issuedVcRepository;
+  @Mock
+  private IssuedVcRepository issuedVcRepository;
 
-    @Mock
-    private IssuedProofRepository issuedProofRepository;
+  @Mock
+  private IssuedProofRepository issuedProofRepository;
 
-    @Mock
-    private WalletService walletService;
+  @Mock
+  private WalletService walletService;
 
-    @Mock
-    private AcaPyConnectionService acaPyConnectionService;
+  @Mock
+  private AcaPyConnectionService acaPyConnectionService;
 
-    @Mock
-    private RemoteTenantAcaPyService remoteTenantAcaPyService;
+  @Mock
+  private RemoteTenantAcaPyService remoteTenantAcaPyService;
 
-    @InjectMocks
-    private IssuedVcServiceImpl issuedVcService;
+  @InjectMocks
+  private IssuedVcServiceImpl issuedVcService;
 
-    private BookingEvent bookingEvent;
-    private Wallet tenantWallet;
-    private Wallet userWallet;
-    private AcaPyConnection connection;
+  private BookingEvent bookingEvent;
+  private Wallet tenantWallet;
+  private Wallet userWallet;
+  private AcaPyConnection connection;
 
-    private static final Long TENANT_ID = 1L;
-    private static final Long USER_ID = 2L;
-    private static final Long BOOKING_ID = 3L;
-    private static final Long EVENT_SCHEDULE_ID = 4L;
-    private static final Long SEAT_ID = 5L;
+  private static final Long TENANT_ID = 1L;
+  private static final Long USER_ID = 2L;
+  private static final Long BOOKING_ID = 3L;
+  private static final Long EVENT_SCHEDULE_ID = 4L;
+  private static final Long SEAT_ID = 5L;
 
-    @BeforeEach
-    void setUp() {
-        bookingEvent = new BookingEvent();
-        bookingEvent.setAccountId(USER_ID);
-        bookingEvent.setTenantId(TENANT_ID);
-        bookingEvent.setBookingId(BOOKING_ID);
-        bookingEvent.setEventScheduleId(EVENT_SCHEDULE_ID);
-        bookingEvent.setSeatId(SEAT_ID);
+  @BeforeEach
+  void setUp() {
+    bookingEvent = new BookingEvent();
+    bookingEvent.setAccountId(USER_ID);
+    bookingEvent.setTenantId(TENANT_ID);
+    bookingEvent.setBookingId(BOOKING_ID);
+    bookingEvent.setEventScheduleId(EVENT_SCHEDULE_ID);
+    bookingEvent.setSeatId(SEAT_ID);
 
-        tenantWallet = new Wallet();
-        tenantWallet.setAccountId(TENANT_ID);
-        tenantWallet.setToken("tenant-token");
-        tenantWallet.setPublicDid("tenant-did");
+    tenantWallet = new Wallet();
+    tenantWallet.setAccountId(TENANT_ID);
+    tenantWallet.setToken("tenant-token");
+    tenantWallet.setPublicDid("tenant-did");
 
-        userWallet = new Wallet();
-        userWallet.setAccountId(USER_ID);
-        userWallet.setToken("user-token");
-        userWallet.setPublicDid("user-did");
+    userWallet = new Wallet();
+    userWallet.setAccountId(USER_ID);
+    userWallet.setToken("user-token");
+    userWallet.setPublicDid("user-did");
 
-        connection = new AcaPyConnection();
-        connection.setConnectionId("test-connection-id");
-    }
+    connection = new AcaPyConnection();
+    connection.setConnectionId("test-connection-id");
+  }
 
-    @Test
+  @Test
     @DisplayName("issueCredential 성공 플로우")
     void issueCredential_success() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -125,7 +125,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository).save(any(IssuedVc.class));
     }
 
-    @Test
+  @Test
     @DisplayName("이미 발급된 VC가 있으면 조기 종료")
     void issueCredential_alreadyIssued() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(true);
@@ -138,7 +138,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("issueCredential 응답 null이면 예외")
     void issueCredential_nullIssueResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -159,7 +159,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("issueCredential 응답의 credExId null이면 예외")
     void issueCredential_nullCredExId() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -183,7 +183,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("presentProof 응답 null이면 예외")
     void issueCredential_nullPresentProofResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -211,7 +211,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("presentProof 응답의 presExId null이면 예외")
     void issueCredential_nullPresExId() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -241,7 +241,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("createInvitation 응답 null이면 예외")
     void issueCredential_nullCreateInvitationResponse() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -276,7 +276,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any(IssuedVc.class));
     }
 
-    @Test
+  @Test
     @DisplayName("createInvitation 응답의 invitationUrl 없으면 예외")
     void issueCredential_emptyInvitationUrl() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -313,7 +313,7 @@ class IssuedVcServiceImplTest {
         verify(issuedVcRepository, never()).save(any(IssuedVc.class));
     }
 
-    @Test
+  @Test
     @DisplayName("외부 API 호출 예외는 비즈니스 예외로 변환")
     void issueCredential_apiThrowsWrapped() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -329,7 +329,7 @@ class IssuedVcServiceImplTest {
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
 
-    @Test
+  @Test
     @DisplayName("redis 예외는 비즈니스 예외로 변환")
     void issueCredential_redisThrowsWrapped() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -360,7 +360,7 @@ class IssuedVcServiceImplTest {
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
 
-    @Test
+  @Test
     @DisplayName("DB 예외는 비즈니스 예외로 변환")
     void issueCredential_dbThrowsWrapped() {
         when(issuedVcRepository.existsByBookingIdAndIssued(BOOKING_ID)).thenReturn(false);
@@ -391,25 +391,23 @@ class IssuedVcServiceImplTest {
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
 
-    @Test
-    @DisplayName("sendVerifiyInviUrlOrThrow 성공")
-    void sendVerifiyInviUrlOrThrow_success() {
-        IssuedVc issued = IssuedVc.builder()
-                .verifyInviUrl("http://verify.example/inv")
-                .presExId("pres-ex-xyz")
-                .status(VcStatus.ISSUED)
-                .build();
+  @Test
+  @DisplayName("sendVerifiyInviUrlOrThrow 성공")
+  void sendVerifiyInviUrlOrThrow_success() {
+    IssuedVc issued = IssuedVc.builder().verifyInviUrl("http://verify.example/inv")
+        .presExId("pres-ex-xyz").status(VcStatus.ISSUED).build();
 
-        when(issuedVcRepository.findByUserIdAndTenantIdAndBookingIdAndStatus(USER_ID, TENANT_ID, BOOKING_ID, VcStatus.ISSUED))
-                .thenReturn(Optional.of(issued));
+    when(issuedVcRepository.findByUserIdAndTenantIdAndBookingIdAndStatus(USER_ID, TENANT_ID,
+        BOOKING_ID, VcStatus.ISSUED)).thenReturn(Optional.of(issued));
 
-        Map<String, String> result = issuedVcService.sendVerifiyInviUrlOrThrow(USER_ID, TENANT_ID, BOOKING_ID);
+    Map<String, String> result =
+        issuedVcService.sendVerifiyInviUrlOrThrow(USER_ID, TENANT_ID, BOOKING_ID);
 
-        assertEquals("http://verify.example/inv", result.get("verifyInviUrl"));
-        assertEquals("pres-ex-xyz", result.get("presExId"));
-    }
+    assertEquals("http://verify.example/inv", result.get("verifyInviUrl"));
+    assertEquals("pres-ex-xyz", result.get("presExId"));
+  }
 
-    @Test
+  @Test
     @DisplayName("sendVerifiyInviUrlOrThrow 미발견시 예외")
     void sendVerifiyInviUrlOrThrow_notFound() {
         when(issuedVcRepository.findByUserIdAndTenantIdAndBookingIdAndStatus(USER_ID, TENANT_ID, BOOKING_ID, VcStatus.ISSUED))
@@ -421,5 +419,3 @@ class IssuedVcServiceImplTest {
         assertEquals(VC_ISSUANCE_FAILED, ex.getErrorCode());
     }
 }
-
-

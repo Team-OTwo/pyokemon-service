@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse.Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,7 @@ import com.pyokemon.did.domain.repository.WalletRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreatePublicDidRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateWalletRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse;
+import com.pyokemon.did.remote.acapy.common.dto.response.CreatePublicDidResponse.Result;
 import com.pyokemon.did.remote.acapy.common.dto.response.CreateWalletResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
@@ -32,61 +32,61 @@ import com.pyokemon.did.service.impl.WalletServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class WalletServiceTest {
 
-    @Mock
-    private RemoteTenantAcaPyService remoteTenantAcaPyService;
-    @Mock
-    private RemoteUserAcaPyService remoteUserAcaPyService;
+  @Mock
+  private RemoteTenantAcaPyService remoteTenantAcaPyService;
+  @Mock
+  private RemoteUserAcaPyService remoteUserAcaPyService;
 
-    @Mock
-    private WalletRepository walletRepository;
+  @Mock
+  private WalletRepository walletRepository;
 
-    @InjectMocks
-    private WalletServiceImpl walletService;
+  @InjectMocks
+  private WalletServiceImpl walletService;
 
-    private RegisterWalletRequest tenantWalletRequest;
-    private RegisterWalletRequest userWalletRequest;
-    private RegisterWalletRequest invalidRoleRequest;
-    private CreateWalletResponse walletResponse;
-    private CreatePublicDidResponse publicDidResponse;
-    private Wallet wallet;
-    private final Long TENANT_ID = 1L;
-    private final Long USER_ID = 2L;
+  private RegisterWalletRequest tenantWalletRequest;
+  private RegisterWalletRequest userWalletRequest;
+  private RegisterWalletRequest invalidRoleRequest;
+  private CreateWalletResponse walletResponse;
+  private CreatePublicDidResponse publicDidResponse;
+  private Wallet wallet;
+  private final Long TENANT_ID = 1L;
+  private final Long USER_ID = 2L;
 
-    @BeforeEach
-    void setUp() {
-        // 테넌트 지갑 요청 객체 생성
-        tenantWalletRequest = new RegisterWalletRequest();
-        tenantWalletRequest.setAccountId(TENANT_ID);
-        tenantWalletRequest.setAccountRole(Wallet.AccountRole.TENANT);
+  @BeforeEach
+  void setUp() {
+    // 테넌트 지갑 요청 객체 생성
+    tenantWalletRequest = new RegisterWalletRequest();
+    tenantWalletRequest.setAccountId(TENANT_ID);
+    tenantWalletRequest.setAccountRole(Wallet.AccountRole.TENANT);
 
-        // 사용자 지갑 요청 객체 생성
-        userWalletRequest = new RegisterWalletRequest();
-        userWalletRequest.setAccountId(USER_ID);
-        userWalletRequest.setAccountRole(Wallet.AccountRole.USER);
+    // 사용자 지갑 요청 객체 생성
+    userWalletRequest = new RegisterWalletRequest();
+    userWalletRequest.setAccountId(USER_ID);
+    userWalletRequest.setAccountRole(Wallet.AccountRole.USER);
 
-        // 유효하지 않은 역할 요청 객체 생성
-        invalidRoleRequest = new RegisterWalletRequest();
-        invalidRoleRequest.setAccountId(3L);
-        invalidRoleRequest.setAccountRole(null);
+    // 유효하지 않은 역할 요청 객체 생성
+    invalidRoleRequest = new RegisterWalletRequest();
+    invalidRoleRequest.setAccountId(3L);
+    invalidRoleRequest.setAccountRole(null);
 
-        // 지갑 응답 객체 생성
-        walletResponse = new CreateWalletResponse();
-        walletResponse.setToken("test-token");
-        walletResponse.setWalletId("test-wallet-id");
+    // 지갑 응답 객체 생성
+    walletResponse = new CreateWalletResponse();
+    walletResponse.setToken("test-token");
+    walletResponse.setWalletId("test-wallet-id");
 
-        // DID 응답 객체 생성
-        Result result = new Result();
-        result.setDid("test-did");
-        result.setVerkey("test-ver-key");
-        publicDidResponse = new CreatePublicDidResponse();
-        publicDidResponse.setResult(result);
+    // DID 응답 객체 생성
+    Result result = new Result();
+    result.setDid("test-did");
+    result.setVerkey("test-ver-key");
+    publicDidResponse = new CreatePublicDidResponse();
+    publicDidResponse.setResult(result);
 
-        // 지갑 객체 생성
-        wallet = Wallet.builder().accountId(TENANT_ID).accountRole(Wallet.AccountRole.TENANT)
-                .token("test-token").publicDid("test-did").publicVerKey("test-ver-key").build();
-    }
+    // 지갑 객체 생성
+    wallet = Wallet.builder().accountId(TENANT_ID).accountRole(Wallet.AccountRole.TENANT)
+        .token("test-token").publicDid("test-did").publicVerKey("test-ver-key").build();
+  }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 등록 성공 테스트")
     void tenant_registerWallet_Success() {
         // Given
@@ -107,7 +107,7 @@ class WalletServiceTest {
         verify(walletRepository).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 지갑 등록 성공 테스트")
     void user_registerWallet_Success() {
         // Given
@@ -128,7 +128,7 @@ class WalletServiceTest {
         verify(walletRepository).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("유효하지 않은 계정 역할로 지갑 등록 시 예외 발생 테스트")
     void registerWallet_InvalidAccountRole() {
         // Given
@@ -147,7 +147,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any());
     }
 
-    @Test
+  @Test
     @DisplayName("이미 존재하는 테넌트 지갑 등록 시 예외 발생 테스트")
     void tenant_registerWallet_WalletAlreadyExists() {
         // Given
@@ -168,7 +168,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("이미 존재하는 사용자 지갑 등록 시 예외 발생 테스트")
     void user_registerWallet_WalletAlreadyExists() {
         // Given
@@ -189,7 +189,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 생성 응답이 null인 경우 예외 발생 테스트")
     void registerWallet_TenantWalletResponseNull() {
         // Given
@@ -211,7 +211,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 지갑 생성 응답이 null인 경우 예외 발생 테스트")
     void registerWallet_UserWalletResponseNull() {
         // Given
@@ -233,7 +233,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("지갑 생성 응답의 토큰이 null인 경우 예외 발생 테스트")
     void registerWallet_WalletTokenNull() {
         // Given
@@ -259,7 +259,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 DID 생성 응답이 null인 경우 예외 발생 테스트")
     void registerWallet_TenantPublicDidResponseNull() {
         // Given
@@ -282,7 +282,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 DID 생성 응답이 null인 경우 예외 발생 테스트")
     void registerWallet_UserPublicDidResponseNull() {
         // Given
@@ -305,7 +305,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("DID 생성 응답의 DID가 null인 경우 예외 발생 테스트")
     void registerWallet_PublicDidNull() {
         // Given
@@ -332,7 +332,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 생성 API 호출 중 예외 발생 테스트")
     void registerWallet_TenantWalletApiException() {
         // Given
@@ -355,7 +355,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 지갑 생성 API 호출 중 예외 발생 테스트")
     void registerWallet_UserWalletApiException() {
         // Given
@@ -378,7 +378,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 DID 생성 API 호출 중 예외 발생 테스트")
     void registerWallet_TenantDidApiException() {
         // Given
@@ -402,7 +402,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("사용자 DID 생성 API 호출 중 예외 발생 테스트")
     void registerWallet_UserDidApiException() {
         // Given
@@ -426,7 +426,7 @@ class WalletServiceTest {
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("DB 저장 중 예외 발생 테스트")
     void registerWallet_DbSaveException() {
         // Given
@@ -450,7 +450,7 @@ class WalletServiceTest {
         verify(walletRepository).save(any(Wallet.class));
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 조회 테스트 - 존재하는 경우")
     void getWalletByAccountId_Exists() {
         // Given
@@ -465,7 +465,7 @@ class WalletServiceTest {
         verify(walletRepository).findByAccountId(TENANT_ID);
     }
 
-    @Test
+  @Test
     @DisplayName("테넌트 지갑 조회 테스트 - 존재하지 않는 경우")
     void getWalletByAccountId_NotExists() {
 
@@ -480,7 +480,7 @@ class WalletServiceTest {
         verify(walletRepository).findByAccountId(TENANT_ID);
     }
 
-    @Test
+  @Test
     @DisplayName("지갑 조회 OrThrow 테스트 - 존재하는 경우")
     void getWalletByAccountIdOrThrow_Exists() {
         // Given
@@ -495,7 +495,7 @@ class WalletServiceTest {
         verify(walletRepository).findByAccountId(TENANT_ID);
     }
 
-    @Test
+  @Test
     @DisplayName("지갑 조회 OrThrow 테스트 - 존재하지 않는 경우 예외 발생")
     void getWalletByAccountIdOrThrow_NotExists() {
         // Given

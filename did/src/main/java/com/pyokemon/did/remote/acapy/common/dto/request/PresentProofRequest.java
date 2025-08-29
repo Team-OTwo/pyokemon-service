@@ -11,8 +11,8 @@ import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.*;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Constraints.Field;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Dif.Options;
 import com.pyokemon.did.remote.acapy.common.dto.request.presentproof.Dif.PresentationDefinition;
-
 import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -61,9 +61,8 @@ public class PresentProofRequest implements AcaPyRequest {
         .constraints(constraints).build();
 
     // 4. 프레젠테이션 정의 생성
-    PresentationDefinition definition =
-        PresentationDefinition.builder().id(presDefId)
-            .inputDescriptors(Collections.singletonList(descriptor)).build();
+    PresentationDefinition definition = PresentationDefinition.builder().id(presDefId)
+        .inputDescriptors(Collections.singletonList(descriptor)).build();
 
     // 5. 옵션 생성
     Options options =
