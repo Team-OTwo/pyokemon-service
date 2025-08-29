@@ -1,4 +1,4 @@
-package com.pyokemon.event.bff.dto;
+package com.pyokemon.event.dto;
 
 import lombok.Getter;
 import lombok.Setter;

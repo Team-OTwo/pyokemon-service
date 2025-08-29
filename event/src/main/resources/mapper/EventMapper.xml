@@ -109,4 +109,42 @@
         WHERE es.event_schedule_id = #{eventScheduleId} AND s.seat_id = #{seatId}
     </select>
 
+    <select id="findEventById" resultType="com.pyokemon.event.dto.EventInfoDto">
+        SELECT event_id, title, thumbnail_url FROM tb_event WHERE event_id = #{eventId}
+    </select>
+
+    <select id="findEventsByIdIn" parameterType="map" resultType="com.pyokemon.event.dto.EventInfoDto">
+        SELECT event_id, title, thumbnail_url
+        FROM tb_event
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                event_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 장르로 eventIds 조회 -->
+    <select id="findIdsByGenre" parameterType="string" resultType="long">
+        SELECT event_id
+        FROM tb_event
+        WHERE genre = #{genre}
+    </select>
+
+    <!-- eventIds로 eventScheduleIds 조회 -->
+    <select id="findIdsByEventIds" parameterType="map" resultType="long">
+        SELECT event_schedule_id
+        FROM tb_event_schedule
+        <where>
+            <if test="eventIds != null and eventIds.size() > 0">
+                event_id IN
+                <foreach collection="eventIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 </mapper>

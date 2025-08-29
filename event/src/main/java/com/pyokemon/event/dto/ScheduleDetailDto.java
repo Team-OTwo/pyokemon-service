@@ -1,4 +1,4 @@
-package com.pyokemon.event.bff.dto;
+package com.pyokemon.event.dto;
 
 import lombok.Data;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Data
-public class BffScheduleDetailDto {
+public class ScheduleDetailDto {
     private Long eventScheduleId;
     private String title;
     private String venueName;

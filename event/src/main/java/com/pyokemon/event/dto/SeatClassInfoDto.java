@@ -1,9 +1,9 @@
-package com.pyokemon.event.bff.dto;
+package com.pyokemon.event.dto;
 
 import lombok.Data;
 
 @Data
-public class BffSeatClassDto {
+public class SeatClassInfoDto {
   private Long seatClassId;
   private String className;
   private Integer priority;

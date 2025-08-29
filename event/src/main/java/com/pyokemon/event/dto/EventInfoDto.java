@@ -1,9 +1,9 @@
-package com.pyokemon.event.bff.dto;
+package com.pyokemon.event.dto;
 
 import lombok.Data;
 
 @Data
-public class BffEventDto {
+public class EventInfoDto {
   private Long eventId;
   private String title;
   private String thumbnailUrl;

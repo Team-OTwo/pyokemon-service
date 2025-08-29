@@ -1,11 +1,11 @@
-package com.pyokemon.event.bff.dto;
+package com.pyokemon.event.dto;
 
 import java.time.LocalDateTime;
 
 import lombok.Data;
 
 @Data
-public class BffEventScheduleDto {
+public class EventScheduleInfoDto {
   private Long eventScheduleId;
   private Long eventId;
   private Long venueId;

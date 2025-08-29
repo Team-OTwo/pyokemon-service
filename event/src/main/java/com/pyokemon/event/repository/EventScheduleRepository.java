@@ -4,6 +4,8 @@ package com.pyokemon.event.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.pyokemon.event.dto.EventScheduleInfoDto;
+import com.pyokemon.event.dto.ScheduleDetailDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,4 +36,11 @@ public interface EventScheduleRepository {
   Long findVenueIdByEventScheduleId(Long eventScheduleId);
 
   List<Long> findEventScheduleIdTwoHoursLater();
+
+  Optional<EventScheduleInfoDto> findEventScheduleById(
+          @Param("eventScheduleId") Long eventScheduleId);
+
+  List<ScheduleDetailDto> findScheduleDetailsByIds(@Param("ids") List<Long> ids);
+
+  List<EventScheduleInfoDto> findEventSchedulesByIdIn(@Param("ids") List<Long> ids);
 }

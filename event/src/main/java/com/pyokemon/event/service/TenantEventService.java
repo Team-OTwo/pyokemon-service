@@ -3,6 +3,8 @@ package com.pyokemon.event.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.event.dto.ActiveEventCountResponseDto;
+import com.pyokemon.event.dto.ScheduleIdsResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -352,4 +354,17 @@ public class TenantEventService {
     kafkaMessageProducer.sendEventConfirmed(kafkaDto);
 
   }
+
+  @Transactional(readOnly = true)
+  public ActiveEventCountResponseDto getActiveEventCount(Long tenantId, int year, int month) {
+    Long count = tenantEventRepository.countActiveEventsByTenant(tenantId, year, month);
+    return new ActiveEventCountResponseDto(count);
+  }
+
+  @Transactional(readOnly = true)
+  public ScheduleIdsResponseDto getScheduleIdsByTenant(Long tenantId, int year, int month) {
+    List<Long> ids = tenantEventRepository.findScheduleIdsByTenantAndMonth(tenantId, year, month);
+    return new ScheduleIdsResponseDto(ids);
+  }
+
 }

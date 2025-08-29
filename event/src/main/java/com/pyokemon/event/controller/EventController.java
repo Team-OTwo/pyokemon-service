@@ -2,10 +2,8 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
-import jakarta.validation.Valid;
-
+import com.pyokemon.common.dto.IdsRequest;
 import org.apache.ibatis.javassist.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +13,6 @@ import com.pyokemon.event.dto.*;
 import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
-import com.pyokemon.event.service.TenantEventService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class EventController {
   private final EventService eventService;
   private final EventScheduleService eventScheduleService;
-  private final TenantEventService tenantEventService;
   private final TenantEventRepository tenantEventRepository;
 
   // 오늘 오픈 티켓
@@ -128,6 +124,79 @@ public class EventController {
       @RequestParam Long seatId) throws NotFoundException {
     SeatDetailResponseDTO dto = eventService.getSeatDetail(eventScheduleId, seatId);
     return ResponseEntity.ok(dto);
+  }
+
+  // Venue 엔드포인트
+  @GetMapping("/venues/{venueId}")
+  public VenueInfoDto getVenue(@PathVariable Long venueId) {
+    return eventScheduleService.getVenue(venueId);
+  }
+
+  // Seat 엔드포인트
+  @GetMapping("/seats/{seatId}")
+  public SeatInfoDto getSeat(@PathVariable Long seatId) {
+    return eventScheduleService.getSeat(seatId);
+  }
+
+  // Event Schedule 엔드포인트
+  @GetMapping("/event-schedules/{eventScheduleId}")
+  public EventScheduleInfoDto getEventSchedule(@PathVariable Long eventScheduleId) {
+    return eventScheduleService.getEventSchedule(eventScheduleId);
+  }
+
+  // Event 엔드포인트
+  @GetMapping("/bff/{eventId}")
+  public EventInfoDto getEvent(@PathVariable Long eventId) {
+    return eventService.getEvent(eventId);
+  }
+
+  // Seat Class 엔드포인트
+  @GetMapping("/seat-classes/{seatClassId}")
+  public SeatClassInfoDto getSeatClass(@PathVariable Long seatClassId) {
+    return eventScheduleService.getSeatClass(seatClassId);
+  }
+
+  @PostMapping("/seats/_batch")
+  public List<SeatInfoDto> getSeat(@RequestBody IdsRequest request) {
+    return eventScheduleService.getSeats(request.getIds());
+  }
+
+  @PostMapping("/seat-classes/_batch")
+  public List<SeatClassInfoDto> getSeatClasses(@RequestBody IdsRequest request) {
+    return eventScheduleService.getSeatClasses(request.getIds());
+  }
+
+  @PostMapping("/event-schedules/_batch")
+  public List<EventScheduleInfoDto> getEventSchedules(@RequestBody IdsRequest request) {
+    return eventScheduleService.getEventSchedules(request.getIds());
+  }
+
+  @PostMapping("/bff/_batch")
+  public List<EventInfoDto> getEvents(@RequestBody IdsRequest request) {
+    System.out.println(request.getIds().get(0));
+    return eventService.getEvents(request.getIds());
+  }
+
+  @PostMapping("/venues/_batch")
+  public List<VenueInfoDto> getVenues(@RequestBody IdsRequest request) {
+    return eventScheduleService.getVenues(request.getIds());
+  }
+
+  @PostMapping("/schedules/details/_batch")
+  public List<ScheduleDetailDto> getScheduleDetails(@RequestBody IdsRequest request) {
+    return eventScheduleService.getScheduleDetailsByIds(request.getIds());
+  }
+
+  /** 0) 장르 → 이벤트 ID 목록 */
+  @PostMapping("/_ids-by-genre")
+  public List<Long> findEventIdsByGenre(@RequestBody GenreRequest req) {
+    return eventService.findEventIdsByGenre(req.getGenre());
+  }
+
+  /** 1) 이벤트 IDs → 스케줄 ID 목록 */
+  @PostMapping("/event-schedules/_ids-by-events")
+  public List<Long> findScheduleIdsByEventIds(@RequestBody IdsRequest req) {
+    return eventService.findScheduleIdsByEventIds(req.getIds());
   }
 
 }

@@ -3,6 +3,9 @@ package com.pyokemon.event.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.event.dto.ActiveEventCountResponseDto;
+import com.pyokemon.event.dto.ScheduleIdsResponseDto;
+import com.pyokemon.event.service.EventService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -123,6 +126,25 @@ public class TenantEventController {
   public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId) {
     tenantEventService.updateStatus(eventId, "CANCELED");
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/summary/count")
+  public ResponseEntity<ActiveEventCountResponseDto> getActiveEventCount(
+          @RequestHeader("x-auth-accountId") Long tenantId,
+          @RequestParam("year") int year,
+          @RequestParam("month") int month) {
+
+    ActiveEventCountResponseDto response = tenantEventService.getActiveEventCount(tenantId, year, month);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/schedules-by-tenant")
+  public ResponseEntity<ScheduleIdsResponseDto> getScheduleIdsByTenant(
+          @RequestHeader("x-auth-accountId") Long tenantId,
+          @RequestParam("year") int year,
+          @RequestParam("month") int month) {
+    ScheduleIdsResponseDto responseDto = tenantEventService.getScheduleIdsByTenant(tenantId, year, month);
+    return ResponseEntity.ok(responseDto);
   }
 
 }

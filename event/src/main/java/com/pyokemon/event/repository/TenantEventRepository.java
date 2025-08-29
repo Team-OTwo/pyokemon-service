@@ -9,6 +9,7 @@ import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.entity.Event;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface TenantEventRepository {
@@ -36,4 +37,7 @@ public interface TenantEventRepository {
   List<TenantEventDetailDtoForApp> findEventListForApp(Long accountId, LocalDateTime cursorDate,
       Long cursorId, int limit, String genre);
 
+  Long countActiveEventsByTenant(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
+
+  List<Long> findScheduleIdsByTenantAndMonth(@Param("tenantId") Long tenantId, @Param("year") int year, @Param("month") int month);
 }

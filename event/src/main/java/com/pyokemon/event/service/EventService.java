@@ -1,8 +1,13 @@
 package com.pyokemon.event.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.pyokemon.common.exception.BusinessException;
 import org.apache.ibatis.javassist.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +18,7 @@ import com.pyokemon.event.repository.*;
 import com.pyokemon.event.repository.EventRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -97,6 +103,45 @@ public class EventService {
       throw new NotFoundException("해당 좌석 정보를 찾을 수 없습니다.");
     }
     return dto;
+  }
+
+  @Transactional(readOnly = true)
+  public EventInfoDto getEvent(Long id) {
+    return eventRepository.findEventById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "EVENT_NOT_FOUND"));
+  }
+
+  @Transactional(readOnly = true)
+  public List<EventInfoDto> getEvents(List<Long> ids) {
+    if (ids == null || ids.isEmpty())
+      return List.of();
+
+    // DB에서 한 번에 조회
+    List<EventInfoDto> rows = eventRepository.findEventsByIdIn(ids);
+
+    // ID 기준 Map으로 정리
+    Map<Long, EventInfoDto> byId =
+            rows.stream().collect(Collectors.toMap(EventInfoDto::getEventId, Function.identity()));
+
+    // 누락된 ID 체크
+    List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
+
+    if (!missing.isEmpty()) {
+      throw new BusinessException("이벤트 정보를 조회할 수 없습니다. ids=" + missing, "EVENT_NOT_FOUND");
+    }
+
+    // 요청 순서 / 중복 유지해서 반환
+    return ids.stream().map(byId::get).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<Long> findEventIdsByGenre(String genre) {
+    return eventRepository.findIdsByGenre(genre);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Long> findScheduleIdsByEventIds(List<Long> eventIds) {
+    return eventRepository.findIdsByEventIds(eventIds);
   }
 
 }

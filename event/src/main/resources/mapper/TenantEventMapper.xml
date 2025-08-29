@@ -227,4 +227,34 @@
             e.event_id = #{eventId}
     </select>
 
+    <select id="findScheduleIdsByTenantAndMonth" resultType="long">
+        SELECT
+            DISTINCT es.event_schedule_id
+        FROM
+            tb_event e
+                INNER JOIN
+            tb_event_schedule es ON e.event_id = es.event_id
+        WHERE
+            e.account_id = #{tenantId}
+                AND e.status = 'APPROVED'
+                AND YEAR(es.event_date) = #{year}
+          AND MONTH(es.event_date) = #{month}
+    </select>
+
+    <select id="countActiveEventsByTenant" resultType="long">
+        SELECT
+            -- 한 공연이 해당 월에 여러 일정을 가질 수 있으므로, 고유한 공연의 개수만 셉니다.
+            COUNT(DISTINCT e.event_id)
+        FROM
+            tb_event e
+                INNER JOIN
+            tb_event_schedule es ON e.event_id = es.event_id
+        WHERE
+            e.account_id = #{tenantId}
+                AND e.status = 'APPROVED'
+                -- 공연일시(event_date)를 기준으로 연도와 월을 필터링합니다.
+                AND YEAR(es.event_date) = #{year}
+          AND MONTH(es.event_date) = #{month}
+    </select>
+
 </mapper> 
