@@ -1,5 +1,7 @@
 package com.pyokemon.account.tenant.controller;
 
+import com.pyokemon.account.tenant.dto.response.TenantInfoDto;
+import com.pyokemon.common.dto.IdsRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,8 @@ import com.pyokemon.account.tenant.service.TenantService;
 import com.pyokemon.common.dto.ResponseDto;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tenants")
@@ -82,5 +86,16 @@ public class TenantController {
     Long accountId = Long.parseLong(currentUserAccountId);
     tenantService.deleteMyTenantAccount(accountId, currentUserAccountId);
     return ResponseEntity.ok(ResponseDto.success("테넌트 계정 삭제 성공"));
+  }
+
+  @GetMapping("/bff/{tenantId}")
+  public ResponseEntity<TenantInfoDto> findAccountsByTenantId(@PathVariable Long tenantId) {
+    TenantInfoDto responseDto = tenantService.findAccountsByTenantId(tenantId);
+    return ResponseEntity.ok(responseDto);
+  }
+
+  @PostMapping("/_batch")
+  public List<TenantInfoDto> findTenantsBatch(@RequestBody IdsRequest req) {
+    return tenantService.findTenantsBatch(req.getIds());
   }
 }

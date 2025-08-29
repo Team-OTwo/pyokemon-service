@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.pyokemon.account.tenant.dto.response.TenantInfoDto;
+import com.pyokemon.account.tenant.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,6 +112,17 @@ public class TenantService {
         () -> new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND));
 
     return tenant.toTenantProfileResponseDto(account.getLoginId());
+  }
+
+  @Transactional(readOnly = true)
+  public TenantInfoDto findAccountsByTenantId(Long tenantId) {
+    return tenantRepository.findAccountsByTenantId(tenantId).map(TenantInfoDto::from)
+            .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + tenantId));
+  }
+
+  @Transactional(readOnly = true)
+  public List<TenantInfoDto> findTenantsBatch(List<Long> tenantIds) {
+    return tenantRepository.findTenantsByIdIn(tenantIds);
   }
 
   @Transactional
