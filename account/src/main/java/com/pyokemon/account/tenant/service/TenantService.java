@@ -1,7 +1,6 @@
 package com.pyokemon.account.tenant.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.pyokemon.account.tenant.dto.response.TenantInfoDto;
