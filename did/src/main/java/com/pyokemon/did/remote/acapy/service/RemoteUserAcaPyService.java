@@ -32,9 +32,9 @@ public interface RemoteUserAcaPyService {
   ReceiveInvitationResponse receiveInvitation(@RequestHeader("Authorization") String authorization,
       @RequestBody ReceiveInvitationRequest request);
 
-  @GetMapping(value = "/credentials/w3c/{credential_id}")
+  @GetMapping(value = "/issue-credential-2.0/records/{cred_ex_id}")
   Object getCredential(@RequestHeader("Authorization") String authorization,
-      @PathVariable String credential_id);
+      @PathVariable String cred_ex_id);
 
   @PostMapping(value = "/issue-credential-2.0/send")
   IssueCredentialResponse issueCredential(@RequestHeader("Authorization") String authorization,
