@@ -1,5 +1,6 @@
 package com.pyokemon.did.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pyokemon.common.entity.BaseEntity;
 
 import lombok.*;
@@ -13,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class IssuedVc extends BaseEntity {
 
-  private String credExId;
+  private String credIdStored;
   private String presExId;
   private String verifyInviUrl;
   private Long bookingId;
@@ -21,8 +22,8 @@ public class IssuedVc extends BaseEntity {
   private Long tenantId;
   private VcStatus status;
 
-  public void activate(String credExId) {
-    this.credExId = credExId;
+  public void activate(String credIdStored) {
+    this.credIdStored = credIdStored;
     status = VcStatus.ISSUED;
   }
 

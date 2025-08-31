@@ -20,12 +20,6 @@ public final class GatewayHeaderConstants {
      * 사용자 계정 ID 헤더
      */
     public static final String X_AUTH_ACCOUNT_ID = "X-Auth-AccountId";
-
-    /**
-     * 테넌트 ID 헤더
-     */
-    public static final String X_AUTH_TENANT_ID = "X-Auth-TenantId";
-
     /**
      * 사용자 역할 헤더
      */

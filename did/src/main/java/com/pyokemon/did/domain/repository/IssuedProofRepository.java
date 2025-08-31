@@ -5,8 +5,10 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 import com.pyokemon.did.domain.IssuedProof;
+import org.springframework.stereotype.Repository;
 
-public interface IssuedProofRepository extends CrudRepository<IssuedProof, String> {
+@Repository
+public interface IssuedProofRepository extends CrudRepository<IssuedProof, Long> {
   /**
    * Finds an IssuedProof entity by its presExId. This works because the presExId field is annotated
    * with @Indexed.
@@ -21,8 +23,6 @@ public interface IssuedProofRepository extends CrudRepository<IssuedProof, Strin
    * the presExId field.
    *
    * @param presExId The presentation exchange ID of the entity to delete.
-   * @return The number of entities deleted (0 or 1).
    */
-  long deleteByPresExId(String presExId);
-
+  //void deleteByPresExId(String presExId);
 }

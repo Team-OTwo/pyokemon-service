@@ -4,6 +4,7 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
 import java.util.Map;
 
+import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,12 +119,12 @@ public class VerificationServiceImpl implements VerificationService {
 
       // 4. 원본 자격 증명 조회
       String delegatorToken = userWallet.getToken();
-      String sourceCredentialExchangeId = issuedVc.getCredExId();
+      String credentialIdStored = issuedVc.getCredIdStored();
 
       GetCredentialResponse sourceCredential = remoteUserAcaPyService.getCredential(delegatorToken, // 위임자
-                                                                                                    // 지갑
+                                           // 지갑
                                                                                                     // 토큰
-          sourceCredentialExchangeId // 원본 자격 증명 교환 식별자
+          credentialIdStored // 원본 자격 증명 교환 식별자
       );
 
       // 5. 자격 증명 주체 위임
@@ -136,7 +137,8 @@ public class VerificationServiceImpl implements VerificationService {
 
       // 6. 위임된 자격 증명 발급
       String connectionId = deviceConnection.getConnectionId();
-      String sourceCredentialId = CredentialSubjectDelegator.extractCredentialId(sourceCredential);
+      //TODO - 원본 subjectcredential에서 뽑기
+      String sourceCredentialId = CredentialIdGenerator.generateCredentialId(bookingId);
       String delegatorDid = userWallet.getPublicDid();
 
       IssueCredentialResponse issueCredentialResponse =
@@ -159,8 +161,8 @@ public class VerificationServiceImpl implements VerificationService {
   }
 
   private void validateIssuedVc(IssuedVc issuedVc, Long userId) throws BusinessException {
-    String credExId = issuedVc.getCredExId();
-    if (credExId == null || credExId.isEmpty()) {
+    String credIdStored = issuedVc.getCredIdStored();
+    if (credIdStored == null || credIdStored.isEmpty()) {
       throw new BusinessException("VC 정보가 유효하지 않습니다.", VC_INVALID);
     }
 
@@ -204,6 +206,7 @@ public class VerificationServiceImpl implements VerificationService {
   }
 
   @Override
+  @Transactional
   public void saveVerification(String PresExId, VpStatus status) {
     Verification verification = Verification.of(PresExId, status);
     verificationRepository.save(verification);

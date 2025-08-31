@@ -1,11 +1,7 @@
 package com.pyokemon.did.remote.acapy.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.did.remote.acapy.common.dto.request.*;
 import com.pyokemon.did.remote.acapy.common.dto.response.*;
@@ -32,9 +28,9 @@ public interface RemoteUserAcaPyService {
   ReceiveInvitationResponse receiveInvitation(@RequestHeader("Authorization") String authorization,
       @RequestBody ReceiveInvitationRequest request);
 
-  @GetMapping(value = "/issue-credential-2.0/records/{cred_ex_id}")
+  @GetMapping(value = "/vc/credentials/{credential_id}")
   GetCredentialResponse getCredential(@RequestHeader("Authorization") String authorization,
-      @PathVariable String cred_ex_id);
+      @PathVariable(name = "credential_id") String credentialId);
 
   @PostMapping(value = "/issue-credential-2.0/send")
   IssueCredentialResponse issueCredential(@RequestHeader("Authorization") String authorization,

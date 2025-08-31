@@ -79,6 +79,7 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
 
 
   @Override
+  @Transactional
   public void handleTenantPresentProofWebhook(PresentProofWebhookRequest request) {
 
     VpStatus finalStatus = FAIL;

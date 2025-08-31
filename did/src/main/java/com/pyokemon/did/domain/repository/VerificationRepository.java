@@ -5,8 +5,10 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 import com.pyokemon.did.domain.Verification;
+import org.springframework.stereotype.Repository;
 
-public interface VerificationRepository extends CrudRepository<Verification, String> {
+@Repository
+public interface VerificationRepository extends CrudRepository<Verification, Long> {
 
 
   /**

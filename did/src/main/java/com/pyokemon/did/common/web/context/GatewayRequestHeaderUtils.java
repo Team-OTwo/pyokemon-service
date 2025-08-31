@@ -44,7 +44,7 @@ public class GatewayRequestHeaderUtils {
    */
   public static Long getTenantIdOrThrowException() {
     HttpServletRequest request = getCurrentRequest();
-    String tenantId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_TENANT_ID);
+    String tenantId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
     if (tenantId == null || tenantId.isEmpty()) {
       throw new BusinessException("테넌트 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }

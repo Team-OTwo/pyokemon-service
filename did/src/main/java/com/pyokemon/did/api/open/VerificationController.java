@@ -39,16 +39,16 @@ public class VerificationController {
 
   @PostMapping
   public ResponseEntity<ResponseDto<CreateVerificationResponse>> issueVerificationUrl(
-      CreateVerificationRequest request) {
+      @RequestBody @Valid CreateVerificationRequest request) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     CreateVerificationResponse response =
         verificationService.createVerificationUrl(request, tenantId);
     return ResponseEntity.ok(ResponseDto.success(response, "검증 URL 생성 성공"));
   }
 
-  @PostMapping("/{pres_ex_id}")
+  @GetMapping("/{pres_ex_id}")
   public ResponseEntity<ResponseDto<HandleVerificationResponse>> handleVerification(
-      @PathVariable(name = "pres_ex_id") String presExId, HandleVerificationRequest request) {
+      @PathVariable(name = "pres_ex_id") String presExId, @RequestBody @Valid HandleVerificationRequest request) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     HandleVerificationResponse response =
         verificationService.handleVerification(tenantId, presExId, request);

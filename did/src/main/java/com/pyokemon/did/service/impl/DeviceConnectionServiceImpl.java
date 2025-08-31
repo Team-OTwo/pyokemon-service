@@ -5,6 +5,7 @@ import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.*;
 
 import java.util.Optional;
 
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -191,10 +192,12 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
    * deviceConnection을 connectionId 또는 alias로 찾고 public DID를 저장합니다
    */
   @Override
+  @Transactional
   public void updatePublicDid(String connectionId, String content) {
 
     DeviceConnection deviceConnection = findByConnectionId(connectionId);
-
+    log.info(connectionId);
+    log.info(content);
     // content가 did:key로 시작하는 경우에만 publicDid에 저장
     if (content != null && content.startsWith("did:key:")) {
       deviceConnection.setPublicDid(content);
@@ -206,6 +209,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
    * deviceConnection을 connectionId 또는 alias로 찾고 public DID를 저장합니다
    */
   @Override
+  @Transactional
   public void findAndUpdateConnectionId(String connectionId, String alias) {
 
     if (deviceConnectionRepository.findByConnectionId(connectionId).isPresent()) {
@@ -214,9 +218,10 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     // alias로 찾기
     DeviceConnection deviceConnection = deviceConnectionRepository.findByAlias(alias)
-        .orElseThrow(() -> new BusinessException(
-            "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
-            "DEVICE_CONNECTION_NOT_FOUND"));
+//        .orElseThrow(() -> new BusinessException(
+//            "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
+//            "DEVICE_CONNECTION_NOT_FOUND"));
+        .orElseThrow(() -> new RetryException("retry - device connection not found"));
 
     // connectionId 저장, active로 상태 바꾸기
     deviceConnection.activate(connectionId);
