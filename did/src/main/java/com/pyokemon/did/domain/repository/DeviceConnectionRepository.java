@@ -40,7 +40,7 @@ public interface DeviceConnectionRepository {
    * @param deviceId 조회할 device_id
    * @return DeviceConnection 목록
    */
-  List<DeviceConnection> findByDeviceId(String deviceId);
+  Optional<DeviceConnection> findByDeviceId(String deviceId);
 
   /**
    * user_id로 DeviceConnection을 조회합니다. 한 사용자당 하나의 DeviceConnection만 존재합니다.

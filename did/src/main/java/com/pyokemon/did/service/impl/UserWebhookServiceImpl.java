@@ -1,30 +1,18 @@
 package com.pyokemon.did.service.impl;
 
-import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.ACTIVE;
-import static com.pyokemon.did.domain.IssuedVc.VcStatus.*;
+import static com.pyokemon.did.domain.DeviceConnection.isDeviceConnectionAliasValid;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.retry.RetryException;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.annotation.WebhookRetryable;
-import com.pyokemon.did.domain.DeviceConnection;
-import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.dto.request.webhook.*;
-import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
-import com.pyokemon.did.domain.repository.IssuedVcRepository;
-import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.service.DeviceConnectionService;
 import com.pyokemon.did.service.IssuedVcService;
 import com.pyokemon.did.service.UserWebhookService;
-import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,32 +22,41 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserWebhookServiceImpl implements UserWebhookService {
 
-  private final DeviceConnectionRepository deviceConnectionRepository;
   private final IssuedVcService issuedVcService;
+  private final DeviceConnectionService deviceConnectionService;
 
   private static final String ISSUE_CREDENTIAL_STATUS_DONE = "done";
   private static final String ISSUE_CREDENTIAL_ROLE_HOLDER = "holder";
 
+  /**
+   * Connection Webhook 왔을때 ConnectionId 저장하는 메소드
+   */
   @Override
-  @WebhookRetryable // 웹훅 전용 재시도 설정 사용
+  @WebhookRetryable
   public void handleConnectionWebhook(ConnectionWebhookRequest webhookDto) {
+    if (webhookDto == null) {
+      throw new BusinessException("Connection webhook 요청이 null입니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
+    }
+
     String state = webhookDto.getState();
     String connectionId = webhookDto.getConnectionId();
     String alias = webhookDto.getAlias();
 
-    if (!isDeviceConnectionAlias(alias)) {
-      return;
+    if (connectionId == null || connectionId.trim().isEmpty()) {
+      throw new BusinessException("Connection ID가 null이거나 비어있습니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
     }
 
-    DeviceConnection deviceConnection = findDeviceConnection(connectionId, alias);
+    if (!isDeviceConnectionAliasValid(alias))
+      return; // alias 형식에 맞는지 보고
+    if (!"active".equals(state))
+      return; // state=active 아닌지 보고
+
     log.info("Connection webhook - state: '{}', alias: '{}', connection_id: '{}'", state, alias,
         connectionId);
 
-    if ("active".equals(state)) {
-      deviceConnection.setStatus(ACTIVE);
-      deviceConnection.setConnectionId(connectionId);
-      deviceConnectionRepository.update(deviceConnection);
-    }
+    deviceConnectionService.findAndUpdateConnectionId(connectionId, alias);
   }
 
   /**
@@ -71,12 +68,15 @@ public class UserWebhookServiceImpl implements UserWebhookService {
         "Connection Webhook 처리 실패 - 최대 재시도 횟수 초과. state: '{}', alias: '{}', connection_id: '{}', error: {}",
         webhookDto.getState(), webhookDto.getAlias(), webhookDto.getConnectionId(), e.getMessage(),
         e);
-
-    // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
-    // 현재는 로그만 남기고 있습니다.
   }
 
   public void handleOutOfBandWebhook(OutOfBandWebhookRequest webhookDto) {
+    if (webhookDto == null) {
+      log.error("OutOfBand webhook request is null");
+      throw new BusinessException("OutOfBand webhook 요청이 null입니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
+    }
+
     log.info("OOB Webhook from User ACA-py - state: {}, oob_id: {}, role: {}, connection_id: {}",
         webhookDto.getState(), webhookDto.getOobId(), webhookDto.getRole(),
         webhookDto.getConnectionId());
@@ -84,30 +84,21 @@ public class UserWebhookServiceImpl implements UserWebhookService {
 
   @Override
   public void handleBasicMessageWebhook(BasicMessageWebhookRequest webhookDto) {
-    try {
-      String state = webhookDto.getState();
-      String connectionId = webhookDto.getConnectionId();
-      String content = webhookDto.getContent();
-      String messageId = webhookDto.getMessageId();
-
-      log.info("Basic Message webhook - state: {}, content: {}, connection_id: {}, message_id: {}",
-          state, connectionId, content, messageId);
-
-      // connectionId로 DeviceConnection 찾기
-      DeviceConnection deviceConnection =
-          deviceConnectionRepository.findByConnectionId(connectionId).orElseThrow(
-              () -> new BusinessException("{}에 대한 DeviceConnection 못찾음: " + connectionId,
-                  "DEVICE_CONNECTION_NOT_FOUND"));
-
-      // content가 did:key로 시작하는 경우에만 publicDid에 저장
-      if (content != null && content.startsWith("did:key:")) {
-        deviceConnection.setPublicDid(content);
-        deviceConnectionRepository.update(deviceConnection);
-      }
-    } catch (Exception e) {
-      log.error("Basic Message webhook 처리 중 오류 발생: {}", e.getMessage(), e);
-      throw e;
+    if (webhookDto == null) {
+      log.error("Basic Message webhook request is null");
+      throw new BusinessException("Basic Message webhook 요청이 null입니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
     }
+
+    String state = webhookDto.getState();
+    String connectionId = webhookDto.getConnectionId();
+    String content = webhookDto.getContent();
+    String messageId = webhookDto.getMessageId();
+
+    log.info("Basic Message webhook - state: {}, content: {}, connection_id: {}, message_id: {}",
+        state, content, connectionId, messageId);
+
+    deviceConnectionService.updatePublicDid(connectionId, messageId);
   }
 
   @Override
@@ -115,6 +106,12 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @WebhookRetryable // 웹훅 전용 재시도 설정 사용
   public void handleIssueCredentialWebhook(
       IssueCredentialWebhookRequest issueCredentialWebhookRequest) {
+
+    if (issueCredentialWebhookRequest == null) {
+      throw new BusinessException("Issue Credential webhook 요청이 null입니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
+    }
+
     // holder webhook 만 처리
     if (!ISSUE_CREDENTIAL_ROLE_HOLDER.equals(issueCredentialWebhookRequest.getRole()))
       return;
@@ -123,15 +120,21 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     if (!ISSUE_CREDENTIAL_STATUS_DONE.equals(issueCredentialWebhookRequest.getState()))
       return;
 
+    String credExId = issueCredentialWebhookRequest.getCredExId();
+    if (credExId == null || credExId.trim().isEmpty()) {
+      throw new BusinessException("Credential exchange ID가 null이거나 비어있습니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
+    }
+
     log.info("Issue credential Webhook from User ACA-Py - cred_ex_id: {}, role: {}, state: {}",
-        issueCredentialWebhookRequest.getCredExId(), issueCredentialWebhookRequest.getRole(),
+        credExId, issueCredentialWebhookRequest.getRole(),
         issueCredentialWebhookRequest.getState());
 
     // 1. issueCredentialWebhookRequest 에서 bookingId 추출
     Long bookingId = issueCredentialWebhookRequest.extractBookingId();
 
     // 2. IssuedVc 조회 및 credExId 업데이트
-    issuedVcService.updateCredExId(bookingId, issueCredentialWebhookRequest.getCredExId());
+    issuedVcService.updateCredExId(bookingId, credExId);
   }
 
   /**
@@ -144,51 +147,19 @@ public class UserWebhookServiceImpl implements UserWebhookService {
         "Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, role: {}, state: {}, error: {}",
         issueCredentialWebhookRequest.getCredExId(), issueCredentialWebhookRequest.getRole(),
         issueCredentialWebhookRequest.getState(), e.getMessage(), e);
-
-    // 여기서 알림 발송, 로그 저장 등의 복구 로직을 수행할 수 있습니다.
-    // 현재는 로그만 남기고 있습니다.
   }
 
   @Override
   public void handleLdProofWebhook(LdProofWebhookRequest ldProofWebhookRequest) {
+
+    if (ldProofWebhookRequest == null) {
+      throw new BusinessException("LD Proof webhook 요청이 null입니다",
+          DidErrorCodes.WEBHOOK_INVALID_PAYLOAD);
+    }
+
     log.info(
         "LD Proof Webhook from User ACA-Py - cred_ex_id: {}, cred_id_stored: {}, cred_ex_ld_proof_id: {}",
         ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredIdStored(),
         ldProofWebhookRequest.getCredExLdProofId());
-  }
-
-  /**
-   * connectionId가 있으면 우선으로 하고, 없으면 alias에서 추출하여 찾습니다.
-   */
-  private DeviceConnection findDeviceConnection(String connectionId, String alias) {
-
-    // 1. connectionId가 유효한 경우, connectionId로 먼저 조회
-    if (connectionId != null && !connectionId.trim().isEmpty()) {
-      Optional<DeviceConnection> deviceOpt =
-          deviceConnectionRepository.findByConnectionId(connectionId);
-      if (deviceOpt.isPresent()) {
-        return deviceOpt.get();
-      }
-    }
-
-    // 2. connectionId로 찾지 못했거나 connectionId가 없는 경우, alias로 조회
-    return deviceConnectionRepository.findByAlias(alias)
-        .orElseThrow(() -> new BusinessException(
-            "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
-            "DEVICE_CONNECTION_NOT_FOUND"));
-  }
-
-
-
-  /**
-   * DeviceConnection alias 패턴인지 확인합니다. DeviceConnection은 "credo:user:{userId}#device:{deviceId}"
-   * 패턴을 사용합니다.
-   */
-  private boolean isDeviceConnectionAlias(String alias) {
-    if (alias == null || alias.trim().isEmpty()) {
-      return false;
-    }
-    // DeviceConnection alias 패턴: "credo:user:{userId}#device:{deviceId}"
-    return alias.startsWith("credo:user:") && alias.contains("#device:");
   }
 }

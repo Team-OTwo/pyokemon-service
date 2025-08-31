@@ -1,9 +1,7 @@
 package com.pyokemon.did.service.impl;
 
-import static com.pyokemon.common.exception.code.DidErrorCodes.DID_NOT_FOUND;
-import static com.pyokemon.common.exception.code.DidErrorCodes.WALLET_NOT_FOUND;
-import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.INVITATION_SENT;
-import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.REVOKED;
+import static com.pyokemon.common.exception.code.DidErrorCodes.*;
+import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.*;
 
 import java.util.Optional;
 
@@ -14,10 +12,10 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.DeviceConnection;
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
+import com.pyokemon.did.domain.dto.response.InvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
+import com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteMediatorAcaPyService;
 import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.DeviceConnectionService;
@@ -39,7 +37,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
   @Override
   @Transactional
-  public CreateInvitationResponse createInvitations(Long userId) {
+  public InvitationResponse createInvitations(Long userId) {
 
     // 1. 사용자 지갑에서 userId, Token 조회
     String userToken = walletService.getWalletToken(userId);
@@ -54,8 +52,8 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
 
     // 5. ACA-Py 초대장 생성 (User + Mediator) - 필요한 경우에만
-    com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse userAcapyResponse;
-    com.pyokemon.did.remote.acapy.common.dto.response.CreateInvitationResponse mediatorAcapyResponse;
+    CreateInvitationResponse userAcapyResponse;
+    CreateInvitationResponse mediatorAcapyResponse;
 
     try {
       if (shouldCreateInvitation) {
@@ -66,7 +64,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
         userAcapyResponse = remoteUserAcaPyService.createInvitation(userToken, userRequest);
 
         if (userAcapyResponse == null || userAcapyResponse.getInvitationUrl() == null) {
-          log.error("User ACA-Py 초대장 생성 실패: 응답이 null이거나 URL이 없음, userId={}", userId);
+          log.error("User ACA-Py 초대장 생성 실패: 응답이 null 이거나 URL이 없음, userId={}", userId);
           throw new RuntimeException("User ACA-Py 초대장 생성에 실패했습니다");
         }
         log.info("User ACA-Py 초대장 생성 완료: userId={}", userId);
@@ -78,7 +76,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
         mediatorAcapyResponse = remoteMediatorAcaPyService.createInvitation(mediatorRequest);
 
         if (mediatorAcapyResponse == null || mediatorAcapyResponse.getInvitationUrl() == null) {
-          log.error("Mediator ACA-Py 초대장 생성 실패: 응답이 null이거나 URL이 없음, userId={}", userId);
+          log.error("Mediator ACA-Py 초대장 생성 실패: 응답이 null 이거나 URL이 없음, userId={}", userId);
           throw new RuntimeException("Mediator ACA-Py 초대장 생성에 실패했습니다");
         }
         log.info("Mediator ACA-Py 초대장 생성 완료: userId={}", userId);
@@ -90,7 +88,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
       // 7. 응답 생성 및 반환
       log.info("초대장 생성 완료: userId={}, deviceId={}", userId, deviceId);
-      return new CreateInvitationResponse(userAcapyResponse.getInvitationUrl(),
+      return new InvitationResponse(userAcapyResponse.getInvitationUrl(),
           mediatorAcapyResponse.getInvitationUrl());
 
     } catch (BusinessException e) {
@@ -177,5 +175,59 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     deviceConnectionRepository.save(newConnection);
     log.info("{} 생성: alias={}, id={}", reason, userAlias, newConnection.getId());
+  }
+
+  /**
+   * deviceId로 deviceConnection을 조회
+   */
+  @Override
+  public DeviceConnection findByDeviceIdOrThrow(String deviceId) {
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByDeviceId(deviceId)
+        .orElseThrow(() -> new BusinessException("디바이스 연결이 존재하지 않습니다.", CONNECTION_NOT_FOUND));
+    return deviceConnection;
+  }
+
+  /**
+   * deviceConnection을 connectionId 또는 alias로 찾고 public DID를 저장합니다
+   */
+  @Override
+  public void updatePublicDid(String connectionId, String content) {
+
+    DeviceConnection deviceConnection = findByConnectionId(connectionId);
+
+    // content가 did:key로 시작하는 경우에만 publicDid에 저장
+    if (content != null && content.startsWith("did:key:")) {
+      deviceConnection.setPublicDid(content);
+      deviceConnectionRepository.update(deviceConnection);
+    }
+  }
+
+  /**
+   * deviceConnection을 connectionId 또는 alias로 찾고 public DID를 저장합니다
+   */
+  @Override
+  public void findAndUpdateConnectionId(String connectionId, String alias) {
+
+    if (deviceConnectionRepository.findByConnectionId(connectionId).isPresent()) {
+      return;
+    }
+
+    // alias로 찾기
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByAlias(alias)
+        .orElseThrow(() -> new BusinessException(
+            "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
+            "DEVICE_CONNECTION_NOT_FOUND"));
+
+    // connectionId 저장, active로 상태 바꾸기
+    deviceConnection.activate(connectionId);
+    deviceConnectionRepository.update(deviceConnection);
+  }
+
+  private DeviceConnection findByConnectionId(String connectionId) {
+
+    DeviceConnection deviceConnection = deviceConnectionRepository.findByConnectionId(connectionId)
+        .orElseThrow(() -> new BusinessException("{}에 대한 DeviceConnection 못찾음: " + connectionId,
+            "DEVICE_CONNECTION_NOT_FOUND"));
+    return deviceConnection;
   }
 }

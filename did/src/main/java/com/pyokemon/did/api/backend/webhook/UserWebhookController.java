@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.did.domain.dto.request.webhook.*;
-import com.pyokemon.did.service.UserWebhookService;
+import com.pyokemon.did.service.webhook.impl.UserWebhookService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

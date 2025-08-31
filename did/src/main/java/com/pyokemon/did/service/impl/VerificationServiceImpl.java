@@ -5,19 +5,20 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.ACAPY_SERVICE_ERR
 import static com.pyokemon.common.exception.code.DidErrorCodes.VP_VERIFICATION_FAILED;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.did.domain.Verification;
 import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
+import com.pyokemon.did.domain.dto.request.VerificationRequest.HandleVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
+import com.pyokemon.did.domain.event.BookingVerifiedEvent;
 import com.pyokemon.did.domain.repository.VerificationRepository;
+import com.pyokemon.did.event.producer.KafkaMessageProducer;
 import com.pyokemon.did.remote.acapy.common.dto.request.JwtVerifyRequest;
 import com.pyokemon.did.remote.acapy.common.dto.response.JwtVerifyResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
@@ -35,18 +36,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
 
-  private final RemoteTenantAcaPyService remoteTenantAcaPyService;
+  private final KafkaMessageProducer kafkaMessageProducer;
 
-  private final WalletService walletService;
+  private final RemoteTenantAcaPyService remoteTenantAcaPyService;
   private final DeviceConnectionService deviceConnectionService;
   private final IssuedVcService issuedVcService;
+  private final WalletService walletService;
   private final VerificationRepository verificationRepository;
+
 
   @Override
   public CreateVerificationResponse createVerificationUrl(CreateVerificationRequest request,
       Long tenantId) {
 
-    Long bookingId = request.getBooking_id();
+    Long bookingId = request.getBookingId();
     JwtVerifyRequest jwtVerifyRequest = JwtVerifyRequest.of(request.getJwt());
     String authorization = walletService.getWalletToken(tenantId);
 
@@ -84,9 +87,18 @@ public class VerificationServiceImpl implements VerificationService {
   }
 
   @Override
-  public HandleVerificationResponse handleVerification(Long tenantId, String presExId) {
-    VpStatus status = getStatusOrThrow(presExId);
-    HandleVerificationResponse response = new HandleVerificationResponse(status.toString());
+  public HandleVerificationResponse handleVerification(Long tenantId, String presExId,
+      HandleVerificationRequest request) {
+
+    Verification verification = verificationRepository.findByPresExId(presExId)
+        .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId,
+            VP_VERIFICATION_FAILED));
+
+    kafkaMessageProducer.send(BookingVerifiedEvent.Topic,
+        BookingVerifiedEvent.toEntity(request.getBookingId()));
+
+    HandleVerificationResponse response =
+        new HandleVerificationResponse(verification.getStatus().toString());
     return response;
   }
 
@@ -94,12 +106,5 @@ public class VerificationServiceImpl implements VerificationService {
   public void saveVerification(String PresExId, VpStatus status) {
     Verification verification = Verification.of(PresExId, status);
     verificationRepository.save(verification);
-  }
-
-  public VpStatus getStatusOrThrow(String presExId) {
-    Verification verification = verificationRepository.findByPresExId(presExId)
-        .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId,
-            VP_VERIFICATION_FAILED));
-    return verification.getStatus();
   }
 }

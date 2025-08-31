@@ -89,12 +89,12 @@ public class RedisController {
       Long venueId = eventScheduleRepository.findVenueIdByEventScheduleId(eventScheduleId);
       redisService.initSeatStatuses(eventScheduleId, venueId);
       return ResponseEntity.ok("특정 이벤트 Redis 초기화 완료: eventScheduleId=" + eventScheduleId);
-      
+
     } catch (Exception e) {
-      log.error("특정 이벤트 Redis 초기화 실패: eventScheduleId={}, error={}", eventScheduleId, e.getMessage(), e);
+      log.error("특정 이벤트 Redis 초기화 실패: eventScheduleId={}, error={}", eventScheduleId,
+          e.getMessage(), e);
       e.printStackTrace();
-      return ResponseEntity.internalServerError()
-          .body("Redis 초기화 실패: " + e.getMessage());
+      return ResponseEntity.internalServerError().body("Redis 초기화 실패: " + e.getMessage());
     }
   }
 }

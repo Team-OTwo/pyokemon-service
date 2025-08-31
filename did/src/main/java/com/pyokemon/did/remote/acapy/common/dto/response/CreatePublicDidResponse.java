@@ -21,7 +21,6 @@ public class CreatePublicDidResponse implements AcaPyResponse {
 
   private Result result;
 
-
   @Data
   @Builder
   @NoArgsConstructor

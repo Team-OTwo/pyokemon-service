@@ -1,14 +1,7 @@
 package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
-import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
 import static com.pyokemon.did.domain.Verification.VpStatus.*;
-
-import java.io.IOException;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.retry.RetryException;
-import org.springframework.retry.annotation.Backoff;
 
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
@@ -16,22 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.AcaPyConnection;
+import com.pyokemon.did.common.annotation.WebhookRetryable;
 import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.Verification;
 import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
 import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import com.pyokemon.did.domain.dto.request.webhook.PresentProofWebhookRequest;
-import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
-import com.pyokemon.did.domain.repository.VerificationRepository;
 import com.pyokemon.did.remote.acapy.common.dto.response.VerifyPresentationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.*;
-import com.pyokemon.did.common.annotation.WebhookRetryable;
-import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
-import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import com.pyokemon.did.service.TenantWebhookService;
 
@@ -48,13 +34,12 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
   private final IssuedVcService issuedVcService;
   private final WalletService walletService;
   private final RemoteTenantAcaPyService remoteTenantAcaPyService;
-  private final AcaPyConnectionRepository acaPyConnectionRepository;
   private final AcaPyConnectionService acaPyConnectionService;
+  private final VerificationService verificationService;
+
 
 
   private static final String CONNECTION_STATUS_ACTIVE = "active";
-  private final VerificationService verificationService;
-
 
   @Override
   @Transactional
@@ -119,7 +104,7 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
       finalStatus = triggerRemoteVerification(presExId, issuedVc) ? SUCCESS : FAIL;
 
     } catch (BusinessException e) {
-      if (e.getErrorCode() == VC_CONSUMED_OR_REVOKED) {
+      if (e.getErrorCode().equals(VC_CONSUMED_OR_REVOKED)) {
         finalStatus = INVALID_VC;
       } else {
         finalStatus = FAIL; // 그 외 모든 BusinessException은 FAIL
@@ -151,14 +136,14 @@ public class TenantWebhookServiceImpl implements TenantWebhookService {
    * 
    * @param presExId 증명 제시 ID
    * @return 유효한 IssuedVc 객체
-   * @throws BusinessException IssuedVc가 없거나 상태가 'ISSUED'가 아닌 경우
+   * @throws BusinessException IssuedVc가 없거나 상태가 'ISSUED' 가 아닌 경우
    */
   private IssuedVc validateAndGetIssuedVc(String presExId) {
     IssuedVc issuedVc = issuedVcService.getIssuedVcByPresExIdOrThrow(presExId);
     if (!issuedVc.isIssued()) {
       // issuedProof 삭제 후 예외 발생
       issuedProofService.revokeIssuedProof(presExId);
-      throw new BusinessException("VC 상태가 'ISSUED'가 아닙니다", VC_CONSUMED_OR_REVOKED);
+      throw new BusinessException("VC 상태가 'ISSUED' 가 아닙니다", VC_CONSUMED_OR_REVOKED);
     }
     return issuedVc;
   }
