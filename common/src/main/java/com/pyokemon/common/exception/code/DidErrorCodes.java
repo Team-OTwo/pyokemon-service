@@ -23,6 +23,7 @@ public final class DidErrorCodes {
   public static final String CONNECTION_NOT_FOUND = "CONNECTION_NOT_FOUND";
   public static final String CONNECTION_ALREADY_ACTIVE = "CONNECTION_ALREADY_ACTIVE";
   public static final String CONNECTION_INVALID_STATE = "CONNECTION_INVALID_STATE";
+  public static final String CONNECTION_INVALID = "CONNECTION_INVALID";
 
   // Webhook 관련 에러
   public static final String WEBHOOK_PROCESSING_FAILED = "WEBHOOK_PROCESSING_FAILED";
@@ -34,6 +35,7 @@ public final class DidErrorCodes {
   public static final String VC_CONSUMED_OR_REVOKED = "VC_CONSUMED_OR_REVOKED";
   public static final String VC_NOT_FOUND = "VC_NOT_FOUND";
   public static final String VC_INVALID = "VC_INVALID";
+  public static final String VC_DELEGATION_FAILED = "VC_DELEGATION_FAILED";
   public static final String VC_ALREADY_CONSUMED = "VC_ALREADY_CONSUMED";
 
   // VP 검증 관련 에러

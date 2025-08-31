@@ -8,12 +8,14 @@ import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificat
 
 public interface VerificationService {
 
-
-  public CreateVerificationResponse createVerificationUrl(CreateVerificationRequest request,
+  CreateVerificationResponse createVerificationUrl(CreateVerificationRequest request,
       Long tenantId);
 
+  void delegateCredential(Long bookingId, Long userId, String deviceId);
 
-  public HandleVerificationResponse handleVerification(Long tenantId, String presExId);
+  HandleVerificationResponse handleVerification(Long tenantId, String presExId);
 
-  public void saveVerification(String PresExId, VpStatus status);
+  void saveVerification(String PresExId, VpStatus status);
+
+
 }

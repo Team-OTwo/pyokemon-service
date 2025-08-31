@@ -1,14 +1,7 @@
 package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.common.exception.code.DidErrorCodes.*;
-import static com.pyokemon.did.domain.IssuedVc.VcStatus.ISSUED;
 import static com.pyokemon.did.domain.Verification.VpStatus.*;
-
-import java.io.IOException;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.retry.RetryException;
-import org.springframework.retry.annotation.Backoff;
 
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
@@ -16,22 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.domain.AcaPyConnection;
 import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.Verification;
 import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
 import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import com.pyokemon.did.domain.dto.request.webhook.PresentProofWebhookRequest;
 import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
-import com.pyokemon.did.domain.repository.VerificationRepository;
 import com.pyokemon.did.remote.acapy.common.dto.response.VerifyPresentationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.*;
 import com.pyokemon.did.common.annotation.WebhookRetryable;
-import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
-import com.pyokemon.did.domain.dto.request.webhook.OutOfBandWebhookRequest;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import com.pyokemon.did.service.TenantWebhookService;
 

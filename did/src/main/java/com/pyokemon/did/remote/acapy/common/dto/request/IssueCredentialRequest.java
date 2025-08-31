@@ -42,12 +42,12 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
   /**
    * 증거가 포함된 예매 자격 증명 발급 요청 생성
    */
-  public static IssueCredentialRequest createWithEvidence(String connectionId, String issuerDid,
-      CredentialSubject subject, Long bookingId) {
-    EvidenceCredential credential = createEvidenceCredential(issuerDid, subject, bookingId);
+  public static IssueCredentialRequest createWithEvidence(String connectionId, String sourceCredentialId,
+                                                          String issuerDid, CredentialSubject subject) {
+    EvidenceCredential credential = createEvidenceCredential(issuerDid, subject, sourceCredentialId);
 
     return IssueCredentialRequest.builder().connectionId(connectionId).autoOffer(true)
-        .filter(CredentialFilter.withEvidenceCredential(credential)).build();
+            .filter(CredentialFilter.withEvidenceCredential(credential)).build();
   }
 
   /**
@@ -66,12 +66,12 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
    * 증거가 포함된 자격 증명 객체 생성
    */
   private static EvidenceCredential createEvidenceCredential(String issuerDid,
-      CredentialSubject subject, Long bookingId) {
+      CredentialSubject delegatedSubject, String sourceCredentialId) {
     return EvidenceCredential.builder().context(createExtendedContext())
-        .id(CredentialIdGenerator.generateDelegateCredentialId(subject.getBookingId()))
+        .id(CredentialIdGenerator.generateDelegateCredentialId(sourceCredentialId))
         .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
-        .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(subject)
-        .evidence(Collections.singletonList(Evidence.derivedFrom(bookingId))).build();
+        .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(delegatedSubject)
+        .evidence(Collections.singletonList(Evidence.derivedFrom(sourceCredentialId))).build();
   }
 
   /**

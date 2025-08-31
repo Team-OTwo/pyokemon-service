@@ -35,4 +35,6 @@ public class CredentialSubject {
     return CredentialSubject.builder().id(userWallet.getPublicDid()).bookingId(bookingId)
         .eventScheduleId(eventScheduleId).seatId(seatId).build();
   }
+
+
 }
