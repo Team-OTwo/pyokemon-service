@@ -178,7 +178,7 @@ public class BookingService {
     Booking booking = bookingOpt.get();
 
     if (Booking.Booked.CANCELED.equals(booking.getStatus())) {
-      log.warn("이미 취소된 예매입니다. 상태 변경을 무시합니다: bookingId={}, currentStatus={}, newStatus={}", 
+      log.warn("이미 취소된 예매입니다. 상태 변경을 무시합니다: bookingId={}, currentStatus={}, newStatus={}",
           bookingId, booking.getStatus(), newStatus);
       return;
     }

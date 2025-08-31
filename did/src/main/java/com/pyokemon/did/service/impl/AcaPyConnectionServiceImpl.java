@@ -108,7 +108,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
 
     // 연결 ID 유효성 검사
     if (connection.getConnectionId() == null || connection.getConnectionId().isEmpty()) {
-      log.warn("테넌트 ID: {} 및 사용자 ID: {}에 대한 연결이 존재하지만 connectionId가 null입니다", tenantId, userId);
+      log.warn("테넌트 ID: {} 및 사용자 ID: {}에 대한 연결이 존재하지만 connectionId가 null 입니다", tenantId, userId);
       throw new BusinessException(
           String.format("테넌트 ID: %d 사용자 ID: %d 에 대한 활성화된 연결을 찾을 수 없습니다.", tenantId, userId),
           CONNECTION_NOT_FOUND);
@@ -122,7 +122,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
 
 
   /**
-   * 테넌트 AcaPy에서 초대장을 생성합니다.
+   * 테넌트 AcaPy 에서 초대장을 생성합니다.
    *
    * @param tenantWallet 테넌트 지갑 정보
    * @param tenantId 테넌트 ID
@@ -144,7 +144,7 @@ public class AcaPyConnectionServiceImpl implements AcaPyConnectionService {
   }
 
   /**
-   * 사용자 AcaPy에서 초대장을 수락합니다.
+   * 사용자 AcaPy 에서 초대장을 수락합니다.
    *
    * @param userWallet 사용자 지갑 정보
    * @param invitation 초대장 정보
