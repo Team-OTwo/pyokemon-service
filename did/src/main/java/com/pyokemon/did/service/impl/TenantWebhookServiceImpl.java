@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.common.annotation.WebhookRetryable;
 import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.dto.request.webhook.ConnectionWebhookRequest;
@@ -18,7 +19,6 @@ import com.pyokemon.did.domain.repository.AcaPyConnectionRepository;
 import com.pyokemon.did.remote.acapy.common.dto.response.VerifyPresentationResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.*;
-import com.pyokemon.did.common.annotation.WebhookRetryable;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import com.pyokemon.did.service.TenantWebhookService;
 

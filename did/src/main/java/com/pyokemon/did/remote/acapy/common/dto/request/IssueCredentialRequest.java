@@ -42,12 +42,13 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
   /**
    * 증거가 포함된 예매 자격 증명 발급 요청 생성
    */
-  public static IssueCredentialRequest createWithEvidence(String connectionId, String sourceCredentialId,
-                                                          String issuerDid, CredentialSubject subject) {
-    EvidenceCredential credential = createEvidenceCredential(issuerDid, subject, sourceCredentialId);
+  public static IssueCredentialRequest createWithEvidence(String connectionId,
+      String sourceCredentialId, String issuerDid, CredentialSubject subject) {
+    EvidenceCredential credential =
+        createEvidenceCredential(issuerDid, subject, sourceCredentialId);
 
     return IssueCredentialRequest.builder().connectionId(connectionId).autoOffer(true)
-            .filter(CredentialFilter.withEvidenceCredential(credential)).build();
+        .filter(CredentialFilter.withEvidenceCredential(credential)).build();
   }
 
   /**
@@ -70,7 +71,8 @@ public class IssueCredentialRequest extends BaseCredentialRequest {
     return EvidenceCredential.builder().context(createExtendedContext())
         .id(CredentialIdGenerator.generateDelegateCredentialId(sourceCredentialId))
         .type(Collections.singletonList(AcaPyConstants.CredentialType.VERIFIABLE_CREDENTIAL))
-        .issuer(issuerDid).issuanceDate(Instant.now().toString()).credentialSubject(delegatedSubject)
+        .issuer(issuerDid).issuanceDate(Instant.now().toString())
+        .credentialSubject(delegatedSubject)
         .evidence(Collections.singletonList(Evidence.derivedFrom(sourceCredentialId))).build();
   }
 

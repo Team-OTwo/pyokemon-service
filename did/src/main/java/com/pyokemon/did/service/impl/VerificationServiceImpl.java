@@ -1,31 +1,33 @@
 package com.pyokemon.did.service.impl;
 
+import static com.pyokemon.common.exception.code.DidErrorCodes.*;
+
 import java.util.Map;
 
-import com.pyokemon.did.domain.DeviceConnection;
-import com.pyokemon.did.domain.IssuedVc;
-import com.pyokemon.did.domain.Wallet;
-import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
-import com.pyokemon.did.remote.acapy.common.constants.AcaPyConstants;
-import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
-import com.pyokemon.did.remote.acapy.common.dto.response.GetCredentialResponse;
-import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
-import com.pyokemon.did.remote.acapy.common.util.CredentialSubjectDelegator;
-import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import com.pyokemon.common.exception.BusinessException;
+import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.Verification;
 import com.pyokemon.did.domain.Verification.VpStatus;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
+import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.VerificationRepository;
+import com.pyokemon.did.remote.acapy.common.constants.AcaPyConstants;
+import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.JwtVerifyRequest;
+import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
+import com.pyokemon.did.remote.acapy.common.dto.response.GetCredentialResponse;
+import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.JwtVerifyResponse;
+import com.pyokemon.did.remote.acapy.common.util.CredentialSubjectDelegator;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
+import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
 import com.pyokemon.did.service.DeviceConnectionService;
 import com.pyokemon.did.service.IssuedVcService;
 import com.pyokemon.did.service.VerificationService;
@@ -33,9 +35,6 @@ import com.pyokemon.did.service.WalletService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.pyokemon.common.exception.code.DidErrorCodes.*;
-import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
 
 @Slf4j
 @Service
@@ -99,15 +98,16 @@ public class VerificationServiceImpl implements VerificationService {
   @Override
   public void delegateCredential(Long bookingId, Long userId, String deviceId) {
     try {
-      log.info("VC 위임 처리 시작 - bookingId: {}, userId: {}, deviceId: {}", bookingId, userId, deviceId);
-      
+      log.info("VC 위임 처리 시작 - bookingId: {}, userId: {}, deviceId: {}", bookingId, userId,
+          deviceId);
+
       // 1. VC 데이터 검증 (가장 중요한 데이터 존재 확인)
       IssuedVc issuedVc = issuedVcService.getIssuedVcByBookingIdOrThrow(bookingId);
       validateIssuedVc(issuedVc, userId);
 
       // 2. 디바이스 연결 검증 (위임 대상 존재 확인)
       DeviceConnection deviceConnection = deviceConnectionRepository.findByDeviceId(deviceId)
-              .orElseThrow(() -> new BusinessException("디바이스 연결이 존재하지 않습니다.", CONNECTION_NOT_FOUND));
+          .orElseThrow(() -> new BusinessException("디바이스 연결이 존재하지 않습니다.", CONNECTION_NOT_FOUND));
       validateDeviceConnection(deviceConnection, userId);
 
       // 3. 사용자 지갑 조회 (모든 검증 통과 후 권한 확인)
@@ -117,36 +117,35 @@ public class VerificationServiceImpl implements VerificationService {
       String delegatorToken = userWallet.getToken();
       String sourceCredentialExchangeId = issuedVc.getCredExId();
 
-      GetCredentialResponse sourceCredential = remoteUserAcaPyService.getCredential(
-              delegatorToken,                 // 위임자 지갑 토큰
-              sourceCredentialExchangeId      // 원본 자격 증명 교환 식별자
+      GetCredentialResponse sourceCredential = remoteUserAcaPyService.getCredential(delegatorToken, // 위임자
+                                                                                                    // 지갑
+                                                                                                    // 토큰
+          sourceCredentialExchangeId // 원본 자격 증명 교환 식별자
       );
 
       // 5. 자격 증명 주체 위임
       String delegateeDid = deviceConnection.getPublicDid();
 
-      CredentialSubject delegatedCredentialSubject = CredentialSubjectDelegator.delegateTo(
-              delegateeDid,           // 피위임자 DID
-              sourceCredential        // 원본 자격 증명
-      );
+      CredentialSubject delegatedCredentialSubject =
+          CredentialSubjectDelegator.delegateTo(delegateeDid, // 피위임자 DID
+              sourceCredential // 원본 자격 증명
+          );
 
       // 6. 위임된 자격 증명 발급
       String connectionId = deviceConnection.getConnectionId();
       String sourceCredentialId = CredentialSubjectDelegator.extractCredentialId(sourceCredential);
       String delegatorDid = userWallet.getPublicDid();
 
-      IssueCredentialResponse issueCredentialResponse = remoteUserAcaPyService.issueCredential(
-              delegatorToken,
-              IssueCredentialRequest.createWithEvidence(
-                      connectionId,               // 디바이스 연결 ID
-                      sourceCredentialId,         // 원본 자격 증명 ID
-                      delegatorDid,               // 위임자 DID
-                      delegatedCredentialSubject  // 위임된 자격 증명 주체
-              )
-      );
+      IssueCredentialResponse issueCredentialResponse =
+          remoteUserAcaPyService.issueCredential(delegatorToken,
+              IssueCredentialRequest.createWithEvidence(connectionId, // 디바이스 연결 ID
+                  sourceCredentialId, // 원본 자격 증명 ID
+                  delegatorDid, // 위임자 DID
+                  delegatedCredentialSubject // 위임된 자격 증명 주체
+              ));
 
       confirmDelegation(issueCredentialResponse);
-      
+
       log.info("VC 위임 처리 완료 - bookingId: {}", bookingId);
     } catch (BusinessException e) {
       throw e;

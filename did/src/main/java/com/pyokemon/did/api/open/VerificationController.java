@@ -1,12 +1,13 @@
 package com.pyokemon.did.api.open;
 
-import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.domain.dto.request.DelegateCredentialRequest;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.did.domain.dto.request.DelegateCredentialRequest;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
@@ -25,12 +26,12 @@ public class VerificationController {
 
   @PostMapping("/delegate-credential")
   public ResponseEntity<ResponseDto<Void>> delegateCredential(
-          @RequestBody @Valid DelegateCredentialRequest delegateCredentialRequest
-          ) {
+      @RequestBody @Valid DelegateCredentialRequest delegateCredentialRequest) {
     Long userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
 
-    verificationService.delegateCredential(delegateCredentialRequest.getBookingId(), userId, deviceId);
+    verificationService.delegateCredential(delegateCredentialRequest.getBookingId(), userId,
+        deviceId);
     return ResponseEntity.ok(ResponseDto.success("자격 증명 위임 성공"));
   }
 
