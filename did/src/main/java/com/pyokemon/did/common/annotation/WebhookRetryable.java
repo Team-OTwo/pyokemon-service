@@ -10,7 +10,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
 /**
- * 웹훅 메소드를 위한 재시도 어노테이션 - 최대 3회 재시도 - 재시도 간격: 1초, 2초, 4초 (지수 백오프) - BusinessException 제외
+ * 웹훅 메소드를 위한 재시도 어노테이션 - 최대 3회 재시도 - 재시도 간격: 1초, 2초, 4초 (지수 백오프)
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -12,9 +12,11 @@ public interface VerificationService {
   CreateVerificationResponse createVerificationUrl(CreateVerificationRequest request,
       Long tenantId);
 
+  void delegateCredential(Long bookingId, Long userId, String deviceId);
+
+  void saveVerification(String PresExId, VpStatus status);
 
   HandleVerificationResponse handleVerification(Long tenantId, String presExId,
       HandleVerificationRequest request);
 
-  void saveVerification(String PresExId, VpStatus status);
 }

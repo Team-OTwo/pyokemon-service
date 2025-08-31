@@ -29,6 +29,7 @@ public class AcaPyConstants {
   public static class Credential {
     public static final String PROOF_TYPE_ED25519 = "Ed25519Signature2020";
     public static final String CREDENTIAL_ID_PREFIX = "urn:booking:";
+    public static final String CREDENTIAL_ID_DELEGATE = ":delegate:";
   }
 
   public static class Context {
@@ -46,6 +47,10 @@ public class AcaPyConstants {
     public static final String VERIFIABLE_CREDENTIAL = "VerifiableCredential";
   }
 
+  public static class Evidence {
+    public static final String DERIVED_FROME = "DerivedFrom";
+  }
+
   public static class Attachment {
     public static final String ATTACHMENT_TYPE = "present-proof";
   }
@@ -57,5 +62,9 @@ public class AcaPyConstants {
 
   public static class Domain {
     public static final String PYOKEMON = "https://www.pyokemon.com";
+  }
+
+  public static class IssuanceState {
+    public static final String OFFER_SENT = "offer-sent";
   }
 }

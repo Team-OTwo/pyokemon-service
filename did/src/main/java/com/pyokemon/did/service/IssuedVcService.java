@@ -26,6 +26,8 @@ public interface IssuedVcService {
 
   IssuedVc getIssuedVcByPresExIdOrThrow(String presExId);
 
+  IssuedVc getIssuedVcByBookingIdOrThrow(Long bookingId);
+
   Map<String, String> sendVerifiyInviUrlOrThrow(Long UserId, Long TenantId, Long BookingId);
 
 }

@@ -139,6 +139,25 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     }
   }
 
+  public IssuedVc getIssuedVcByBookingIdOrThrow(Long bookingId) {
+    try {
+      IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId)
+          .orElseThrow(() -> new BusinessException("VC가 존재하지 않습니다.", VC_NOT_FOUND));
+
+      // status != ISSUED 예외처리
+      if (!issuedVc.getStatus().equals(ISSUED)) {
+        throw new BusinessException("유효한 VC가 존재하지 않습니다.", VC_INVALID);
+      }
+
+      return issuedVc;
+    } catch (BusinessException e) {
+      throw e;
+    } catch (Exception e) {
+      // TODO: 적절한 예외 코드 처리
+      throw new BusinessException("VC 조회 실패", VC_NOT_FOUND);
+    }
+  }
+
   @Override
   public Map<String, String> sendVerifiyInviUrlOrThrow(Long userId, Long tenantId, Long bookingId) {
     IssuedVc issuedVc = issuedVcRepository
