@@ -32,30 +32,9 @@ public final class CredentialSubjectDelegator {
     }
 
     try {
-      return credentialResponse.getByFormat().getCredOffer().getLdProof().getCredential()
-          .getCredentialSubject();
+      return credentialResponse.getCredentialSubject();
     } catch (Exception e) {
       throw new BusinessException("자격 증명 주체 추출에 실패했습니다.", VC_INVALID);
-    }
-  }
-
-  /**
-   * GetCredentialResponse에서 Credential ID를 추출합니다.
-   * 
-   * @param credentialResponse 자격 증명 응답
-   * @return 추출된 Credential ID
-   * @throws BusinessException 응답이 유효하지 않은 경우
-   */
-  public static String extractCredentialId(GetCredentialResponse credentialResponse)
-      throws BusinessException {
-    if (credentialResponse == null) {
-      throw new BusinessException("자격 증명 응답이 null입니다.", VC_INVALID);
-    }
-
-    try {
-      return credentialResponse.getByFormat().getCredOffer().getLdProof().getCredential().getId();
-    } catch (Exception e) {
-      throw new BusinessException("자격 증명 ID 추출에 실패했습니다.", VC_INVALID);
     }
   }
 

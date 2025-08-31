@@ -4,7 +4,7 @@
 
     <resultMap id="IssuedVcResultMap" type="com.pyokemon.did.domain.IssuedVc">
         <id column="id" property="id"/>
-        <result column="cred_ex_id" property="credExId"/>
+        <result column="cred_id_stored" property="credIdStored"/>
         <result column="pres_ex_id" property="presExId"/>
         <result column="verify_invi_url" property="verifyInviUrl"/>
         <result column="booking_id" property="bookingId"/>
@@ -47,6 +47,14 @@
         LIMIT 1
     </select>
 
+    <select id="findByPresExId" resultMap="IssuedVcResultMap">
+        SELECT *
+        FROM tb_issued_vc
+        WHERE pres_ex_id = #{presExId}
+    </select>
+
+
+
     <select id="existsByBookingIdAndIssued" resultType="boolean">
         SELECT EXISTS(SELECT 1
                       FROM tb_issued_vc
@@ -55,15 +63,15 @@
     </select>
 
     <insert id="save" parameterType="com.pyokemon.did.domain.IssuedVc" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO tb_issued_vc (cred_ex_id, verify_invi_url, pres_ex_id, booking_id, user_id, tenant_id,
+        INSERT INTO tb_issued_vc (cred_id_stored, verify_invi_url, pres_ex_id, booking_id, user_id, tenant_id,
                                   status, created_at, updated_at)
-        VALUES (#{credExId}, #{verifyInviUrl}, #{presExId}, #{bookingId}, #{userId}, #{tenantId}, #{status},
+        VALUES (#{credIdStored}, #{verifyInviUrl}, #{presExId}, #{bookingId}, #{userId}, #{tenantId}, #{status},
                 NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.did.domain.IssuedVc">
         UPDATE tb_issued_vc
-        SET cred_ex_id      = #{credExId},
+        SET cred_id_stored      = #{credIdStored},
             pres_ex_id      = #{presExId},
             verify_invi_url = #{verifyInviUrl},
             booking_id      = #{bookingId},

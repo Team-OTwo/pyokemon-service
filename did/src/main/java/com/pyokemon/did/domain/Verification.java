@@ -1,10 +1,12 @@
 package com.pyokemon.did.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @Builder
@@ -12,7 +14,11 @@ import lombok.Getter;
 public class Verification {
 
   @Id
-  private String pres_ex_id;
+  private Long id;
+
+  @Indexed
+  @JsonProperty("pres_ex_id")
+  private String presExId;
 
   private VpStatus status;
 
@@ -22,6 +28,6 @@ public class Verification {
 
 
   public static Verification of(String presExId, VpStatus status) {
-    return Verification.builder().pres_ex_id(presExId).status(status).build();
+    return Verification.builder().presExId(presExId).status(status).build();
   }
 }

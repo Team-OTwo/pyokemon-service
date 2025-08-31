@@ -19,11 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class IssuedProofServiceImpl implements IssuedProofService {
 
-  IssuedProofRepository issuedProofRepository;
+  private final IssuedProofRepository issuedProofRepository;
 
   @Override
   public void revokeIssuedProof(String presExId) {
-    issuedProofRepository.deleteByPresExId(presExId);
+    IssuedProof issuedProof = issuedProofRepository.findByPresExId(presExId)
+            .orElseThrow(() -> new BusinessException("VP 요청을 찾을 수 없습니다", VP_VERIFICATION_FAILED));
+    issuedProofRepository.delete(issuedProof);
   }
 
   @Override
@@ -32,5 +34,4 @@ public class IssuedProofServiceImpl implements IssuedProofService {
         .orElseThrow(() -> new BusinessException("VP 요청을 찾을 수 없습니다", VP_VERIFICATION_FAILED));
     return issuedProof.getChallenge();
   }
-
 }

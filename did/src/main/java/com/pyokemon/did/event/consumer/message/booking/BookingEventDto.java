@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingEvent {
+public class BookingEventDto {
   private Long bookingId;
   private Long eventScheduleId;
   private Long seatId;

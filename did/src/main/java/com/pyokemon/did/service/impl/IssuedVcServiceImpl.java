@@ -18,7 +18,7 @@ import com.pyokemon.did.domain.IssuedVc;
 import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.repository.IssuedProofRepository;
 import com.pyokemon.did.domain.repository.IssuedVcRepository;
-import com.pyokemon.did.event.consumer.message.booking.BookingEvent;
+import com.pyokemon.did.event.consumer.message.booking.BookingEventDto;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.PresentProofRequest;
@@ -51,7 +51,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
   @Override
   @Transactional
-  public void issueCredential(BookingEvent bookingEvent) throws BusinessException {
+  public void issueCredential(BookingEventDto bookingEvent) throws BusinessException {
     Long userId = bookingEvent.getAccountId();
     Long tenantId = bookingEvent.getTenantId();
     Long bookingId = bookingEvent.getBookingId();
@@ -107,8 +107,8 @@ public class IssuedVcServiceImpl implements IssuedVcService {
           userWallet.getAccountId(), bookingId, presentProofResponse.getPresExId(),
           createInvitationResponse.getInvitationUrl()));
 
-      log.info("VC 발급 완료 - bookingId: {}, presExId: {}, credExId: {}", bookingId,
-          presentProofResponse.getPresExId(), issueCredentialResponse.getCredExId());
+      log.info("VC 발급 완료 - bookingId: {}, presExId: {}", bookingId,
+          presentProofResponse.getPresExId());
 
     } catch (BusinessException e) {
       throw e;
@@ -120,7 +120,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
 
   @Override
   @Transactional
-  public void updateCredExId(Long bookingId, String credExId) throws RetryException {
+  public void updateCredIdStored(Long bookingId, String credIdStored) throws RetryException {
     try {
       IssuedVc issuedVc = issuedVcRepository.findByBookingId(bookingId)
           .orElseThrow(() -> new RetryException("retry - vc not found"));
@@ -129,7 +129,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
       if (!issuedVc.getStatus().equals(PENDING))
         return;
 
-      issuedVc.activate(credExId);
+      issuedVc.activate(credIdStored);
 
       issuedVcRepository.update(issuedVc);
     } catch (RetryException e) {
@@ -138,6 +138,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
       throw new RetryException("retry - fail to update vc");
     }
   }
+
 
   public IssuedVc getIssuedVcByBookingIdOrThrow(Long bookingId) {
     try {
@@ -194,12 +195,12 @@ public class IssuedVcServiceImpl implements IssuedVcService {
     IssueCredentialResponse response =
         remoteTenantAcaPyService.issueCredential(tenantToken, request);
 
-    if (response == null || response.getCredExId() == null) {
+    if (response == null) {
       log.error("VC 발급 실패 - bookingId: {}, connectionId: {}", bookingId, connectionId);
       throw new BusinessException("VC 발급에 실패했습니다.", VC_ISSUANCE_FAILED);
     }
 
-    log.debug("VC 발급 요청 성공 - bookingId: {}, credExId: {}", bookingId, response.getCredExId());
+    log.debug("VC 발급 요청 성공 - bookingId: {}", bookingId);
     return response;
   }
 
