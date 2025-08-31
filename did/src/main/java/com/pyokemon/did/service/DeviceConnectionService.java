@@ -1,11 +1,18 @@
 package com.pyokemon.did.service;
 
-import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
+import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.dto.response.InvitationResponse;
 
 public interface DeviceConnectionService {
 
-  CreateInvitationResponse createInvitations(Long userId);
+  InvitationResponse createInvitations(Long userId);
 
-  public Long getUserIdByDidOrThrow(String did);
+  Long getUserIdByDidOrThrow(String did);
+
+  DeviceConnection findByDeviceIdOrThrow(String deviceId);
+
+  void updatePublicDid(String connectionId, String content);
+
+  void findAndUpdateConnectionId(String connectionId, String alias);
 
 }

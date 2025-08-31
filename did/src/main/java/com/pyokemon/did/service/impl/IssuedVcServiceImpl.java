@@ -101,7 +101,7 @@ public class IssuedVcServiceImpl implements IssuedVcService {
           PROOF_TIME_TO_LIVE_SECONDS));
 
       // 8. 자격 증명 정보 저장
-      log.info("VC 발급 정보 저장 - bookintId: {}, presExId: {}", bookingId,
+      log.info("VC 발급 정보 저장 - bookingId: {}, presExId: {}", bookingId,
           presentProofResponse.getPresExId());
       issuedVcRepository.save(issueCredentialResponse.toEntity(tenantWallet.getAccountId(),
           userWallet.getAccountId(), bookingId, presentProofResponse.getPresExId(),

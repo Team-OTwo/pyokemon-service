@@ -2,6 +2,8 @@ package com.pyokemon.did.domain.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +16,11 @@ public class VerificationResponse {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class CreateVerificationResponse {
+
+    @JsonProperty("verify_invi_url")
     private String VerifyInviUrl;
+
+    @JsonProperty("pres_ex_id")
     private String presExId;
   }
 

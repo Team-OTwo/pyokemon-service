@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
-import com.pyokemon.did.domain.dto.response.InvitationResponse.CreateInvitationResponse;
+import com.pyokemon.did.domain.dto.response.InvitationResponse;
 import com.pyokemon.did.service.DeviceConnectionService;
 
 import lombok.AllArgsConstructor;
@@ -20,14 +20,14 @@ public class InvitationController {
   private final DeviceConnectionService deviceConnectionService;
 
   @PostMapping
-  public ResponseEntity<ResponseDto<CreateInvitationResponse>> createInvitations() {
+  public ResponseEntity<ResponseDto<InvitationResponse>> createInvitations() {
 
     // Gateway에서 전달받은 헤더 정보 추출
     Long userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
     log.info("초대장 생성 요청: userId={}", userId);
 
-    CreateInvitationResponse invitations = deviceConnectionService.createInvitations(userId);
+    InvitationResponse invitations = deviceConnectionService.createInvitations(userId);
 
     log.info("invitations={}", invitations);
     // 비즈니스 로직
