@@ -1,6 +1,7 @@
 package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.EventErrorCodes;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
@@ -59,30 +62,19 @@ public class TenantEventService {
   private String contextPath;
 
 
-  public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
-    return tenantEventRepository.findTenantEventDetailByEventId(eventId);
-  }
-
-  public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(
-      Long eventScheduleId) {
-    return tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
+  public EventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
+    EventDetailResponseDTO eventDetail = tenantEventRepository.findTenantEventDetailByEventId(eventId);
+    
+    if (eventDetail != null) {
+      List<SeatPriceResponseDto> seatPrices = tenantEventRepository.findSeatPricesByEventId(eventId);
+      eventDetail.setSeatPrice(seatPrices);
+    }
+    
+    return eventDetail;
   }
 
   public List<TenantEventListDto> getTenantEventListByAccountId(Long accountId) {
     return tenantEventRepository.findTenantEventListByAccountId(accountId);
-  }
-
-  public MonthlyEventSummaryResponse getMonthlyEventSummary(Long accountId, int year, int month) {
-    String startDate = String.format("%04d-%02d-01 00:00:00", year, month);
-    String endDate = String.format("%04d-%02d-%02d 23:59:59", year, month,
-        java.time.YearMonth.of(year, month).lengthOfMonth());
-
-    List<MonthlyEventDTO> events =
-        tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
-    MonthlySummaryDTO summary =
-        tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
-
-    return MonthlyEventSummaryResponse.builder().events(events).summary(summary).build();
   }
 
   @Transactional
@@ -202,7 +194,7 @@ public class TenantEventService {
 
   private Event findEventById(Long eventId) {
     // tenantEventRepository를 사용하여 Event 정보 조회
-    TenantEventDetailResponseDTO eventDetail =
+    EventDetailResponseDTO eventDetail =
         tenantEventRepository.findTenantEventDetailByEventId(eventId);
     if (eventDetail == null) {
       return null;
@@ -212,17 +204,15 @@ public class TenantEventService {
       // DTO -> Entity
       Event event = objectMapper.convertValue(eventDetail, Event.class);
 
-      // status enum 변환 필요
-      if (eventDetail.getStatus() != null) {
-        event.setStatus(Event.EventStatus.valueOf(eventDetail.getStatus()));
-      }
+      // status enum 변환 필요 - EventDetailResponseDTO에는 status가 없으므로 기본값 사용
+      event.setStatus(Event.EventStatus.PENDING);
 
       return event;
     } catch (IllegalArgumentException e) {
       return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
           .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
           .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
-          .status(Event.EventStatus.valueOf(eventDetail.getStatus())).build();
+          .status(Event.EventStatus.PENDING).build();
     }
   }
 
@@ -387,7 +377,6 @@ public class TenantEventService {
   }
 
   // 이미지 파일 업로드(React Quill 에디터에서 호출)
-
   public String uploadImageFile(MultipartFile file) {
     try {
       // 파일 확장자 검증
@@ -521,8 +510,6 @@ public class TenantEventService {
     
     return optimized;
   }
-
-
 
   // Base64 이미지를 서버에 저장하고 URL로 변환
   private String convertBase64ImagesToUrls(String html) {

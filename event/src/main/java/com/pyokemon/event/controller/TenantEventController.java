@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
@@ -34,21 +35,11 @@ public class TenantEventController {
         "Tenant events retrieved successfully for account_id: " + account_id);
   }
 
-  // 테넌트별 월간 공연 요약 조회
-  @GetMapping("/monthly-summary")
-  public ResponseDto<MonthlyEventSummaryResponse> getTenantMonthlySummary(
-      @RequestParam Long account_id, @RequestParam int year, @RequestParam int month) {
-    MonthlyEventSummaryResponse response =
-        tenantEventService.getMonthlyEventSummary(account_id, year, month);
-    return ResponseDto.success(response,
-        "Monthly summary retrieved successfully for account_id: " + account_id);
-  }
-
   // 테넌트용 이벤트 상세조회 (가격 정보 포함)
   @GetMapping("/{eventId}/detail")
-  public ResponseDto<TenantEventDetailResponseDTO> getTenantEventDetail(
+  public ResponseDto<EventDetailResponseDTO> getTenantEventDetail(
       @PathVariable Long eventId) {
-    TenantEventDetailResponseDTO eventDetail =
+    EventDetailResponseDTO eventDetail =
         tenantEventService.getTenantEventDetailByEventId(eventId);
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
   }

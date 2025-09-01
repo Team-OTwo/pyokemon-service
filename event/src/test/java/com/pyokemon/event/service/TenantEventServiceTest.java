@@ -22,6 +22,9 @@ import com.pyokemon.event.dto.tenant.EventResponseDto;
 import com.pyokemon.event.dto.tenant.EventScheduleDto;
 import com.pyokemon.event.dto.tenant.EventUpdateDto;
 import com.pyokemon.event.dto.tenant.PriceDto;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.tenant.TenantEventListDto;
+
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -59,8 +62,7 @@ class TenantEventServiceTest {
   private EventRegisterDto mockEventRegisterDto;
   private EventUpdateDto mockEventUpdateDto;
   private EventScheduleDto mockEventScheduleDto;
-  private TenantEventDetailResponseDTO mockTenantEventDetail;
-  private TenantBookingDetailResponseDTO mockTenantBookingDetail;
+  private EventDetailResponseDTO mockTenantEventDetail;
   private TenantEventListDto mockTenantEventList;
   private Event mockEvent;
   private Venue mockVenue;
@@ -83,13 +85,11 @@ class TenantEventServiceTest {
         .ticketOpenAt(LocalDateTime.now().plusDays(1)).eventDate(LocalDateTime.now().plusDays(7))
         .prices(Arrays.asList(PriceDto.builder().seatClassId(1L).price(50000).build())).build();
 
-    mockTenantEventDetail = new TenantEventDetailResponseDTO();
+    mockTenantEventDetail = new EventDetailResponseDTO();
     mockTenantEventDetail.setEventId(1L);
     mockTenantEventDetail.setTitle("Test Event");
-    mockTenantEventDetail.setStatus("APPROVED");
 
-    mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
-    mockTenantBookingDetail.setEventScheduleId(1L);
+
 
     mockTenantEventList = new TenantEventListDto();
     mockTenantEventList.setEventId(1L);
@@ -109,26 +109,11 @@ class TenantEventServiceTest {
     when(tenantEventRepository.findTenantEventDetailByEventId(eventId))
         .thenReturn(mockTenantEventDetail);
 
-    TenantEventDetailResponseDTO result = tenantEventService.getTenantEventDetailByEventId(eventId);
+    EventDetailResponseDTO result = tenantEventService.getTenantEventDetailByEventId(eventId);
 
     assertNotNull(result);
     assertEquals(mockTenantEventDetail.getEventId(), result.getEventId());
     verify(tenantEventRepository).findTenantEventDetailByEventId(eventId);
-  }
-
-  @Test
-  void getTenantBookingDetailByEventScheduleId_ShouldReturnTenantBookingDetail() {
-    Long eventScheduleId = 1L;
-
-    when(tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId))
-        .thenReturn(mockTenantBookingDetail);
-
-    TenantBookingDetailResponseDTO result =
-        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
-
-    assertNotNull(result);
-    assertEquals(mockTenantBookingDetail.getEventScheduleId(), result.getEventScheduleId());
-    verify(tenantEventRepository).findTenantBookingDetailByEventScheduleId(eventScheduleId);
   }
 
   @Test
@@ -147,32 +132,7 @@ class TenantEventServiceTest {
     verify(tenantEventRepository).findTenantEventListByAccountId(accountId);
   }
 
-  @Test
-  void getMonthlyEventSummary_ShouldReturnMonthlyEventSummary() {
-    Long accountId = 1L;
-    int year = 2024;
-    int month = 1;
-    String startDate = "2024-01-01 00:00:00";
-    String endDate = "2024-01-31 23:59:59";
 
-    List<MonthlyEventDTO> events = Arrays.asList(new MonthlyEventDTO());
-    MonthlySummaryDTO summary = MonthlySummaryDTO.builder().totalRevenue(1000000)
-        .activeEventCount(5).totalTicketsSold(100).build();
-
-    when(tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate))
-        .thenReturn(events);
-    when(tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate))
-        .thenReturn(summary);
-
-    MonthlyEventSummaryResponse result =
-        tenantEventService.getMonthlyEventSummary(accountId, year, month);
-
-    assertNotNull(result);
-    assertEquals(events, result.getEvents());
-    assertEquals(summary, result.getSummary());
-    verify(tenantEventRepository).findMonthlyEventsByAccountId(accountId, startDate, endDate);
-    verify(tenantEventRepository).findMonthlySummaryByAccountId(accountId, startDate, endDate);
-  }
 
   @Test
   void registerEvent_ShouldRegisterEventSuccessfully() {
