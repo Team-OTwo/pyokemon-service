@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.service.TenantEventService;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,34 +35,15 @@ public class TenantEventController {
         "Tenant events retrieved successfully for account_id: " + account_id);
   }
 
-  // 테넌트별 월간 공연 요약 조회
-  @GetMapping("/monthly-summary")
-  public ResponseDto<MonthlyEventSummaryResponse> getTenantMonthlySummary(
-      @RequestParam Long account_id, @RequestParam int year, @RequestParam int month) {
-    MonthlyEventSummaryResponse response =
-        tenantEventService.getMonthlyEventSummary(account_id, year, month);
-    return ResponseDto.success(response,
-        "Monthly summary retrieved successfully for account_id: " + account_id);
-  }
-
   // 테넌트용 이벤트 상세조회 (가격 정보 포함)
   @GetMapping("/{eventId}/detail")
-  public ResponseDto<TenantEventDetailResponseDTO> getTenantEventDetail(
+  public ResponseDto<EventDetailResponseDTO> getTenantEventDetail(
       @PathVariable Long eventId) {
-    TenantEventDetailResponseDTO eventDetail =
+    EventDetailResponseDTO eventDetail =
         tenantEventService.getTenantEventDetailByEventId(eventId);
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
   }
-
-  // 테넌트용 예매 현황 조회 (event_schedule_id 기반)
-  @GetMapping("/booking/{eventScheduleId}/detail")
-  public ResponseDto<TenantBookingDetailResponseDTO> getTenantBookingDetail(
-      @PathVariable Long eventScheduleId) {
-    TenantBookingDetailResponseDTO bookingDetail =
-        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
-    return ResponseDto.success(bookingDetail, "Tenant booking detail retrieved successfully");
-  }
-
+  
   // 이벤트 등록 (테넌트용)
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -123,6 +106,15 @@ public class TenantEventController {
   public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId) {
     tenantEventService.updateStatus(eventId, "CANCELED");
     return ResponseEntity.ok().build();
+  }
+
+  // 이미지 파일 업로드 API(React Quill 에디터에서 호출)
+  @PostMapping("/upload-image")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseDto<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    String fileUrl = tenantEventService.uploadImageFile(file);
+    
+    return ResponseDto.success(fileUrl, "Image uploaded successfully");
   }
 
 }

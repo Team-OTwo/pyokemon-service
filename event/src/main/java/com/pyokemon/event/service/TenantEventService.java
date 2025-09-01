@@ -1,6 +1,7 @@
 package com.pyokemon.event.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.EventErrorCodes;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
@@ -22,6 +25,15 @@ import com.pyokemon.event.repository.PriceRepository;
 import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.repository.VenueRepository;
 import com.pyokemon.event.service.RedisService;
+import org.springframework.web.multipart.MultipartFile;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+import org.springframework.beans.factory.annotation.Value;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,31 +51,30 @@ public class TenantEventService {
   private final RedisService redisService;
   private final KafkaMessageProducer kafkaMessageProducer;
 
+  // 파일 업로드 설정
+  @Value("${app.upload.path:uploads}")
+  private String uploadPath;
 
-  public TenantEventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
-    return tenantEventRepository.findTenantEventDetailByEventId(eventId);
-  }
+  @Value("${app.upload.url-prefix:/uploads}")
+  private String urlPrefix;
 
-  public TenantBookingDetailResponseDTO getTenantBookingDetailByEventScheduleId(
-      Long eventScheduleId) {
-    return tenantEventRepository.findTenantBookingDetailByEventScheduleId(eventScheduleId);
+  @Value("${server.servlet.context-path:/event}")
+  private String contextPath;
+
+
+  public EventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
+    EventDetailResponseDTO eventDetail = tenantEventRepository.findTenantEventDetailByEventId(eventId);
+    
+    if (eventDetail != null) {
+      List<SeatPriceResponseDto> seatPrices = tenantEventRepository.findSeatPricesByEventId(eventId);
+      eventDetail.setSeatPrice(seatPrices);
+    }
+    
+    return eventDetail;
   }
 
   public List<TenantEventListDto> getTenantEventListByAccountId(Long accountId) {
     return tenantEventRepository.findTenantEventListByAccountId(accountId);
-  }
-
-  public MonthlyEventSummaryResponse getMonthlyEventSummary(Long accountId, int year, int month) {
-    String startDate = String.format("%04d-%02d-01 00:00:00", year, month);
-    String endDate = String.format("%04d-%02d-%02d 23:59:59", year, month,
-        java.time.YearMonth.of(year, month).lengthOfMonth());
-
-    List<MonthlyEventDTO> events =
-        tenantEventRepository.findMonthlyEventsByAccountId(accountId, startDate, endDate);
-    MonthlySummaryDTO summary =
-        tenantEventRepository.findMonthlySummaryByAccountId(accountId, startDate, endDate);
-
-    return MonthlyEventSummaryResponse.builder().events(events).summary(summary).build();
   }
 
   @Transactional
@@ -105,6 +116,12 @@ public class TenantEventService {
               "VENUE_NOT_FOUND");
         }
       }
+    }
+
+    // HTML XSS 방지를 위한 sanitization
+    if (eventRegisterDto.getDescription() != null) {
+      String sanitizedDescription = sanitizeHtml(eventRegisterDto.getDescription());
+      eventRegisterDto.setDescription(sanitizedDescription);
     }
 
     // 새로 추가된 공연 status PENDING으로 설정
@@ -177,7 +194,7 @@ public class TenantEventService {
 
   private Event findEventById(Long eventId) {
     // tenantEventRepository를 사용하여 Event 정보 조회
-    TenantEventDetailResponseDTO eventDetail =
+    EventDetailResponseDTO eventDetail =
         tenantEventRepository.findTenantEventDetailByEventId(eventId);
     if (eventDetail == null) {
       return null;
@@ -187,24 +204,30 @@ public class TenantEventService {
       // DTO -> Entity
       Event event = objectMapper.convertValue(eventDetail, Event.class);
 
-      // status enum 변환 필요
-      if (eventDetail.getStatus() != null) {
-        event.setStatus(Event.EventStatus.valueOf(eventDetail.getStatus()));
-      }
+      // status enum 변환 필요 - EventDetailResponseDTO에는 status가 없으므로 기본값 사용
+      event.setStatus(Event.EventStatus.PENDING);
 
       return event;
     } catch (IllegalArgumentException e) {
       return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
           .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
           .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
-          .status(Event.EventStatus.valueOf(eventDetail.getStatus())).build();
+          .status(Event.EventStatus.PENDING).build();
     }
   }
 
   private void updateEventInfo(Event event, EventUpdateDto updateDto) {
     event.setTitle(updateDto.getTitle());
     event.setAgeLimit(updateDto.getAgeLimit());
+    
+    // HTML XSS 방지를 위한 sanitization
+    if (updateDto.getDescription() != null) {
+      String sanitizedDescription = sanitizeHtml(updateDto.getDescription());
+      event.setDescription(sanitizedDescription);
+    } else {
     event.setDescription(updateDto.getDescription());
+    }
+    
     event.setGenre(updateDto.getGenre());
     event.setThumbnailUrl(updateDto.getThumbnailUrl());
     if (updateDto.getStatus() != null) {
@@ -352,4 +375,219 @@ public class TenantEventService {
     kafkaMessageProducer.sendEventConfirmed(kafkaDto);
 
   }
+
+  // 이미지 파일 업로드(React Quill 에디터에서 호출)
+  public String uploadImageFile(MultipartFile file) {
+    try {
+      // 파일 확장자 검증
+      validateFileExtension(file);
+      
+      // 파일 크기 검증 (10MB 제한)
+      validateFileSize(file);
+      
+      // 고유한 파일명 생성 (단축된 형태)
+      String originalFilename = file.getOriginalFilename();
+      String fileExtension = getFileExtension(originalFilename);
+      // UUID 대신 짧은 해시 사용
+      String uniqueFilename = generateShortFilename() + fileExtension;
+      
+      // 업로드 디렉토리 생성 (상대 경로 사용)
+      Path uploadDir = Paths.get(uploadPath);
+      if (!Files.exists(uploadDir)) {
+        Files.createDirectories(uploadDir);
+      }
+      
+      // 파일 저장
+      Path filePath = uploadDir.resolve(uniqueFilename);
+      Files.copy(file.getInputStream(), filePath);
+      
+             // 파일 URL 반환 (context path 포함)
+       String fileUrl = contextPath + urlPrefix + "/" + uniqueFilename;
+      log.info("File uploaded successfully to local storage: {}", fileUrl);
+      
+      return fileUrl;
+      
+    } catch (IOException e) {
+      log.error("Failed to upload file to local storage: {}", file.getOriginalFilename(), e);
+      throw new BusinessException("Failed to upload file", "FILE_UPLOAD_FAILED");
+    }
+  }
+
+  // 파일 확장자 검증
+  private void validateFileExtension(MultipartFile file) {
+    String originalFilename = file.getOriginalFilename();
+    if (originalFilename == null) {
+      throw new BusinessException("Invalid file name", "INVALID_FILE_NAME");
+    }
+    
+    String extension = getFileExtension(originalFilename).toLowerCase();
+    String[] allowedExtensions = {".jpg", ".jpeg", ".png", ".gif", ".webp"};
+    
+    boolean isValid = false;
+    for (String allowedExt : allowedExtensions) {
+      if (allowedExt.equals(extension)) {
+        isValid = true;
+        break;
+      }
+    }
+    
+    if (!isValid) {
+      throw new BusinessException("Unsupported file type. Allowed: jpg, jpeg, png, gif, webp", "UNSUPPORTED_FILE_TYPE");
+    }
+  }
+  
+  // 파일 크기 검증
+  private void validateFileSize(MultipartFile file) {
+    long maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.getSize() > maxSize) {
+      throw new BusinessException("File size exceeds limit. Maximum: 10MB", "FILE_SIZE_EXCEEDED");
+    }
+  }
+  
+  // 파일 확장자 추출
+  private String getFileExtension(String filename) {
+    int lastDotIndex = filename.lastIndexOf('.');
+    if (lastDotIndex == -1) {
+      throw new BusinessException("File must have an extension", "INVALID_FILE_EXTENSION");
+    }
+    return filename.substring(lastDotIndex);
+  }
+
+  // 짧은 파일명 생성 (UUID 대신 사용)
+  private String generateShortFilename() {
+    // 현재 시간 기반으로 짧은 해시 생성
+    long timestamp = System.currentTimeMillis();
+    int random = (int) (Math.random() * 10000);
+    return String.format("%d_%d", timestamp, random);
+  }
+
+  // React Quill에서 생성된 HTML을 안전하게 정리하고 최적화
+  // DOMPurify와 유사한 기능을 제공하며 HTML 크기를 줄임
+  private String sanitizeHtml(String html) {
+    if (html == null || html.trim().isEmpty()) {
+      return "";
+    }
+
+    // React Quill에서 허용되는 태그와 속성들을 정의
+    Safelist safelist = Safelist.relaxed()
+            .addTags("span", "div", "p", "br", "h1", "h2", "h3", "h4", "h5", "h6")
+            .addAttributes(":all", "style", "class", "id")
+            .addAttributes("img", "src", "alt", "title", "width", "height")
+            .addAttributes("a", "href", "target", "rel")
+            .addAttributes("table", "border", "cellpadding", "cellspacing")
+            .addAttributes("td", "colspan", "rowspan")
+            .addAttributes("th", "colspan", "rowspan")
+            .addAttributes("ul", "type")
+            .addAttributes("ol", "type", "start")
+            .addAttributes("li", "value")
+            .addAttributes("blockquote", "cite")
+            .addAttributes("code", "class")
+            .addAttributes("pre", "class")
+            .addProtocols("img", "src", "http", "https", "data")
+            .addProtocols("a", "href", "http", "https", "mailto", "tel");
+
+    String sanitizedHtml = Jsoup.clean(html, safelist);
+    
+    // HTML 최적화: 불필요한 공백 제거 및 이미지 URL 압축
+    String optimizedHtml = optimizeHtml(sanitizedHtml);
+    
+    log.debug("HTML optimized: {} -> {} -> {}", html.length(), sanitizedHtml.length(), optimizedHtml.length());
+    
+    return optimizedHtml;
+  }
+
+  // HTML 내용을 최적화하여 크기를 줄임
+  private String optimizeHtml(String html) {
+    if (html == null || html.trim().isEmpty()) {
+      return "";
+    }
+
+    // 1. Base64 이미지를 URL로 변환 (가장 중요!)
+    String optimized = convertBase64ImagesToUrls(html);
+    
+    // 2. 불필요한 공백과 줄바꿈 제거
+    optimized = optimized.replaceAll("\\s+", " ").trim();
+    
+    return optimized;
+  }
+
+  // Base64 이미지를 서버에 저장하고 URL로 변환
+  private String convertBase64ImagesToUrls(String html) {
+    if (html == null || !html.contains("data:image")) {
+      return html;
+    }
+
+    // Base64 이미지 패턴 찾기: <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...">
+    String pattern = "<img[^>]*src=\"data:image/([^;]+);base64,([^\"]+)\"[^>]*>";
+    java.util.regex.Pattern imgPattern = java.util.regex.Pattern.compile(pattern);
+    java.util.regex.Matcher matcher = imgPattern.matcher(html);
+    
+    StringBuffer result = new StringBuffer();
+    
+    while (matcher.find()) {
+      try {
+        String imageType = matcher.group(1); // jpeg, png, gif 등
+        String base64Data = matcher.group(2);
+        
+        // Base64를 바이트 배열로 변환
+        byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+        
+        // 파일 확장자 결정
+        String extension = getExtensionFromMimeType(imageType);
+        
+        // 고유한 파일명 생성
+        String filename = generateShortFilename() + extension;
+        
+        // 업로드 디렉토리 생성 (상대 경로 사용)
+        Path uploadDir = Paths.get(uploadPath);
+        if (!Files.exists(uploadDir)) {
+          Files.createDirectories(uploadDir);
+        }
+        
+        // 파일 저장
+        Path filePath = uploadDir.resolve(filename);
+        Files.write(filePath, imageBytes);
+        
+                 // URL 생성 (context path 포함)
+         String imageUrl = contextPath + urlPrefix + "/" + filename;
+        
+        log.info("Base64 image converted to URL: {} ({} bytes)", imageUrl, imageBytes.length);
+        
+        // 원본 img 태그를 URL로 교체
+        String replacement = matcher.group(0).replaceFirst(
+            "src=\"data:image/[^\"]+\"", 
+            "src=\"" + imageUrl + "\""
+        );
+        
+        matcher.appendReplacement(result, java.util.regex.Matcher.quoteReplacement(replacement));
+        
+      } catch (Exception e) {
+        log.error("Failed to convert base64 image to URL", e);
+        // 실패한 경우 원본 유지
+        matcher.appendReplacement(result, java.util.regex.Matcher.quoteReplacement(matcher.group(0)));
+      }
+    }
+    
+    matcher.appendTail(result);
+    return result.toString();
+  }
+
+  // MIME 타입에서 파일 확장자 추출
+  private String getExtensionFromMimeType(String mimeType) {
+    switch (mimeType.toLowerCase()) {
+      case "jpeg":
+      case "jpg":
+        return ".jpg";
+      case "png":
+        return ".png";
+      case "gif":
+        return ".gif";
+      case "webp":
+        return ".webp";
+      default:
+        return ".jpg"; // 기본값
+    }
+  }
+
+
 }

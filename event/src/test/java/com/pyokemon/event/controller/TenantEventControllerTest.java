@@ -24,6 +24,9 @@ import com.pyokemon.event.dto.tenant.EventRegisterDto;
 import com.pyokemon.event.dto.tenant.EventResponseDto;
 import com.pyokemon.event.dto.tenant.EventScheduleDto;
 import com.pyokemon.event.dto.tenant.EventUpdateDto;
+import com.pyokemon.event.dto.tenant.TenantEventListDto;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
+
 import com.pyokemon.event.service.TenantEventService;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,9 +44,7 @@ class TenantEventControllerTest {
   private EventRegisterDto mockEventRegisterDto;
   private EventResponseDto mockEventResponseDto;
   private TenantEventListDto mockTenantEventList;
-  private TenantEventDetailResponseDTO mockTenantEventDetail;
-  private TenantBookingDetailResponseDTO mockTenantBookingDetail;
-  private MonthlyEventSummaryResponse mockMonthlySummary;
+  private EventDetailResponseDTO mockTenantEventDetail;
 
   @BeforeEach
   void setUp() {
@@ -66,14 +67,13 @@ class TenantEventControllerTest {
     mockTenantEventList.setEventId(1L);
     mockTenantEventList.setTitle("Test Event");
 
-    mockTenantEventDetail = new TenantEventDetailResponseDTO();
+    mockTenantEventDetail = new EventDetailResponseDTO();
     mockTenantEventDetail.setEventId(1L);
     mockTenantEventDetail.setTitle("Test Event");
 
-    mockTenantBookingDetail = new TenantBookingDetailResponseDTO();
-    mockTenantBookingDetail.setEventScheduleId(1L);
 
-    mockMonthlySummary = new MonthlyEventSummaryResponse();
+
+
   }
 
   @Test
@@ -92,23 +92,7 @@ class TenantEventControllerTest {
     verify(tenantEventService).getTenantEventListByAccountId(accountId);
   }
 
-  @Test
-  void getTenantMonthlySummary_ShouldReturnMonthlySummary() throws Exception {
-    Long accountId = 1L;
-    int year = 2024;
-    int month = 1;
 
-    when(tenantEventService.getMonthlyEventSummary(accountId, year, month))
-        .thenReturn(mockMonthlySummary);
-
-    mockMvc
-        .perform(get("/api/events/tenant/monthly-summary").param("account_id", accountId.toString())
-            .param("year", String.valueOf(year)).param("month", String.valueOf(month)))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.success").value(true));
-
-    verify(tenantEventService).getMonthlyEventSummary(accountId, year, month);
-  }
 
   @Test
   void getTenantEventDetail_ShouldReturnTenantEventDetail() throws Exception {
@@ -125,20 +109,7 @@ class TenantEventControllerTest {
     verify(tenantEventService).getTenantEventDetailByEventId(eventId);
   }
 
-  @Test
-  void getTenantBookingDetail_ShouldReturnTenantBookingDetail() throws Exception {
-    Long eventScheduleId = 1L;
 
-    when(tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId))
-        .thenReturn(mockTenantBookingDetail);
-
-    mockMvc.perform(get("/api/events/tenant/booking/{eventScheduleId}/detail", eventScheduleId))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.data.eventScheduleId").value(1));
-
-    verify(tenantEventService).getTenantBookingDetailByEventScheduleId(eventScheduleId);
-  }
 
   @Test
     void registerEvent_ShouldRegisterEventSuccessfully() throws Exception {
