@@ -15,6 +15,7 @@ import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.service.TenantEventService;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,16 +52,7 @@ public class TenantEventController {
         tenantEventService.getTenantEventDetailByEventId(eventId);
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
   }
-
-  // 테넌트용 예매 현황 조회 (event_schedule_id 기반)
-  @GetMapping("/booking/{eventScheduleId}/detail")
-  public ResponseDto<TenantBookingDetailResponseDTO> getTenantBookingDetail(
-      @PathVariable Long eventScheduleId) {
-    TenantBookingDetailResponseDTO bookingDetail =
-        tenantEventService.getTenantBookingDetailByEventScheduleId(eventScheduleId);
-    return ResponseDto.success(bookingDetail, "Tenant booking detail retrieved successfully");
-  }
-
+  
   // 이벤트 등록 (테넌트용)
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -123,6 +115,15 @@ public class TenantEventController {
   public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId) {
     tenantEventService.updateStatus(eventId, "CANCELED");
     return ResponseEntity.ok().build();
+  }
+
+  // 이미지 파일 업로드 API(React Quill 에디터에서 호출)
+  @PostMapping("/upload-image")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseDto<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    String fileUrl = tenantEventService.uploadImageFile(file);
+    
+    return ResponseDto.success(fileUrl, "Image uploaded successfully");
   }
 
 }
