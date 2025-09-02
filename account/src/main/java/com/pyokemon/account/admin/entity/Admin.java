@@ -2,6 +2,8 @@ package com.pyokemon.account.admin.entity;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,11 +15,9 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Admin {
+public class Admin extends BaseEntity {
 
-  private Long adminId;
   private Long accountId;
   private String name;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+
 }

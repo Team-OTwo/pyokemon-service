@@ -18,4 +18,5 @@ public interface VerificationRepository extends CrudRepository<Verification, Lon
    * @return Verification 객체 (Optional)
    */
   Optional<Verification> findByPresExId(String presExId);
+
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.event.repository.EventScheduleRepository;
 import com.pyokemon.event.service.RedisService;
 
@@ -52,8 +53,8 @@ public class RedisController {
   }
 
   @PostMapping("/{scheduleId}/{seatId}/hold")
-  public ResponseEntity<String> holdSeat(@PathVariable Long scheduleId, @PathVariable Long seatId,
-      @RequestHeader("X-Auth-AccountId") Long userId) {
+  public ResponseEntity<String> holdSeat(@PathVariable Long scheduleId, @PathVariable Long seatId) {
+    Long userId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     long ttlSeconds = 300L;
     log.info("좌석 홀드 요청: scheduleId={}, seatId={}, userId={}, ttl={}초", scheduleId, seatId, userId,
         ttlSeconds);

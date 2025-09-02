@@ -15,15 +15,15 @@ public interface AccountRepository {
 
   Optional<Account> findByLoginIdAndStatus(String loginId, AccountStatus status);
 
-  Optional<Account> findByAccountId(Long accountId);
+  Optional<Account> findByAccountId(Long id);
 
   int insert(Account account);
 
   int update(Account account);
 
-  int updateStatus(Long accountId, AccountStatus status);
+  int updateStatus(Long id, AccountStatus status);
 
-  int updatePassword(@Param("accountId") Long accountId, @Param("password") String password);
+  int updatePassword(@Param("id") Long id, @Param("password") String password);
 
   boolean existsByLoginId(String loginId);
 

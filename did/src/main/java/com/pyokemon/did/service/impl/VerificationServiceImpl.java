@@ -83,7 +83,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     // invi_url, pres_ex_id 조회
-    Long userId = deviceConnectionService.getUserIdByDidOrThrow(credoPublicDid);
+    Long userId = deviceConnectionService.getUserIdByPublicDidOrThrow(credoPublicDid);
     Map<String, String> stringMap =
         issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, bookingId);
 

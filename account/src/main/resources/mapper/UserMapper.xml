@@ -2,27 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.user.repository.UserRepository">
 
-    <select id="findByUserId" resultType="com.pyokemon.account.user.entity.User">
-        SELECT * FROM tb_user WHERE user_id = #{userId}
+    <resultMap id="UserResultMap" type="com.pyokemon.account.user.entity.User">
+        <id column="id" property="id"/>
+        <result column="account_id" property="accountId"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="birth" property="birth"/>
+        <result column="is_verified" property="isVerified"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="UserResultMap">
+        SELECT * FROM tb_user WHERE id = #{id}
     </select>
 
-    <select id="findByAccountId" resultType="com.pyokemon.account.user.entity.User">
+    <select id="findByAccountId" resultMap="UserResultMap">
         SELECT * FROM tb_user WHERE account_id = #{accountId}
     </select>
 
-    <insert id="insert" parameterType="com.pyokemon.account.user.entity.User" useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO tb_user (account_id, name, phone, birth, is_verified)
-        VALUES (#{accountId}, #{name}, #{phone}, #{birth}, #{isVerified})
+    <insert id="insert" parameterType="com.pyokemon.account.user.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_user (account_id, name, phone, birth, is_verified, created_at, updated_at)
+        VALUES (#{accountId}, #{name}, #{phone}, #{birth}, #{isVerified}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.user.entity.User">
         UPDATE tb_user 
-        SET name = #{name}, phone = #{phone}, birth = #{birth}, is_verified = #{isVerified}
-        WHERE user_id = #{userId}
+        SET name = #{name}, phone = #{phone}, birth = #{birth}, is_verified = #{isVerified}, updated_at = NOW()
+        WHERE id = #{id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_user WHERE user_id = #{userId}
+        DELETE FROM tb_user WHERE id = #{id}
     </delete>
 
 </mapper> 

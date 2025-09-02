@@ -1,6 +1,11 @@
 package com.pyokemon.account.tenant.dto.request;
 
+import static com.pyokemon.account.auth.entity.AccountStatus.ACTIVE;
+
 import jakarta.validation.constraints.NotBlank;
+
+import com.pyokemon.account.auth.entity.Account;
+import com.pyokemon.account.tenant.entity.Tenant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,4 +43,14 @@ public class TenantRegisterRequestDto {
 
   @NotBlank(message = "대표명은 필수입니다.")
   private String ceo;
+
+  public Account toAccount() {
+    return Account.builder().loginId(loginId).password(password).role("TENANT").status(ACTIVE)
+        .build();
+  }
+
+  public Tenant toTenant(Long accountId) {
+    return Tenant.builder().accountId(accountId).ceo(ceo).city(city).corpId(corpId).name(name)
+        .street(street).zipcode(zipcode).build();
+  }
 }

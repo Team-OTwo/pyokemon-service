@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
@@ -74,10 +75,10 @@ public class TenantEventController {
   // 앱 커서기반 공연 조회
   @GetMapping("/app")
   public ResponseDto<TenantEventListResponseDtoForApp> getEventListForApp(
-      @RequestHeader(value = "X-Auth-AccountId") Long accountId,
       @RequestParam(required = false) LocalDateTime cursorDate,
       @RequestParam(required = false) Long cursorId, @RequestParam(defaultValue = "8") int limit,
       @RequestParam(required = false) String genre) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     List<TenantEventDetailDtoForApp> events =
         tenantEventService.getEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
 

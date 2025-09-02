@@ -1,4 +1,4 @@
-package com.pyokemon.did.common.web.constant;
+package com.pyokemon.common.web.constant;
 
 /**
  * Gateway를 통해 전달되는 인증 헤더 상수들을 정의하는 클래스

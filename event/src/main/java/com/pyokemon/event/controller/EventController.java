@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.service.EventScheduleService;
@@ -42,9 +43,9 @@ public class EventController {
 
   // 공연 상세 조회
   @GetMapping("/{eventId}")
-  public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId,
-      @RequestHeader(value = "X-Auth-AccountId", required = false) Long accountId)
+  public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId)
       throws NotFoundException {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
     return ResponseEntity.ok(dto);
   }
@@ -60,16 +61,16 @@ public class EventController {
 
   // 관심 공연 등록, 취소
   @PostMapping("/save/{eventId}")
-  public ResponseEntity<String> saveEvent(@PathVariable Long eventId,
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
+  public ResponseEntity<String> saveEvent(@PathVariable Long eventId) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     return ResponseEntity.ok(eventService.saveSavedEvent(accountId, eventId));
   }
 
   // 관심 공연 조회
   @GetMapping("/saved-events")
-  public List<EventItemResponseDTO> getSavedEvents(
-      @RequestHeader("X-Auth-AccountId") Long accountId, @RequestParam(defaultValue = "1") int page,
+  public List<EventItemResponseDTO> getSavedEvents(@RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "9") int size) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     if (accountId == null) {
       throw new BusinessException("로그인이 필요합니다.", AccountErrorCodes.ACCESS_DENIED);
     }

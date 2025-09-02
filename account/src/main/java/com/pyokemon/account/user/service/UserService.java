@@ -54,7 +54,7 @@ public class UserService {
 
     accountRepository.insert(account);
 
-    User user = User.builder().accountId(account.getAccountId()).name(request.getName())
+    User user = User.builder().accountId(account.getId()).name(request.getName())
         .phone(request.getPhone()).birth(request.getBirth()).isVerified(false).build();
 
     userRepository.insert(user);

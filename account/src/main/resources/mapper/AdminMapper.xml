@@ -3,14 +3,14 @@
 <mapper namespace="com.pyokemon.account.admin.repository.AdminRepository">
 
     <select id="findByAdminId" resultType="com.pyokemon.account.admin.entity.Admin">
-        SELECT * FROM tb_admin WHERE admin_id = #{adminId}
+        SELECT * FROM tb_admin WHERE id = #{Id}
     </select>
 
     <select id="findByAccountId" resultType="com.pyokemon.account.admin.entity.Admin">
         SELECT * FROM tb_admin WHERE account_id = #{accountId}
     </select>
 
-    <insert id="insert" parameterType="com.pyokemon.account.admin.entity.Admin" useGeneratedKeys="true" keyProperty="adminId">
+    <insert id="insert" parameterType="com.pyokemon.account.admin.entity.Admin" useGeneratedKeys="true" keyProperty="Id">
         INSERT INTO tb_admin (account_id, name)
         VALUES (#{accountId}, #{name})
     </insert>
@@ -18,11 +18,11 @@
     <update id="update" parameterType="com.pyokemon.account.admin.entity.Admin">
         UPDATE tb_admin 
         SET name = #{name}
-        WHERE admin_id = #{adminId}
+        WHERE id = #{Id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_admin WHERE admin_id = #{adminId}
+        DELETE FROM tb_admin WHERE id = #{Id}
     </delete>
 
 </mapper> 

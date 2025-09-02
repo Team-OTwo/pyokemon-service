@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.dto.response.InvitationResponse;
 import com.pyokemon.did.service.DeviceConnectionService;
 

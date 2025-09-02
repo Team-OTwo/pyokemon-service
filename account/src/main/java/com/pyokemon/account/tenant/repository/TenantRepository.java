@@ -10,7 +10,7 @@ import com.pyokemon.account.tenant.entity.Tenant;
 @Mapper
 public interface TenantRepository {
 
-  Optional<Tenant> findByTenantId(Long tenantId);
+  Optional<Tenant> findByTenantId(Long id);
 
   Optional<Tenant> findByAccountId(Long accountId);
 
@@ -22,5 +22,5 @@ public interface TenantRepository {
 
   int update(Tenant tenant);
 
-  int delete(Long tenantId);
+  int delete(Long id);
 }

@@ -10,7 +10,7 @@ import com.pyokemon.account.user.entity.User;
 @Mapper
 public interface UserRepository {
 
-  Optional<User> findByUserId(@Param("userId") Long userId);
+  Optional<User> findByUserId(@Param("id") Long id);
 
   Optional<User> findByAccountId(@Param("accountId") Long accountId);
 
@@ -18,5 +18,5 @@ public interface UserRepository {
 
   int update(User user);
 
-  int delete(@Param("userId") Long userId);
+  int delete(@Param("id") Long id);
 }

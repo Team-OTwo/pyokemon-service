@@ -26,4 +26,5 @@ public class UpdateTenantProfileRequestDto {
 
   @NotBlank(message = "대표명은 필수입니다.")
   private String ceo;
+
 }

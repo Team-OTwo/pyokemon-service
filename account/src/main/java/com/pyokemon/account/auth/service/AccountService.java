@@ -45,6 +45,13 @@ public class AccountService {
   private final RedisTemplate<String, String> redisTemplate;
 
   @Transactional
+  public Account registerAccount(Account account) {
+    account.setPassword(passwordUtil.encode(account.getPassword()));
+    accountRepository.insert(account);
+    return account;
+  }
+
+  @Transactional
   public LoginResponseDto login(LoginRequestDto request) {
     log.info("로그인 시도: {}", request.getLoginId());
 
@@ -65,15 +72,13 @@ public class AccountService {
     }
 
     // JWT 토큰 생성
-    String accessToken =
-        tokenGenerator.generateAccessToken(account.getAccountId(), account.getRole());
-    String refreshToken =
-        tokenGenerator.generateRefreshToken(account.getAccountId(), account.getRole());
+    String accessToken = tokenGenerator.generateAccessToken(account.getId(), account.getRole());
+    String refreshToken = tokenGenerator.generateRefreshToken(account.getId(), account.getRole());
 
     if ("USER".equals(account.getRole())) {
       log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
 
-      Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
+      Optional<User> userOpt = userRepository.findByAccountId(account.getId());
 
       if (userOpt.isEmpty()) {
         throw new BusinessException("사용자를 찾을 수 없습니다.", AccountErrorCodes.USER_NOT_FOUND);
@@ -82,11 +87,11 @@ public class AccountService {
       User user = userOpt.get();
 
       return LoginResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken)
-          .role(account.getRole()).userName(user.getName()).accountId(account.getAccountId())
+          .role(account.getRole()).userName(user.getName()).accountId(account.getId())
           .isVerified(user.getIsVerified()).build();
     } else {
       return LoginResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken)
-          .role(account.getRole()).accountId(account.getAccountId()).build();
+          .role(account.getRole()).accountId(account.getId()).build();
     }
   }
 
@@ -117,7 +122,7 @@ public class AccountService {
     String refreshToken = null;
 
     if (role.equals("USER")) {
-      Optional<User> userOpt = userRepository.findByAccountId(account.getAccountId());
+      Optional<User> userOpt = userRepository.findByAccountId(account.getId());
 
       if (userOpt.isEmpty()) {
         throw new BusinessException("사용자 계정을 찾을 수 없습니다.", AccountErrorCodes.USER_NOT_FOUND);
@@ -127,8 +132,8 @@ public class AccountService {
 
       if (!userDeviceRepository.existsByUserIdAndIsValid(user.getUserId(), true)) {
         deviceStatus = "NOT_REGISTERED";
-        accessToken = tokenGenerator.generateAccessToken(account.getAccountId(), role);
-        refreshToken = tokenGenerator.generateRefreshToken(account.getAccountId(), role);
+        accessToken = tokenGenerator.generateAccessToken(account.getId(), role);
+        refreshToken = tokenGenerator.generateRefreshToken(account.getId(), role);
       } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(),
           request.getDeviceNumber(), true)) {
         deviceStatus = "MISMATCHED";
@@ -145,17 +150,17 @@ public class AccountService {
         UserDevice userDevice = userDeviceOpt.get();
         userDevice.setIsLogin(true);
         userDeviceRepository.update(userDevice);
-        accessToken = tokenGenerator.generateAppAccessToken(account.getAccountId(), role,
-            userDevice.getUserDeviceId());
-        refreshToken = tokenGenerator.generateAppRefreshToken(account.getAccountId(), role,
-            userDevice.getUserDeviceId());
+        accessToken =
+            tokenGenerator.generateAppAccessToken(account.getId(), role, userDevice.getId());
+        refreshToken =
+            tokenGenerator.generateAppRefreshToken(account.getId(), role, userDevice.getId());
       }
     }
 
     log.info("로그인 성공: {} (역할: {})", request.getLoginId(), role);
 
     return AppLoginResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken)
-        .role(role).accountId(account.getAccountId()).deviceStatus(deviceStatus).build();
+        .role(role).accountId(account.getId()).deviceStatus(deviceStatus).build();
   }
 
   @Transactional
@@ -297,10 +302,8 @@ public class AccountService {
   @Transactional
   public void deleteAccount(Long accountId) {
     log.info("계정 삭제 시도: ID: {}", accountId);
-
     // 계정 존재 확인
-    boolean exists = accountRepository.findByAccountId(accountId).isPresent();
-    if (!exists) {
+    if (!accountRepository.findByAccountId(accountId).isPresent()) {
       log.warn("계정 삭제 실패: 계정을 찾을 수 없음 - ID: {}", accountId);
       throw new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND);
     }
@@ -308,5 +311,16 @@ public class AccountService {
     // 계정 상태를 DELETED로 변경
     accountRepository.updateStatus(accountId, AccountStatus.DELETED);
     log.info("계정 삭제 성공: ID: {}", accountId);
+  }
+
+  public void existsByLoginId(String loginId) {
+    if (accountRepository.findByLoginId(loginId).isPresent()) {
+      throw new BusinessException("이미 등록된 사용자입니다.", AccountErrorCodes.DUPLICATE_LOGIN_ID);
+    }
+  }
+
+  public Account getAccountById(Long accountId) {
+    return accountRepository.findByAccountId(accountId).orElseThrow(
+        () -> new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND));
   }
 }
