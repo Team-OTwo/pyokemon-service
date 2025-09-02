@@ -24,7 +24,7 @@ public class IssuedProofServiceImpl implements IssuedProofService {
   @Override
   public void revokeIssuedProof(String presExId) {
     IssuedProof issuedProof = issuedProofRepository.findByPresExId(presExId)
-            .orElseThrow(() -> new BusinessException("VP 요청을 찾을 수 없습니다", VP_VERIFICATION_FAILED));
+        .orElseThrow(() -> new BusinessException("VP 요청을 찾을 수 없습니다", VP_VERIFICATION_FAILED));
     issuedProofRepository.delete(issuedProof);
   }
 

@@ -2,6 +2,8 @@ package com.pyokemon.account.user.entity;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,15 +15,13 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDevice {
+public class UserDevice extends BaseEntity {
 
-  private Long userDeviceId;
   private Long userId;
   private String deviceNumber;
   private String fcmToken;
   private String osType; // ANDROID, IOS
   private Boolean isLogin;
   private Boolean isValid;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+
 }

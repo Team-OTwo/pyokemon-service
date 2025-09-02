@@ -1,12 +1,13 @@
 package com.pyokemon.did.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @Builder

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.dto.request.DelegateCredentialRequest;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.HandleVerificationRequest;
@@ -48,7 +48,8 @@ public class VerificationController {
 
   @GetMapping("/{pres_ex_id}")
   public ResponseEntity<ResponseDto<HandleVerificationResponse>> handleVerification(
-      @PathVariable(name = "pres_ex_id") String presExId, @RequestBody @Valid HandleVerificationRequest request) {
+      @PathVariable(name = "pres_ex_id") String presExId,
+      @RequestBody @Valid HandleVerificationRequest request) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     HandleVerificationResponse response =
         verificationService.handleVerification(tenantId, presExId, request);

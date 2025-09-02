@@ -4,7 +4,6 @@ import static com.pyokemon.common.exception.code.DidErrorCodes.*;
 
 import java.util.Map;
 
-import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +17,18 @@ import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificatio
 import com.pyokemon.did.domain.dto.request.VerificationRequest.HandleVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
+import com.pyokemon.did.domain.event.BookingVerifiedEvent;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.domain.repository.VerificationRepository;
+import com.pyokemon.did.event.producer.KafkaMessageProducer;
 import com.pyokemon.did.remote.acapy.common.constants.AcaPyConstants;
 import com.pyokemon.did.remote.acapy.common.dto.request.IssueCredentialRequest;
-import com.pyokemon.did.domain.event.BookingVerifiedEvent;
-import com.pyokemon.did.event.producer.KafkaMessageProducer;
 import com.pyokemon.did.remote.acapy.common.dto.request.JwtVerifyRequest;
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.CredentialSubject;
 import com.pyokemon.did.remote.acapy.common.dto.response.GetCredentialResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.IssueCredentialResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.JwtVerifyResponse;
+import com.pyokemon.did.remote.acapy.common.util.CredentialIdGenerator;
 import com.pyokemon.did.remote.acapy.common.util.CredentialSubjectDelegator;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.remote.acapy.service.RemoteUserAcaPyService;
@@ -83,7 +83,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     // invi_url, pres_ex_id 조회
-    Long userId = deviceConnectionService.getUserIdByDidOrThrow(credoPublicDid);
+    Long userId = deviceConnectionService.getUserIdByPublicDidOrThrow(credoPublicDid);
     Map<String, String> stringMap =
         issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, bookingId);
 
@@ -122,8 +122,8 @@ public class VerificationServiceImpl implements VerificationService {
       String credentialIdStored = issuedVc.getCredIdStored();
 
       GetCredentialResponse sourceCredential = remoteUserAcaPyService.getCredential(delegatorToken, // 위임자
-                                           // 지갑
-                                                                                                    // 토큰
+          // 지갑
+          // 토큰
           credentialIdStored // 원본 자격 증명 교환 식별자
       );
 
@@ -137,7 +137,7 @@ public class VerificationServiceImpl implements VerificationService {
 
       // 6. 위임된 자격 증명 발급
       String connectionId = deviceConnection.getConnectionId();
-      //TODO - 원본 subjectcredential에서 뽑기
+      // TODO - 원본 subjectcredential에서 뽑기
       String sourceCredentialId = CredentialIdGenerator.generateCredentialId(bookingId);
       String delegatorDid = userWallet.getPublicDid();
 

@@ -9,6 +9,7 @@ public final class AccountErrorCodes {
   public static final String ACCOUNT_LOCKED = "ACCOUNT_LOCKED";
   public static final String ACCOUNT_DISABLED = "ACCOUNT_DISABLED";
   public static final String ACCOUNT_NOT_VERIFIED = "ACCOUNT_NOT_VERIFIED";
+  public static final String ACCOUNT_CREATION_FAILED = "ACCOUNT_CREATION_FAILED";
 
   // 인증 관련 에러
   public static final String LOGIN_FAILED = "LOGIN_FAILED";

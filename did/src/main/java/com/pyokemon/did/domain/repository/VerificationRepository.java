@@ -3,9 +3,9 @@ package com.pyokemon.did.domain.repository;
 import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import com.pyokemon.did.domain.Verification;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VerificationRepository extends CrudRepository<Verification, Long> {
@@ -18,4 +18,5 @@ public interface VerificationRepository extends CrudRepository<Verification, Lon
    * @return Verification 객체 (Optional)
    */
   Optional<Verification> findByPresExId(String presExId);
+
 }

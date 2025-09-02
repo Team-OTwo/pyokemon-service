@@ -16,6 +16,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
 }
 
 tasks.named('test') {
