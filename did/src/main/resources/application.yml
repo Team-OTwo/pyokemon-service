@@ -37,7 +37,7 @@ spring:
   # Redis 설정
   data:
     redis:
-      host: localhost
+      host: pyokemon-redis
       port: 6379
       timeout: 2000ms
       lettuce:
@@ -52,14 +52,14 @@ spring:
       client:
         default-to-properties: false
 
-# 로그 레벨 설정
-logging:
-  level:
-    com.pyokemon.did: DEBUG
-    org.springframework.cloud.openfeign: DEBUG
-    org.springframework.transaction: DEBUG
-    org.springframework.web: DEBUG
-    feign: DEBUG
+# # 로그 레벨 설정
+# logging:
+#   level:
+#     com.pyokemon.did: DEBUG
+#     org.springframework.cloud.openfeign: DEBUG
+#     org.springframework.transaction: DEBUG
+#     org.springframework.web: DEBUG
+#     feign: DEBUG
 
 # Booking 서비스 설정
 booking:
@@ -84,6 +84,17 @@ acapy:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
+# Swagger 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  packages-to-scan: com.pyokemon.did.api
+  packages-to-exclude: com.pyokemon.did.api.backend.webhook
+
 ---
 spring:
   config:
@@ -91,4 +102,12 @@ spring:
       on-profile: "dev"
     import:
       - classpath:dev-config.yml
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "local"
+    import:
+      - classpath:local-config.yml
 

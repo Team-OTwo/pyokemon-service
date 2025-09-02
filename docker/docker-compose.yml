@@ -121,6 +121,29 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
 
+  did-service:
+    build:
+      context: ..
+      dockerfile: did/Dockerfile
+    container_name: pyokemon-did-service
+    restart: unless-stopped
+    depends_on:
+      - did-mysql
+      - redis
+      - kafka
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://did-mysql:3306/pyokemon_did?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: pyokemon
+      SPRING_DATASOURCE_PASSWORD: pyokemon123
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    ports:
+      - "8084:8084"
+    volumes:
+      - ../did/logs:/app/logs
+
 volumes:
   account_mysql_data:
     driver: local

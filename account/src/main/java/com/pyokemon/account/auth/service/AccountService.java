@@ -54,6 +54,7 @@ public class AccountService {
   @Transactional
   public LoginResponseDto login(LoginRequestDto request) {
     log.info("로그인 시도: {}", request.getLoginId());
+    log.info("입력된 비밀번호: {}", request.getPassword());
 
     // 계정 조회
     Optional<Account> accountOpt =
@@ -64,16 +65,30 @@ public class AccountService {
     }
 
     Account account = accountOpt.get();
+    log.info("계정 조회 성공: ID={}, Role={}, Status={}", account.getId(), account.getRole(),
+        account.getStatus());
+    log.info("DB에 저장된 비밀번호 해시: {}", account.getPassword());
 
     // 비밀번호 확인
-    if (!passwordUtil.matches(request.getPassword(), account.getPassword())) {
+    log.info("비밀번호 검증 시작...");
+    boolean passwordMatches = passwordUtil.matches(request.getPassword(), account.getPassword());
+    log.info("비밀번호 검증 결과: {}", passwordMatches);
+
+    if (!passwordMatches) {
       log.warn("로그인 실패: 비밀번호 불일치 - {}", request.getLoginId());
+      log.warn("입력된 비밀번호: {}", request.getPassword());
+      log.warn("DB 해시: {}", account.getPassword());
       throw new BusinessException("로그인 ID 또는 비밀번호가 올바르지 않습니다.", AccountErrorCodes.INVALID_LOGIN);
     }
+
+    log.info("비밀번호 검증 성공!");
 
     // JWT 토큰 생성
     String accessToken = tokenGenerator.generateAccessToken(account.getId(), account.getRole());
     String refreshToken = tokenGenerator.generateRefreshToken(account.getId(), account.getRole());
+    log.info("JWT 토큰 생성 완료: accessToken={}, refreshToken={}",
+        accessToken.substring(0, Math.min(20, accessToken.length())) + "...",
+        refreshToken.substring(0, Math.min(20, refreshToken.length())) + "...");
 
     if ("USER".equals(account.getRole())) {
       log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
@@ -90,6 +105,7 @@ public class AccountService {
           .role(account.getRole()).userName(user.getName()).accountId(account.getId())
           .isVerified(user.getIsVerified()).build();
     } else {
+      log.info("로그인 성공: {} (역할: {})", request.getLoginId(), account.getRole());
       return LoginResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken)
           .role(account.getRole()).accountId(account.getId()).build();
     }
@@ -322,5 +338,17 @@ public class AccountService {
   public Account getAccountById(Long accountId) {
     return accountRepository.findByAccountId(accountId).orElseThrow(
         () -> new BusinessException("계정을 찾을 수 없습니다.", AccountErrorCodes.ACCOUNT_NOT_FOUND));
+  }
+
+  /**
+   * 테스트용 메서드: admin123!! 비밀번호의 새로운 해시를 생성합니다. 테스트 후 삭제하세요.
+   */
+  public void generateHashForTest() {
+    String rawPassword = "admin123!!";
+    String newHash = passwordUtil.encode(rawPassword);
+    log.info("=== 테스트용 해시 생성 ===");
+    log.info("원본 비밀번호: {}", rawPassword);
+    log.info("새로운 해시: {}", newHash);
+    log.info("========================");
   }
 }

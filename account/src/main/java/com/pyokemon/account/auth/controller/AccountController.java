@@ -68,4 +68,12 @@ public class AccountController {
     return ResponseEntity.ok(ResponseDto.success("비밀번호 변경 성공"));
   }
 
+  // 테스트용 엔드포인트: admin123!! 비밀번호의 새로운 해시를 생성합니다.
+  // 테스트 후 삭제하세요.
+  @PostMapping("/test/generate-hash")
+  public ResponseEntity<ResponseDto<String>> generateHashForTest() {
+    accountService.generateHashForTest();
+    return ResponseEntity.ok(ResponseDto.success("해시 생성 완료. 로그를 확인하세요."));
+  }
+
 }
