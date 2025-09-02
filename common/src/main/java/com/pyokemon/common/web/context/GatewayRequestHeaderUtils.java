@@ -1,4 +1,4 @@
-package com.pyokemon.did.common.web.context;
+package com.pyokemon.common.web.context;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -7,7 +7,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.common.web.constant.GatewayHeaderConstants;
+import com.pyokemon.common.web.constant.GatewayHeaderConstants;
 
 /**
  * DID 서비스의 /api 경로에서 Gateway를 통해 전달받은 헤더 정보를 안전하게 추출하는 유틸리티 클래스 /api 경로는 Gateway를 거쳐서 사용자 인증 정보를
@@ -111,16 +111,6 @@ public class GatewayRequestHeaderUtils {
   public static boolean isUser() {
     String role = getUserRoleOrThrowException();
     return GatewayHeaderConstants.Role.ROLE_USER.equals(role);
-  }
-
-  /**
-   * 사용자가 관리자 권한을 가지고 있는지 확인합니다.
-   *
-   * @return 관리자 권한 여부
-   */
-  public static boolean isAdmin() {
-    String role = getUserRoleOrThrowException();
-    return GatewayHeaderConstants.Role.ROLE_ADMIN.equals(role);
   }
 
   /**

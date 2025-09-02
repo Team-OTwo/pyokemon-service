@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.event.dto.CancelEventResponseDTO;
@@ -16,7 +17,6 @@ import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.service.TenantEventService;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,13 +37,11 @@ public class TenantEventController {
 
   // 테넌트용 이벤트 상세조회 (가격 정보 포함)
   @GetMapping("/{eventId}/detail")
-  public ResponseDto<EventDetailResponseDTO> getTenantEventDetail(
-      @PathVariable Long eventId) {
-    EventDetailResponseDTO eventDetail =
-        tenantEventService.getTenantEventDetailByEventId(eventId);
+  public ResponseDto<EventDetailResponseDTO> getTenantEventDetail(@PathVariable Long eventId) {
+    EventDetailResponseDTO eventDetail = tenantEventService.getTenantEventDetailByEventId(eventId);
     return ResponseDto.success(eventDetail, "Tenant event detail retrieved successfully");
   }
-  
+
   // 이벤트 등록 (테넌트용)
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -113,7 +111,7 @@ public class TenantEventController {
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseDto<String> uploadImage(@RequestParam("file") MultipartFile file) {
     String fileUrl = tenantEventService.uploadImageFile(file);
-    
+
     return ResponseDto.success(fileUrl, "Image uploaded successfully");
   }
 

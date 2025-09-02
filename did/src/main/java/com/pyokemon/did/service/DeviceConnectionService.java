@@ -1,8 +1,9 @@
 package com.pyokemon.did.service;
 
+import org.springframework.retry.RetryException;
+
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.dto.response.InvitationResponse;
-import org.springframework.retry.RetryException;
 
 public interface DeviceConnectionService {
 

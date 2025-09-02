@@ -5,7 +5,6 @@ import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.*;
 
 import java.util.Optional;
 
-import com.pyokemon.did.domain.Wallet;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.DeviceConnection;
+import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.response.InvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;
@@ -79,9 +79,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
    */
   private String createUserAcaPyInvitationUrl(String deviceId, Long userId, String userToken) {
     log.info("User ACA-Py 초대장 생성 요청: userId={}", userId);
-    CreateInvitationRequest userRequest =
-            CreateInvitationRequest.forUserDevice(userId, deviceId);
-    CreateInvitationResponse  userAcapyResponse = remoteUserAcaPyService.createInvitation(userToken, userRequest);
+    CreateInvitationRequest userRequest = CreateInvitationRequest.forUserDevice(userId, deviceId);
+    CreateInvitationResponse userAcapyResponse =
+        remoteUserAcaPyService.createInvitation(userToken, userRequest);
 
     if (userAcapyResponse == null || userAcapyResponse.getInvitationUrl() == null) {
       log.error("User ACA-Py 초대장 생성 실패: 응답이 null 이거나 URL이 없음, userId={}", userId);
@@ -94,8 +94,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   private String createMediatorAcaPyInvitationUrl(String deviceId, Long userId) {
     log.info("Mediator ACA-Py 초대장 생성 요청: userId={}", userId);
     CreateInvitationRequest mediatorRequest =
-            CreateInvitationRequest.forUserDevice(userId, deviceId);
-    CreateInvitationResponse mediatorAcapyResponse = remoteMediatorAcaPyService.createInvitation(mediatorRequest);
+        CreateInvitationRequest.forUserDevice(userId, deviceId);
+    CreateInvitationResponse mediatorAcapyResponse =
+        remoteMediatorAcaPyService.createInvitation(mediatorRequest);
 
     if (mediatorAcapyResponse == null || mediatorAcapyResponse.getInvitationUrl() == null) {
       log.error("Mediator ACA-Py 초대장 생성 실패: 응답이 null 이거나 URL이 없음, userId={}", userId);
@@ -213,12 +214,13 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   @Transactional
   public void UpdateConnectionId(String connectionId, String alias) throws RetryException {
     try {
-    // alias로 찾기
-    DeviceConnection deviceConnection = getDeviceConnectionByAliasOrThrow(alias);
-    deviceConnection.activate(connectionId);
-    deviceConnectionRepository.update(deviceConnection);
+      // alias로 찾기
+      DeviceConnection deviceConnection = getDeviceConnectionByAliasOrThrow(alias);
+      deviceConnection.activate(connectionId);
+      deviceConnectionRepository.update(deviceConnection);
     } catch (BusinessException e) {
-      if (e.getErrorCode().equals(CONNECTION_INVALID_STATE)) return;;
+      if (e.getErrorCode().equals(CONNECTION_INVALID_STATE))
+        return;;
     } catch (Exception e) {
       throw new RetryException("<UNK> <UNK> <UNK> <UNK> <UNK> <UNK> <UNK> <UNK>.", e);
     }
@@ -238,7 +240,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
    */
   private DeviceConnection getDeviceConnectionByAliasOrThrow(String alias) {
     DeviceConnection deviceConnection = deviceConnectionRepository.findByAlias(alias)
-            .orElseThrow(() -> new BusinessException("not found", CONNECTION_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException("not found", CONNECTION_NOT_FOUND));
 
     if (DeviceConnection.DeviceConnectionStatus.REVOKED.equals(deviceConnection.getStatus())) {
       throw new BusinessException("invalid connection", CONNECTION_INVALID_STATE);
