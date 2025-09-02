@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pyokemon.did.domain.dto.request.webhook.*;
 import com.pyokemon.did.service.UserWebhookService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/backend/webhook/user/topic")
+@Hidden
 public class UserWebhookController {
 
   private final UserWebhookService userWebhookService;
