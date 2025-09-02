@@ -20,13 +20,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.exception.GlobalExceptionHandler;
+import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.EventRegisterDto;
 import com.pyokemon.event.dto.tenant.EventResponseDto;
 import com.pyokemon.event.dto.tenant.EventScheduleDto;
 import com.pyokemon.event.dto.tenant.EventUpdateDto;
 import com.pyokemon.event.dto.tenant.TenantEventListDto;
-import com.pyokemon.event.dto.EventDetailResponseDTO;
-
 import com.pyokemon.event.service.TenantEventService;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,7 +69,6 @@ class TenantEventControllerTest {
     mockTenantEventDetail = new EventDetailResponseDTO();
     mockTenantEventDetail.setEventId(1L);
     mockTenantEventDetail.setTitle("Test Event");
-
 
 
 

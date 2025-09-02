@@ -2,8 +2,8 @@ package com.pyokemon.did.service.impl;
 
 import static com.pyokemon.did.domain.DeviceConnection.isDeviceConnectionAliasValid;
 
-import com.pyokemon.did.domain.IssuedCredentialWebhookResult;
-import com.pyokemon.did.domain.repository.IssuedCredentialWebhookResultRepository;
+import java.util.Optional;
+
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
@@ -12,15 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
 import com.pyokemon.did.common.annotation.WebhookRetryable;
+import com.pyokemon.did.domain.IssuedCredentialWebhookResult;
 import com.pyokemon.did.domain.dto.request.webhook.*;
+import com.pyokemon.did.domain.repository.IssuedCredentialWebhookResultRepository;
 import com.pyokemon.did.service.DeviceConnectionService;
 import com.pyokemon.did.service.IssuedVcService;
 import com.pyokemon.did.service.UserWebhookService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -135,11 +135,14 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     // 1. issueCredentialWebhookRequest 에서 bookingId 추출
     Long bookingId = issueCredentialWebhookRequest.extractBookingId();
     // 2. IssuedVc 조회 및 credExId 업데이트
-    Optional<IssuedCredentialWebhookResult> webhookResult = issuedCredentialWebhookResultRepository.findByCredExId(credExId);
+    Optional<IssuedCredentialWebhookResult> webhookResult =
+        issuedCredentialWebhookResultRepository.findByCredExId(credExId);
 
-    if (webhookResult.isPresent()) return;
+    if (webhookResult.isPresent())
+      return;
 
-    issuedCredentialWebhookResultRepository.save(IssuedCredentialWebhookResult.of(credExId,bookingId));
+    issuedCredentialWebhookResultRepository
+        .save(IssuedCredentialWebhookResult.of(credExId, bookingId));
 
   }
 
@@ -149,7 +152,8 @@ public class UserWebhookServiceImpl implements UserWebhookService {
   @WebhookRetryable
   public void handleLdProofWebhook(LdProofWebhookRequest ldProofWebhookRequest) {
 
-    IssuedCredentialWebhookResult webhookResult = issuedCredentialWebhookResultRepository.findByCredExId(ldProofWebhookRequest.getCredExId())
+    IssuedCredentialWebhookResult webhookResult =
+        issuedCredentialWebhookResultRepository.findByCredExId(ldProofWebhookRequest.getCredExId())
             .orElseThrow(() -> new RetryException("없당께"));
 
     Long bookingId = webhookResult.getBookingId();
@@ -167,11 +171,10 @@ public class UserWebhookServiceImpl implements UserWebhookService {
    * handleLdProofWebhook 재시도 실패 시 복구 메소드
    */
   @Recover
-  public void recoverLdProofWebhook(Exception e,
-                                    LdProofWebhookRequest ldProofWebhookRequest) {
+  public void recoverLdProofWebhook(Exception e, LdProofWebhookRequest ldProofWebhookRequest) {
     log.error(
-            "Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, cred_ex_ld_proof_id: {}, cred_id_stored: {}, error: {}",
-            ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredExLdProofId(),
-            ldProofWebhookRequest.getCredIdStored(), e.getMessage(), e);
+        "Issue Credential Webhook 처리 실패 - 최대 재시도 횟수 초과. cred_ex_id: {}, cred_ex_ld_proof_id: {}, cred_id_stored: {}, error: {}",
+        ldProofWebhookRequest.getCredExId(), ldProofWebhookRequest.getCredExLdProofId(),
+        ldProofWebhookRequest.getCredIdStored(), e.getMessage(), e);
   }
 }

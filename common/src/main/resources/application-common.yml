@@ -17,9 +17,9 @@ spring:
     
   # Kafka 공통 설정
   kafka:
-    bootstrap-servers: localhost:9092
+#    bootstrap-servers: localhost:9092
     listener:
-      ack-mode: manual_immediate
+      ack-mode: manual-immediate
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -81,7 +81,7 @@ spring:
   # Redis 설정
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:pyokemon-redis}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
       lettuce:

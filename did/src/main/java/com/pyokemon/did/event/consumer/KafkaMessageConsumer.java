@@ -1,12 +1,12 @@
 package com.pyokemon.did.event.consumer;
 
-import com.pyokemon.did.event.consumer.message.booking.BookingEventDto;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.kafka.KafkaTopicConstants;
+import com.pyokemon.did.event.consumer.message.booking.BookingEventDto;
 import com.pyokemon.did.service.AcaPyConnectionService;
 import com.pyokemon.did.service.IssuedVcService;
 
@@ -21,8 +21,7 @@ public class KafkaMessageConsumer {
   private final IssuedVcService issuedVcService;
 
   @KafkaListener(topics = KafkaTopicConstants.BOOKING_STATUS_UPDATED,
-      groupId = "${spring.application.name}",
-  containerFactory = "kafkaListenerContainerFactory")
+      groupId = "${spring.application.name}", containerFactory = "kafkaListenerContainerFactory")
   void handleBookingEvent(BookingEventDto event) {
     log.info("Received booking event: {}", event);
 

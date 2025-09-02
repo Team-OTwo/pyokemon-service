@@ -3,9 +3,9 @@ package com.pyokemon.did.domain.repository;
 import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import com.pyokemon.did.domain.IssuedProof;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IssuedProofRepository extends CrudRepository<IssuedProof, Long> {
@@ -24,5 +24,5 @@ public interface IssuedProofRepository extends CrudRepository<IssuedProof, Long>
    *
    * @param presExId The presentation exchange ID of the entity to delete.
    */
-  //void deleteByPresExId(String presExId);
+  // void deleteByPresExId(String presExId);
 }

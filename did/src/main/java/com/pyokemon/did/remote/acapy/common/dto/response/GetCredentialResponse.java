@@ -1,4 +1,5 @@
 package com.pyokemon.did.remote.acapy.common.dto.response;
+
 import com.pyokemon.did.remote.acapy.common.dto.request.credential.BaseCredential;
 
 import lombok.*;
@@ -11,4 +12,3 @@ import lombok.*;
 public class GetCredentialResponse extends BaseCredential {
 
 }
-

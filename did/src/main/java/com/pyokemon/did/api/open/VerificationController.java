@@ -48,7 +48,8 @@ public class VerificationController {
 
   @GetMapping("/{pres_ex_id}")
   public ResponseEntity<ResponseDto<HandleVerificationResponse>> handleVerification(
-      @PathVariable(name = "pres_ex_id") String presExId, @RequestBody @Valid HandleVerificationRequest request) {
+      @PathVariable(name = "pres_ex_id") String presExId,
+      @RequestBody @Valid HandleVerificationRequest request) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     HandleVerificationResponse response =
         verificationService.handleVerification(tenantId, presExId, request);

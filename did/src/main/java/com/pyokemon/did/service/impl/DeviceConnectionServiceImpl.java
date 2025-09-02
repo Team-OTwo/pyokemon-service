@@ -218,9 +218,9 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     // alias로 찾기
     DeviceConnection deviceConnection = deviceConnectionRepository.findByAlias(alias)
-//        .orElseThrow(() -> new BusinessException(
-//            "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
-//            "DEVICE_CONNECTION_NOT_FOUND"));
+        // .orElseThrow(() -> new BusinessException(
+        // "DeviceConnection not found for connection_id: " + connectionId + " or alias: " + alias,
+        // "DEVICE_CONNECTION_NOT_FOUND"));
         .orElseThrow(() -> new RetryException("retry - device connection not found"));
 
     // connectionId 저장, active로 상태 바꾸기
