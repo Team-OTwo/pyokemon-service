@@ -63,7 +63,7 @@ public class UserWebhookServiceImpl implements UserWebhookService {
     log.info("Connection webhook - state: '{}', alias: '{}', connection_id: '{}'", state, alias,
         connectionId);
 
-    deviceConnectionService.findAndUpdateConnectionId(connectionId, alias);
+    deviceConnectionService.UpdateConnectionId(connectionId, alias);
   }
 
   /**

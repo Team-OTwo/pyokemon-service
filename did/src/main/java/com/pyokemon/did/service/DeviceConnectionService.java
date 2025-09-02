@@ -2,17 +2,18 @@ package com.pyokemon.did.service;
 
 import com.pyokemon.did.domain.DeviceConnection;
 import com.pyokemon.did.domain.dto.response.InvitationResponse;
+import org.springframework.retry.RetryException;
 
 public interface DeviceConnectionService {
 
   InvitationResponse createInvitations(Long userId);
 
-  Long getUserIdByDidOrThrow(String did);
+  Long getUserIdByPublicDidOrThrow(String did);
 
-  DeviceConnection findByDeviceIdOrThrow(String deviceId);
+  DeviceConnection getDeviceConnectionByDeviceIdOrThrow(String deviceId);
 
   void updatePublicDid(String connectionId, String content);
 
-  void findAndUpdateConnectionId(String connectionId, String alias);
+  void UpdateConnectionId(String connectionId, String alias) throws RetryException;
 
 }
