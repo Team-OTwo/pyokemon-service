@@ -89,6 +89,8 @@ spring:
           max-active: 8
           max-idle: 8
           min-idle: 0
+  kafka:
+    bootstrap-servers: pyokemon-kafka:9092
 
 # dev 환경에서 로그 환경 변수 설정
 logging:
