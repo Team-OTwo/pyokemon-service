@@ -21,16 +21,16 @@ public class RedisController {
   private final EventScheduleRepository eventScheduleRepository;
 
   @GetMapping("/{scheduleId}/status/by-class")
-  public ResponseEntity<Map<String, Map<String, String>>> getAllSeatStatusesBySeatClass(
+  public ResponseEntity<Map<String, Integer>> getAvailableSeatCountsBySeatClass(
       @PathVariable Long scheduleId) {
-    log.info("좌석 클래스별 전체 상태 조회 요청: scheduleId={}", scheduleId);
+    log.info("좌석 클래스별 남은 좌석 개수 조회 요청: scheduleId={}", scheduleId);
 
     try {
-      Map<String, Map<String, String>> seatStatuses =
-          redisService.getAllSeatStatusesBySeatClass(scheduleId);
-      return ResponseEntity.ok(seatStatuses);
+      Map<String, Integer> availableSeatCounts =
+          redisService.getAvailableSeatCountsBySeatClass(scheduleId);
+      return ResponseEntity.ok(availableSeatCounts);
     } catch (Exception e) {
-      log.error("좌석 클래스별 전체 상태 조회 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
+      log.error("좌석 클래스별 남은 좌석 개수 조회 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
       return ResponseEntity.internalServerError().build();
     }
   }

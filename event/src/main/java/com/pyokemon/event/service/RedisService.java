@@ -333,4 +333,56 @@ public class RedisService {
     clearSeatStatus(scheduleId, seatId);
     log.info("좌석 예매 취소: scheduleId={}, seatId={}", scheduleId, seatId);
   }
+
+  public Map<String, Integer> getAvailableSeatCountsBySeatClass(Long scheduleId) {
+    try {
+      Map<String, Integer> result = new LinkedHashMap<>();
+
+      Long venueId = getVenueIdByScheduleId(scheduleId);
+      List<SeatClass> seatClasses = seatClassRepository.findByVenueId(venueId);
+
+      String holdKeyPattern = String.format("seat:hold:%d:*", scheduleId);
+      Set<String> holdKeys = redis.keys(holdKeyPattern);
+      Map<String, String> holdStatuses = new HashMap<>();
+
+      if (!holdKeys.isEmpty()) {
+        List<String> holdValues = redis.opsForValue().multiGet(holdKeys);
+        for (int i = 0; i < holdKeys.size(); i++) {
+          String key = holdKeys.toArray(new String[0])[i];
+          String value = holdValues.get(i);
+          if (value != null) {
+            String seatId = key.substring(key.lastIndexOf(":") + 1);
+            holdStatuses.put(seatId, "HELD");
+          }
+        }
+      }
+
+      for (SeatClass seatClass : seatClasses) {
+        String className = seatClass.getClassName();
+        String classKey = String.format(SEAT_CLASS_STATUS_KEY_PATTERN, scheduleId, className);
+
+        Map<Object, Object> statusMap = redis.opsForHash().entries(classKey);
+        if (!statusMap.isEmpty()) {
+          int availableCount = 0;
+          for (Map.Entry<Object, Object> entry : statusMap.entrySet()) {
+            String seatId = (String) entry.getKey();
+            String status = (String) entry.getValue();
+
+            // HELD 상태가 아니고, 빈 문자열("")이거나 null인 경우만 카운트
+            if (!holdStatuses.containsKey(seatId) && (status == null || status.isEmpty())) {
+              availableCount++;
+            }
+          }
+          result.put(className, availableCount);
+        } else {
+          result.put(className, 0);
+        }
+      }
+
+      return result;
+    } catch (Exception e) {
+      log.error("좌석 클래스별 남은 좌석 개수 조회 실패: scheduleId={}, error={}", scheduleId, e.getMessage(), e);
+      throw new RuntimeException("좌석 클래스별 남은 좌석 개수 조회에 실패했습니다: " + e.getMessage(), e);
+    }
+  }
 }
