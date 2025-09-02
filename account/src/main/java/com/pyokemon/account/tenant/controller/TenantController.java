@@ -57,7 +57,7 @@ public class TenantController {
   // 내 정보 조회 (테넌트 본인만)
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> getMyProfile() {
-    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     TenantProfileResponseDto response = tenantService.getMyTenantProfile(accountId);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
   }
@@ -66,7 +66,7 @@ public class TenantController {
   @PutMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> updateProfile(
       @Valid @RequestBody UpdateTenantProfileRequestDto request) {
-    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     TenantProfileResponseDto response = tenantService.updateMyTenantProfile(accountId, request);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 수정 성공"));
   }
@@ -74,7 +74,7 @@ public class TenantController {
   // 테넌트 계정 삭제 (테넌트 본인만)
   @DeleteMapping("/profile")
   public ResponseEntity<ResponseDto<Void>> deleteMyAccount() {
-    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    Long accountId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     tenantService.deleteMyTenantAccount(accountId);
     return ResponseEntity.ok(ResponseDto.success("테넌트 계정 삭제 성공"));
   }

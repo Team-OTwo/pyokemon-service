@@ -32,10 +32,10 @@ public class Tenant extends BaseEntity {
         .zipcode(this.zipcode).ceo(this.ceo).build();
   }
 
-  public Tenant update(UpdateTenantProfileRequestDto request) {
-    return Tenant.builder().accountId(this.accountId).name(this.name) // 기존
-        .corpId(this.corpId) // 기존 값 유지
-        .city(request.getCity()).street(request.getStreet()).zipcode(request.getZipcode())
-        .ceo(request.getCeo()).build();
+  public void update(UpdateTenantProfileRequestDto request) {
+    this.city = request.getCity();
+    this.street = request.getStreet();
+    this.zipcode = request.getZipcode();
+    this.ceo = request.getCeo();
   }
 }

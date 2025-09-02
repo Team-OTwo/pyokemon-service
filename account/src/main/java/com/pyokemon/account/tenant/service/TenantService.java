@@ -23,9 +23,11 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TenantService {
 
   private final TenantRepository tenantRepository;
@@ -42,9 +44,8 @@ public class TenantService {
       Account account = accountService.registerAccount(request.toAccount());
       Tenant tenant = request.toTenant(account.getId());
 
-      remoteDidService.registerWallet(RegisterWalletRequest.of(account.getId(), TENANT));
+      // remoteDidService.registerWallet(RegisterWalletRequest.of(account.getId(), TENANT));
       tenantRepository.insert(tenant);
-
       return tenant.to(account.getLoginId());
 
     } catch (BusinessException e) {
@@ -70,10 +71,10 @@ public class TenantService {
     Tenant tenant = getTenantById(tenantId);
     Account account = accountService.getAccountById(tenant.getAccountId());
 
-    Tenant updatedTenant = tenant.update(request);
-    tenantRepository.update(updatedTenant);
+    tenant.update(request);
+    tenantRepository.update(tenant);
 
-    return updatedTenant.to(account.getLoginId());
+    return tenant.to(account.getLoginId());
   }
 
   @Transactional
@@ -101,10 +102,18 @@ public class TenantService {
     Tenant tenant = getTenantByAccountId(accountId);
     Account account = accountService.getAccountById(tenant.getAccountId());
 
-    Tenant updatedTenant = tenant.update(request);
-    tenantRepository.update(updatedTenant);
+    log.info("업데이트 전 Tenant ID: {}, City: {}, Street: {}", tenant.getId(), tenant.getCity(),
+        tenant.getStreet());
 
-    return updatedTenant.to(account.getLoginId());
+    tenant.update(request);
+
+    log.info("업데이트 후 Tenant ID: {}, City: {}, Street: {}", tenant.getId(), tenant.getCity(),
+        tenant.getStreet());
+
+    int result = tenantRepository.update(tenant);
+    log.info("업데이트 결과: {} 행이 영향받음", result);
+
+    return tenant.to(account.getLoginId());
   }
 
   @Transactional

@@ -38,7 +38,7 @@
 
     <update id="update" parameterType="com.pyokemon.account.tenant.entity.Tenant">
         UPDATE tb_tenant 
-        SET name = #{name}, corp_id = #{corpId}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}, updated_at = NOW()
+        SET name = #{name}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 
