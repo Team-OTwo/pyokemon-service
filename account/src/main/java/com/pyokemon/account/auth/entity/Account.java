@@ -2,6 +2,8 @@ package com.pyokemon.account.auth.entity;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,13 +15,11 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Account extends BaseEntity {
 
-  private Long accountId;
   private String role; // USER, TENANT, ADMIN
   private String loginId;
   private String password;
   private AccountStatus status;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+
 }

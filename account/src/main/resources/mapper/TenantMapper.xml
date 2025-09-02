@@ -2,35 +2,48 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.tenant.repository.TenantRepository">
 
-    <select id="findByTenantId" resultType="com.pyokemon.account.tenant.entity.Tenant">
-        SELECT * FROM tb_tenant WHERE tenant_id = #{tenantId}
+    <resultMap id="TenantResultMap" type="com.pyokemon.account.tenant.entity.Tenant">
+        <id column="id" property="id"/>
+        <result column="account_id" property="accountId"/>
+        <result column="name" property="name"/>
+        <result column="corp_id" property="corpId"/>
+        <result column="city" property="city"/>
+        <result column="street" property="street"/>
+        <result column="zipcode" property="zipcode"/>
+        <result column="ceo" property="ceo"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findByTenantId" resultMap="TenantResultMap">
+        SELECT * FROM tb_tenant WHERE id = #{id}
     </select>
 
-    <select id="findByAccountId" resultType="com.pyokemon.account.tenant.entity.Tenant">
+    <select id="findByAccountId" resultMap="TenantResultMap">
         SELECT * FROM tb_tenant WHERE account_id = #{accountId}
     </select>
 
-    <select id="findByCorpId" resultType="com.pyokemon.account.tenant.entity.Tenant">
+    <select id="findByCorpId" resultMap="TenantResultMap">
         SELECT * FROM tb_tenant WHERE corp_id = #{corpId}
     </select>
 
-    <select id="findAll" resultType="com.pyokemon.account.tenant.entity.Tenant">
+    <select id="findAll" resultMap="TenantResultMap">
         SELECT * FROM tb_tenant ORDER BY created_at DESC
     </select>
 
-    <insert id="insert" parameterType="com.pyokemon.account.tenant.entity.Tenant" useGeneratedKeys="true" keyProperty="tenantId">
-        INSERT INTO tb_tenant (account_id, name, corp_id, city, street, zipcode, ceo)
-        VALUES (#{accountId}, #{name}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo})
+    <insert id="insert" parameterType="com.pyokemon.account.tenant.entity.Tenant" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_tenant (account_id, name, corp_id, city, street, zipcode, ceo, created_at, updated_at)
+        VALUES (#{accountId}, #{name}, #{corpId}, #{city}, #{street}, #{zipcode}, #{ceo}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.tenant.entity.Tenant">
         UPDATE tb_tenant 
-        SET name = #{name}, corp_id = #{corpId}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}
-        WHERE tenant_id = #{tenantId}
+        SET name = #{name}, corp_id = #{corpId}, city = #{city}, street = #{street}, zipcode = #{zipcode}, ceo = #{ceo}, updated_at = NOW()
+        WHERE id = #{id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_tenant WHERE tenant_id = #{tenantId}
+        DELETE FROM tb_tenant WHERE id = #{id}
     </delete>
 
 </mapper> 

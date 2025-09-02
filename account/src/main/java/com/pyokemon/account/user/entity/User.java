@@ -3,6 +3,8 @@ package com.pyokemon.account.user.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
 
   private Long userId;
   private Long accountId;
@@ -22,6 +24,5 @@ public class User {
   private String phone;
   private LocalDate birth;
   private Boolean isVerified;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+
 }

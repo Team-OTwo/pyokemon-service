@@ -15,6 +15,6 @@ public class TenantDto {
   private String name;
 
   public static TenantDto from(Tenant tenant) {
-    return TenantDto.builder().tenantId(tenant.getTenantId()).name(tenant.getName()).build();
+    return TenantDto.builder().tenantId(tenant.getId()).name(tenant.getName()).build();
   }
 }

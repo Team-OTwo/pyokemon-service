@@ -2,6 +2,8 @@ package com.pyokemon.account.tenant.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.account.tenant.entity.Tenant;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,4 +28,11 @@ public class TenantProfileResponseDto {
   private String ceo;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+
+  public static TenantProfileResponseDto of(Tenant tenant, String loginId) {
+    return TenantProfileResponseDto.builder().accountId(tenant.getAccountId()).loginId(loginId)
+        .name(tenant.getName()).corpId(tenant.getCorpId()).city(tenant.getCity())
+        .street(tenant.getStreet()).zipcode(tenant.getZipcode()).ceo(tenant.getCeo()).build();
+  }
+
 }

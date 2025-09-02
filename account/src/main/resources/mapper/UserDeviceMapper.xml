@@ -3,11 +3,11 @@
 <mapper namespace="com.pyokemon.account.user.repository.UserDeviceRepository">
 
     <select id="findByUserDeviceId" resultType="com.pyokemon.account.user.entity.UserDevice">
-        SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId}
+        SELECT * FROM tb_user_device WHERE id = #{d}
     </select>
 
     <select id="findByUserDeviceIdAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
-        SELECT * FROM tb_user_device WHERE user_device_id = #{userDeviceId} AND is_valid = #{isValid}
+        SELECT * FROM tb_user_device WHERE id = #{Id} AND is_valid = #{isValid}
     </select>
 
     <select id="findByUserId" resultType="com.pyokemon.account.user.entity.UserDevice">
@@ -46,11 +46,11 @@
     <update id="update" parameterType="com.pyokemon.account.user.entity.UserDevice">
         UPDATE tb_user_device 
         SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_login = #{isLogin}, is_valid = #{isValid}
-        WHERE user_device_id = #{userDeviceId}
+        WHERE id = #{Id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_user_device WHERE user_device_id = #{userDeviceId}
+        DELETE FROM tb_user_device WHERE id = #{Id}
     </delete>
 
     <delete id="deleteByUserIdAndDeviceNumber">

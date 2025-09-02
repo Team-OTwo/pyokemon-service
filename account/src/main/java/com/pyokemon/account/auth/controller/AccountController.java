@@ -7,16 +7,13 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
-import com.pyokemon.account.auth.dto.request.LogoutRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import com.pyokemon.account.auth.dto.response.LoginResponseDto;
 import com.pyokemon.account.auth.dto.response.TokenResponseDto;
 import com.pyokemon.account.auth.service.AccountService;
-import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.code.AccountErrorCodes;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -66,27 +63,9 @@ public class AccountController {
   public ResponseEntity<ResponseDto<Void>> changePassword(
       @Valid @RequestBody UpdatePasswordRequestDto request) {
     // 현재 로그인한 사용자의 ID를 가져옴 (헤더에서 토큰 추출 후 파싱)
-    Long accountId = getCurrentAccountId();
+    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
     accountService.changePassword(accountId, request);
     return ResponseEntity.ok(ResponseDto.success("비밀번호 변경 성공"));
   }
 
-  // 현재 로그인한 사용자의 ID를 가져오는 헬퍼 메소드
-  private Long getCurrentAccountId() {
-    try {
-      String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-      return Long.parseLong(userId);
-    } catch (Exception e) {
-      throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "인증 정보가 없습니다.");
-    }
-  }
-
-  // 현재 로그인한 사용자의 역할을 가져오는 헬퍼 메소드
-  private String getCurrentUserRole() {
-    try {
-      return GatewayRequestHeaderUtils.getUserRoleOrThrowException();
-    } catch (Exception e) {
-      throw new BusinessException(AccountErrorCodes.ACCESS_DENIED, "인증 정보가 없습니다.");
-    }
-  }
 }

@@ -38,6 +38,10 @@ spring:
           max-idle: 8
           min-idle: 0
 
+services:
+  did:
+    base-url: http://localhost:8084/did
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pyokemon.account.auth.entity,com.pyokemon.account.user.entity,com.pyokemon.account.tenant.entity,com.pyokemon.account.admin.entity

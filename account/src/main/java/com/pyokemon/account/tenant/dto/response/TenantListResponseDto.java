@@ -34,7 +34,7 @@ public class TenantListResponseDto {
 
     public static TenantSummaryDto fromTenant(com.pyokemon.account.tenant.entity.Tenant tenant,
         String loginId) {
-      return TenantSummaryDto.builder().tenantId(tenant.getTenantId())
+      return TenantSummaryDto.builder().tenantId(tenant.getId())
           .loginId(loginId != null ? loginId : "N/A").name(tenant.getName())
           .corpId(tenant.getCorpId()).city(tenant.getCity()).createdAt(tenant.getCreatedAt())
           .build();

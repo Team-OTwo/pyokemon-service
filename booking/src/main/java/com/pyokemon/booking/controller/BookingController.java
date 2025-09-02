@@ -8,6 +8,7 @@ import com.pyokemon.booking.dto.response.AccountIdResponse;
 import com.pyokemon.booking.dto.response.BookingResponse;
 import com.pyokemon.booking.dto.response.EventScheduleIdResponse;
 import com.pyokemon.booking.service.BookingService;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,22 +27,23 @@ public class BookingController {
   }
 
   @GetMapping("/account")
-  public ResponseEntity<AccountIdResponse> getBookingsByAccountId(
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
+  public ResponseEntity<AccountIdResponse> getBookingsByAccountId() {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     AccountIdResponse response = bookingService.getBookingsByAccountId(accountId);
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/booking")
-  public ResponseEntity<BookingResponse> createBooking(@RequestBody BookingRequest request,
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
+  public ResponseEntity<BookingResponse> createBooking(@RequestBody BookingRequest request) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
+
     BookingResponse booking = bookingService.createBooking(request, accountId);
     return ResponseEntity.ok(booking);
   }
 
   @DeleteMapping("/booking/{eventScheduleId}")
-  public ResponseEntity<Void> cancelBooking(@PathVariable Long eventScheduleId,
-      @RequestHeader("X-Auth-AccountId") Long accountId) {
+  public ResponseEntity<Void> cancelBooking(@PathVariable Long eventScheduleId) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     bookingService.cancelBooking(eventScheduleId, accountId);
     return ResponseEntity.ok().build();
   }

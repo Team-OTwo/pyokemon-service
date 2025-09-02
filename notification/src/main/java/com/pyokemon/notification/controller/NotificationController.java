@@ -6,6 +6,7 @@ import org.apache.coyote.Response;
 import org.springframework.web.bind.annotation.*;
 
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.notification.dto.NotificationListResponseDto;
 import com.pyokemon.notification.dto.NotificationListResponseDtoApp;
 import com.pyokemon.notification.dto.NotificationResponseDto;
@@ -27,8 +28,8 @@ public class NotificationController {
   // 앱 알림 조회
   @GetMapping
   public ResponseDto<NotificationListResponseDtoApp> getNotificationListApp(
-      @RequestHeader(value = "X-Auth-AccountId") Long accountId,
       @RequestParam(required = false) Long cursorId, @RequestParam(defaultValue = "8") int size) {
+    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     NotificationListResponseDtoApp notifications =
         notificationService.getNotificationListApp(accountId, cursorId, size);
     return ResponseDto.success(notifications, "알람조회가 완료 되었습니다.");

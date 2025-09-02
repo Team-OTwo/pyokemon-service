@@ -1,7 +1,6 @@
 package com.pyokemon.account.auth.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,16 +16,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.pyokemon.account.auth.dto.request.AppLoginRequestDto;
 import com.pyokemon.account.auth.dto.request.LoginRequestDto;
-import com.pyokemon.account.auth.dto.request.LogoutRequestDto;
 import com.pyokemon.account.auth.dto.request.UpdatePasswordRequestDto;
 import com.pyokemon.account.auth.dto.response.AppLoginResponseDto;
 import com.pyokemon.account.auth.dto.response.LoginResponseDto;
 import com.pyokemon.account.auth.dto.response.TokenResponseDto;
 import com.pyokemon.account.auth.service.AccountService;
-import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.common.exception.code.AccountErrorCodes;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {

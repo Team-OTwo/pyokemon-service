@@ -9,7 +9,7 @@ import com.pyokemon.account.admin.entity.Admin;
 @Mapper
 public interface AdminRepository {
 
-  Optional<Admin> findByAdminId(Long adminId);
+  Optional<Admin> findByAdminId(Long id);
 
   Optional<Admin> findByAccountId(Long accountId);
 
@@ -17,5 +17,5 @@ public interface AdminRepository {
 
   int update(Admin admin);
 
-  int delete(Long adminId);
+  int delete(Long id);
 }

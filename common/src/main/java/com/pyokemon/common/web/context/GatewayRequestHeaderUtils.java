@@ -28,6 +28,12 @@ public class GatewayRequestHeaderUtils {
       throw new BusinessException("사용자 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }
 
+    // role이 USER인지 확인
+    String role = getUserRoleOrThrowException();
+    if (!GatewayHeaderConstants.Role.ROLE_USER.equals(role)) {
+      throw new BusinessException("테넌트만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
+    }
+
     try {
       return Long.valueOf(accountId);
     } catch (NumberFormatException e) {
@@ -59,6 +65,33 @@ public class GatewayRequestHeaderUtils {
       return Long.valueOf(tenantId);
     } catch (NumberFormatException e) {
       throw new BusinessException("테넌트 ID가 올바른 숫자 형식이 아닙니다: " + tenantId,
+          DidErrorCodes.ACCESS_DENIED);
+    }
+  }
+
+  /**
+   * Gateway에서 전달받은 관리자 ID를 Long 타입으로 반환하거나 예외를 발생시킵니다. role이 ADMIN인 경우에만 반환합니다.
+   *
+   * @return 관리자 ID (Long)
+   * @throws BusinessException 인증 정보가 없거나 숫자 형식이 아니거나 ADMIN 권한이 아닌 경우
+   */
+  public static Long getAdminIdOrThrowException() {
+    HttpServletRequest request = getCurrentRequest();
+    String adminId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
+    if (adminId == null || adminId.isEmpty()) {
+      throw new BusinessException("관리자 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
+    }
+
+    // role이 TENANT인지 확인
+    String role = getUserRoleOrThrowException();
+    if (!GatewayHeaderConstants.Role.ROLE_ADMIN.equals(role)) {
+      throw new BusinessException("관리자만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
+    }
+
+    try {
+      return Long.valueOf(adminId);
+    } catch (NumberFormatException e) {
+      throw new BusinessException("관리자 ID가 올바른 숫자 형식이 아닙니다: " + adminId,
           DidErrorCodes.ACCESS_DENIED);
     }
   }
@@ -119,21 +152,19 @@ public class GatewayRequestHeaderUtils {
    * @return 사용자 ID
    * @throws BusinessException role이 USER가 아닌 경우
    */
-  public static String getAccountId() {
+  public static Long getAccountIdOrThrow() {
     HttpServletRequest request = getCurrentRequest();
     String accountId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
-
     if (accountId == null || accountId.isEmpty()) {
       throw new BusinessException("사용자 인증 정보가 없습니다.", DidErrorCodes.ACCESS_DENIED);
     }
 
-    // role이 USER인지 확인
-    String role = getUserRoleOrThrowException();
-    if (!GatewayHeaderConstants.Role.ROLE_USER.equals(role)) {
-      throw new BusinessException("일반 사용자만 접근할 수 있습니다.", DidErrorCodes.PERMISSION_DENIED);
+    try {
+      return Long.valueOf(accountId);
+    } catch (NumberFormatException e) {
+      throw new BusinessException("사용자 ID가 올바른 숫자 형식이 아닙니다: " + accountId,
+          DidErrorCodes.ACCESS_DENIED);
     }
-
-    return accountId;
   }
 
   /**

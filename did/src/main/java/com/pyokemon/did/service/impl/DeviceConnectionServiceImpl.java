@@ -11,9 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.DidErrorCodes;
-import com.pyokemon.did.common.web.context.GatewayRequestHeaderUtils;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.DeviceConnection;
-import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.response.InvitationResponse;
 import com.pyokemon.did.domain.repository.DeviceConnectionRepository;
 import com.pyokemon.did.remote.acapy.common.dto.request.CreateInvitationRequest;

@@ -6,13 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pyokemon.account.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.account.tenant.dto.request.TenantRegisterRequestDto;
 import com.pyokemon.account.tenant.dto.request.UpdateTenantProfileRequestDto;
 import com.pyokemon.account.tenant.dto.response.TenantListResponseDto;
 import com.pyokemon.account.tenant.dto.response.TenantProfileResponseDto;
 import com.pyokemon.account.tenant.service.TenantService;
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,10 +57,8 @@ public class TenantController {
   // 내 정보 조회 (테넌트 본인만)
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> getMyProfile() {
-    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-    Long accountId = Long.parseLong(currentUserAccountId);
-    TenantProfileResponseDto response =
-        tenantService.getMyTenantProfile(accountId, currentUserAccountId);
+    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    TenantProfileResponseDto response = tenantService.getMyTenantProfile(accountId);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 조회 성공"));
   }
 
@@ -68,19 +66,16 @@ public class TenantController {
   @PutMapping("/profile")
   public ResponseEntity<ResponseDto<TenantProfileResponseDto>> updateProfile(
       @Valid @RequestBody UpdateTenantProfileRequestDto request) {
-    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-    Long accountId = Long.parseLong(currentUserAccountId);
-    TenantProfileResponseDto response =
-        tenantService.updateMyTenantProfile(accountId, request, currentUserAccountId);
+    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    TenantProfileResponseDto response = tenantService.updateMyTenantProfile(accountId, request);
     return ResponseEntity.ok(ResponseDto.success(response, "내 정보 수정 성공"));
   }
 
   // 테넌트 계정 삭제 (테넌트 본인만)
   @DeleteMapping("/profile")
   public ResponseEntity<ResponseDto<Void>> deleteMyAccount() {
-    String currentUserAccountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-    Long accountId = Long.parseLong(currentUserAccountId);
-    tenantService.deleteMyTenantAccount(accountId, currentUserAccountId);
+    Long accountId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+    tenantService.deleteMyTenantAccount(accountId);
     return ResponseEntity.ok(ResponseDto.success("테넌트 계정 삭제 성공"));
   }
 }
