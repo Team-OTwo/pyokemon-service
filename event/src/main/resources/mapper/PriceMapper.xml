@@ -15,7 +15,7 @@
         ORDER BY sc.priority
     </select>
 
-    <insert id="save" parameterType="Price" useGeneratedKeys="true" keyProperty="priceId" keyColumn="price_id">
+    <insert id="save" parameterType="Price" useGeneratedKeys="true" keyProperty="id" keyColumn="price_id">
         INSERT INTO tb_price (
             event_schedule_id, 
             seat_class_id, 
@@ -26,10 +26,10 @@
             #{eventScheduleId}, 
             #{seatClassId}, 
             #{price}, 
-            #{createdAt},
-            #{updatedAt}
+            NOW(),
+            NOW()
         )
-                 <selectKey resultType="long" keyProperty="priceId" order="AFTER">
+                 <selectKey resultType="long" keyProperty="id" order="AFTER">
              SELECT LAST_INSERT_ID()
          </selectKey>
      </insert>
@@ -38,9 +38,8 @@
          UPDATE tb_price SET
              seat_class_id = #{seatClassId},
              price = #{price},
-             updated_at = #{updatedAt}
-         WHERE price_id = #{priceId}
+             updated_at = NOW()
+         WHERE price_id = #{id}
      </update>
      
 </mapper> 
-

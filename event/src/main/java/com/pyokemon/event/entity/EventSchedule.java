@@ -2,6 +2,8 @@ package com.pyokemon.event.entity;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,14 +15,11 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventSchedule {
+public class EventSchedule extends BaseEntity {
 
-  private Long eventScheduleId;
   private Long eventId;
   private Long venueId;
   private LocalDateTime ticketOpenAt;
   private LocalDateTime eventDate;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 
 }

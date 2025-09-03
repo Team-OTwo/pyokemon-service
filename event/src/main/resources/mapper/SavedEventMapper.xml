@@ -7,7 +7,7 @@
 <mapper namespace="com.pyokemon.event.repository.SavedEventRepository">
 
 
-    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="savedEventId"
+    <insert id="save" parameterType="SavedEvent" useGeneratedKeys="true" keyProperty="id"
             keyColumn="saved_event_id">
         INSERT INTO tb_saved_event (
         event_id,
@@ -49,4 +49,3 @@
     </select>
 
 </mapper>
-

@@ -1,6 +1,6 @@
 package com.pyokemon.event.entity;
 
-import java.time.LocalDateTime;
+import com.pyokemon.common.entity.BaseEntity;
 
 import lombok.*;
 
@@ -9,10 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SavedEvent {
-  private Long savedEventId;
+public class SavedEvent extends BaseEntity {
   private Long eventId;
   private Long accountId;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 }

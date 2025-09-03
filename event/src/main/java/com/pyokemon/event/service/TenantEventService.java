@@ -5,9 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
@@ -25,6 +23,7 @@ import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
+import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -50,6 +49,26 @@ public class TenantEventService {
   private final ObjectMapper objectMapper;
   private final RedisService redisService;
   private final KafkaMessageProducer kafkaMessageProducer;
+
+  //이벤트 승인 처리
+  @Transactional
+  public void approveEvent(Long eventId) {
+    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
+        .eventId(eventId)
+        .status("APPROVED")
+        .build();
+    tenantEventRepository.cancelEvent(dto);
+  }
+
+  // 이벤트 거절 처리
+  @Transactional
+  public void rejectEvent(Long eventId) {
+    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
+        .eventId(eventId)
+        .status("REJECTED")
+        .build();
+    tenantEventRepository.cancelEvent(dto);
+  }
 
   // 파일 업로드 설정
   @Value("${app.upload.path:uploads}")
@@ -135,7 +154,7 @@ public class TenantEventService {
     // Create and save event
     Event event = mapToEvent(eventRegisterDto);
     Long eventId = saveEvent(event);
-    event.setEventId(eventId);
+    event.setId(eventId);
 
     // Create and save schedules and prices if present
     if (eventRegisterDto.getSchedules() != null) {
@@ -144,17 +163,15 @@ public class TenantEventService {
         scheduleDto.setEventId(eventId);
 
         // EventSchedule 생성 시 eventId를 직접 전달
-        EventSchedule eventSchedule =
-            EventSchedule.builder().eventId(eventId).venueId(scheduleDto.getVenueId())
-                .ticketOpenAt(scheduleDto.getTicketOpenAt()).eventDate(scheduleDto.getEventDate())
-                .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
+        EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
+            .venueId(scheduleDto.getVenueId()).ticketOpenAt(scheduleDto.getTicketOpenAt())
+            .eventDate(scheduleDto.getEventDate()).build();
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
         // Redis에 좌석 상태 초기화
         redisService.initSeatStatuses(eventScheduleId, scheduleDto.getVenueId());
 
-        // Save prices if present
         if (scheduleDto.getPrices() != null) {
           for (PriceDto priceDto : scheduleDto.getPrices()) {
             priceDto.setEventScheduleId(eventScheduleId);
@@ -175,14 +192,12 @@ public class TenantEventService {
     // EventSchedule 생성 시 eventId를 직접 전달
     EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
         .venueId(eventScheduleDto.getVenueId()).ticketOpenAt(eventScheduleDto.getTicketOpenAt())
-        .eventDate(eventScheduleDto.getEventDate()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .eventDate(eventScheduleDto.getEventDate()).build();
 
     Long eventScheduleId = saveEventSchedule(eventSchedule);
 
     redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
-    // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {
         priceDto.setEventScheduleId(eventScheduleId);
@@ -203,18 +218,20 @@ public class TenantEventService {
     }
 
     try {
-      // DTO -> Entity
       Event event = objectMapper.convertValue(eventDetail, Event.class);
 
-      // status enum 변환 필요 - EventDetailResponseDTO에는 status가 없으므로 기본값 사용
+      event.setId(eventDetail.getEventId());
       event.setStatus(Event.EventStatus.PENDING);
 
       return event;
     } catch (IllegalArgumentException e) {
-      return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
+      Event event = Event.builder().title(eventDetail.getTitle())
           .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
           .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
           .status(Event.EventStatus.PENDING).build();
+
+      event.setId(eventDetail.getEventId());
+      return event;
     }
   }
 
@@ -235,9 +252,6 @@ public class TenantEventService {
     if (updateDto.getStatus() != null) {
       event.setStatus(updateDto.getStatus());
     }
-    event.setUpdatedAt(LocalDateTime.now());
-
-    // 이벤트 정보 저장 - tenantEventRepository 사용
     tenantEventRepository.updateEvent(event);
   }
 
@@ -269,7 +283,7 @@ public class TenantEventService {
     newSchedule.setEventId(eventId);
 
     eventScheduleRepository.save(newSchedule);
-    Long newScheduleId = newSchedule.getEventScheduleId();
+    Long newScheduleId = newSchedule.getId();
 
     // 새 스케줄 추가 시 좌석 상태를 Redis에 초기화
     redisService.initSeatStatuses(newScheduleId, scheduleDto.getVenueId());
@@ -301,14 +315,24 @@ public class TenantEventService {
   }
 
   private EventSchedule mapToEventScheduleForUpdate(EventScheduleUpdateDto dto) {
-    return EventSchedule.builder().eventScheduleId(dto.getEventScheduleId())
-        .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .updatedAt(LocalDateTime.now()).build();
+    EventSchedule schedule = EventSchedule.builder().venueId(dto.getVenueId())
+        .ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate()).build();
+
+    if (dto.getEventScheduleId() != null) {
+      schedule.setId(dto.getEventScheduleId());
+    }
+
+    return schedule;
   }
 
   private Price mapToPriceForUpdate(PriceUpdateDto dto) {
-    return Price.builder().priceId(dto.getPriceId()).seatClassId(dto.getSeatClassId())
-        .price(dto.getPrice()).updatedAt(LocalDateTime.now()).build();
+    Price price = Price.builder().seatClassId(dto.getSeatClassId()).price(dto.getPrice()).build();
+
+    if (dto.getPriceId() != null) {
+      price.setId(dto.getPriceId());
+    }
+
+    return price;
   }
 
   private boolean validateVenueExists(Long venueId) {
@@ -318,19 +342,17 @@ public class TenantEventService {
   private Event mapToEvent(EventRegisterDto dto) {
     return Event.builder().accountId(dto.getAccountId()).title(dto.getTitle())
         .ageLimit(dto.getAgeLimit()).description(dto.getDescription()).genre(dto.getGenre())
-        .thumbnailUrl(dto.getThumbnailUrl()).status(dto.getStatus()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .thumbnailUrl(dto.getThumbnailUrl()).status(dto.getStatus()).build();
   }
 
   private Price mapToPrice(PriceDto dto) {
     return Price.builder().eventScheduleId(dto.getEventScheduleId())
-        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).build();
   }
 
   private EventResponseDto mapToEventResponseDto(Event event) {
     EventResponseDto responseDto = new EventResponseDto();
-    responseDto.setEventId(event.getEventId());
+    responseDto.setEventId(event.getId());
     responseDto.setAccountId(event.getAccountId());
     responseDto.setTitle(event.getTitle());
     responseDto.setAgeLimit(event.getAgeLimit());
@@ -345,12 +367,12 @@ public class TenantEventService {
 
   private Long saveEvent(Event event) {
     tenantEventRepository.save(event);
-    return event.getEventId();
+    return event.getId();
   }
 
   private Long saveEventSchedule(EventSchedule eventSchedule) {
     eventScheduleRepository.save(eventSchedule);
-    return eventSchedule.getEventScheduleId();
+    return eventSchedule.getId();
   }
 
   private Long savePrice(Price price) {
@@ -361,6 +383,38 @@ public class TenantEventService {
   public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId,
       LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
     return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit, genre);
+  }
+
+  /**
+   * 앱 커서 기반 공연 조회 (페이징 처리 포함)
+   * @param accountId 계정 ID
+   * @param cursorDate 커서 날짜
+   * @param cursorId 커서 ID
+   * @param limit 조회 제한 개수
+   * @param genre 장르
+   * @return 페이징 처리된 응답 DTO
+   */
+  public TenantEventListResponseDtoForApp getEventListForAppResponse(Long accountId,
+      LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
+    // limit + 1개를 조회하여 다음 페이지 존재 여부 확인
+    List<TenantEventDetailDtoForApp> events =
+        getEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
+
+    TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
+
+    // limit + 1개로 마지막 페이지 판단
+    if (events.size() > limit) {
+      TenantEventDetailDtoForApp lastItem = events.get(limit);
+      response.setLastCursorId(lastItem.getEventId());
+      response.setLastCursorDate(lastItem.getEventDate());
+      events = events.subList(0, limit);
+    } else {
+      response.setLastCursorId(null);
+      response.setLastCursorDate(null);
+    }
+
+    response.setEvents(events);
+    return response;
   }
 
   public void updateStatus(Long eventId, String status) {
@@ -502,10 +556,10 @@ public class TenantEventService {
       return "";
     }
 
-    // 1. Base64 이미지를 URL로 변환 (가장 중요!)
+    // Base64 이미지를 URL로 변환
     String optimized = convertBase64ImagesToUrls(html);
 
-    // 2. 불필요한 공백과 줄바꿈 제거
+    // 불필요한 공백과 줄바꿈 제거
     optimized = optimized.replaceAll("\\s+", " ").trim();
 
     return optimized;
@@ -517,7 +571,7 @@ public class TenantEventService {
       return html;
     }
 
-    // Base64 이미지 패턴 찾기: <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...">
+    // Base64 이미지 패턴 찾기
     String pattern = "<img[^>]*src=\"data:image/([^;]+);base64,([^\"]+)\"[^>]*>";
     java.util.regex.Pattern imgPattern = java.util.regex.Pattern.compile(pattern);
     java.util.regex.Matcher matcher = imgPattern.matcher(html);

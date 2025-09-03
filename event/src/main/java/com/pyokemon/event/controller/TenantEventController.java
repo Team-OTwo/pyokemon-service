@@ -12,10 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
-import com.pyokemon.event.dto.CancelEventResponseDTO;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
-import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.service.TenantEventService;
 
@@ -79,30 +77,14 @@ public class TenantEventController {
       @RequestParam(required = false) Long cursorId, @RequestParam(defaultValue = "8") int limit,
       @RequestParam(required = false) String genre) {
     Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
-    List<TenantEventDetailDtoForApp> events =
-        tenantEventService.getEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
-
-    TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
-
-    // limit + 1개로 마지막 페이지 판단
-    if (events.size() > limit) {
-      TenantEventDetailDtoForApp lastItem = events.get(limit);
-      response.setLastCursorId(lastItem.getEventId());
-      response.setLastCursorDate(lastItem.getEventDate());
-      events = events.subList(0, limit);
-    } else {
-      response.setLastCursorId(null);
-      response.setLastCursorDate(null);
-    }
-
-    response.setEvents(events);
-
+    TenantEventListResponseDtoForApp response = 
+        tenantEventService.getEventListForAppResponse(accountId, cursorDate, cursorId, limit, genre);
     return ResponseDto.success(response, "Tenant events retrieved successfully");
   }
 
   // 공연삭제
   @PostMapping("/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId) {
+  public ResponseEntity<Void> updateStatusEvent(@PathVariable Long eventId) {
     tenantEventService.updateStatus(eventId, "CANCELED");
     return ResponseEntity.ok().build();
   }

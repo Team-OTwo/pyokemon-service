@@ -2,10 +2,7 @@ package com.pyokemon.event.controller;
 
 import java.util.List;
 
-import jakarta.validation.Valid;
-
 import org.apache.ibatis.javassist.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +10,6 @@ import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.AccountErrorCodes;
 import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.event.dto.*;
-import com.pyokemon.event.repository.TenantEventRepository;
 import com.pyokemon.event.service.EventScheduleService;
 import com.pyokemon.event.service.EventService;
 import com.pyokemon.event.service.TenantEventService;
@@ -27,7 +23,6 @@ public class EventController {
   private final EventService eventService;
   private final EventScheduleService eventScheduleService;
   private final TenantEventService tenantEventService;
-  private final TenantEventRepository tenantEventRepository;
 
   // 오늘 오픈 티켓
   @GetMapping("/open-today")
@@ -103,23 +98,15 @@ public class EventController {
 
   // 공연등록 승인
   @PostMapping("/approved/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateApprovedStatusEvent(
-      @PathVariable Long eventId) {
-    CancelEventResponseDTO dto = new CancelEventResponseDTO();
-    dto.setEventId(eventId);
-    dto.setStatus("APPROVED");
-    tenantEventRepository.cancelEvent(dto);
+  public ResponseEntity<Void> updateApprovedStatusEvent(@PathVariable Long eventId) {
+    tenantEventService.approveEvent(eventId);
     return ResponseEntity.ok().build();
   }
 
   // 공연등록 거절
   @PostMapping("/rejected/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateRejectedStatusEvent(
-      @PathVariable Long eventId) {
-    CancelEventResponseDTO dto = new CancelEventResponseDTO();
-    dto.setEventId(eventId);
-    dto.setStatus("REJECTED");
-    tenantEventRepository.cancelEvent(dto);
+  public ResponseEntity<Void> updateRejectedStatusEvent(@PathVariable Long eventId) {
+    tenantEventService.rejectEvent(eventId);
     return ResponseEntity.ok().build();
   }
 

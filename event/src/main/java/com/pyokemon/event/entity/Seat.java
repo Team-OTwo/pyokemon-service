@@ -1,6 +1,6 @@
 package com.pyokemon.event.entity;
 
-import java.time.LocalDateTime;
+import com.pyokemon.common.entity.BaseEntity;
 
 import lombok.*;
 
@@ -9,13 +9,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Seat {
-  private Long seatId;
+public class Seat extends BaseEntity {
   private Long venueId;
   private Long seatClassId;
   private Long floor;
   private String row;
   private String col;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 }
