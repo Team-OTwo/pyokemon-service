@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,6 +208,11 @@ public class BookingService {
   // PENDING 예약 만료 처리 스케줄러 (1분마다 실행)
   @Transactional(readOnly = false)
   @Scheduled(cron = "0 */1 * * * *")
+  @SchedulerLock(
+          name = "expirePendingBookings", // 락 이름은 유니크하게
+          lockAtMostFor = "2m",  // 2분 이상 락 유지, 장애 시 중복 실행 방지
+          lockAtLeastFor = "1m"  // 최소 1분 락 유지, 중복 실행 방지
+  )
   public void expirePendingBookings() {
     try {
       LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
