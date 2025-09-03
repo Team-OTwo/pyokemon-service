@@ -84,7 +84,7 @@ public class VerificationController {
   @GetMapping("/{pres_ex_id}")
   public ResponseEntity<ResponseDto<HandleVerificationResponse>> handleVerification(
       @Parameter(description = "검증 ID") @PathVariable(name = "pres_ex_id") String presExId,
-      @PathVariable(name="booking_id") Long bookingId) {
+      @Parameter(description = "예약 ID") @RequestParam(name = "booking_id") Long bookingId) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     HandleVerificationResponse response =
         verificationService.handleVerification(tenantId, presExId, bookingId);
