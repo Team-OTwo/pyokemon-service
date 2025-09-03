@@ -1,5 +1,6 @@
 package com.pyokemon.event;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(scanBasePackages = {"com.pyokemon"})
 @MapperScan({"com.pyokemon.event.repository", "com.pyokemon.event.bff.repository"})
 @EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 @EnableKafka
 @EnableFeignClients
 public class EventApplication {
