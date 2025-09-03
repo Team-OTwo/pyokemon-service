@@ -27,16 +27,4 @@ public class VerificationRequest {
     private String jwt;
   }
 
-  @Data
-  @Builder
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class HandleVerificationRequest {
-
-    @JsonProperty("booking_id")
-    @NotNull
-    private Long bookingId;
-
-  }
-
 }

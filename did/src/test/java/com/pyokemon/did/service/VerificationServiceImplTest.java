@@ -18,17 +18,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.pyokemon.common.exception.BusinessException;
-import com.pyokemon.did.domain.dto.request.VerificationRequest;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
-import com.pyokemon.did.domain.dto.response.VerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.remote.acapy.common.dto.response.JwtVerifyResponse;
 import com.pyokemon.did.remote.acapy.service.RemoteTenantAcaPyService;
 import com.pyokemon.did.service.impl.VerificationServiceImpl;
 
-import feign.FeignException;
-import feign.Request;
-import feign.Response;
 
 @ExtendWith(MockitoExtension.class)
 class VerificationServiceImplTest {
@@ -60,7 +55,7 @@ class VerificationServiceImplTest {
     // 테스트 데이터 설정
     request = new CreateVerificationRequest();
     request.setJwt("test.jwt.token");
-    request.setBooking_id(123L);
+    request.setBookingId(123L);
 
     tenantId = 456L;
     walletToken = "wallet_token_123";
@@ -84,7 +79,7 @@ class VerificationServiceImplTest {
         // given
         when(walletService.getWalletToken(tenantId)).thenReturn(walletToken);
         when(remoteTenantAcaPyService.jwtVerify(eq(walletToken), any())).thenReturn(jwtVerifyResponse);
-        when(deviceConnectionService.getUserIdByDidOrThrow("did:credo:test123")).thenReturn(userId);
+        when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123")).thenReturn(userId);
         when(issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, 123L)).thenReturn(vcData);
 
         // when
@@ -209,7 +204,7 @@ class VerificationServiceImplTest {
 
     when(walletService.getWalletToken(tenantId)).thenReturn(walletToken);
     when(remoteTenantAcaPyService.jwtVerify(eq(walletToken), any())).thenReturn(jwtVerifyResponse);
-    when(deviceConnectionService.getUserIdByDidOrThrow("did:credo:test123")).thenReturn(userId);
+    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123")).thenReturn(userId);
     when(issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, 123L))
         .thenReturn(invalidVcData);
 
@@ -228,7 +223,7 @@ class VerificationServiceImplTest {
 
     when(walletService.getWalletToken(tenantId)).thenReturn(walletToken);
     when(remoteTenantAcaPyService.jwtVerify(eq(walletToken), any())).thenReturn(jwtVerifyResponse);
-    when(deviceConnectionService.getUserIdByDidOrThrow("did:credo:test123")).thenReturn(userId);
+    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123")).thenReturn(userId);
     when(issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, 123L))
         .thenReturn(invalidVcData);
 
