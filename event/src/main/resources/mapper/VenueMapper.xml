@@ -5,7 +5,7 @@
     
     <select id="findById" parameterType="long" resultType="Venue">
         SELECT 
-            venue_id,
+            venue_id as id,
             venue_name,
             city,
             street,

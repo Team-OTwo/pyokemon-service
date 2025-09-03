@@ -1,6 +1,6 @@
 package com.pyokemon.event.entity;
 
-import java.time.LocalDateTime;
+import com.pyokemon.common.entity.BaseEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +13,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class Event extends BaseEntity {
 
-  private Long eventId;
   private Long accountId;
   private String title;
   private Long ageLimit;
@@ -23,8 +22,6 @@ public class Event {
   private String genre;
   private String thumbnailUrl;
   private EventStatus status;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 
   public enum EventStatus {
     APPROVED, REJECTED, PENDING, CANCELED;

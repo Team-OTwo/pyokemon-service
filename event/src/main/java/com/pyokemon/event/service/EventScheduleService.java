@@ -75,7 +75,7 @@ public class EventScheduleService {
   public void registerEventSchedule(EventScheduleDto eventScheduleDto) {
     EventSchedule eventSchedule = mapToEventSchedule(eventScheduleDto);
     eventScheduleRepository.save(eventSchedule);
-    Long eventScheduleId = eventSchedule.getEventScheduleId();
+    Long eventScheduleId = eventSchedule.getId();
 
     redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
@@ -91,14 +91,13 @@ public class EventScheduleService {
   private EventSchedule mapToEventSchedule(EventScheduleDto dto) {
     EventSchedule eventSchedule = EventSchedule.builder().eventId(dto.getEventId())
         .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
+        .build();
     return eventSchedule;
   }
 
   private Price mapToPrice(PriceDto dto) {
     return Price.builder().eventScheduleId(dto.getEventScheduleId())
-        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).build();
   }
 
   public List<BookingInfoResponseDTO> getBookingInfo(Long eventScheduleId) {
@@ -118,9 +117,9 @@ public class EventScheduleService {
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
-    List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getSeatClassId());
+    List<Seat> seats = seatRepository.findBySeatClassId(seatClass.getId());
 
-    return seats.stream().map(Seat::getSeatId).collect(Collectors.toList());
+    return seats.stream().map(Seat::getId).collect(Collectors.toList());
   }
 
   public List<SeatInfoResponseDTO> getSeatInfoByGrade(Long eventScheduleId, String seatGradeName) {
@@ -130,10 +129,10 @@ public class EventScheduleService {
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
     List<Seat> seats =
-        seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getSeatClassId());
+        seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getId());
 
     return seats.stream()
-        .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getSeatId()).col(seat.getCol())
+        .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getId()).col(seat.getCol())
             .row(seat.getRow()).seatGrade(seatClass.getClassName()).build())
         .collect(Collectors.toList());
   }

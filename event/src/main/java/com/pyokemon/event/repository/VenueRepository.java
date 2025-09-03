@@ -9,5 +9,5 @@ import com.pyokemon.event.entity.Venue;
 
 @Mapper
 public interface VenueRepository {
-  Optional<Venue> findById(Long venueId);
+  Optional<Venue> findById(Long id);
 }

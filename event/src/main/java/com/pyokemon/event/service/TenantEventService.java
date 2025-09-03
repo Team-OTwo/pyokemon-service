@@ -135,7 +135,7 @@ public class TenantEventService {
     // Create and save event
     Event event = mapToEvent(eventRegisterDto);
     Long eventId = saveEvent(event);
-    event.setEventId(eventId);
+    event.setId(eventId);
 
     // Create and save schedules and prices if present
     if (eventRegisterDto.getSchedules() != null) {
@@ -147,7 +147,7 @@ public class TenantEventService {
         EventSchedule eventSchedule =
             EventSchedule.builder().eventId(eventId).venueId(scheduleDto.getVenueId())
                 .ticketOpenAt(scheduleDto.getTicketOpenAt()).eventDate(scheduleDto.getEventDate())
-                .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
+                .build();
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
@@ -175,8 +175,7 @@ public class TenantEventService {
     // EventSchedule 생성 시 eventId를 직접 전달
     EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
         .venueId(eventScheduleDto.getVenueId()).ticketOpenAt(eventScheduleDto.getTicketOpenAt())
-        .eventDate(eventScheduleDto.getEventDate()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .eventDate(eventScheduleDto.getEventDate()).build();
 
     Long eventScheduleId = saveEventSchedule(eventSchedule);
 
@@ -206,15 +205,19 @@ public class TenantEventService {
       // DTO -> Entity
       Event event = objectMapper.convertValue(eventDetail, Event.class);
 
+      event.setId(eventDetail.getEventId());
       // status enum 변환 필요 - EventDetailResponseDTO에는 status가 없으므로 기본값 사용
       event.setStatus(Event.EventStatus.PENDING);
 
       return event;
     } catch (IllegalArgumentException e) {
-      return Event.builder().eventId(eventDetail.getEventId()).title(eventDetail.getTitle())
+      Event event = Event.builder().title(eventDetail.getTitle())
           .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
           .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
           .status(Event.EventStatus.PENDING).build();
+      
+      event.setId(eventDetail.getEventId());
+      return event;
     }
   }
 
@@ -235,7 +238,7 @@ public class TenantEventService {
     if (updateDto.getStatus() != null) {
       event.setStatus(updateDto.getStatus());
     }
-    event.setUpdatedAt(LocalDateTime.now());
+    // updatedAt은 MyBatis에서 NOW()로 자동 설정됨
 
     // 이벤트 정보 저장 - tenantEventRepository 사용
     tenantEventRepository.updateEvent(event);
@@ -269,7 +272,7 @@ public class TenantEventService {
     newSchedule.setEventId(eventId);
 
     eventScheduleRepository.save(newSchedule);
-    Long newScheduleId = newSchedule.getEventScheduleId();
+    Long newScheduleId = newSchedule.getId();
 
     // 새 스케줄 추가 시 좌석 상태를 Redis에 초기화
     redisService.initSeatStatuses(newScheduleId, scheduleDto.getVenueId());
@@ -301,14 +304,26 @@ public class TenantEventService {
   }
 
   private EventSchedule mapToEventScheduleForUpdate(EventScheduleUpdateDto dto) {
-    return EventSchedule.builder().eventScheduleId(dto.getEventScheduleId())
+    EventSchedule schedule = EventSchedule.builder()
         .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .updatedAt(LocalDateTime.now()).build();
+        .build();
+    
+    if (dto.getEventScheduleId() != null) {
+      schedule.setId(dto.getEventScheduleId());
+    }
+    
+    return schedule;
   }
 
   private Price mapToPriceForUpdate(PriceUpdateDto dto) {
-    return Price.builder().priceId(dto.getPriceId()).seatClassId(dto.getSeatClassId())
-        .price(dto.getPrice()).updatedAt(LocalDateTime.now()).build();
+    Price price = Price.builder().seatClassId(dto.getSeatClassId())
+        .price(dto.getPrice()).build();
+    
+    if (dto.getPriceId() != null) {
+      price.setId(dto.getPriceId());
+    }
+    
+    return price;
   }
 
   private boolean validateVenueExists(Long venueId) {
@@ -318,19 +333,17 @@ public class TenantEventService {
   private Event mapToEvent(EventRegisterDto dto) {
     return Event.builder().accountId(dto.getAccountId()).title(dto.getTitle())
         .ageLimit(dto.getAgeLimit()).description(dto.getDescription()).genre(dto.getGenre())
-        .thumbnailUrl(dto.getThumbnailUrl()).status(dto.getStatus()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .thumbnailUrl(dto.getThumbnailUrl()).status(dto.getStatus()).build();
   }
 
   private Price mapToPrice(PriceDto dto) {
     return Price.builder().eventScheduleId(dto.getEventScheduleId())
-        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .seatClassId(dto.getSeatClassId()).price(dto.getPrice()).build();
   }
 
   private EventResponseDto mapToEventResponseDto(Event event) {
     EventResponseDto responseDto = new EventResponseDto();
-    responseDto.setEventId(event.getEventId());
+    responseDto.setEventId(event.getId());
     responseDto.setAccountId(event.getAccountId());
     responseDto.setTitle(event.getTitle());
     responseDto.setAgeLimit(event.getAgeLimit());
@@ -345,12 +358,12 @@ public class TenantEventService {
 
   private Long saveEvent(Event event) {
     tenantEventRepository.save(event);
-    return event.getEventId();
+    return event.getId();
   }
 
   private Long saveEventSchedule(EventSchedule eventSchedule) {
     eventScheduleRepository.save(eventSchedule);
-    return eventSchedule.getEventScheduleId();
+    return eventSchedule.getId();
   }
 
   private Long savePrice(Price price) {

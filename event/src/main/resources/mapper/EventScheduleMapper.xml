@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pyokemon.event.repository.EventScheduleRepository">
-    <insert id="save" parameterType="EventSchedule" useGeneratedKeys="true" keyProperty="eventScheduleId" keyColumn="event_schedule_id">
+    <insert id="save" parameterType="EventSchedule" useGeneratedKeys="true" keyProperty="id" keyColumn="event_schedule_id">
         INSERT INTO tb_event_schedule (
             event_id,
             venue_id,
@@ -17,10 +17,10 @@
             #{venueId},
             #{ticketOpenAt},
             #{eventDate},
-            #{createdAt},
-            #{updatedAt}
+            NOW(),
+            NOW()
         )
-        <selectKey resultType="long" keyProperty="eventScheduleId" order="AFTER">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
@@ -31,8 +31,8 @@
             venue_id = #{venueId},
             ticket_open_at = #{ticketOpenAt},
             event_date = #{eventDate},
-            updated_at = #{updatedAt}
-        WHERE event_schedule_id = #{eventScheduleId}
+            updated_at = NOW()
+        WHERE event_schedule_id = #{id}
     </update>
 
     <select id="findVenueIdByEventScheduleId" resultType="long" parameterType="long">

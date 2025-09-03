@@ -83,7 +83,7 @@ public class RedisService {
 
         Map<String, String> initMap = new LinkedHashMap<>();
         for (Seat seat : classSeats) {
-          initMap.put(String.valueOf(seat.getSeatId()), "");
+          initMap.put(String.valueOf(seat.getId()), "");
         }
 
         redis.opsForHash().putAll(classKey, initMap);
@@ -229,7 +229,7 @@ public class RedisService {
     try {
       List<Seat> seats = seatRepository.findByVenueId(getVenueIdByScheduleId(scheduleId));
       Optional<Seat> seatOpt =
-          seats.stream().filter(seat -> seat.getSeatId().equals(seatId)).findFirst();
+          seats.stream().filter(seat -> seat.getId().equals(seatId)).findFirst();
 
       if (seatOpt.isEmpty()) {
         throw new IllegalArgumentException("좌석을 찾을 수 없습니다: seatId=" + seatId);
