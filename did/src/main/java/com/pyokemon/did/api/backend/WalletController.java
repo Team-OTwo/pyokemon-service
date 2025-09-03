@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pyokemon.common.dto.ResponseDto;
-import com.pyokemon.did.domain.dto.request.WalletRequest;
 import com.pyokemon.did.domain.dto.request.WalletRequest.RegisterWalletRequest;
 import com.pyokemon.did.service.WalletService;
 

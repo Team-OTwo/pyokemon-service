@@ -14,7 +14,6 @@ import com.pyokemon.did.domain.Verification;
 import com.pyokemon.did.domain.Verification.VpStatus;
 import com.pyokemon.did.domain.Wallet;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
-import com.pyokemon.did.domain.dto.request.VerificationRequest.HandleVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
 import com.pyokemon.did.domain.event.BookingVerifiedEvent;
@@ -190,15 +189,14 @@ public class VerificationServiceImpl implements VerificationService {
 
 
   @Override
-  public HandleVerificationResponse handleVerification(Long tenantId, String presExId,
-      HandleVerificationRequest request) {
+  public HandleVerificationResponse handleVerification(Long tenantId, String presExId, Long bookingId) {
 
     Verification verification = verificationRepository.findByPresExId(presExId)
         .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId,
             VP_VERIFICATION_FAILED));
 
     kafkaMessageProducer.send(BookingVerifiedEvent.Topic,
-        BookingVerifiedEvent.toEntity(request.getBookingId()));
+        BookingVerifiedEvent.toEntity(bookingId));
 
     HandleVerificationResponse response =
         new HandleVerificationResponse(verification.getStatus().toString());

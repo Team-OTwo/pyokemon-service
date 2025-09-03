@@ -9,7 +9,6 @@ import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.did.domain.dto.request.DelegateCredentialRequest;
 import com.pyokemon.did.domain.dto.request.VerificationRequest.CreateVerificationRequest;
-import com.pyokemon.did.domain.dto.request.VerificationRequest.HandleVerificationRequest;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.CreateVerificationResponse;
 import com.pyokemon.did.domain.dto.response.VerificationResponse.HandleVerificationResponse;
 import com.pyokemon.did.service.VerificationService;
@@ -85,11 +84,10 @@ public class VerificationController {
   @GetMapping("/{pres_ex_id}")
   public ResponseEntity<ResponseDto<HandleVerificationResponse>> handleVerification(
       @Parameter(description = "검증 ID") @PathVariable(name = "pres_ex_id") String presExId,
-      @Parameter(description = "검증 처리 요청 정보") @RequestBody
-      @Valid HandleVerificationRequest request) {
+      @PathVariable(name="booking_id") Long bookingId) {
     Long tenantId = GatewayRequestHeaderUtils.getTenantIdOrThrowException();
     HandleVerificationResponse response =
-        verificationService.handleVerification(tenantId, presExId, request);
+        verificationService.handleVerification(tenantId, presExId, bookingId);
     return ResponseEntity.ok(ResponseDto.success(response, "검증 처리 완료"));
   }
 }
