@@ -5,9 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
@@ -52,6 +50,26 @@ public class TenantEventService {
   private final RedisService redisService;
   private final KafkaMessageProducer kafkaMessageProducer;
 
+  //이벤트 승인 처리
+  @Transactional
+  public void approveEvent(Long eventId) {
+    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
+        .eventId(eventId)
+        .status("APPROVED")
+        .build();
+    tenantEventRepository.cancelEvent(dto);
+  }
+
+  // 이벤트 거절 처리
+  @Transactional
+  public void rejectEvent(Long eventId) {
+    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
+        .eventId(eventId)
+        .status("REJECTED")
+        .build();
+    tenantEventRepository.cancelEvent(dto);
+  }
+
   // 파일 업로드 설정
   @Value("${app.upload.path:uploads}")
   private String uploadPath;
@@ -81,11 +99,10 @@ public class TenantEventService {
   }
 
   @Transactional
-  public EventResponseDto updateEvent(Long eventId, EventUpdateDto eventUpdateDto) {
-    eventUpdateDto.setEventId(eventId);
-    Event existingEvent = findEventById(eventId);
+  public EventResponseDto updateEvent(EventUpdateDto eventUpdateDto) {
+    Event existingEvent = findEventById(eventUpdateDto.getEventId());
     if (existingEvent == null) {
-      throw new BusinessException("Event not found with id: " + eventId,
+      throw new BusinessException("Event not found with id: " + eventUpdateDto.getEventId(),
           "EVENT_NOT_FOUND");
     }
 
@@ -155,7 +172,6 @@ public class TenantEventService {
         // Redis에 좌석 상태 초기화
         redisService.initSeatStatuses(eventScheduleId, scheduleDto.getVenueId());
 
-        // Save prices if present
         if (scheduleDto.getPrices() != null) {
           for (PriceDto priceDto : scheduleDto.getPrices()) {
             priceDto.setEventScheduleId(eventScheduleId);
@@ -182,7 +198,6 @@ public class TenantEventService {
 
     redisService.initSeatStatuses(eventScheduleId, eventScheduleDto.getVenueId());
 
-    // Save prices if present
     if (eventScheduleDto.getPrices() != null) {
       for (PriceDto priceDto : eventScheduleDto.getPrices()) {
         priceDto.setEventScheduleId(eventScheduleId);
@@ -379,11 +394,11 @@ public class TenantEventService {
    * @param genre 장르
    * @return 페이징 처리된 응답 DTO
    */
-  public TenantEventListResponseDtoForApp getEventListForAppWithPaging(Long accountId,
+  public TenantEventListResponseDtoForApp getEventListForAppResponse(Long accountId,
       LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
     // limit + 1개를 조회하여 다음 페이지 존재 여부 확인
     List<TenantEventDetailDtoForApp> events =
-        tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
+        getEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
 
     TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
 
@@ -541,10 +556,12 @@ public class TenantEventService {
       return "";
     }
 
-    // Base64 이미지를 URL로 변환 (가장 중요!)
+    // Base64 이미지를 URL로 변환
     String optimized = convertBase64ImagesToUrls(html);
+
     // 불필요한 공백과 줄바꿈 제거
     optimized = optimized.replaceAll("\\s+", " ").trim();
+
     return optimized;
   }
 
@@ -558,6 +575,7 @@ public class TenantEventService {
     String pattern = "<img[^>]*src=\"data:image/([^;]+);base64,([^\"]+)\"[^>]*>";
     java.util.regex.Pattern imgPattern = java.util.regex.Pattern.compile(pattern);
     java.util.regex.Matcher matcher = imgPattern.matcher(html);
+
     StringBuffer result = new StringBuffer();
 
     while (matcher.find()) {

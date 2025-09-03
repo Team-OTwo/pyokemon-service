@@ -12,10 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.pyokemon.common.dto.ResponseDto;
 import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
-import com.pyokemon.event.dto.CancelEventResponseDTO;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
-import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
 import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.service.TenantEventService;
 
@@ -57,7 +55,8 @@ public class TenantEventController {
   @PutMapping("/{eventId}")
   public ResponseDto<EventResponseDto> updateEvent(@PathVariable Long eventId,
       @Valid @RequestBody EventUpdateDto eventUpdateDto) {
-    EventResponseDto updatedEvent = tenantEventService.updateEvent(eventId, eventUpdateDto);
+    eventUpdateDto.setEventId(eventId);
+    EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
     return ResponseDto.success(updatedEvent, "Event updated successfully");
   }
 
@@ -79,13 +78,13 @@ public class TenantEventController {
       @RequestParam(required = false) String genre) {
     Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
     TenantEventListResponseDtoForApp response = 
-        tenantEventService.getEventListForAppWithPaging(accountId, cursorDate, cursorId, limit, genre);
+        tenantEventService.getEventListForAppResponse(accountId, cursorDate, cursorId, limit, genre);
     return ResponseDto.success(response, "Tenant events retrieved successfully");
   }
 
   // 공연삭제
   @PostMapping("/{eventId}")
-  public ResponseEntity<CancelEventResponseDTO> updateStatusEvent(@PathVariable Long eventId) {
+  public ResponseEntity<Void> updateStatusEvent(@PathVariable Long eventId) {
     tenantEventService.updateStatus(eventId, "CANCELED");
     return ResponseEntity.ok().build();
   }
