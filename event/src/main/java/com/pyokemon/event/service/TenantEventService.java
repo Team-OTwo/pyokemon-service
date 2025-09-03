@@ -25,6 +25,7 @@ import com.pyokemon.event.dto.SeatPriceResponseDto;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
 import com.pyokemon.event.dto.tenant.*;
 import com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp;
+import com.pyokemon.event.dto.tenant.app.TenantEventListResponseDtoForApp;
 import com.pyokemon.event.entity.Event;
 import com.pyokemon.event.entity.EventSchedule;
 import com.pyokemon.event.entity.Price;
@@ -80,10 +81,11 @@ public class TenantEventService {
   }
 
   @Transactional
-  public EventResponseDto updateEvent(EventUpdateDto eventUpdateDto) {
-    Event existingEvent = findEventById(eventUpdateDto.getEventId());
+  public EventResponseDto updateEvent(Long eventId, EventUpdateDto eventUpdateDto) {
+    eventUpdateDto.setEventId(eventId);
+    Event existingEvent = findEventById(eventId);
     if (existingEvent == null) {
-      throw new BusinessException("Event not found with id: " + eventUpdateDto.getEventId(),
+      throw new BusinessException("Event not found with id: " + eventId,
           "EVENT_NOT_FOUND");
     }
 
@@ -144,10 +146,9 @@ public class TenantEventService {
         scheduleDto.setEventId(eventId);
 
         // EventSchedule 생성 시 eventId를 직접 전달
-        EventSchedule eventSchedule =
-            EventSchedule.builder().eventId(eventId).venueId(scheduleDto.getVenueId())
-                .ticketOpenAt(scheduleDto.getTicketOpenAt()).eventDate(scheduleDto.getEventDate())
-                .build();
+        EventSchedule eventSchedule = EventSchedule.builder().eventId(eventId)
+            .venueId(scheduleDto.getVenueId()).ticketOpenAt(scheduleDto.getTicketOpenAt())
+            .eventDate(scheduleDto.getEventDate()).build();
 
         Long eventScheduleId = saveEventSchedule(eventSchedule);
 
@@ -202,11 +203,9 @@ public class TenantEventService {
     }
 
     try {
-      // DTO -> Entity
       Event event = objectMapper.convertValue(eventDetail, Event.class);
 
       event.setId(eventDetail.getEventId());
-      // status enum 변환 필요 - EventDetailResponseDTO에는 status가 없으므로 기본값 사용
       event.setStatus(Event.EventStatus.PENDING);
 
       return event;
@@ -215,7 +214,7 @@ public class TenantEventService {
           .ageLimit(eventDetail.getAgeLimit()).description(eventDetail.getDescription())
           .genre(eventDetail.getGenre()).thumbnailUrl(eventDetail.getThumbnailUrl())
           .status(Event.EventStatus.PENDING).build();
-      
+
       event.setId(eventDetail.getEventId());
       return event;
     }
@@ -238,9 +237,6 @@ public class TenantEventService {
     if (updateDto.getStatus() != null) {
       event.setStatus(updateDto.getStatus());
     }
-    // updatedAt은 MyBatis에서 NOW()로 자동 설정됨
-
-    // 이벤트 정보 저장 - tenantEventRepository 사용
     tenantEventRepository.updateEvent(event);
   }
 
@@ -304,25 +300,23 @@ public class TenantEventService {
   }
 
   private EventSchedule mapToEventScheduleForUpdate(EventScheduleUpdateDto dto) {
-    EventSchedule schedule = EventSchedule.builder()
-        .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .build();
-    
+    EventSchedule schedule = EventSchedule.builder().venueId(dto.getVenueId())
+        .ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate()).build();
+
     if (dto.getEventScheduleId() != null) {
       schedule.setId(dto.getEventScheduleId());
     }
-    
+
     return schedule;
   }
 
   private Price mapToPriceForUpdate(PriceUpdateDto dto) {
-    Price price = Price.builder().seatClassId(dto.getSeatClassId())
-        .price(dto.getPrice()).build();
-    
+    Price price = Price.builder().seatClassId(dto.getSeatClassId()).price(dto.getPrice()).build();
+
     if (dto.getPriceId() != null) {
       price.setId(dto.getPriceId());
     }
-    
+
     return price;
   }
 
@@ -374,6 +368,38 @@ public class TenantEventService {
   public List<TenantEventDetailDtoForApp> getEventListForApp(Long accountId,
       LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
     return tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit, genre);
+  }
+
+  /**
+   * 앱 커서 기반 공연 조회 (페이징 처리 포함)
+   * @param accountId 계정 ID
+   * @param cursorDate 커서 날짜
+   * @param cursorId 커서 ID
+   * @param limit 조회 제한 개수
+   * @param genre 장르
+   * @return 페이징 처리된 응답 DTO
+   */
+  public TenantEventListResponseDtoForApp getEventListForAppWithPaging(Long accountId,
+      LocalDateTime cursorDate, Long cursorId, int limit, String genre) {
+    // limit + 1개를 조회하여 다음 페이지 존재 여부 확인
+    List<TenantEventDetailDtoForApp> events =
+        tenantEventRepository.findEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
+
+    TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
+
+    // limit + 1개로 마지막 페이지 판단
+    if (events.size() > limit) {
+      TenantEventDetailDtoForApp lastItem = events.get(limit);
+      response.setLastCursorId(lastItem.getEventId());
+      response.setLastCursorDate(lastItem.getEventDate());
+      events = events.subList(0, limit);
+    } else {
+      response.setLastCursorId(null);
+      response.setLastCursorDate(null);
+    }
+
+    response.setEvents(events);
+    return response;
   }
 
   public void updateStatus(Long eventId, String status) {
@@ -515,12 +541,10 @@ public class TenantEventService {
       return "";
     }
 
-    // 1. Base64 이미지를 URL로 변환 (가장 중요!)
+    // Base64 이미지를 URL로 변환 (가장 중요!)
     String optimized = convertBase64ImagesToUrls(html);
-
-    // 2. 불필요한 공백과 줄바꿈 제거
+    // 불필요한 공백과 줄바꿈 제거
     optimized = optimized.replaceAll("\\s+", " ").trim();
-
     return optimized;
   }
 
@@ -530,11 +554,10 @@ public class TenantEventService {
       return html;
     }
 
-    // Base64 이미지 패턴 찾기: <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...">
+    // Base64 이미지 패턴 찾기
     String pattern = "<img[^>]*src=\"data:image/([^;]+);base64,([^\"]+)\"[^>]*>";
     java.util.regex.Pattern imgPattern = java.util.regex.Pattern.compile(pattern);
     java.util.regex.Matcher matcher = imgPattern.matcher(html);
-
     StringBuffer result = new StringBuffer();
 
     while (matcher.find()) {

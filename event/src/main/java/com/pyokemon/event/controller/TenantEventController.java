@@ -57,8 +57,7 @@ public class TenantEventController {
   @PutMapping("/{eventId}")
   public ResponseDto<EventResponseDto> updateEvent(@PathVariable Long eventId,
       @Valid @RequestBody EventUpdateDto eventUpdateDto) {
-    eventUpdateDto.setEventId(eventId);
-    EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
+    EventResponseDto updatedEvent = tenantEventService.updateEvent(eventId, eventUpdateDto);
     return ResponseDto.success(updatedEvent, "Event updated successfully");
   }
 
@@ -79,24 +78,8 @@ public class TenantEventController {
       @RequestParam(required = false) Long cursorId, @RequestParam(defaultValue = "8") int limit,
       @RequestParam(required = false) String genre) {
     Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
-    List<TenantEventDetailDtoForApp> events =
-        tenantEventService.getEventListForApp(accountId, cursorDate, cursorId, limit + 1, genre);
-
-    TenantEventListResponseDtoForApp response = new TenantEventListResponseDtoForApp();
-
-    // limit + 1개로 마지막 페이지 판단
-    if (events.size() > limit) {
-      TenantEventDetailDtoForApp lastItem = events.get(limit);
-      response.setLastCursorId(lastItem.getEventId());
-      response.setLastCursorDate(lastItem.getEventDate());
-      events = events.subList(0, limit);
-    } else {
-      response.setLastCursorId(null);
-      response.setLastCursorDate(null);
-    }
-
-    response.setEvents(events);
-
+    TenantEventListResponseDtoForApp response = 
+        tenantEventService.getEventListForAppWithPaging(accountId, cursorDate, cursorId, limit, genre);
     return ResponseDto.success(response, "Tenant events retrieved successfully");
   }
 
