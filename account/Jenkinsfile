@@ -16,7 +16,7 @@ pipeline {
     // 이 파이프라인에서 사용할 환경 변수들을 정의합니다.
     environment {
         AWS_REGION     = "ap-northeast-2"
-        ECR_REPO_NAME  = "pyokemon/account" // ECR 리포지토리 이름
+        ECR_REPO_NAME  = "pyokemon/account-service" // ECR 리포지토리 이름
     }
 
     stages {
