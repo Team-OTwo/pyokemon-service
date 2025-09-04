@@ -1,7 +1,11 @@
 package com.pyokemon.event.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.pyokemon.event.dto.kafka.EventKafkaDto;
+import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,7 @@ public class EventService {
 
   private final EventRepository eventRepository;
   private final SavedEventRepository savedEventRepository;
+  private final KafkaMessageProducer kafkaMessageProducer;
 
   // 공연 상세 조회
   public EventDetailResponseDTO getEventDetail(Long eventId, Long accountId)
@@ -34,7 +39,11 @@ public class EventService {
   // 관심공연 등록
   @Transactional
   public String saveSavedEvent(Long accountId, Long eventId) {
-    Object event = eventRepository.findEventDetailByEventId(eventId);
+//    Object event = eventRepository.findEventDetailByEventId(eventId);
+    EventDetailResponseDTO event = eventRepository.findEventDetailByEventId(eventId);
+    String title = event.getTitle();
+    LocalDateTime ticketOpenAt = event.getTicketOpenAt();
+
     if (event == null) {
       return "존재하지 않는 공연입니다";
     }
@@ -48,9 +57,17 @@ public class EventService {
 
     if (exists) {
       savedEventRepository.delete(accountId, eventId);
+
+      SaveEventKafkaDto kafkaDto = new SaveEventKafkaDto(eventId, accountId, title, ticketOpenAt);
+      kafkaMessageProducer.saveEventKafka(kafkaDto);
+
       return "관심 공연에서 삭제되었습니다";
     } else {
       savedEventRepository.save(savedEvent);
+
+      SaveEventKafkaDto kafkaDto = new SaveEventKafkaDto(eventId, accountId, title, ticketOpenAt);
+      kafkaMessageProducer.saveEventKafka(kafkaDto);
+
       return "관심 공연으로 등록되었습니다";
     }
   }
