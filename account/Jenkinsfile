@@ -24,7 +24,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                     script {
                         echo "Running Gradle build..."
-                         sh "./gradlew :account-service:clean :account-service:bootJar"
+                         sh "./gradlew :account:clean :account:bootJar"
 
                         // ECR 리포지토리의 전체 URL을 구성합니다.
                         def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
