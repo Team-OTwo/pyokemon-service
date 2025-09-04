@@ -44,7 +44,13 @@ public class TenantService {
       Account account = accountService.registerAccount(request.toAccount());
       Tenant tenant = request.toTenant(account.getId());
 
-      // remoteDidService.registerWallet(RegisterWalletRequest.of(account.getId(), TENANT));
+      try {
+        remoteDidService.registerWallet(RegisterWalletRequest.of(account.getId(), TENANT));
+      } catch (Exception e) {
+        log.error("DID wallet 생성 실패: {}", e.getMessage());
+        throw new BusinessException("DID wallet 생성에 실패했습니다.", ACCOUNT_CREATION_FAILED);
+      }
+
       tenantRepository.insert(tenant);
       return tenant.to(account.getLoginId());
 

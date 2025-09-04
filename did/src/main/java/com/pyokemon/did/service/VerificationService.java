@@ -15,7 +15,6 @@ public interface VerificationService {
 
   void saveVerification(String PresExId, VpStatus status);
 
-  HandleVerificationResponse handleVerification(Long tenantId, String presExId,
-      Long bookingId);
+  HandleVerificationResponse handleVerification(Long tenantId, String presExId, Long bookingId);
 
 }

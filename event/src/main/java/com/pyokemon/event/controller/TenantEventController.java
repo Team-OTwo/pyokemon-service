@@ -77,8 +77,8 @@ public class TenantEventController {
       @RequestParam(required = false) Long cursorId, @RequestParam(defaultValue = "8") int limit,
       @RequestParam(required = false) String genre) {
     Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
-    TenantEventListResponseDtoForApp response = 
-        tenantEventService.getEventListForAppResponse(accountId, cursorDate, cursorId, limit, genre);
+    TenantEventListResponseDtoForApp response = tenantEventService
+        .getEventListForAppResponse(accountId, cursorDate, cursorId, limit, genre);
     return ResponseDto.success(response, "Tenant events retrieved successfully");
   }
 

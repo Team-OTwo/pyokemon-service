@@ -1,6 +1,8 @@
 package com.pyokemon.account.user.service;
 
 // import org.springframework.security.crypto.password.PasswordEncoder;
+import static com.pyokemon.account.remote.did.RegisterWalletRequest.AccountRole.USER;
+
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pyokemon.account.auth.entity.Account;
 import com.pyokemon.account.auth.entity.AccountStatus;
 import com.pyokemon.account.auth.repository.AccountRepository;
+import com.pyokemon.account.remote.did.RegisterWalletRequest;
+import com.pyokemon.account.remote.did.RemoteDidService;
 import com.pyokemon.account.user.dto.request.CreateUserRequestDto;
 import com.pyokemon.account.user.dto.request.RegisterDeviceRequestDto;
 import com.pyokemon.account.user.dto.request.UpdateUserRequestDto;
@@ -25,7 +29,9 @@ import com.pyokemon.common.exception.code.AccountErrorCodes;
 import com.pyokemon.common.util.PasswordUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -34,6 +40,7 @@ public class UserService {
   private final AccountRepository accountRepository;
   private final UserDeviceRepository userDeviceRepository;
   // private final PasswordEncoder passwordEncoder;
+  private final RemoteDidService remoteDidService;
   private final PasswordUtil passwordUtil;
 
   // 계정 생성
@@ -58,6 +65,14 @@ public class UserService {
         .phone(request.getPhone()).birth(request.getBirth()).isVerified(false).build();
 
     userRepository.insert(user);
+
+    try {
+      remoteDidService.registerWallet(RegisterWalletRequest.of(account.getId(), USER));
+    } catch (Exception e) {
+      log.error("DID wallet 생성 실패: {}", e.getMessage());
+      throw new BusinessException("DID wallet 생성에 실패했습니다.",
+          AccountErrorCodes.ACCOUNT_CREATION_FAILED);
+    }
 
     return UserDetailDto.builder().loginId(request.getLoginId()).name(request.getName())
         .phone(request.getPhone()).birth(request.getBirth()).build();

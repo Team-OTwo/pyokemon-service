@@ -204,7 +204,8 @@ class VerificationServiceImplTest {
 
     when(walletService.getWalletToken(tenantId)).thenReturn(walletToken);
     when(remoteTenantAcaPyService.jwtVerify(eq(walletToken), any())).thenReturn(jwtVerifyResponse);
-    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123")).thenReturn(userId);
+    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123"))
+        .thenReturn(userId);
     when(issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, 123L))
         .thenReturn(invalidVcData);
 
@@ -223,7 +224,8 @@ class VerificationServiceImplTest {
 
     when(walletService.getWalletToken(tenantId)).thenReturn(walletToken);
     when(remoteTenantAcaPyService.jwtVerify(eq(walletToken), any())).thenReturn(jwtVerifyResponse);
-    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123")).thenReturn(userId);
+    when(deviceConnectionService.getUserIdByPublicDidOrThrow("did:credo:test123"))
+        .thenReturn(userId);
     when(issuedVcService.sendVerifiyInviUrlOrThrow(userId, tenantId, 123L))
         .thenReturn(invalidVcData);
 
