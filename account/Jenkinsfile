@@ -25,7 +25,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                         script {
                             echo "Running Gradle build..."
-                             sh "./gradlew clean build"
+                             sh "../gradlew clean build"
 
                             echo "Checking for built JAR file..."
                             // 2. 빌드가 완료된 후, 생성된 파일을 확인합니다.
