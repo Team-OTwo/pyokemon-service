@@ -17,7 +17,7 @@ spring:
     
   # Kafka 공통 설정
   kafka:
-#    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:9092
     listener:
       ack-mode: manual-immediate
     consumer:

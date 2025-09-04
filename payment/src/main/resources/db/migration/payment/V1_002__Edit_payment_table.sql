@@ -1,6 +1,8 @@
--- tb_payment 테이블 생성
+-- 기존 테이블 삭제 및 재생성 (BaseEntity와 일치하도록 수정)
+DROP TABLE IF EXISTS tb_payment;
+
 CREATE TABLE tb_payment (
-                            payment_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            id             BIGINT AUTO_INCREMENT PRIMARY KEY,
                             booking_id     BIGINT NOT NULL,
                             event_schedule_id BIGINT NOT NULL,
                             order_id       VARCHAR(255),

@@ -2,6 +2,8 @@ package com.pyokemon.payment.entity;
 
 import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,20 +15,17 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Payment {
+public class Payment extends BaseEntity {
 
-  private Long paymentId;
   private Long bookingId;
+  private Long eventScheduleId;
   private String orderId;
   private String paymentKey;
   private String method;
   private Long amount;
   private PaymentStatus status;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 
   public enum PaymentStatus {
     READY, DONE, CANCELED, FAILED, EXPIRED
   }
-
 }

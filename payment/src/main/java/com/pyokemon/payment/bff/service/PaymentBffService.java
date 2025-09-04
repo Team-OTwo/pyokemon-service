@@ -50,7 +50,7 @@ public class PaymentBffService {
 
     // 결과를 Map으로 정리
     Map<Long, Payment> byId =
-        rows.stream().collect(Collectors.toMap(Payment::getPaymentId, Function.identity()));
+        rows.stream().collect(Collectors.toMap(Payment::getId, Function.identity()));
 
     // 누락 체크 → 기존 단건 정책 유지
     List<Long> missing =
