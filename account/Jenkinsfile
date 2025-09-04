@@ -1,10 +1,57 @@
+
+
 pipeline {
-    agent any
+        // 빌드 환경: Java 21, Gradle 8.5
+        agent {
+            docker {
+                image 'gradle:8.5-jdk21'
+                args '-v /var/run/docker.sock:/var/run/docker.sock'
+            }
+        }
+
+    // ▼▼▼ [수정 1] environment 블록에서 AWS_ACCOUNT_ID 제거 ▼▼▼
+    environment {
+        AWS_REGION     = "ap-northeast-2"
+        ECR_REPO_NAME  = "pyokemon/account"
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Build and Push to ECR') {
             steps {
-                echo 'Checking out account service source code!'
-                // 실제 checkout 로직은 Jenkins Job 설정에서 가져오므로 여기서는 비워둬도 됨
+                // ▼▼▼ [수정 2] withCredentials 블록 추가 ▼▼▼
+                // 'aws-account-id'라는 ID를 가진 Credential을 'AWS_ACCOUNT_ID' 변수로 불러옴
+                withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
+                    script {
+                        // ECR 리포지토리의 전체 주소를 만듭니다.
+                        def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
+
+                        // 이미지에 태그를 붙입니다.
+                        def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
+
+                        echo "Building Docker image: ${imageNameWithTag}"
+
+                        // Dockerfile을 사용하여 이미지를 빌드합니다.
+                        dockerImage = docker.build(imageNameWithTag, ".")
+
+                        echo "Pushing image to ECR..."
+
+                        // ECR 주소로 로그인 (IAM Role 자동 사용)
+                        docker.withRegistry("https://${ecrRepoUrl}") {
+                            dockerImage.push()
+                        }
+                        echo "Push successful."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                if (dockerImage != null) {
+                    sh "docker rmi ${dockerImage.id}"
+                }
             }
         }
     }
