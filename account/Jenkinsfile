@@ -1,16 +1,16 @@
 def dockerImage
 
 pipeline {
-    // Jenkins 에이전트 노드에서 파이프라인을 실행합니다.
-    // tools 블록에 정의된 전역 도구를 사용합니다.
+    // 특정 컨테이너를 지정하는 대신, 사용 가능한 모든 에이전트를 사용
     agent any
 
-    // Jenkins의 'Global Tool Configuration'에 설정된 도구들을 사용합니다.
+    // 전역 도구 설정을 파이프라인에 적용
     tools {
         gradle 'Gradle 8.5'
         jdk 'OpenJDK 21'
         dockerTool 'Docker'
     }
+
 
     environment {
         AWS_REGION     = "ap-northeast-2"
@@ -20,32 +20,24 @@ pipeline {
     stages {
         stage('Build and Push to ECR') {
             steps {
-                // 'account' 디렉토리로 이동하여 Gradle 빌드를 실행합니다.
                 dir('account') {
-                    // Jenkins Credentials에 저장된 AWS 계정 ID를 환경 변수로 로드합니다.
+                // Jenkins Credentials에 저장된 AWS 계정 ID를 환경 변수로 로드합니다.
                     withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                         script {
                             echo "Running Gradle build..."
-                            // account 디렉토리에서 상위 디렉토리의 gradlew 스크립트를 실행합니다.
-                            sh "../gradlew clean build"
+                             sh "../gradlew clean build"
 
-                            // ECR 리포지토리의 전체 주소를 구성합니다.
+
+                            // ECR 리포지토리의 전체 URL을 구성합니다.
                             def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
                             // 빌드 번호를 태그로 사용해 이미지 이름을 정의합니다.
                             def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
 
-                            // 'Amazon ECR' 플러그인을 사용하여 ECR에 로그인합니다.
+                            // 1. ECR에 로그인 (플러그인 사용)
                             echo "Logging in to ECR using Amazon ECR Plugin..."
                             ecrLogin()
 
-                            echo "Building Docker image: ${imageNameWithTag}"
-                            // Dockerfile을 이용해 이미지를 빌드합니다.
-                            dockerImage = docker.build(imageNameWithTag, ".")
-
-                            echo "Pushing image to ECR..."
-                            // ECR로 이미지를 푸시합니다.
-                            dockerImage.push()
-
+//                           g
                             echo "Push successful."
                         }
                     }
