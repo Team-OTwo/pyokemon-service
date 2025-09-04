@@ -13,11 +13,11 @@ public interface PaymentRepository {
 
   void updatePaymentFailed(String orderId, String status, String method);
 
-  Payment selectByOrderId(String orderId);
+  Payment findByOrderId(String orderId);
 
   void cancelPayment(String orderId, String status);
 
-  Payment selectLatestByBookingId(Long bookingId);
+  Payment findLatestByBookingId(Long bookingId);
 
-  Payment selectByOrderIdStatus(String orderId);
+  Payment findByOrderIdAndStatus(String orderId);
 }

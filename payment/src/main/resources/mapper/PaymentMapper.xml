@@ -5,11 +5,24 @@
 
 <mapper namespace="com.pyokemon.payment.repository.PaymentRepository">
 
-    <insert id="insertInitiatePayment" parameterType="com.pyokemon.payment.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
+    <resultMap id="PaymentResultMap" type="com.pyokemon.payment.entity.Payment">
+        <id column="id" property="id"/>
+        <result column="booking_id" property="bookingId"/>
+        <result column="event_schedule_id" property="eventScheduleId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="payment_key" property="paymentKey"/>
+        <result column="method" property="method"/>
+        <result column="amount" property="amount"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insertInitiatePayment" parameterType="com.pyokemon.payment.dto.PaymentDto" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_payment (
-            booking_id, order_id, amount, method, status, event_schedule_id
+            booking_id, order_id, amount, method, status, event_schedule_id, created_at, updated_at
         ) VALUES (
-                     #{bookingId}, #{orderId}, #{amount}, #{method}, #{status}, #{eventScheduleId}
+                     #{bookingId}, #{orderId}, #{amount}, #{method}, #{status}, #{eventScheduleId}, NOW(), NOW()
                  )
     </insert>
 
@@ -25,9 +38,8 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <select id="selectByOrderId" parameterType="string" resultType="Payment">
-        SELECT payment_id, booking_id, payment_key, status
-        FROM tb_payment
+    <select id="findByOrderId" parameterType="string" resultMap="PaymentResultMap">
+        SELECT * FROM tb_payment
         WHERE order_id = #{orderId}
     </select>
 
@@ -37,15 +49,15 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <select id="selectLatestByBookingId" resultType="Payment">
-        SELECT payment_id, booking_id, order_id, payment_key, status
-        FROM tb_payment
+    <select id="findLatestByBookingId" resultMap="PaymentResultMap">
+        SELECT * FROM tb_payment
         WHERE booking_id = #{bookingId}
+        ORDER BY created_at DESC
+        LIMIT 1
     </select>
 
-    <select id="selectByOrderIdStatus" parameterType="string" resultType="Payment">
-        SELECT status
-        FROM tb_payment
+    <select id="findByOrderIdAndStatus" parameterType="string" resultMap="PaymentResultMap">
+        SELECT * FROM tb_payment
         WHERE order_id = #{orderId}
     </select>
 

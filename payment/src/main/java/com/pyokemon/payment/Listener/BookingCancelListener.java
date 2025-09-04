@@ -4,8 +4,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import com.pyokemon.payment.dto.kafka.BookingEventDto;
-import com.pyokemon.payment.service.PaymentCancelService;
-import com.pyokemon.payment.service.PaymentExpiredService;
+import com.pyokemon.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BookingCancelListener {
 
-  private final PaymentCancelService paymentCancelService;
-  private final PaymentExpiredService paymentExpiredService;
+  private final PaymentService paymentService;
 
   @KafkaListener(
       topics = "#{T(com.pyokemon.common.kafka.KafkaTopicConstants).BOOKING_STATUS_UPDATED}",
@@ -39,10 +37,10 @@ public class BookingCancelListener {
     }
 
     if ("EXPIRED".equals(status)) {
-      paymentExpiredService.expireByBookingId(bookingEvent.getBookingId(), "예약 만료");
+      paymentService.expireByBookingId(bookingEvent.getBookingId(), "예약 만료");
       log.info("예약 만료 처리 완료: {}", bookingEvent.getBookingId());
     } else if ("CANCELED".equals(status)) {
-      paymentCancelService.cancelByBookingId(bookingEvent.getBookingId(), "예약 취소 요청");
+      paymentService.cancelByBookingId(bookingEvent.getBookingId(), "예약 취소 요청");
       log.info("예약 취소 처리 완료: {}", bookingEvent.getBookingId());
     }
   }
