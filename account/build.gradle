@@ -27,5 +27,5 @@ tasks.named('test') {
 
 // JAR 파일 이름 설정
 bootJar {
-    archiveFileName = "account-0.0.1.jar"
+    archiveFileName = "account-0.0.2.jar"
 } 
