@@ -40,7 +40,7 @@ public class EventController {
   @GetMapping("/{eventId}")
   public ResponseEntity<EventDetailResponseDTO> getEventDetail(@PathVariable Long eventId)
       throws NotFoundException {
-    Long accountId = GatewayRequestHeaderUtils.getAccountIdOrThrow();
+    Long accountId = GatewayRequestHeaderUtils.getAccountId();
     EventDetailResponseDTO dto = eventService.getEventDetail(eventId, accountId);
     return ResponseEntity.ok(dto);
   }
