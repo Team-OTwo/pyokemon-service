@@ -1,0 +1,11 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                // 실제 checkout 로직은 Jenkins Job 설정에서 가져오므로 여기서는 비워둬도 됨
+            }
+        }
+    }
+}
