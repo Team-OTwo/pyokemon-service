@@ -13,7 +13,7 @@ pipeline {
                     echo "Changed files: ${changedFiles}"
 
                     // account-service의 파일이 변경되었는지 확인
-                    if (hasServiceChanged('account-service', changedFiles)) {
+                    if (hasServiceChanged('account', changedFiles)) {
                         echo "Changes detected in account-service. Triggering build..."
                         // 'account-service-pipeline' Job을 호출
                         build job: 'account-service'
