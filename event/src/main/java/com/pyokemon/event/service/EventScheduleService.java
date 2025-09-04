@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -89,9 +90,9 @@ public class EventScheduleService {
   }
 
   private EventSchedule mapToEventSchedule(EventScheduleDto dto) {
-    EventSchedule eventSchedule = EventSchedule.builder().eventId(dto.getEventId())
-        .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .build();
+    EventSchedule eventSchedule =
+        EventSchedule.builder().eventId(dto.getEventId()).venueId(dto.getVenueId())
+            .ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate()).build();
     return eventSchedule;
   }
 
@@ -128,8 +129,7 @@ public class EventScheduleService {
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
-    List<Seat> seats =
-        seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getId());
+    List<Seat> seats = seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getId());
 
     return seats.stream()
         .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getId()).col(seat.getCol())
@@ -139,6 +139,7 @@ public class EventScheduleService {
 
 
   @Scheduled(fixedRate = 5 * 60 * 1000)
+  @SchedulerLock(name = "publishTwoHoursAheadEvents", lockAtMostFor = "10m", lockAtLeastFor = "1m")
   public void publishTwoHoursAheadEvents() {
     List<Long> upcomingIds = eventScheduleRepository.findEventScheduleIdTwoHoursLater();
     for (Long id : upcomingIds) {
