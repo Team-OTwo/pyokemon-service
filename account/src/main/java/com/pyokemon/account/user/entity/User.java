@@ -18,7 +18,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-  private Long userId;
   private Long accountId;
   private String name;
   private String phone;

@@ -10,9 +10,9 @@ import com.pyokemon.account.user.entity.UserDevice;
 @Mapper
 public interface UserDeviceRepository {
 
-  Optional<UserDevice> findByUserDeviceId(Long userDeviceId);
+  Optional<UserDevice> findById(Long id);
 
-  Optional<UserDevice> findByUserDeviceIdAndIsValid(Long userDeviceId, boolean isValid);
+  Optional<UserDevice> findByIdAndIsValid(Long id, boolean isValid);
 
   List<UserDevice> findByUserId(Long userId);
 
@@ -34,7 +34,7 @@ public interface UserDeviceRepository {
 
   int update(UserDevice userDevice);
 
-  int delete(Long userDeviceId);
+  int delete(Long id);
 
   int deleteByUserIdAndDeviceNumber(Long userId, String deviceNumber);
 }

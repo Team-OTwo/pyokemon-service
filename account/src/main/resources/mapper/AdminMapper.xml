@@ -2,27 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.admin.repository.AdminRepository">
 
-    <select id="findByAdminId" resultType="com.pyokemon.account.admin.entity.Admin">
-        SELECT * FROM tb_admin WHERE id = #{Id}
+    <resultMap id="AdminResultMap" type="com.pyokemon.account.admin.entity.Admin">
+        <id column="id" property="id"/>
+        <result column="account_id" property="accountId"/>
+        <result column="name" property="name"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findByAdminId" resultMap="AdminResultMap">
+        SELECT * FROM tb_admin WHERE id = #{id}
     </select>
 
-    <select id="findByAccountId" resultType="com.pyokemon.account.admin.entity.Admin">
+    <select id="findByAccountId" resultMap="AdminResultMap">
         SELECT * FROM tb_admin WHERE account_id = #{accountId}
     </select>
 
-    <insert id="insert" parameterType="com.pyokemon.account.admin.entity.Admin" useGeneratedKeys="true" keyProperty="Id">
-        INSERT INTO tb_admin (account_id, name)
-        VALUES (#{accountId}, #{name})
+    <insert id="insert" parameterType="com.pyokemon.account.admin.entity.Admin" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_admin (account_id, name, created_at, updated_at)
+        VALUES (#{accountId}, #{name}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.admin.entity.Admin">
         UPDATE tb_admin 
-        SET name = #{name}
-        WHERE id = #{Id}
+        SET name = #{name}, updated_at = NOW()
+        WHERE id = #{id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_admin WHERE id = #{Id}
+        DELETE FROM tb_admin WHERE id = #{id}
     </delete>
 
 </mapper> 

@@ -2,23 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.account.user.repository.UserDeviceRepository">
 
-    <select id="findByUserDeviceId" resultType="com.pyokemon.account.user.entity.UserDevice">
-        SELECT * FROM tb_user_device WHERE id = #{d}
+    <resultMap id="UserDeviceResultMap" type="com.pyokemon.account.user.entity.UserDevice">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="device_number" property="deviceNumber"/>
+        <result column="fcm_token" property="fcmToken"/>
+        <result column="os_type" property="osType"/>
+        <result column="is_login" property="isLogin"/>
+        <result column="is_valid" property="isValid"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findById" resultMap="UserDeviceResultMap">
+        SELECT * FROM tb_user_device WHERE id = #{id}
     </select>
 
-    <select id="findByUserDeviceIdAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
-        SELECT * FROM tb_user_device WHERE id = #{Id} AND is_valid = #{isValid}
+    <select id="findByIdAndIsValid" resultMap="UserDeviceResultMap">
+        SELECT * FROM tb_user_device WHERE id = #{id} AND is_valid = #{isValid}
     </select>
 
-    <select id="findByUserId" resultType="com.pyokemon.account.user.entity.UserDevice">
+    <select id="findByUserId" resultMap="UserDeviceResultMap">
         SELECT * FROM tb_user_device WHERE user_id = #{userId}
     </select>
 
-    <select id="findByUserIdAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
+    <select id="findByUserIdAndIsValid" resultMap="UserDeviceResultMap">
         SELECT * FROM tb_user_device WHERE user_id = #{userId} AND is_valid = #{isValid}
     </select>
 
-    <select id="findByUserIdAndDeviceNumberAndIsValid" resultType="com.pyokemon.account.user.entity.UserDevice">
+    <select id="findByUserIdAndDeviceNumberAndIsValid" resultMap="UserDeviceResultMap">
         SELECT * FROM tb_user_device WHERE user_id = #{userId} AND device_number = #{deviceNumber} AND is_valid = #{isValid}
     </select>
 
@@ -38,19 +50,19 @@
         SELECT COUNT(*) > 0 FROM tb_user_device WHERE user_id = #{userId}
     </select>
 
-    <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="userDeviceId">
-        INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_login, is_valid)
-        VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isLogin}, #{isValid})
+    <insert id="insert" parameterType="com.pyokemon.account.user.entity.UserDevice" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_user_device (user_id, device_number, fcm_token, os_type, is_login, is_valid, created_at, updated_at)
+        VALUES (#{userId}, #{deviceNumber}, #{fcmToken}, #{osType}, #{isLogin}, #{isValid}, NOW(), NOW())
     </insert>
 
     <update id="update" parameterType="com.pyokemon.account.user.entity.UserDevice">
         UPDATE tb_user_device 
-        SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_login = #{isLogin}, is_valid = #{isValid}
-        WHERE id = #{Id}
+        SET device_number = #{deviceNumber}, fcm_token = #{fcmToken}, os_type = #{osType}, is_login = #{isLogin}, is_valid = #{isValid}, updated_at = NOW()
+        WHERE id = #{id}
     </update>
 
     <delete id="delete">
-        DELETE FROM tb_user_device WHERE id = #{Id}
+        DELETE FROM tb_user_device WHERE id = #{id}
     </delete>
 
     <delete id="deleteByUserIdAndDeviceNumber">
