@@ -10,7 +10,7 @@ import com.pyokemon.account.user.entity.User;
 @Mapper
 public interface UserRepository {
 
-  Optional<User> findByUserId(@Param("id") Long id);
+  Optional<User> findById(@Param("id") Long id);
 
   Optional<User> findByAccountId(@Param("accountId") Long accountId);
 

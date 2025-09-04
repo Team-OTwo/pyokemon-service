@@ -13,7 +13,7 @@
         <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
-    <select id="findByUserId" resultMap="UserResultMap">
+    <select id="findById" resultMap="UserResultMap">
         SELECT * FROM tb_user WHERE id = #{id}
     </select>
 

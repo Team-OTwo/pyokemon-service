@@ -146,11 +146,11 @@ public class AccountService {
 
       User user = userOpt.get();
 
-      if (!userDeviceRepository.existsByUserIdAndIsValid(user.getUserId(), true)) {
+      if (!userDeviceRepository.existsByUserIdAndIsValid(user.getId(), true)) {
         deviceStatus = "NOT_REGISTERED";
         accessToken = tokenGenerator.generateAccessToken(account.getId(), role);
         refreshToken = tokenGenerator.generateRefreshToken(account.getId(), role);
-      } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getUserId(),
+      } else if (!userDeviceRepository.existsByUserIdAndDeviceNumberAndIsValid(user.getId(),
           request.getDeviceNumber(), true)) {
         deviceStatus = "MISMATCHED";
         return AppLoginResponseDto.builder().accountId(user.getAccountId())
@@ -159,7 +159,7 @@ public class AccountService {
 
       if (deviceStatus.equals("REGISTERED")) {
         Optional<UserDevice> userDeviceOpt =
-            userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+            userDeviceRepository.findByUserIdAndIsValid(user.getId(), true);
         if (userDeviceOpt.isEmpty()) {
           throw new BusinessException("존재하지 않는 디바이스 입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
         }
@@ -302,7 +302,7 @@ public class AccountService {
 
     if (deviceId != null) {
       Optional<UserDevice> userDeviceOpt =
-          userDeviceRepository.findByUserDeviceIdAndIsValid(deviceId, true);
+          userDeviceRepository.findByIdAndIsValid(deviceId, true);
 
       if (userDeviceOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);

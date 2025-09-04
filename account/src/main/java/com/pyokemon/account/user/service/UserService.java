@@ -86,7 +86,7 @@ public class UserService {
     User user = userOpt.get();
 
     Optional<UserDevice> userDeviceOpt =
-        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+        userDeviceRepository.findByUserIdAndIsValid(user.getId(), true);
 
     if (userDeviceOpt.isEmpty()) {
       throw new BusinessException("기기를 찾을 수 없습니다", AccountErrorCodes.DEVICE_NOT_FOUND);
@@ -129,7 +129,7 @@ public class UserService {
     }
 
     Optional<UserDevice> userDeviceOpt =
-        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true);
+        userDeviceRepository.findByUserIdAndIsValid(user.getId(), true);
 
     if (userDeviceOpt.isEmpty()) {
       throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);
@@ -144,7 +144,7 @@ public class UserService {
 
     userDeviceRepository.update(currentUserDevice);
 
-    UserDevice userDevice = UserDevice.builder().userId(user.getUserId())
+    UserDevice userDevice = UserDevice.builder().userId(user.getId())
         .deviceNumber(request.getDeviceNumber()).fcmToken(request.getFcmToken())
         .osType(request.getOsType()).isValid(true).isLogin(true).build();
 
@@ -196,7 +196,7 @@ public class UserService {
       throw new BusinessException("이미 등록된 디바이스입니다.", AccountErrorCodes.DEVICE_ALREADY_REGISTERED);
     }
 
-    UserDevice userDevice = UserDevice.builder().userId(user.getUserId())
+    UserDevice userDevice = UserDevice.builder().userId(user.getId())
         .deviceNumber(request.getDeviceNumber()).fcmToken(request.getFcmToken())
         .osType(request.getOsType()).isValid(true).isLogin(true).build();
 
@@ -212,7 +212,7 @@ public class UserService {
     User user = userOpt.get();
 
     UserDevice userDevice =
-        userDeviceRepository.findByUserIdAndIsValid(user.getUserId(), true).orElseThrow(
+        userDeviceRepository.findByUserIdAndIsValid(user.getId(), true).orElseThrow(
             () -> new BusinessException("디바이스를 찾을 수 없습니다.", AccountErrorCodes.DEVICE_NOT_FOUND));
 
     userDevice.setIsValid(false);
