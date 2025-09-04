@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PaymentDto {
-  private Long paymentId;
+  private Long id;
   private Long bookingId;
   private Long eventScheduleId;
   private String orderId;

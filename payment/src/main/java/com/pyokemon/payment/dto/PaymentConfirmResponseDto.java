@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentConfirmResponseDto {
-  private Long paymentId;
+  private Long id;
   private Long bookingId;
   private String orderId;
   private String paymentKey;
