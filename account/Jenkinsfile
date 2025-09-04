@@ -1,50 +1,59 @@
-def dockerImage
+// account/Jenkinsfile
+
+// 파이프라인 전체에서 사용할 수 있도록 변수를 미리 선언하고 null로 초기화합니다.
+def dockerImage = null
 
 pipeline {
-    // 특정 컨테이너를 지정하는 대신, 사용 가능한 모든 에이전트를 사용
+    // 사용 가능한 모든 에이전트를 사용합니다.
     agent any
 
-    // 전역 도구 설정을 파이프라인에 적용
+    // Jenkins 전역 도구 설정에서 정의된 도구들을 이 파이프라인에 적용합니다.
     tools {
         gradle 'Gradle 8.5'
         jdk 'OpenJDK 21'
-        dockerTool 'Docker'
     }
 
-
+    // 이 파이프라인에서 사용할 환경 변수들을 정의합니다.
     environment {
         AWS_REGION     = "ap-northeast-2"
-        ECR_REPO_NAME  = "pyokemon/account"
+        ECR_REPO_NAME  = "pyokemon/account" // ECR 리포지토리 이름
     }
 
     stages {
-        stage('Build and Push to ECR') {
+        // 1. 애플리케이션 빌드 스테이지
+        stage('Build Spring Boot App') {
             steps {
+                echo "Running Gradle build at project root..."
+                // 프로젝트 루트에서 gradlew를 실행하여 jar 파일을 빌드합니다.
+                sh "./gradlew clean build"
+            }
+        }
+
+        // 2. Docker 이미지 빌드 및 푸시 스테이지
+        stage('Build & Push Docker Image') {
+            steps {
+                // Dockerfile이 있는 account 디렉토리로 이동합니다.
                 dir('account') {
-                // Jenkins Credentials에 저장된 AWS 계정 ID를 환경 변수로 로드합니다.
+                    // Jenkins Credentials에 저장된 AWS 계정 ID를 안전하게 불러옵니다.
                     withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                         script {
-                            echo "Running Gradle build..."
-                             sh "../gradlew clean build"
-
-
                             // ECR 리포지토리의 전체 URL을 구성합니다.
                             def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
-                            // 빌드 번호를 태그로 사용해 이미지 이름을 정의합니다.
                             def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
-
-                            // 1. ECR에 로그인 (플러그인 사용)
-
 
                             echo "Building Docker image: ${imageNameWithTag}"
 
-
+                            // 현재 디렉토리(account/)의 Dockerfile을 사용하여 이미지를 빌드합니다.
+                            dockerImage = docker.build(imageNameWithTag, ".")
 
                             echo "Pushing image to ECR..."
 
-                            // IAM Role을 사용하여 ECR에 로그인하고, 빌드한 이미지를 푸시합니다.
-                            docker.withRegistry("https://${ecrRepoUrl}", "ecr:${AWS_REGION}:pyokemon-ecr-credential") {
-                                docker.build(imageNameWithTag, ".").push
+                            // ▼▼▼ [수정된 부분] ▼▼▼
+                            // Jenkins에 등록된 Credential을 사용하여 ECR에 로그인합니다.
+                            // 'ecr:리전:Credential-ID' 형식으로 지정합니다.
+                            docker.withRegistry("https://${ecrRepoUrl}", "ecr:${env.AWS_REGION}:pyokemon-ecr-credential") {
+                                // 안정적인 sh 명령어로 push 실행
+                                sh "docker push ${imageNameWithTag}"
                             }
                             echo "Push successful."
                         }
@@ -54,14 +63,17 @@ pipeline {
         }
     }
 
-    // 빌드가 성공하든 실패하든 관계없이 빌드가 끝나면 로컬에 남은 이미지를 삭제합니다.
+    // 빌드가 끝나면 항상 실행되는 정리 단계입니다.
     post {
         always {
             script {
+                // dockerImage 변수에 값이 할당되었을 경우에만 실행됩니다.
                 if (dockerImage != null) {
+                    echo "Cleaning up Docker image..."
                     sh "docker rmi ${dockerImage.id}"
                 }
             }
         }
     }
 }
+
