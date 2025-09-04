@@ -1,15 +1,16 @@
-
-
 pipeline {
-        // 빌드 환경: Java 21, Gradle 8.5
-        agent {
-            docker {
-                image 'gradle:8.5-jdk21'
-                args '-v /var/run/docker.sock:/var/run/docker.sock'
-            }
-        }
+    // 특정 컨테이너를 지정하는 대신, 사용 가능한 모든 에이전트를 사용
+    agent any
 
-    // ▼▼▼ [수정 1] environment 블록에서 AWS_ACCOUNT_ID 제거 ▼▼▼
+    // 전역 도구 설정을 파이프라인에 적용
+    tools {
+        gradle 'Gradle 8.5'
+        jdk 'OpenJDK 21'
+        dockerTool 'Docker'
+    }
+
+    def dockerImage = null
+
     environment {
         AWS_REGION     = "ap-northeast-2"
         ECR_REPO_NAME  = "pyokemon/account"
@@ -18,24 +19,24 @@ pipeline {
     stages {
         stage('Build and Push to ECR') {
             steps {
-                // ▼▼▼ [수정 2] withCredentials 블록 추가 ▼▼▼
-                // 'aws-account-id'라는 ID를 가진 Credential을 'AWS_ACCOUNT_ID' 변수로 불러옴
+                // Jenkins Credentials에 저장된 AWS 계정 ID를 환경 변수로 로드합니다.
                 withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                     script {
-                        // ECR 리포지토리의 전체 주소를 만듭니다.
+                        // ECR 리포지토리의 전체 URL을 구성합니다.
                         def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
-
-                        // 이미지에 태그를 붙입니다.
+                        // 빌드 번호를 태그로 사용해 이미지 이름을 정의합니다.
                         def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
 
                         echo "Building Docker image: ${imageNameWithTag}"
 
-                        // Dockerfile을 사용하여 이미지를 빌드합니다.
+                        // Dockerfile을 이용해 이미지를 빌드합니다.
+                        // 이제 'docker' 명령어를 바로 사용할 수 있습니다.
                         dockerImage = docker.build(imageNameWithTag, ".")
 
                         echo "Pushing image to ECR..."
 
-                        // ECR 주소로 로그인 (IAM Role 자동 사용)
+                        // IAM Role을 사용하여 ECR에 로그인하고, 빌드한 이미지를 푸시합니다.
+                        // 'docker' 명령어가 전역 설정에서 온 것을 인식합니다.
                         docker.withRegistry("https://${ecrRepoUrl}") {
                             dockerImage.push()
                         }
@@ -46,6 +47,7 @@ pipeline {
         }
     }
 
+    // 빌드가 성공하든 실패하든 관계없이 빌드가 끝나면 로컬에 남은 이미지를 삭제합니다.
     post {
         always {
             script {
