@@ -28,7 +28,9 @@ pipeline {
 
                         echo "Checking for built JAR file..."
                         // 2. 빌드가 완료된 후, 생성된 파일을 확인합니다.
-                        sh "ls -l build/libs"
+                        sh "ls -l account/build"
+                        sh "ls -l account/build/libs"
+
 
 
                         // ECR 리포지토리의 전체 URL을 구성합니다.
