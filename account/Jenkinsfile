@@ -27,17 +27,17 @@ pipeline {
                             echo "Running Gradle build..."
                              sh "../gradlew clean build"
 
-                            echo "Checking for built JAR file..."
-                            // 2. 빌드가 완료된 후, 생성된 파일을 확인합니다.
-                            sh "ls -l build"
-                            sh "ls -l build/libs"
-
-
 
                             // ECR 리포지토리의 전체 URL을 구성합니다.
                             def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
                             // 빌드 번호를 태그로 사용해 이미지 이름을 정의합니다.
                             def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
+
+                            // ECR 로그인
+                            echo "Logging in to ECR..."
+                            sh """
+                                aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${ecrRepoUrl}
+                            """
 
                             echo "Building Docker image: ${imageNameWithTag}"
 
