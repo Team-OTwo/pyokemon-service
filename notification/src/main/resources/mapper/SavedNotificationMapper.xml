@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.pyokemon.notification.repository.SavedNotificationRepository">
+
+
+    <insert id="saveNotification" parameterType="com.pyokemon.notification.dto.SavedNotificationDto" >
+        INSERT INTO tb_saved_notification (
+        event_id,
+        account_id,
+        title,
+        message,
+        ticket_open_at
+        ) VALUES (
+        #{eventId},
+        #{accountId},
+        #{title},
+        #{message},
+        #{ticketOpenAt}
+        )
+    </insert>
+
+    <delete id="deleteNotification" parameterType="com.pyokemon.notification.dto.SavedNotificationDto">
+        DELETE FROM tb_saved_notification
+        WHERE account_id = #{accountId}
+          AND event_id = #{eventId}
+
+    </delete>
+
+    <select id="selectNotification" resultType="com.pyokemon.notification.dto.SavedNotificationDto">
+        SELECT event_id, account_id
+        FROM tb_saved_notification
+        WHERE event_id = #{eventId}
+        AND account_id = #{accountId}
+    </select>
+
+    <select id="findByTicketOpenAtBetween" resultType="com.pyokemon.notification.dto.SavedNotificationDto">
+        SELECT event_id, account_id, title, ticket_open_at
+        FROM tb_saved_notification
+        WHERE ticket_open_at BETWEEN #{start} AND #{end}
+    </select>
+
+
+</mapper>

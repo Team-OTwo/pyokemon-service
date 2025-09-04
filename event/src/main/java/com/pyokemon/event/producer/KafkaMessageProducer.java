@@ -1,5 +1,6 @@
 package com.pyokemon.event.producer;
 
+import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +29,9 @@ public class KafkaMessageProducer {
         String.valueOf(eventScheduleId), eventScheduleId);
   }
 
+  public void saveEventKafka(SaveEventKafkaDto dto){
+    kafkaMessageSender.send(KafkaTopicConstants.EVENT_SAVED_UPDATED,
+            String.valueOf(dto.getEventId()), dto);
+  }
 
 }

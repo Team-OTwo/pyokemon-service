@@ -32,7 +32,7 @@ public class KafkaMessageConsumer {
    * 
    * @param bookingEvent 예매 이벤트 정보
    */
-  @KafkaListener(topics = KafkaTopicConstants.EVENT_STATUS_UPDATED,
+  @KafkaListener(topics = KafkaTopicConstants.BOOKING_STATUS_UPDATED,
       properties = {JsonDeserializer.VALUE_DEFAULT_TYPE
           + ":com.pyokemon.notification.event.consumer.message.booking.BookingEvent"},
       groupId = "notification-service")
@@ -133,7 +133,6 @@ public class KafkaMessageConsumer {
         eventInfo.getSeat().getSeat_class().getClass_name(), eventInfo.getSeat().getFloor(),
         eventInfo.getSeat().getRow(), eventInfo.getSeat().getCol());
   }
-  // 준희님 바꿔줘요!!!!!!!!!
 
   /**
    * 사용자 정보를 조회합니다.
