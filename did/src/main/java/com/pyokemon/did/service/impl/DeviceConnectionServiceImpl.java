@@ -45,11 +45,10 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
     // 2. Gateway 헤더에서 deviceId 추출
     String deviceId = GatewayRequestHeaderUtils.getUserDeviceOrThrowException();
     // 3. tb_device_connection 확인 및 예외처리
-    boolean shouldCreateInvitation = checkAndProcessDeviceConnection(userId, deviceId);
+    checkAndProcessDeviceConnection(userId, deviceId);
     // 4. ACA-Py 초대장 생성 (User + Mediator) - 필요한 경우에만
 
     try {
-      if (shouldCreateInvitation) {
 
         // User ACA-Py 초대장 생성
         String userAcaPyInvitationUrl = createUserAcaPyInvitationUrl(deviceId, userId, userToken);
@@ -57,10 +56,6 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
         String mediatorAcaPyInvitationUrl = createMediatorAcaPyInvitationUrl(deviceId, userId);
 
         return new InvitationResponse(mediatorAcaPyInvitationUrl, userAcaPyInvitationUrl);
-      } else {
-        log.info("새로운 초대장 생성이 필요하지 않습니다: userId={}, deviceId={}", userId, deviceId);
-        throw new BusinessException("초대장 생성이 필요하지 않은 상태입니다", DidErrorCodes.INVALID_REQUEST);
-      }
     } catch (BusinessException e) {
       throw e;
     } catch (Exception e) {
@@ -116,20 +111,20 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
   /**
    * DeviceConnection 비즈니스 로직 예외처리
    */
-  private boolean checkAndProcessDeviceConnection(Long userId, String deviceId) {
+  private void checkAndProcessDeviceConnection(Long userId, String deviceId) {
+
     String userAlias = String.format("credo:user:%d#device:%s", userId, deviceId);
 
-    // 1. userId 없음 → 새 연결 생성
-    Optional<DeviceConnection> existingConnection =
-        deviceConnectionRepository.findByAlias(userAlias);
+    Optional<DeviceConnection> existingConnection = deviceConnectionRepository.findByAlias(userAlias);
+
     if (existingConnection.isEmpty()) {
       createNewDeviceConnection(userId, deviceId, userAlias, "신규 사용자");
-      return true;
+      return;
     }
 
     DeviceConnection existing = existingConnection.get();
 
-    // 2.userId 있음, deviceId 다름 → 기존 연결 REVOKED 처리 후 새 연결 생성
+    // userId 있음, deviceId 다름 → 기존 연결 REVOKED 처리 후 새 연결 생성
     if (!existing.getDeviceId().equals(deviceId)) {
       existing.setStatus(REVOKED);
       deviceConnectionRepository.update(existing);
@@ -137,36 +132,13 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
           existing.getDeviceId(), deviceId);
 
       createNewDeviceConnection(userId, deviceId, userAlias, "deviceId 변경");
-      return true;
     }
 
-    // 3. userId 있음, deviceId 같음 → 상태별 처리
-    return handleDeviceConnectionByStatus(existing, userId, deviceId, userAlias);
-  }
-
-  /**
-   * 기존 연결의 상태에 따라 처리합니다.
-   */
-  private boolean handleDeviceConnectionByStatus(DeviceConnection existing, Long userId,
-      String deviceId, String userAlias) {
-    switch (existing.getStatus()) {
-      case ACTIVE, DID_RECEIVED:
-        log.error("이미 연결된 상태: userId={}, deviceId={}, alias={}", userId, deviceId, userAlias);
-        throw new BusinessException("이미 연결되어 있는 connection이 active 상태입니다",
-            DidErrorCodes.CONNECTION_ALREADY_ACTIVE);
-
-      case INVITATION_SENT:
-        log.error("이미 pending 중인 invitation: userId={}, deviceId={}, alias={}", userId, deviceId,
-            userAlias);
-        throw new BusinessException("이미 pending 중인 invitation이 존재합니다",
-            DidErrorCodes.INVITATION_ALREADY_SENT);
-
-      case REVOKED:
-      default:
-        log.info("기존 연결 재생성: status={}, alias={}, id={}", existing.getStatus(), userAlias,
-            existing.getId());
-        createNewDeviceConnection(userId, deviceId, userAlias, "기존 상태: " + existing.getStatus());
-        return true;
+    // 동일 디바이스의 기존 연결이 있는 경우 →  새 연결 생성 (재발급)
+    if (existing.getDeviceId().equals(deviceId)){
+      updateDeviceConnection(existing);
+      log.info("앱 초기화로 연결 재생성: id={}, oldDeviceId={}, newDeviceId={}", existing.getId(),
+              existing.getDeviceId(), deviceId);
     }
   }
 
@@ -180,6 +152,15 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     deviceConnectionRepository.save(newConnection);
     log.info("{} 생성: alias={}, id={}", reason, userAlias, newConnection.getId());
+  }
+
+  /**
+   * 기존 DeviceConnection을 업데이트합니다.
+   */
+  private void updateDeviceConnection(DeviceConnection deviceConnection) {
+
+    deviceConnection.update();
+    deviceConnectionRepository.update(deviceConnection);
   }
 
   /**
@@ -219,7 +200,7 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
       deviceConnectionRepository.update(deviceConnection);
     } catch (BusinessException e) {
       if (e.getErrorCode().equals(CONNECTION_INVALID_STATE))
-        return;;
+        return;
     } catch (Exception e) {
       throw new RetryException("<UNK> <UNK> <UNK> <UNK> <UNK> <UNK> <UNK> <UNK>.", e);
     }

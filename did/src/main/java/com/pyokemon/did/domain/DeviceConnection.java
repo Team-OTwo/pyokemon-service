@@ -1,6 +1,7 @@
 package com.pyokemon.did.domain;
 
 import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.ACTIVE;
+import static com.pyokemon.did.domain.DeviceConnection.DeviceConnectionStatus.INVITATION_SENT;
 
 import java.util.Objects;
 
@@ -47,5 +48,11 @@ public class DeviceConnection extends BaseEntity {
     if (!Objects.equals(connectionIdFromWebhook, this.connectionId)) {
       this.connectionId = connectionIdFromWebhook;
     }
+  }
+
+  public void update(){
+    this.status = INVITATION_SENT;
+    this.setPublicDid(null);
+    this.setConnectionId(null);
   }
 }
