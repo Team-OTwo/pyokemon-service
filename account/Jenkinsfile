@@ -39,10 +39,11 @@ pipeline {
                             echo "Building Docker image: ${imageNameWithTag}"
 
 
+
                             echo "Pushing image to ECR..."
 
                             // IAM Role을 사용하여 ECR에 로그인하고, 빌드한 이미지를 푸시합니다.
-                            docker.withRegistry("https://${ecrRepoUrl}", "ecr:${AWS_REGION}:${AWS_ACCOUNT_ID}") {
+                            docker.withRegistry("https://${ecrRepoUrl}", "ecr:${AWS_REGION}:pyokemon-ecr-credential") {
                                 docker.build(imageNameWithTag, ".").push
                             }
                             echo "Push successful."
