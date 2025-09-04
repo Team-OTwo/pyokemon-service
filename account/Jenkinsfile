@@ -34,8 +34,7 @@ pipeline {
                             def imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
 
                             // 1. ECR에 로그인 (플러그인 사용)
-                            echo "Logging in to ECR using Amazon ECR Plugin..."
-                            ecrLogin()
+
 
                             echo "Building Docker image: ${imageNameWithTag}"
 
