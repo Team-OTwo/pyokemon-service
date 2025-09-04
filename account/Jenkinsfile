@@ -23,6 +23,9 @@ pipeline {
                 // Jenkins Credentials에 저장된 AWS 계정 ID를 환경 변수로 로드합니다.
                 withCredentials([string(credentialsId: 'aws-account-id', variable: 'AWS_ACCOUNT_ID')]) {
                     script {
+                        echo "Running Gradle build..."
+                        sh "gradle clean build"
+
                         // ECR 리포지토리의 전체 URL을 구성합니다.
                         def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
                         // 빌드 번호를 태그로 사용해 이미지 이름을 정의합니다.
