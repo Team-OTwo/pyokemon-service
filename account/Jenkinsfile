@@ -1,4 +1,6 @@
-// account/Jenkinsfile
+// Jenkinsfile
+
+def serviceName = "account" 
 
 // 파이프라인 전역에서 사용할 변수를 선언하고 초기화합니다.
 // dockerImage: 빌드된 도커 이미지 객체를 저장하여 post 단계에서 이미지 ID를 참조하는 데 사용됩니다.
@@ -24,12 +26,6 @@ pipeline {
         // AWS 설정
         AWS_REGION = "ap-northeast-2"
 
-        // ECR 리포지토리 설정
-        ECR_REPO_NAME = "pyokemon/account-service"
-
-        // 프로젝트 소스 코드가 위치한 디렉토리
-        PROJECT_DIR = 'account'
-
         // Jenkins Credentials ID
         // 이곳에서 Credential ID를 관리하면 파이프라인 코드의 다른 부분을 수정할 필요가 없습니다.
         AWS_ACCOUNT_ID_CRED = 'aws-account-id'
@@ -43,7 +39,7 @@ pipeline {
         stage('Build Spring Boot App') {
             steps {
                 // 프로젝트 디렉토리로 이동하여 빌드를 수행합니다.
-                dir(env.PROJECT_DIR) {
+                dir(serviceName) {
                     echo "Gradle 빌드를 시작합니다..."
                     // gradlew 스크립트는 Jenkinsfile 위치가 아닌 프로젝트 루트에 있으므로, 상위 경로(../)에서 실행합니다.
                     sh "../gradlew clean build"
@@ -61,9 +57,9 @@ pipeline {
                     withCredentials([string(credentialsId: env.AWS_ACCOUNT_ID_CRED, variable: 'AWS_ACCOUNT_ID')]) {
                         // ECR 리포지토리 URL을 구성합니다.
                         def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
-
+                        def ecrRepoName = "pyokemon/${serviceName}-service"
                         // 전역 변수에 최종 이미지 이름을 할당합니다. (예: 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/pyokemon/account-service:123)
-                        imageNameWithTag = "${ecrRepoUrl}/${env.ECR_REPO_NAME}:${env.BUILD_NUMBER}"
+                        imageNameWithTag = "${ecrRepoUrl}/${ecrRepoName}:${env.BUILD_NUMBER}"
 
                         echo "ECR 이미지 정보가 준비되었습니다."
                         echo "Image Name with Tag: ${imageNameWithTag}"
@@ -78,12 +74,12 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // Dockerfile이 있는 프로젝트 디렉토리로 이동합니다.
-                dir(env.PROJECT_DIR) {
+                dir(serviceName) {
                     // 변수 할당과 같은 Groovy 스크립트는 'script' 블록으로 감싸야 합니다.
                     script {
                         echo "Docker 이미지를 빌드합니다: ${imageNameWithTag}"
 
-                        // 현재 디렉토리(PROJECT_DIR)의 Dockerfile을 사용하여 이미지를 빌드하고,
+                        // 현재 디렉토리(serviceName)의 Dockerfile을 사용하여 이미지를 빌드하고,
                         // 빌드된 이미지 객체를 전역 변수 'dockerImage'에 저장합니다.
                         dockerImage = docker.build(imageNameWithTag, ".")
                     }
