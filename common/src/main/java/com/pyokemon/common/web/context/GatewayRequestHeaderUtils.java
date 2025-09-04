@@ -168,6 +168,26 @@ public class GatewayRequestHeaderUtils {
   }
 
   /**
+   * Gateway에서 전달받은 사용자 ID를 반환합니다. role이 USER인 경우에만 반환합니다. 사용자 ID가 없는 경우 null을 반환합니다.
+   *
+   * @return 사용자 ID 또는 null
+   */
+  public static Long getAccountId(){
+    HttpServletRequest request = getCurrentRequest();
+    String accountId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
+    if(accountId == null || accountId.isEmpty()){
+      return null;
+    }
+
+    try {
+      return Long.valueOf(accountId);
+    } catch (NumberFormatException e) {
+      throw new BusinessException("사용자 ID가 올바른 숫자 형식이 아닙니다: " + accountId,
+              DidErrorCodes.ACCESS_DENIED);
+    }
+  }
+
+  /**
    * 현재 HTTP 요청 객체를 반환합니다.
    *
    * @return HttpServletRequest
