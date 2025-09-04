@@ -89,9 +89,9 @@ public class EventScheduleService {
   }
 
   private EventSchedule mapToEventSchedule(EventScheduleDto dto) {
-    EventSchedule eventSchedule = EventSchedule.builder().eventId(dto.getEventId())
-        .venueId(dto.getVenueId()).ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate())
-        .build();
+    EventSchedule eventSchedule =
+        EventSchedule.builder().eventId(dto.getEventId()).venueId(dto.getVenueId())
+            .ticketOpenAt(dto.getTicketOpenAt()).eventDate(dto.getEventDate()).build();
     return eventSchedule;
   }
 
@@ -128,8 +128,7 @@ public class EventScheduleService {
     SeatClass seatClass = seatClassRepository.findByClassName(seatGradeName)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석 등급입니다: " + seatGradeName));
 
-    List<Seat> seats =
-        seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getId());
+    List<Seat> seats = seatRepository.findByVenueIdAndSeatClassId(venueId, seatClass.getId());
 
     return seats.stream()
         .map(seat -> SeatInfoResponseDTO.builder().seatId(seat.getId()).col(seat.getCol())

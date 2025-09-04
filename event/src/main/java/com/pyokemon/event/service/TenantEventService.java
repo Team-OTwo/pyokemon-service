@@ -50,23 +50,19 @@ public class TenantEventService {
   private final RedisService redisService;
   private final KafkaMessageProducer kafkaMessageProducer;
 
-  //이벤트 승인 처리
+  // 이벤트 승인 처리
   @Transactional
   public void approveEvent(Long eventId) {
-    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
-        .eventId(eventId)
-        .status("APPROVED")
-        .build();
+    CancelEventResponseDTO dto =
+        CancelEventResponseDTO.builder().eventId(eventId).status("APPROVED").build();
     tenantEventRepository.cancelEvent(dto);
   }
 
   // 이벤트 거절 처리
   @Transactional
   public void rejectEvent(Long eventId) {
-    CancelEventResponseDTO dto = CancelEventResponseDTO.builder()
-        .eventId(eventId)
-        .status("REJECTED")
-        .build();
+    CancelEventResponseDTO dto =
+        CancelEventResponseDTO.builder().eventId(eventId).status("REJECTED").build();
     tenantEventRepository.cancelEvent(dto);
   }
 
@@ -387,6 +383,7 @@ public class TenantEventService {
 
   /**
    * 앱 커서 기반 공연 조회 (페이징 처리 포함)
+   * 
    * @param accountId 계정 ID
    * @param cursorDate 커서 날짜
    * @param cursorId 커서 ID

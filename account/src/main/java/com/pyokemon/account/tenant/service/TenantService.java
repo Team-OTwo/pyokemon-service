@@ -50,7 +50,7 @@ public class TenantService {
         log.error("DID wallet 생성 실패: {}", e.getMessage());
         throw new BusinessException("DID wallet 생성에 실패했습니다.", ACCOUNT_CREATION_FAILED);
       }
-      
+
       tenantRepository.insert(tenant);
       return tenant.to(account.getLoginId());
 

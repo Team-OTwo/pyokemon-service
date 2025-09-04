@@ -301,8 +301,7 @@ public class AccountService {
     }
 
     if (deviceId != null) {
-      Optional<UserDevice> userDeviceOpt =
-          userDeviceRepository.findByIdAndIsValid(deviceId, true);
+      Optional<UserDevice> userDeviceOpt = userDeviceRepository.findByIdAndIsValid(deviceId, true);
 
       if (userDeviceOpt.isEmpty()) {
         throw new BusinessException("존재하지 않는 기기입니다.", AccountErrorCodes.DEVICE_NOT_FOUND);

@@ -189,14 +189,14 @@ public class VerificationServiceImpl implements VerificationService {
 
 
   @Override
-  public HandleVerificationResponse handleVerification(Long tenantId, String presExId, Long bookingId) {
+  public HandleVerificationResponse handleVerification(Long tenantId, String presExId,
+      Long bookingId) {
 
     Verification verification = verificationRepository.findByPresExId(presExId)
         .orElseThrow(() -> new BusinessException("해당 presExId를 가진 검증 정보를 찾을 수 없습니다: " + presExId,
             VP_VERIFICATION_FAILED));
 
-    kafkaMessageProducer.send(BookingVerifiedEvent.Topic,
-        BookingVerifiedEvent.toEntity(bookingId));
+    kafkaMessageProducer.send(BookingVerifiedEvent.Topic, BookingVerifiedEvent.toEntity(bookingId));
 
     HandleVerificationResponse response =
         new HandleVerificationResponse(verification.getStatus().toString());
