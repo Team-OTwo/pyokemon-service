@@ -2,7 +2,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY build/libs/*.jar /app.jar
+COPY build/libs/account-0.0.2.jar app.jar
+
 ENV SPRING_PROFILES_ACTIVE=dev
 
 EXPOSE 8080
