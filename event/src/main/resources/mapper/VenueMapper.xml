@@ -5,7 +5,7 @@
     
     <select id="findById" parameterType="long" resultType="Venue">
         SELECT 
-            venue_id as id,
+            id,
             venue_name,
             city,
             street,
@@ -13,7 +13,7 @@
             created_at,
             updated_at
         FROM tb_venue 
-        WHERE venue_id = #{id}
+        WHERE id = #{id}
     </select>
     
 </mapper> 

@@ -265,12 +265,12 @@ public class RedisService {
 
       for (Map<String, Object> eventSchedule : eventSchedules) {
         try {
-          Long eventScheduleId = ((Number) eventSchedule.get("event_schedule_id")).longValue();
+          Long eventScheduleId = ((Number) eventSchedule.get("id")).longValue();
           Long venueId = ((Number) eventSchedule.get("venue_id")).longValue();
           initSeatStatuses(eventScheduleId, venueId);
         } catch (Exception e) {
           log.error("Redis 초기화 실패: eventScheduleId={}, venueId={}, error={}",
-              eventSchedule.get("event_schedule_id"), eventSchedule.get("venue_id"), e.getMessage(),
+              eventSchedule.get("id"), eventSchedule.get("venue_id"), e.getMessage(),
               e);
           continue;
         }

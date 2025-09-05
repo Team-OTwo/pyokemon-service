@@ -4,37 +4,37 @@
 
     <select id="findTenantEventListByAccountId" resultType="com.pyokemon.event.dto.tenant.TenantEventListDto">
         SELECT
-        e.event_id as eventId,
-        es.event_schedule_id as eventScheduleId,
+        e.id as eventId,
+        es.id as eventScheduleId,
         e.thumbnail_url as thumbnailUrl,
         e.title,
         es.event_date as eventDate,
         v.venue_name as venueName,
         e.status
         FROM tb_event e
-        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
-        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
+        LEFT JOIN tb_event_schedule es ON e.id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.id
         WHERE e.account_id = #{accountId}
         ORDER BY es.event_date ASC
     </select>
 
     <select id="findTenantEventDetailByEventId" resultType="com.pyokemon.event.dto.EventDetailResponseDTO">
         SELECT
-        e.event_id as eventId,
+        e.id as eventId,
         e.account_id as tenantId,
         e.title,
         e.age_limit as ageLimit,
         e.description,
         e.genre,
         e.thumbnail_url as thumbnailUrl,
-        es.event_schedule_id as eventScheduleId,
+        es.id as eventScheduleId,
         es.ticket_open_at as ticketOpenAt,
         es.event_date as eventDate,
         v.venue_name as venueName
         FROM tb_event e
-        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
-        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
-        WHERE e.event_id = #{eventId}
+        LEFT JOIN tb_event_schedule es ON e.id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.id
+        WHERE e.id = #{eventId}
         LIMIT 1
     </select>
 
@@ -43,7 +43,7 @@
         sc.class_name as className,
         p.price
         FROM tb_price p
-        JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
+        JOIN tb_seat_class sc ON p.seat_class_id = sc.id
         WHERE p.event_schedule_id = #{eventScheduleId}
         ORDER BY sc.priority ASC
     </select>
@@ -54,8 +54,8 @@
         sc.class_name as className,
         p.price
         FROM tb_price p
-        JOIN tb_seat_class sc ON p.seat_class_id = sc.seat_class_id
-        JOIN tb_event_schedule es ON p.event_schedule_id = es.event_schedule_id
+        JOIN tb_seat_class sc ON p.seat_class_id = sc.id
+        JOIN tb_event_schedule es ON p.event_schedule_id = es.id
         WHERE es.event_id = #{eventId}
         ORDER BY sc.priority ASC
     </select>
@@ -70,7 +70,7 @@
         thumbnail_url = #{thumbnailUrl},
         status = #{status},
         updated_at = NOW()
-        WHERE event_id = #{id}
+        WHERE id = #{id}
     </update>
 
     <insert id="save" parameterType="Event" useGeneratedKeys="true" keyProperty="id" keyColumn="event_id">
@@ -103,24 +103,24 @@
     <!--    앱 커서 기반 공연 조회-->
     <select id="findEventListForApp" resultType="com.pyokemon.event.dto.tenant.app.TenantEventDetailDtoForApp">
         SELECT
-        e.event_id as eventId,
+        e.id as eventId,
         e.title,
         es.event_date as eventDate,
         v.venue_name as venueName,
         e.genre
         FROM tb_event e
-        LEFT JOIN tb_event_schedule es ON e.event_id = es.event_id
-        LEFT JOIN tb_venue v ON es.venue_id = v.venue_id
+        LEFT JOIN tb_event_schedule es ON e.id = es.event_id
+        LEFT JOIN tb_venue v ON es.venue_id = v.id
         WHERE e.account_id = #{accountId}
         AND e.status = 'APPROVED'
         AND es.event_date &gt;= NOW()
         <if test="cursorDate != null and cursorId != null">
-            AND (es.event_date, e.event_id) &gt;= (#{cursorDate}, #{cursorId})
+            AND (es.event_date, e.id) &gt;= (#{cursorDate}, #{cursorId})
         </if>
         <if test="genre != null">
             AND e.genre = #{genre}
         </if>
-        ORDER BY es.event_date ASC, e.event_id ASC
+        ORDER BY es.event_date ASC, e.id ASC
         <if test="limit != null">
             LIMIT #{limit}
         </if>
@@ -129,14 +129,14 @@
     <update id="cancelEvent" parameterType="com.pyokemon.event.dto.CancelEventResponseDTO">
         UPDATE tb_event
         SET status = #{status}, updated_at = NOW()
-        WHERE event_id = #{eventId}
+        WHERE id = #{eventId}
     </update>
 
     <select id="findEventScheduleId" resultType="Long">
         SELECT event_schedule_id
-        FROM tb_event_schedule es JOIN tb_event e ON es.event_id = e.event_id
+        FROM tb_event_schedule es JOIN tb_event e ON es.event_id = e.id
         WHERE
-            e.event_id = #{eventId}
+            e.id = #{eventId}
     </select>
 
 </mapper> 

@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS tb_price;
+CREATE TABLE tb_price (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        event_schedule_id BIGINT NOT NULL,
+        seat_class_id BIGINT NOT NULL,
+        price INT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

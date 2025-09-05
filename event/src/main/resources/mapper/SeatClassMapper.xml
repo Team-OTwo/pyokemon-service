@@ -6,29 +6,29 @@
 <mapper namespace="com.pyokemon.event.repository.SeatClassRepository">
 
     <select id="findByClassName" resultType="SeatClass" parameterType="string">
-        SELECT seat_class_id as id, class_name, priority, created_at, updated_at
+        SELECT id, class_name, priority, created_at, updated_at
         FROM tb_seat_class
         WHERE class_name = #{param1}
     </select>
 
     <select id="findAll" resultType="SeatClass">
-        SELECT seat_class_id as id, class_name, priority, created_at, updated_at
+        SELECT id, class_name, priority, created_at, updated_at
         FROM tb_seat_class
         ORDER BY priority ASC
     </select>
 
     <select id="findByVenueId" resultType="SeatClass" parameterType="long">
-        SELECT DISTINCT sc.seat_class_id as id, sc.class_name, sc.priority, sc.created_at, sc.updated_at
+        SELECT DISTINCT id, sc.class_name, sc.priority, sc.created_at, sc.updated_at
         FROM tb_seat_class sc
-        INNER JOIN tb_seat s ON sc.seat_class_id = s.seat_class_id
+        INNER JOIN tb_seat s ON sc.id = s.seat_class_id
         WHERE s.venue_id = #{param1}
         ORDER BY sc.priority ASC
     </select>
 
     <select id="findById" resultType="SeatClass" parameterType="long">
-        SELECT seat_class_id as id, class_name, priority, created_at, updated_at
+        SELECT id, class_name, priority, created_at, updated_at
         FROM tb_seat_class
-        WHERE seat_class_id = #{param1}
+        WHERE id = #{param1}
     </select>
 
 </mapper>
