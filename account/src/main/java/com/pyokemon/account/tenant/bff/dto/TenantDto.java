@@ -11,9 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 public class TenantDto {
 
+  private Long id;
   private String name;
 
   public static TenantDto from(Tenant tenant) {
-    return TenantDto.builder().name(tenant.getName()).build();
+    return TenantDto.builder().id(tenant.getId()).name(tenant.getName()).build();
   }
 }

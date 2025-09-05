@@ -4,7 +4,7 @@
 <mapper namespace="com.pyokemon.account.tenant.bff.repository.TenantBffRepository">
 
     <resultMap id="tenantResultMap" type="com.pyokemon.account.tenant.entity.Tenant">
-        <id property="tenantId" column="id"/>
+        <id property="id" column="id"/>
         <result property="name" column="name"/>
     </resultMap>
 
@@ -15,7 +15,7 @@
         FROM
             tb_tenant
         WHERE
-            id = #{tenantId}
+            id = #{id}
     </select>
 
     <select id="findTenantsByIdIn"

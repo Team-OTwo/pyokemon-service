@@ -120,7 +120,7 @@ public class BookingBffService {
   }
 
   private BookingDto toDto(Booking b) {
-    return BookingDto.builder().bookingId(b.getId()).eventScheduleId(b.getEventScheduleId())
+    return BookingDto.builder().id(b.getId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
         .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
   }

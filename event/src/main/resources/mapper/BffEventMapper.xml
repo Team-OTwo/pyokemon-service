@@ -11,7 +11,7 @@
         SELECT id, seat_class_id, floor, `row`, col FROM tb_seat WHERE id = #{seatId}
     </select>
     <select id="findSeatByVenueId" resultType="com.pyokemon.event.bff.dto.BffSeatDto">
-        SELECT seat_id, seat_class_id, floor, `row`, col FROM tb_seat WHERE venue_id = #{venueId}
+        SELECT id, seat_class_id, floor, `row`, col FROM tb_seat WHERE venue_id = #{venueId}
     </select>
 
     <!-- 배치: ids가 비면 0행 반환 -->
