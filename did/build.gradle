@@ -33,4 +33,8 @@ tasks.named('test') {
 // JAR 파일 이름 설정
 bootJar {
     archiveFileName = "did-0.0.1.jar"
-} 
+}
+
+jar {
+    enabled = false
+}

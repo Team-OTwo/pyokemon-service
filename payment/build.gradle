@@ -24,3 +24,7 @@ tasks.named('test') {
 bootJar {
     archiveFileName = "payment-0.0.1.jar"
 }
+
+jar {
+    enabled = false
+}

@@ -30,4 +30,8 @@ tasks.named('test') {
 
 bootJar {
     archiveFileName = "event-0.0.1.jar"
-} 
+}
+
+jar {
+    enabled = false
+}

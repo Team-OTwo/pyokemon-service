@@ -33,3 +33,7 @@ tasks.named('test') {
 bootJar {
     archiveFileName = "notification-0.0.1.jar"
 }
+
+jar {
+    enabled = false
+}

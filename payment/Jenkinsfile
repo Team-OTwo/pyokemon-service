@@ -1,0 +1,128 @@
+
+def serviceName = "payment"
+
+// 파이프라인 전역에서 사용할 변수를 선언하고 초기화합니다.
+// dockerImage: 빌드된 도커 이미지 객체를 저장하여 post 단계에서 이미지 ID를 참조하는 데 사용됩니다.
+// imageNameWithTag: ECR에 푸시할 전체 이미지 이름(태그 포함)을 저장하며, 여러 스테이지에서 공유됩니다.
+def dockerImage = null
+def imageNameWithTag = null
+
+pipeline {
+    // 사용 가능한 모든 에이전트를 할당합니다.
+    agent any
+
+    // Jenkins 전역 도구 설정에 정의된 JDK와 Gradle 버전을 지정합니다.
+    tools {
+        gradle 'Gradle 8.5'
+        jdk 'OpenJDK 21'
+    }
+
+    // =========================================================================
+    // 환경 변수 및 설정 (Configuration)
+    // =========================================================================
+    // 파이프라인에서 사용할 주요 변수들을 이곳에서 중앙 관리합니다.
+    environment {
+        // AWS 설정
+        AWS_REGION = "ap-northeast-2"
+
+        // Jenkins Credentials ID
+        // 이곳에서 Credential ID를 관리하면 파이프라인 코드의 다른 부분을 수정할 필요가 없습니다.
+        AWS_ACCOUNT_ID_CRED = 'aws-account-id'
+        ECR_CREDENTIAL_ID = 'pyokemon-ecr-credential'
+    }
+
+    stages {
+        // =========================================================================
+        // Stage 1: 소스 코드 빌드
+        // =========================================================================
+        stage('Build Spring Boot App') {
+            steps {
+                // 프로젝트 디렉토리로 이동하여 빌드를 수행합니다.
+                dir(serviceName) {
+                    echo "Gradle 빌드를 시작합니다..."
+                    // gradlew 스크립트는 Jenkinsfile 위치가 아닌 프로젝트 루트에 있으므로, 상위 경로(../)에서 실행합니다.
+                    sh "../gradlew clean build"
+                }
+            }
+        }
+
+        // =========================================================================
+        // Stage 2: 빌드 정보 준비 (Docker 이미지 이름 및 태그 생성)
+        // =========================================================================
+        stage('Prepare Build Info') {
+            steps {
+                script {
+                    // withCredentials 블록을 사용하여 AWS 계정 ID를 안전하게 불러옵니다.
+                    withCredentials([string(credentialsId: env.AWS_ACCOUNT_ID_CRED, variable: 'AWS_ACCOUNT_ID')]) {
+                        // ECR 리포지토리 URL을 구성합니다.
+                        def ecrRepoUrl = "${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
+                        def ecrRepoName = "pyokemon/${serviceName}-service"
+                        // 전역 변수에 최종 이미지 이름을 할당합니다. (예: 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/pyokemon/account-service:123)
+                        imageNameWithTag = "${ecrRepoUrl}/${ecrRepoName}:${env.BUILD_NUMBER}"
+
+                        echo "ECR 이미지 정보가 준비되었습니다."
+                        echo "Image Name with Tag: ${imageNameWithTag}"
+                    }
+                }
+            }
+        }
+
+        // =========================================================================
+        // Stage 3: Docker 이미지 빌드
+        // =========================================================================
+        stage('Build Docker Image') {
+            steps {
+                // Dockerfile이 있는 프로젝트 디렉토리로 이동합니다.
+                dir(serviceName) {
+                    // 변수 할당과 같은 Groovy 스크립트는 'script' 블록으로 감싸야 합니다.
+                    script {
+                        echo "Docker 이미지를 빌드합니다: ${imageNameWithTag}"
+
+                        // 현재 디렉토리(serviceName)의 Dockerfile을 사용하여 이미지를 빌드하고,
+                        // 빌드된 이미지 객체를 전역 변수 'dockerImage'에 저장합니다.
+                        dockerImage = docker.build(imageNameWithTag, ".")
+                    }
+                }
+            }
+        }
+
+        // =========================================================================
+        // Stage 4: Docker 이미지를 ECR에 푸시
+        // =========================================================================
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                 // withCredentials 블록을 사용하여 AWS 계정 ID를 안전하게 불러옵니다.
+                    withCredentials([string(credentialsId: env.AWS_ACCOUNT_ID_CRED, variable: 'AWS_ACCOUNT_ID')]) {
+                        echo "이미지를 ECR로 푸시합니다..."
+
+                        // Jenkins Credential을 사용하여 ECR에 안전하게 로그인합니다.
+                        // 'ecr:리전:Credential-ID' 형식으로 지정합니다.
+                        docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com", "ecr:${env.AWS_REGION}:${env.ECR_CREDENTIAL_ID}") {
+                            // 로그인 성공 후 이미지 푸시를 실행합니다.
+                            sh "docker push ${imageNameWithTag}"
+                        }
+                        echo "ECR 푸시가 성공적으로 완료되었습니다."
+                    }
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // Post-build Actions (빌드 후 정리 작업)
+    // =========================================================================
+    // 파이프라인의 성공/실패 여부와 관계없이 항상 실행되는 블록입니다.
+    post {
+        always {
+            script {
+                // dockerImage 변수가 null이 아닌 경우 (즉, 이미지 빌드가 성공적으로 시작된 경우)에만 실행됩니다.
+                if (dockerImage != null) {
+                    echo "빌드에 사용된 로컬 Docker 이미지를 정리합니다..."
+                    // 빌드 에이전트의 디스크 공간을 확보하기 위해 생성된 이미지를 삭제합니다.
+                    sh "docker rmi ${dockerImage.id}"
+                }
+            }
+        }
+    }
+}
