@@ -62,7 +62,7 @@
         SELECT
             #{eventScheduleId} as event_schedule_id,
             #{seatId} as seat_id,
-            e.event_id as "event.event_id",
+            e.id as "event.event_id",
             e.title as "event.event_title",
             DATE_FORMAT(es.ticket_open_at, '%Y-%m-%d %H:%i:%s') as "event_schedule.ticket_open_at",
             DATE_FORMAT(es.event_date, '%Y-%m-%d %H:%i:%s') as "event_schedule.event_date",
@@ -73,10 +73,10 @@
             sc.class_name as "seat.seat_class.class_name"
         FROM tb_seat s
         JOIN tb_seat_class sc ON s.seat_class_id = sc.id
-        JOIN tb_venue v ON s.venue_id = v.venue_id
-        JOIN tb_event_schedule es ON es.venue_id = v.venue_id
-        JOIN tb_event e ON es.event_id = e.event_id
-        WHERE es.id = #{eventScheduleId} AND s.seat_id = #{seatId}
+        JOIN tb_venue v ON s.venue_id = v.id
+        JOIN tb_event_schedule es ON es.venue_id = v.id
+        JOIN tb_event e ON es.event_id = e.id
+        WHERE es.id = #{eventScheduleId} AND s.id = #{seatId}
     </select>
 
 </mapper>

@@ -68,7 +68,7 @@
 
 
     <select id="findEventSchedulesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventScheduleDto">
-        SELECT id as seatClassId, event_id, venue_id, event_date
+        SELECT id as eventScheduleId, event_id, venue_id, event_date
         FROM tb_event_schedule
         <where>
             <if test="ids != null and ids.size() > 0">
