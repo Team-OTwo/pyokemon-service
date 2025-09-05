@@ -4,30 +4,30 @@
 <mapper namespace="com.pyokemon.account.tenant.bff.repository.TenantBffRepository">
 
     <resultMap id="tenantResultMap" type="com.pyokemon.account.tenant.entity.Tenant">
-        <id property="tenantId" column="tenant_id"/>
+        <id property="tenantId" column="id"/>
         <result property="name" column="name"/>
     </resultMap>
 
     <select id="findByTenantId" parameterType="long" resultMap="tenantResultMap">
         SELECT
-            tenant_id,
+            id,
             name
         FROM
             tb_tenant
         WHERE
-            tenant_id = #{tenantId}
+            id = #{tenantId}
     </select>
 
     <select id="findTenantsByIdIn"
             parameterType="map"
             resultType="com.pyokemon.account.tenant.bff.dto.TenantDto">
         SELECT
-        tenant_id,
+        id,
         name
         FROM tb_tenant
         <where>
             <if test="ids != null and ids.size() > 0">
-                tenant_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
