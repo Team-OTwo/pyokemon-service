@@ -46,4 +46,9 @@ public class InvitationController {
     // 비즈니스 로직
     return ResponseEntity.ok(ResponseDto.success(invitations));
   }
+
+  @PostMapping("/hello")
+  public void hello() {
+    log.info("hello");
+  }
 }
