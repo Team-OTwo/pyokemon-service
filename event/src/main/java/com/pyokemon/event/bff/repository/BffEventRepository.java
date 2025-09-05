@@ -20,6 +20,8 @@ public interface BffEventRepository {
 
   Optional<BffSeatDto> findSeatById(@Param("seatId") Long seatId);
 
+  List<BffSeatDto> findSeatByVenueId(@Param("venueId") Long venueId);
+
   Optional<BffEventDto> findEventById(@Param("eventId") Long eventId);
 
   Optional<BffSeatClassDto> findSeatClassById(@Param("seatClassId") Long seatClassId);

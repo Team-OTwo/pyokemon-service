@@ -20,10 +20,10 @@ public class BookingBffController {
 
   private final BookingBffService bookingBffService;
 
-  // @GetMapping("/event-schedules/{eventScheduleId}/bookings")
-  // public List<BookingDto> getEventScheduleBookings(@PathVariable Long eventScheduleId) {
-  // return bookingBffService.getEventScheduleBookings(eventScheduleId);
-  // }
+  @GetMapping("/event-schedules/{eventScheduleId}/bookings")
+  public List<BookingDto> getEventScheduleBookings(@PathVariable Long eventScheduleId) {
+  return bookingBffService.getEventScheduleBookings(eventScheduleId);
+  }
 
   @GetMapping("/accounts/{accountId}/bookings")
   public List<BookingDto> getAccountBookings(@PathVariable Long accountId) {
@@ -37,7 +37,7 @@ public class BookingBffController {
     return bookingBffService.getAccountIdBookingsOrderByDate(accountId, page, size);
   }
 
-  @GetMapping("/event-schedules/{eventScheduleId}/bookings")
+  @GetMapping("/event-schedules/{eventScheduleId}/bookings/page")
   public PageResponse<BookingDto> getBookingsOrderByDate(@PathVariable Long eventScheduleId,
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "10") Integer size) {

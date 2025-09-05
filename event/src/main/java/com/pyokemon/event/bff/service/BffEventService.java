@@ -72,6 +72,10 @@ public class BffEventService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SEAT_NOT_FOUND"));
   }
 
+  public List<BffSeatDto> getSeatForVenue(Long venueId) {
+    return repo.findSeatByVenueId(venueId);
+  }
+
   public List<BffSeatDto> getSeats(List<Long> ids) {
     if (ids == null || ids.isEmpty())
       return List.of();

@@ -26,8 +26,8 @@ public class BookingBffService {
       return null;
     }
 
-    return bookings.stream().map(this::toDto) // Booking -> BookingDto
-        .toList(); // Java 16+면 이거 사용 가능
+    return bookings.stream().map(this::toDto)
+        .toList();
   }
 
   public List<BookingDto> getAccountIdBookings(Long accountId) {
