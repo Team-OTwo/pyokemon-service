@@ -6,14 +6,14 @@
 <mapper namespace="com.pyokemon.payment.bff.repository.PaymentBffRepository">
 
     <select id="findByPaymentId" resultType="Payment">
-        SELECT * FROM tb_payment WHERE payment_id = #{paymentId}
+        SELECT * FROM tb_payment WHERE id = #{paymentId}
     </select>
 
     <!-- 배치 조회 -->
     <select id="findByPaymentIds"
             parameterType="map"
             resultType="com.pyokemon.payment.entity.Payment">
-        SELECT payment_id, amount, method, status, created_at, updated_at
+        SELECT id, amount, method, status, created_at, updated_at
         FROM tb_payment
         WHERE
         <choose>
