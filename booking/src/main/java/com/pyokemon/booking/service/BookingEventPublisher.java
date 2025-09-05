@@ -2,7 +2,6 @@ package com.pyokemon.booking.service;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.booking.dto.kafka.BookingEventDto;
 import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.common.kafka.KafkaMessageSender;
@@ -17,23 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 public class BookingEventPublisher {
 
   private final KafkaMessageSender kafkaMessageSender;
-  private final ObjectMapper objectMapper;
 
   public void publishBookingStatusUpdate(Booking booking) {
     try {
-      BookingEventDto event = BookingEventDto.builder().bookingId(booking.getBookingId())
+      BookingEventDto event = BookingEventDto.builder().bookingId(booking.getId())
           .eventScheduleId(booking.getEventScheduleId()).seatId(booking.getSeatId())
           .accountId(booking.getAccountId()).tenantId(booking.getTenantId())
           .status(booking.getStatus().name()).build();
 
       kafkaMessageSender.send(KafkaTopicConstants.BOOKING_STATUS_UPDATED,
-          String.valueOf(booking.getBookingId()), event);
+          String.valueOf(booking.getId()), event);
 
       log.info("Published booking status update event: bookingId={}, status={}, message={}",
-          booking.getBookingId(), booking.getStatus().name(), event);
+          booking.getId(), booking.getStatus().name(), event);
     } catch (Exception e) {
-      log.error("Failed to publish booking status update event for booking: {}",
-          booking.getBookingId(), e);
+      log.error("Failed to publish booking status update event for booking: {}", booking.getId(),
+          e);
     }
   }
 

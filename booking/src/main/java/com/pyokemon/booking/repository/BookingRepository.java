@@ -14,8 +14,6 @@ import com.pyokemon.booking.entity.Booking;
 @Mapper
 public interface BookingRepository {
 
-  List<Long> findSeatIdsByEventScheduleId(@Param("eventScheduleId") Long eventScheduleId);
-
   List<SeatStatusInfo> findSeatStatusInfosByEventScheduleId(
       @Param("eventScheduleId") Long eventScheduleId);
 
@@ -27,9 +25,7 @@ public interface BookingRepository {
   Optional<Booking> findActiveBookingByEventScheduleIdAndAccountId(
       @Param("eventScheduleId") Long eventScheduleId, @Param("accountId") Long accountId);
 
-  Optional<Booking> findById(@Param("bookingId") Long bookingId);
-
-  List<Booking> findPendingBookings();
+  Optional<Booking> findById(@Param("id") Long id);
 
   List<Booking> findPendingBookingsOlderThan(@Param("createdAt") java.time.LocalDateTime createdAt);
 
@@ -39,8 +35,6 @@ public interface BookingRepository {
   void save(Booking booking);
 
   void update(Booking booking);
-
-  void delete(@Param("bookingId") Long bookingId);
 
   Long updateStatus(@Param("eventScheduleId") Long eventScheduleId, @Param("status") String status);
 
