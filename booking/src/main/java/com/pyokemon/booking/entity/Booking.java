@@ -2,6 +2,7 @@ package com.pyokemon.booking.entity;
 
 
 import com.pyokemon.common.entity.BaseEntity;
+
 import lombok.*;
 
 @Getter
