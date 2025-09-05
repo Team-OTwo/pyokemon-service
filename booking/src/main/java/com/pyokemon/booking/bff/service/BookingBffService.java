@@ -60,8 +60,8 @@ public class BookingBffService {
 
   public PageResponse<BookingDto> getBookingsOrderByDate(Long eventScheduleId, Integer page,
       Integer size) {
-    List<Booking> bookings = bookingBffRepository
-        .findByEventScheduleIdOrderByBookingId(eventScheduleId, page * size, size);
+    List<Booking> bookings =
+        bookingBffRepository.findByEventScheduleIdOrderById(eventScheduleId, page * size, size);
     Long totalCount = bookingBffRepository.countByEventScheduleId(eventScheduleId);
 
     if (bookings.isEmpty()) {
@@ -76,7 +76,7 @@ public class BookingBffService {
   }
 
   public BookingDto getBooking(Long bookingId) {
-    Optional<Booking> bookingOpt = bookingBffRepository.findByBookingId(bookingId);
+    Optional<Booking> bookingOpt = bookingBffRepository.findById(bookingId);
 
     if (bookingOpt.isEmpty()) {
       throw new BusinessException("해당 예약은 존재하지 않습니다.", "BOOKING_NOT_FOUND");
@@ -97,7 +97,7 @@ public class BookingBffService {
       bookings = bookings.subList(0, size);
     }
 
-    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+    Long nextCursor = hasMore ? bookings.get(bookings.size() - 1).getId() : null;
 
     return new CursorPageResponse<>(bookings, nextCursor, hasMore);
   }
@@ -113,14 +113,14 @@ public class BookingBffService {
       bookings = bookings.subList(0, size);
     }
 
-    Long nextCursor = hasMore ? bookings.getLast().getBookingId() : null;
+    Long nextCursor = hasMore ? bookings.get(bookings.size() - 1).getId() : null;
 
     return new CursorPageResponse<>(bookings, nextCursor, hasMore);
 
   }
 
   private BookingDto toDto(Booking b) {
-    return BookingDto.builder().bookingId(b.getBookingId()).eventScheduleId(b.getEventScheduleId())
+    return BookingDto.builder().bookingId(b.getId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
         .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
   }
