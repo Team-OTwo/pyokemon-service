@@ -17,6 +17,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -95,3 +96,5 @@ temp/
 *.swo
 
 notification/src/main/resources/pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
+
+secrets/

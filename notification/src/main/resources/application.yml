@@ -38,8 +38,6 @@ event:
     base-url: http://localhost:8081/event
 
 firebase:
-  sdk:
-    json: classpath:pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
   storage:
     bucket: pyokemon-8a667.firebasestorage.app
 

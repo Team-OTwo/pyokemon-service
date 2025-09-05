@@ -5,6 +5,7 @@ WORKDIR /app
 COPY build/libs/*.jar app.jar
 
 ENV SPRING_PROFILES_ACTIVE=dev
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/secret/firebase.json
 
 EXPOSE 8085
 

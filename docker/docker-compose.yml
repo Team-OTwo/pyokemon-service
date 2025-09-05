@@ -144,6 +144,13 @@ services:
     volumes:
       - ../did/logs:/app/logs
 
+  notification-service:
+    build: ./notification
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secret/firebase.json
+    volumes:
+      - ./secrets/firebase.json:/app/secret/firebase.json:ro
+
 volumes:
   account_mysql_data:
     driver: local

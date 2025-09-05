@@ -8,8 +8,6 @@ account:
   service:
     base-url: http://pyokemon-account-service:8080/account
 
-  firebase:
-    sdk:
-      json: classpath:pyokemon-8a667-firebase-adminsdk-fbsvc-a90c7e922a.json
-    storage:
-      bucket: pyokemon-8a667.appspot.com
+firebase:
+  storage:
+    bucket: pyokemon-8a667.appspot.com
