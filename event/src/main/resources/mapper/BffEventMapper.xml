@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pyokemon.event.bff.repository.BffEventRepository">
     <select id="findEventScheduleById" resultType="com.pyokemon.event.bff.dto.BffEventScheduleDto">
-        SELECT event_schedule_id, event_id, venue_id, event_date FROM tb_event_schedule WHERE event_schedule_id = #{eventScheduleId}
+        SELECT id, event_id, venue_id, event_date FROM tb_event_schedule WHERE id = #{eventScheduleId}
     </select>
     <select id="findVenueById" resultType="com.pyokemon.event.bff.dto.BffVenueDto">
-        SELECT venue_id, venue_name FROM tb_venue WHERE venue_id = #{venueId}
+        SELECT id, venue_name FROM tb_venue WHERE id = #{venueId}
     </select>
     <select id="findSeatById" resultType="com.pyokemon.event.bff.dto.BffSeatDto">
-        SELECT seat_id, seat_class_id, floor, `row`, col FROM tb_seat WHERE seat_id = #{seatId}
+        SELECT id, seat_class_id, floor, `row`, col FROM tb_seat WHERE id = #{seatId}
     </select>
 
     <!-- 배치: ids가 비면 0행 반환 -->
@@ -16,7 +16,7 @@
             parameterType="map"
             resultType="com.pyokemon.event.bff.dto.BffSeatDto">
         SELECT
-        seat_id,
+        id as seatId,
         seat_class_id,
         floor,
         `row`,
@@ -25,7 +25,7 @@
         WHERE
         <choose>
             <when test="ids != null and ids.size() > 0">
-                seat_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
@@ -37,10 +37,10 @@
     </select>
 
     <select id="findEventById" resultType="com.pyokemon.event.bff.dto.BffEventDto">
-        SELECT event_id, title, thumbnail_url FROM tb_event WHERE event_id = #{eventId}
+        SELECT id as eventId, title, thumbnail_url FROM tb_event WHERE id = #{eventId}
     </select>
     <select id="findSeatClassById" resultType="com.pyokemon.event.bff.dto.BffSeatClassDto">
-        SELECT seat_class_id, class_name, priority FROM tb_seat_class WHERE seat_class_id = #{seatClassId}
+        SELECT id as seatClassId, class_name, priority FROM tb_seat_class WHERE id = #{seatClassId}
     </select>
 
     <!-- 배치 조회 -->
@@ -48,14 +48,14 @@
             parameterType="map"
             resultType="com.pyokemon.event.bff.dto.BffSeatClassDto">
         SELECT
-        seat_class_id,
+        id as seatClassId,
         class_name,
         priority
         FROM tb_seat_class
         WHERE
         <choose>
             <when test="ids != null and ids.size() > 0">
-                seat_class_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
@@ -68,11 +68,11 @@
 
 
     <select id="findEventSchedulesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventScheduleDto">
-        SELECT event_schedule_id, event_id, venue_id, event_date
+        SELECT id as seatClassId, event_id, venue_id, event_date
         FROM tb_event_schedule
         <where>
             <if test="ids != null and ids.size() > 0">
-                event_schedule_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
@@ -81,11 +81,11 @@
     </select>
 
     <select id="findEventsByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventDto">
-        SELECT event_id, title, thumbnail_url
+        SELECT id as eventId, title, thumbnail_url
         FROM tb_event
         <where>
             <if test="ids != null and ids.size() > 0">
-                event_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
@@ -94,11 +94,11 @@
     </select>
 
     <select id="findVenuesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffVenueDto">
-        SELECT venue_id, venue_name
+        SELECT id as venueId, venue_name
         FROM tb_venue
         <where>
             <if test="ids != null and ids.size() > 0">
-                venue_id IN
+                id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
@@ -108,11 +108,11 @@
 
     <select id="findScheduleIdsByTenantAndMonth" resultType="long">
         SELECT
-            DISTINCT es.event_schedule_id
+            DISTINCT es.id
         FROM
             tb_event e
                 INNER JOIN
-            tb_event_schedule es ON e.event_id = es.event_id
+            tb_event_schedule es ON e.id = es.event_id
         WHERE
             e.account_id = #{tenantId}
                 AND e.status = 'APPROVED'
@@ -122,18 +122,18 @@
 
     <select id="findScheduleDetailsByIds" resultType="com.pyokemon.event.bff.dto.BffScheduleDetailDto">
         SELECT
-        es.event_schedule_id AS eventScheduleId,
+        es.id AS eventScheduleId,
         e.title,
         v.venue_name AS venueName,
         es.event_date AS eventDate
         FROM
         tb_event_schedule es
         INNER JOIN
-        tb_event e ON es.event_id = e.event_id
+        tb_event e ON es.event_id = e.id
         INNER JOIN
-        tb_venue v ON es.venue_id = v.venue_id
+        tb_venue v ON es.venue_id = v.id
         WHERE
-        es.event_schedule_id IN
+        es.id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
@@ -142,11 +142,11 @@
     <select id="countActiveEventsByTenant" resultType="long">
         SELECT
             -- 한 공연이 해당 월에 여러 일정을 가질 수 있으므로, 고유한 공연의 개수만 셉니다.
-            COUNT(DISTINCT e.event_id)
+            COUNT(DISTINCT e.id)
         FROM
             tb_event e
                 INNER JOIN
-            tb_event_schedule es ON e.event_id = es.event_id
+            tb_event_schedule es ON e.id = es.event_id
         WHERE
             e.account_id = #{tenantId}
                 AND e.status = 'APPROVED'
@@ -157,18 +157,18 @@
 
     <!-- 장르로 eventIds 조회 -->
     <select id="findIdsByGenre" parameterType="string" resultType="long">
-        SELECT event_id
+        SELECT id as eventId
         FROM tb_event
         WHERE genre = #{genre}
     </select>
 
     <!-- eventIds로 eventScheduleIds 조회 -->
     <select id="findIdsByEventIds" parameterType="map" resultType="long">
-        SELECT event_schedule_id
+        SELECT id as eventScheduleId
         FROM tb_event_schedule
         <where>
             <if test="eventIds != null and eventIds.size() > 0">
-                event_id IN
+                id IN
                 <foreach collection="eventIds" item="id" open="(" separator="," close=")">
                     #{id}
                 </foreach>
