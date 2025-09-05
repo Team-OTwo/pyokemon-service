@@ -24,7 +24,7 @@ pipeline {
                             // 예: 'account' Job, 'payment' Job 등
                             build job: serviceName + "-service", wait: true // wait: true로 변경하여 작업을 순차적으로 실행
                         } else {
-                            echo "${serviceName}에서 변경 사항 없음. 빌드를 건너<binary data, 1 bytes><binary data, 1 bytes><binary data, 1 bytes>니다."
+                            echo "${serviceName}에서 변경 사항 없음. 빌드를 건너뜁니다."
                         }
                     }
                 }
