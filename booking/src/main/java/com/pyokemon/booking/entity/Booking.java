@@ -1,7 +1,7 @@
 package com.pyokemon.booking.entity;
 
-import java.time.LocalDateTime;
 
+import com.pyokemon.common.entity.BaseEntity;
 import lombok.*;
 
 @Getter
@@ -9,16 +9,14 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Booking {
-  private Long bookingId;
+public class Booking extends BaseEntity {
+
   private Long eventScheduleId;
   private Long seatId;
   private Long accountId;
   private Long tenantId;
   private Long paymentId;
   private Booked status;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
 
   public enum Booked {
     PENDING, BOOKED, CANCELED, FAILED, EXPIRED
