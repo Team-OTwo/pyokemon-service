@@ -24,7 +24,7 @@
 
     <select id="findNotificationListByAccountId" resultType="com.pyokemon.notification.dto.NotificationResponseDto">
         SELECT
-         e.notification_id,
+         e.id as notificationId,
          e.title,
          e.message,
          e.is_checked,
@@ -32,7 +32,7 @@
         FROM tb_notification e
         WHERE e.account_id = #{accountId}
         <if test="cursorId != null">
-            AND e.notification_id &lt;= #{cursorId}
+            AND e.id &lt;= #{cursorId}
         </if>
         ORDER BY created_at DESC
         <if test="size != null">
@@ -49,7 +49,7 @@
 
     <select id="findNotificationAppListByAccountId" >
         SELECT
-            e.notification_id,
+            e.id,
             e.title,
             e.message,
             e.is_checked,
@@ -61,7 +61,7 @@
     <update id="updateNotificationReadByNotificationId" >
         UPDATE tb_notification SET
            is_checked = 1
-        WHERE notification_id = #{notificationId}
+        WHERE id = #{notificationId}
         AND
             account_id = #{accountId}  AND
             is_checked = 0
