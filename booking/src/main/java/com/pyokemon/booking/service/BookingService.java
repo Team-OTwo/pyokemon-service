@@ -24,7 +24,6 @@ import com.pyokemon.booking.entity.Booking;
 import com.pyokemon.booking.repository.BookingRepository;
 import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.exception.code.EventErrorCodes;
-import com.pyokemon.common.exception.code.PaymentErrorCodes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -123,12 +122,11 @@ public class BookingService {
     // 새 예약 생성
     Booking newBooking = Booking.builder().eventScheduleId(request.getEventScheduleId())
         .seatId(request.getSeatId()).accountId(accountId).tenantId(request.getTenantId())
-        .paymentId(null).status(Booking.Booked.PENDING).createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now()).build();
+        .paymentId(null).status(Booking.Booked.PENDING).build();
 
     bookingRepository.save(newBooking);
 
-    return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getBookingId());
+    return new BookingResponse(newBooking.getEventScheduleId(), newBooking.getId());
   }
 
   // 예약 취소
@@ -154,7 +152,6 @@ public class BookingService {
     }
 
     booking.setStatus(Booking.Booked.CANCELED);
-    booking.setUpdatedAt(LocalDateTime.now());
     bookingRepository.update(booking);
 
     bookingEventPublisher.publishBookingStatusUpdate(booking);
@@ -186,7 +183,6 @@ public class BookingService {
 
     booking.setStatus(newStatus);
     booking.setPaymentId(paymentId);
-    booking.setUpdatedAt(LocalDateTime.now());
 
     bookingRepository.update(booking);
     bookingEventPublisher.publishBookingStatusUpdate(booking);
@@ -221,12 +217,11 @@ public class BookingService {
       expiredBookings.parallelStream().forEach(booking -> {
         try {
           booking.setStatus(Booking.Booked.EXPIRED);
-          booking.setUpdatedAt(LocalDateTime.now());
           bookingRepository.update(booking);
 
           bookingEventPublisher.publishBookingStatusUpdate(booking);
         } catch (Exception e) {
-          log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getBookingId(), e);
+          log.error("예약 만료 처리 중 오류 발생: bookingId={}", booking.getId(), e);
         }
       });
     } catch (Exception e) {
@@ -253,14 +248,14 @@ public class BookingService {
 
       for (Booking booking : bookedBookings) {
         try {
-          BookingEventDto eventDto = BookingEventDto.builder().bookingId(booking.getBookingId())
+          BookingEventDto eventDto = BookingEventDto.builder().bookingId(booking.getId())
               .eventScheduleId(booking.getEventScheduleId()).seatId(booking.getSeatId())
               .accountId(booking.getAccountId()).tenantId(booking.getTenantId()).status("confirmed")
               .build();
 
           bookingEventPublisher.publishBookingEvent(eventDto);
         } catch (Exception e) {
-          log.error("예약 이벤트 발행 중 오류 발생: bookingId={}, eventScheduleId={}", booking.getBookingId(),
+          log.error("예약 이벤트 발행 중 오류 발생: bookingId={}, eventScheduleId={}", booking.getId(),
               eventScheduleId, e);
         }
       }
