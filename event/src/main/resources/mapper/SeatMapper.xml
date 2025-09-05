@@ -6,13 +6,13 @@
 <mapper namespace="com.pyokemon.event.repository.SeatRepository">
 
     <select id="findBySeatClassId" resultType="Seat" parameterType="long">
-        SELECT seat_id as id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
+        SELECT id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
         FROM tb_seat
         WHERE seat_class_id = #{param1}
     </select>
 
     <select id="findByVenueIdAndSeatClassId" resultType="Seat">
-        SELECT seat_id as id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
+        SELECT id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
         FROM tb_seat
         WHERE venue_id = #{param1} AND seat_class_id = #{param2}
     </select>
@@ -24,7 +24,7 @@
     </select>
 
     <select id="findByVenueId" resultType="Seat" parameterType="long">
-        SELECT seat_id as id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
+        SELECT id, venue_id, seat_class_id, floor, `row`, col, created_at, updated_at
         FROM tb_seat
         WHERE venue_id = #{param1}
     </select>
