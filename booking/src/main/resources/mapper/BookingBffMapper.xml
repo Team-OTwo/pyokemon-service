@@ -6,20 +6,20 @@
 <mapper namespace="com.pyokemon.booking.bff.repository.BookingBffRepository">
 
     <select id="findByEventScheduleId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+        SELECT id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
         ORDER BY created_at DESC
     </select>
 
     <select id="findByAccountId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+        SELECT id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
     </select>
 
     <select id="findByAccountIdOrderByDate" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+        SELECT id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE account_id = #{accountId}
         AND status IN ('BOOKED', 'CANCELED')
@@ -27,11 +27,11 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <select id="findByEventScheduleIdOrderByBookingId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+    <select id="findByEventScheduleIdOrderById" resultType="Booking">
+        SELECT id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
         WHERE event_schedule_id = #{eventScheduleId}
-        ORDER BY booking_id DESC
+        ORDER BY id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -47,10 +47,10 @@
         WHERE event_schedule_id = #{eventScheduleId}
     </select>
 
-    <select id="findByBookingId" resultType="Booking">
-        SELECT booking_id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
+    <select id="findById" resultType="Booking">
+        SELECT id, event_schedule_id, seat_id, account_id, tenant_id, payment_id, status, created_at, updated_at
         FROM tb_booking
-        WHERE booking_id = #{bookingId}
+        WHERE id = #{id}
     </select>
 
     <select id="findBookingCountsByScheduleIds" resultType="com.pyokemon.booking.bff.dto.BookingCountDto">
@@ -83,19 +83,19 @@
     </select>
 
     <select id="findByAccountWithCursor" resultType="Booking">
-        SELECT booking_id, event_schedule_id, tenant_id
+        SELECT id, event_schedule_id, tenant_id
         FROM tb_booking
         WHERE account_id = #{accountId}
         <if test="cursor != null">
-            AND booking_id &lt; #{cursor}
+            AND id &lt; #{cursor}
         </if>
-        ORDER BY booking_id DESC
+        ORDER BY id DESC
         LIMIT #{size}
     </select>
 
     <!-- 2) 특정 스케줄 집합 + 계정 예매순 커서 -->
     <select id="findByAccountAndSchedulesWithCursor" resultType="Booking">
-        SELECT booking_id, event_schedule_id, tenant_id
+        SELECT id, event_schedule_id, tenant_id
         FROM tb_booking
         WHERE account_id = #{accountId}
         <if test="scheduleIds != null and scheduleIds.size() &gt; 0">
@@ -105,9 +105,9 @@
             </foreach>
         </if>
         <if test="cursor != null">
-            AND booking_id &lt; #{cursor}
+            AND id &lt; #{cursor}
         </if>
-        ORDER BY booking_id DESC
+        ORDER BY id DESC
         LIMIT #{size}
     </select>
 
