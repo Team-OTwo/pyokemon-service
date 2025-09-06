@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BffSeatDto {
-  private Long seatId;
+  private Long id;
   private Long seatClassId;
   private Long floor;
   private String row;

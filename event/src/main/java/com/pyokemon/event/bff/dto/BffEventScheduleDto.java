@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class BffEventScheduleDto {
-  private Long eventScheduleId;
+  private Long id;
   private Long eventId;
   private Long venueId;
   private LocalDateTime eventDate;
