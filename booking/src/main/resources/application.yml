@@ -12,7 +12,7 @@ spring:
       - common
   
   datasource:
-    url: jdbc:mysql://localhost:3311/pyokemon_booking?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3311/pyokemon_booking?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root_password

@@ -204,15 +204,17 @@ public class BookingService {
   // PENDING 예약 만료 처리 스케줄러 (1분마다 실행)
   @Transactional(readOnly = false)
   @Scheduled(cron = "0 */1 * * * *")
-  @SchedulerLock(name = "expirePendingBookings", // 락 이름은 유니크하게
-      lockAtMostFor = "2m", // 2분 이상 락 유지, 장애 시 중복 실행 방지
-      lockAtLeastFor = "1m" // 최소 1분 락 유지, 중복 실행 방지
-  )
   public void expirePendingBookings() {
     try {
-      LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+      LocalDateTime now = LocalDateTime.now();
+      LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
+      
+      log.info("스케줄러 실행 - 현재시간: {}, 5분전: {}", now, fiveMinutesAgo);
+      
       List<Booking> expiredBookings =
           bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
+          
+      log.info("만료 대상 예약 수: {}", expiredBookings.size());
 
       expiredBookings.parallelStream().forEach(booking -> {
         try {
