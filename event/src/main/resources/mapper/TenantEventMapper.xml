@@ -133,7 +133,7 @@
     </update>
 
     <select id="findEventScheduleId" resultType="Long">
-        SELECT event_schedule_id
+        SELECT es.id
         FROM tb_event_schedule es JOIN tb_event e ON es.event_id = e.id
         WHERE
             e.id = #{eventId}

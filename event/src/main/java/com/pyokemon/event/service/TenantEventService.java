@@ -141,6 +141,12 @@ public class TenantEventService {
       eventRegisterDto.setDescription(sanitizedDescription);
     }
 
+    // thumbnail 필드의 Base64 이미지를 서버에 저장하고 URL로 변환
+    if (eventRegisterDto.getThumbnailUrl() != null && eventRegisterDto.getThumbnailUrl().startsWith("data:image")) {
+      String thumbnailUrl = convertBase64ImageToUrl(eventRegisterDto.getThumbnailUrl());
+      eventRegisterDto.setThumbnailUrl(thumbnailUrl);
+    }
+
     // 새로 추가된 공연 status PENDING으로 설정
     eventRegisterDto.setStatus(Event.EventStatus.PENDING);
 
@@ -244,7 +250,15 @@ public class TenantEventService {
     }
 
     event.setGenre(updateDto.getGenre());
-    event.setThumbnailUrl(updateDto.getThumbnailUrl());
+    // thumbnail 필드의 Base64 이미지를 서버에 저장하고 URL로 변환
+    if (updateDto.getThumbnailUrl() != null && updateDto.getThumbnailUrl().startsWith("data:image")) {
+      String thumbnailUrl = convertBase64ImageToUrl(updateDto.getThumbnailUrl());
+      event.setThumbnailUrl(thumbnailUrl);
+    } else {
+      event.setThumbnailUrl(updateDto.getThumbnailUrl());
+    }
+
+    event.setGenre(updateDto.getGenre());
     if (updateDto.getStatus() != null) {
       event.setStatus(updateDto.getStatus());
     }
@@ -492,9 +506,9 @@ public class TenantEventService {
 
   // 파일 크기 검증
   private void validateFileSize(MultipartFile file) {
-    long maxSize = 10 * 1024 * 1024; // 10MB
+    long maxSize = 50 * 1024 * 1024; // 50MB
     if (file.getSize() > maxSize) {
-      throw new BusinessException("File size exceeds limit. Maximum: 10MB", "FILE_SIZE_EXCEEDED");
+      throw new BusinessException("File size exceeds limit. Maximum: 50MB", "FILE_SIZE_EXCEEDED");
     }
   }
 
@@ -636,6 +650,59 @@ public class TenantEventService {
         return ".webp";
       default:
         return ".jpg"; // 기본값
+    }
+  }
+
+  // 단일 Base64 이미지를 서버에 저장하고 URL로 변환
+  private String convertBase64ImageToUrl(String base64ImageData) {
+    if (base64ImageData == null || !base64ImageData.startsWith("data:image")) {
+      return base64ImageData;
+    }
+
+    try {
+      // Base64 데이터에서 MIME 타입과 데이터 추출
+      String[] parts = base64ImageData.split(",");
+      if (parts.length != 2) {
+        log.warn("Invalid base64 image format");
+        return base64ImageData;
+      }
+
+      String mimeTypePart = parts[0]; // data:image/jpeg;base64
+      String base64Data = parts[1];
+
+      // MIME 타입에서 이미지 타입 추출
+      String imageType = mimeTypePart.substring(mimeTypePart.indexOf("/") + 1, mimeTypePart.indexOf(";"));
+      
+      // Base64를 바이트 배열로 변환
+      byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+      // 파일 확장자 결정
+      String extension = getExtensionFromMimeType(imageType);
+
+      // 고유한 파일명 생성
+      String filename = generateShortFilename() + extension;
+
+      // 업로드 디렉토리 생성 (상대 경로 사용)
+      Path uploadDir = Paths.get(uploadPath);
+      if (!Files.exists(uploadDir)) {
+        Files.createDirectories(uploadDir);
+      }
+
+      // 파일 저장
+      Path filePath = uploadDir.resolve(filename);
+      Files.write(filePath, imageBytes);
+
+      // URL 생성 (context path 포함)
+      String imageUrl = contextPath + urlPrefix + "/" + filename;
+
+      log.info("Base64 thumbnail image converted to URL: {} ({} bytes)", imageUrl, imageBytes.length);
+
+      return imageUrl;
+
+    } catch (Exception e) {
+      log.error("Failed to convert base64 thumbnail image to URL", e);
+      // 실패한 경우 원본 반환
+      return base64ImageData;
     }
   }
 
