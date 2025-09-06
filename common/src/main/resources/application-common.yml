@@ -14,7 +14,7 @@ spring:
     table: flyway_schema_history
     encoding: UTF-8
     create-schemas: true
-    
+
   # Kafka 공통 설정
   kafka:
     bootstrap-servers: localhost:9092

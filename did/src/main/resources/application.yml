@@ -22,7 +22,7 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-      
+
   flyway:
     locations: classpath:db/migration/did
     repair-on-migrate: true
@@ -110,4 +110,3 @@ spring:
       on-profile: "local"
     import:
       - classpath:local-config.yml
-
