@@ -7,8 +7,7 @@
 <mapper namespace="com.pyokemon.event.repository.PriceRepository">
 
     <select id="findPricesWithSeatClassByEventScheduleId" resultType="PriceWithSeatClassDTO">
-        SELECT p.id as price_id, p.event_schedule_id, p.seat_class_id, p.price,
-               sc.class_name
+        SELECT p.id, p.event_schedule_id, p.seat_class_id, p.price, sc.class_name
         FROM tb_price p
         JOIN tb_seat_class sc ON p.seat_class_id = sc.id
         WHERE p.event_schedule_id = #{eventScheduleId}
