@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class BffVenueDto {
-  private Long venueId;
+  private Long id;
   private String venueName;
 }

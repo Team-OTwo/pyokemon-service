@@ -26,8 +26,8 @@ public class BookingBffService {
       return null;
     }
 
-    return bookings.stream().map(this::toDto) // Booking -> BookingDto
-        .toList(); // Java 16+면 이거 사용 가능
+    return bookings.stream().map(this::toDto)
+        .toList();
   }
 
   public List<BookingDto> getAccountIdBookings(Long accountId) {
@@ -120,7 +120,7 @@ public class BookingBffService {
   }
 
   private BookingDto toDto(Booking b) {
-    return BookingDto.builder().bookingId(b.getId()).eventScheduleId(b.getEventScheduleId())
+    return BookingDto.builder().id(b.getId()).eventScheduleId(b.getEventScheduleId())
         .seatId(b.getSeatId()).accountId(b.getAccountId()).paymentId(b.getPaymentId())
         .status(b.getStatus()).updatedAt(b.getUpdatedAt()).tenantId(b.getTenantId()).build();
   }

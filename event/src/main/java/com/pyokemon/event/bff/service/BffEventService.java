@@ -33,7 +33,7 @@ public class BffEventService {
       return List.of();
     List<BffEventScheduleDto> rows = repo.findEventSchedulesByIdIn(ids);
     Map<Long, BffEventScheduleDto> byId = rows.stream()
-        .collect(Collectors.toMap(BffEventScheduleDto::getEventScheduleId, Function.identity()));
+        .collect(Collectors.toMap(BffEventScheduleDto::getId, Function.identity()));
     List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
 
     if (!missing.isEmpty()) {
@@ -55,7 +55,7 @@ public class BffEventService {
     List<BffVenueDto> rows = repo.findVenuesByIdIn(ids);
 
     Map<Long, BffVenueDto> byId =
-        rows.stream().collect(Collectors.toMap(BffVenueDto::getVenueId, Function.identity()));
+        rows.stream().collect(Collectors.toMap(BffVenueDto::getId, Function.identity()));
 
     List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
 
@@ -72,13 +72,17 @@ public class BffEventService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SEAT_NOT_FOUND"));
   }
 
+  public List<BffSeatDto> getSeatForVenue(Long venueId) {
+    return repo.findSeatByVenueId(venueId);
+  }
+
   public List<BffSeatDto> getSeats(List<Long> ids) {
     if (ids == null || ids.isEmpty())
       return List.of();
 
     List<BffSeatDto> rows = repo.findSeatsByIdIn(ids);
     Map<Long, BffSeatDto> byId =
-        rows.stream().collect(Collectors.toMap(BffSeatDto::getSeatId, Function.identity()));
+        rows.stream().collect(Collectors.toMap(BffSeatDto::getId, Function.identity()));
 
     // 하나라도 없으면 예외를 던질지, 있는 것만 쓸지는 정책대로
     List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
@@ -104,7 +108,7 @@ public class BffEventService {
 
     // ID 기준 Map으로 정리
     Map<Long, BffEventDto> byId =
-        rows.stream().collect(Collectors.toMap(BffEventDto::getEventId, Function.identity()));
+        rows.stream().collect(Collectors.toMap(BffEventDto::getId, Function.identity()));
 
     // 누락된 ID 체크
     List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
@@ -128,7 +132,7 @@ public class BffEventService {
 
     List<BffSeatClassDto> rows = repo.findSeatClassesByIdIn(seatClassIds);
     Map<Long, BffSeatClassDto> byId = rows.stream()
-        .collect(Collectors.toMap(BffSeatClassDto::getSeatClassId, Function.identity()));
+        .collect(Collectors.toMap(BffSeatClassDto::getId, Function.identity()));
 
     // 누락 처리: 기존 정책에 맞춰서 예외 or skip
     List<Long> missing =

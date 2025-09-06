@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BffEventDto {
-  private Long eventId;
+  private Long id;
   private String title;
   private String thumbnailUrl;
 }

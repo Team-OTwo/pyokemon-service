@@ -12,7 +12,7 @@ import com.pyokemon.account.tenant.entity.Tenant;
 @Mapper
 public interface TenantBffRepository {
 
-  Optional<Tenant> findByTenantId(@Param("tenantId") Long tenantId);
+  Optional<Tenant> findByTenantId(@Param("id") Long tenantId);
 
   List<TenantDto> findTenantsByIdIn(@Param("ids") List<Long> ids);
 }

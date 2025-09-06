@@ -36,6 +36,11 @@ public class BffEventController {
     return bffEventService.getSeat(seatId);
   }
 
+  @GetMapping("/venues/{venueId}/seats")
+  public List<BffSeatDto> getSeatForVenue(@PathVariable Long venueId) {
+    return bffEventService.getSeatForVenue(venueId);
+  }
+
   // Event 엔드포인트
   @GetMapping("/bff/events/{eventId}")
   public BffEventDto getEvent(@PathVariable Long eventId) {

@@ -10,13 +10,16 @@
     <select id="findSeatById" resultType="com.pyokemon.event.bff.dto.BffSeatDto">
         SELECT id, seat_class_id, floor, `row`, col FROM tb_seat WHERE id = #{seatId}
     </select>
+    <select id="findSeatByVenueId" resultType="com.pyokemon.event.bff.dto.BffSeatDto">
+        SELECT id, seat_class_id, floor, `row`, col FROM tb_seat WHERE venue_id = #{venueId}
+    </select>
 
     <!-- 배치: ids가 비면 0행 반환 -->
     <select id="findSeatsByIdIn"
             parameterType="map"
             resultType="com.pyokemon.event.bff.dto.BffSeatDto">
         SELECT
-        id as seatId,
+        id,
         seat_class_id,
         floor,
         `row`,
@@ -37,10 +40,10 @@
     </select>
 
     <select id="findEventById" resultType="com.pyokemon.event.bff.dto.BffEventDto">
-        SELECT id as eventId, title, thumbnail_url FROM tb_event WHERE id = #{eventId}
+        SELECT id, title, thumbnail_url FROM tb_event WHERE id = #{eventId}
     </select>
     <select id="findSeatClassById" resultType="com.pyokemon.event.bff.dto.BffSeatClassDto">
-        SELECT id as seatClassId, class_name, priority FROM tb_seat_class WHERE id = #{seatClassId}
+        SELECT id, class_name, priority FROM tb_seat_class WHERE id = #{seatClassId}
     </select>
 
     <!-- 배치 조회 -->
@@ -48,7 +51,7 @@
             parameterType="map"
             resultType="com.pyokemon.event.bff.dto.BffSeatClassDto">
         SELECT
-        id as seatClassId,
+        id,
         class_name,
         priority
         FROM tb_seat_class
@@ -68,7 +71,7 @@
 
 
     <select id="findEventSchedulesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventScheduleDto">
-        SELECT id as eventScheduleId, event_id, venue_id, event_date
+        SELECT id, event_id, venue_id, event_date
         FROM tb_event_schedule
         <where>
             <if test="ids != null and ids.size() > 0">
@@ -81,7 +84,7 @@
     </select>
 
     <select id="findEventsByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffEventDto">
-        SELECT id as eventId, title, thumbnail_url
+        SELECT id, title, thumbnail_url
         FROM tb_event
         <where>
             <if test="ids != null and ids.size() > 0">
@@ -94,7 +97,7 @@
     </select>
 
     <select id="findVenuesByIdIn" parameterType="map" resultType="com.pyokemon.event.bff.dto.BffVenueDto">
-        SELECT id as venueId, venue_name
+        SELECT id, venue_name
         FROM tb_venue
         <where>
             <if test="ids != null and ids.size() > 0">
