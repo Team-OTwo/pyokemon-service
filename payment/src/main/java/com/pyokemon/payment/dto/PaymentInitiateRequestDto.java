@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentInitiateRequestDto {
-  private Long paymentId;
+  private Long id;
   private Long bookingId;
   private String orderId;
   private int amount;

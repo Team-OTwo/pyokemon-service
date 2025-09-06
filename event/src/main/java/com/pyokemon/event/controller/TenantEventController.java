@@ -3,14 +3,14 @@ package com.pyokemon.event.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pyokemon.common.dto.ResponseDto;
+import com.pyokemon.common.exception.BusinessException;
 import com.pyokemon.common.web.context.GatewayRequestHeaderUtils;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
 import com.pyokemon.event.dto.tenant.*;
@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class TenantEventController {
 
   private final TenantEventService tenantEventService;
+  private final ObjectMapper objectMapper;
 
   // 테넌트별 공연 목록 조회 (테넌트 웹용)
   @GetMapping
@@ -45,26 +46,54 @@ public class TenantEventController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseDto<EventResponseDto> registerEvent(
-      @Valid @RequestBody EventRegisterDto eventRegisterDto) {
-    EventResponseDto registeredEvent =
-        tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
-    return ResponseDto.success(registeredEvent, "Event registered successfully");
+      @RequestParam("eventData") String eventDataJson,
+      @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile) {
+    try {
+      // JSON 문자열을 EventRegisterDto로 변환
+      EventRegisterDto eventRegisterDto = objectMapper.readValue(eventDataJson, EventRegisterDto.class);
+      
+      // 썸네일 파일이 있으면 Base64로 변환
+      if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+        String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
+        eventRegisterDto.setThumbnailUrl(base64Thumbnail);
+      }
+      
+      EventResponseDto registeredEvent =
+          tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
+      return ResponseDto.success(registeredEvent, "Event registered successfully");
+    } catch (Exception e) {
+      throw new BusinessException("Failed to process multipart request", "MULTIPART_PROCESSING_FAILED");
+    }
   }
 
   // 이벤트 수정 (테넌트용)
   @PutMapping("/{eventId}")
   public ResponseDto<EventResponseDto> updateEvent(@PathVariable Long eventId,
-      @Valid @RequestBody EventUpdateDto eventUpdateDto) {
-    eventUpdateDto.setEventId(eventId);
-    EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
-    return ResponseDto.success(updatedEvent, "Event updated successfully");
+      @RequestParam("eventData") String eventDataJson,
+      @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile) {
+    try {
+      // JSON 문자열을 EventUpdateDto로 변환
+      EventUpdateDto eventUpdateDto = objectMapper.readValue(eventDataJson, EventUpdateDto.class);
+      eventUpdateDto.setEventId(eventId);
+      
+      // 썸네일 파일이 있으면 Base64로 변환
+      if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+        String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
+        eventUpdateDto.setThumbnailUrl(base64Thumbnail);
+      }
+      
+      EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
+      return ResponseDto.success(updatedEvent, "Event updated successfully");
+    } catch (Exception e) {
+      throw new BusinessException("Failed to process multipart request", "MULTIPART_PROCESSING_FAILED");
+    }
   }
 
   // 일정 등록 (기존 공연에 일정 추가) - 테넌트용
   @PostMapping("/{eventId}/schedules")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseDto<String> registerEventSchedule(@PathVariable Long eventId,
-      @Valid @RequestBody EventScheduleDto eventScheduleDto) {
+      @RequestBody EventScheduleDto eventScheduleDto) {
     String result = tenantEventService.registerEventSchedule(eventId, eventScheduleDto);
     return ResponseDto.success(result, "Event schedule registered successfully");
   }
@@ -96,6 +125,18 @@ public class TenantEventController {
     String fileUrl = tenantEventService.uploadImageFile(file);
 
     return ResponseDto.success(fileUrl, "Image uploaded successfully");
+  }
+
+  // MultipartFile을 Base64로 변환하는 헬퍼 메서드
+  private String convertMultipartFileToBase64(MultipartFile file) {
+    try {
+      byte[] fileBytes = file.getBytes();
+      String base64String = java.util.Base64.getEncoder().encodeToString(fileBytes);
+      String mimeType = file.getContentType();
+      return "data:" + mimeType + ";base64," + base64String;
+    } catch (Exception e) {
+      throw new BusinessException("Failed to convert file to Base64", "FILE_CONVERSION_FAILED");
+    }
   }
 
 }

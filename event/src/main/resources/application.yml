@@ -10,6 +10,12 @@ spring:
     include:
       - flyway
       - common
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      enabled: true
 
   datasource:
     url: jdbc:mysql://localhost:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
