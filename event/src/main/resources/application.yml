@@ -18,7 +18,7 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:mysql://localhost:3307/pyokemon_event?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/pyokemon_event?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: pyokemon_event
     password: pyokemon123

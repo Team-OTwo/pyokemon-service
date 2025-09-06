@@ -34,7 +34,7 @@ public class PaymentEventListener {
   public void processPaymentEvent(PaymentKafkaDto paymentEvent) {
     Booking.Booked newStatus = mapPaymentStatusToBookingStatus(paymentEvent.getStatus());
     bookingService.updateBookingStatus(paymentEvent.getBookingId(), newStatus,
-        paymentEvent.getPaymentId());
+        paymentEvent.getId());
   }
 
   private Booking.Booked mapPaymentStatusToBookingStatus(String paymentStatus) {
