@@ -1,6 +1,7 @@
 services:
   account-mysql:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: pyokemon-account-mysql
     environment:
       MYSQL_DATABASE: pyokemon_account
@@ -14,6 +15,7 @@ services:
 
   event-mysql:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: pyokemon-event-mysql
     environment:
       MYSQL_DATABASE: pyokemon_event
@@ -27,6 +29,7 @@ services:
 
   notification-mysql:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: pyokemon-notification-mysql
     environment:
       MYSQL_DATABASE: pyokemon_notification
@@ -41,6 +44,7 @@ services:
   did-mysql:
     image: mysql:8.0
     container_name: pyokemon-did-mysql
+    platform: linux/amd64
     environment:
       MYSQL_DATABASE: pyokemon_did
       MYSQL_USER: pyokemon
@@ -53,6 +57,7 @@ services:
 
   payment-mysql:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: pyokemon-payment-mysql
     environment:
       MYSQL_DATABASE: pyokemon_payment
@@ -66,6 +71,7 @@ services:
       - payment_mysql_data:/var/lib/mysql
 
   booking-mysql:
+    platform: linux/amd64
     image: mysql:8.0
     container_name: pyokemon-booking-mysql
     environment:
@@ -121,28 +127,6 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
 
-  did-service:
-    build:
-      context: ..
-      dockerfile: did/Dockerfile
-    container_name: pyokemon-did-service
-    restart: unless-stopped
-    depends_on:
-      - did-mysql
-      - redis
-      - kafka
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:mysql://did-mysql:3306/pyokemon_did?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: pyokemon
-      SPRING_DATASOURCE_PASSWORD: pyokemon123
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-    ports:
-      - "8084:8084"
-    volumes:
-      - ../did/logs:/app/logs
 
 volumes:
   account_mysql_data:
