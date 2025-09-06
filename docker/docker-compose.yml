@@ -1,7 +1,6 @@
 services:
   account-mysql:
     image: mysql:8.0
-    platform: linux/amd64
     container_name: pyokemon-account-mysql
     environment:
       MYSQL_DATABASE: pyokemon_account
@@ -15,7 +14,6 @@ services:
 
   event-mysql:
     image: mysql:8.0
-    platform: linux/amd64
     container_name: pyokemon-event-mysql
     environment:
       MYSQL_DATABASE: pyokemon_event
@@ -29,7 +27,6 @@ services:
 
   notification-mysql:
     image: mysql:8.0
-    platform: linux/amd64
     container_name: pyokemon-notification-mysql
     environment:
       MYSQL_DATABASE: pyokemon_notification
@@ -44,7 +41,6 @@ services:
   did-mysql:
     image: mysql:8.0
     container_name: pyokemon-did-mysql
-    platform: linux/amd64
     environment:
       MYSQL_DATABASE: pyokemon_did
       MYSQL_USER: pyokemon
@@ -57,7 +53,6 @@ services:
 
   payment-mysql:
     image: mysql:8.0
-    platform: linux/amd64
     container_name: pyokemon-payment-mysql
     environment:
       MYSQL_DATABASE: pyokemon_payment
@@ -71,7 +66,6 @@ services:
       - payment_mysql_data:/var/lib/mysql
 
   booking-mysql:
-    platform: linux/amd64
     image: mysql:8.0
     container_name: pyokemon-booking-mysql
     environment:
