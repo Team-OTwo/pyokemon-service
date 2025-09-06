@@ -52,10 +52,10 @@ public class TenantEventController {
       // JSON 문자열을 EventRegisterDto로 변환
       EventRegisterDto eventRegisterDto = objectMapper.readValue(eventDataJson, EventRegisterDto.class);
       
-      // 썸네일 파일이 있으면 Base64로 변환
+      // 썸네일 파일이 있으면 파일로 저장하고 절대 URL 생성
       if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
-        String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
-        eventRegisterDto.setThumbnailUrl(base64Thumbnail);
+        String thumbnailUrl = tenantEventService.uploadImageFile(thumbnailFile);
+        eventRegisterDto.setThumbnailUrl(thumbnailUrl);
       }
       
       EventResponseDto registeredEvent =
@@ -76,10 +76,10 @@ public class TenantEventController {
       EventUpdateDto eventUpdateDto = objectMapper.readValue(eventDataJson, EventUpdateDto.class);
       eventUpdateDto.setEventId(eventId);
       
-      // 썸네일 파일이 있으면 Base64로 변환
+      // 썸네일 파일이 있으면 파일로 저장하고 절대 URL 생성
       if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
-        String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
-        eventUpdateDto.setThumbnailUrl(base64Thumbnail);
+        String thumbnailUrl = tenantEventService.uploadImageFile(thumbnailFile);
+        eventUpdateDto.setThumbnailUrl(thumbnailUrl);
       }
       
       EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
@@ -127,16 +127,5 @@ public class TenantEventController {
     return ResponseDto.success(fileUrl, "Image uploaded successfully");
   }
 
-  // MultipartFile을 Base64로 변환하는 헬퍼 메서드
-  private String convertMultipartFileToBase64(MultipartFile file) {
-    try {
-      byte[] fileBytes = file.getBytes();
-      String base64String = java.util.Base64.getEncoder().encodeToString(fileBytes);
-      String mimeType = file.getContentType();
-      return "data:" + mimeType + ";base64," + base64String;
-    } catch (Exception e) {
-      throw new BusinessException("Failed to convert file to Base64", "FILE_CONVERSION_FAILED");
-    }
-  }
 
 }

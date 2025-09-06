@@ -36,21 +36,16 @@ spring:
     consumer:
       group-id: ${spring.application.name}
 
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-
-# 파일 업로드 설정
+# 앱 설정
 app:
   upload:
     path: event/uploads
     url-prefix: /uploads
-  # S3 설정 (선택사항 - 나중에 S3로 전환 시 사용)
-  # storage:
-  #   type: s3  # local 또는 s3
-  # s3:
-  #   bucket-name: your-bucket-name
-  #   region: ap-northeast-2
-  #   url-prefix: https://your-bucket.s3.amazonaws.com
+  server:
+    base-url: http://localhost:8081
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
 
 ---
 spring:

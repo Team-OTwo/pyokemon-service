@@ -75,6 +75,9 @@ public class TenantEventService {
 
   @Value("${server.servlet.context-path:/event}")
   private String contextPath;
+  
+  @Value("${app.server.base-url:http://localhost:8081}")
+  private String serverBaseUrl;
 
 
   public EventDetailResponseDTO getTenantEventDetailByEventId(Long eventId) {
@@ -468,8 +471,8 @@ public class TenantEventService {
       Path filePath = uploadDir.resolve(uniqueFilename);
       Files.copy(file.getInputStream(), filePath);
 
-      // 파일 URL 반환 (context path 포함)
-      String fileUrl = contextPath + urlPrefix + "/" + uniqueFilename;
+      // 파일 URL 반환 (절대 URL 생성)
+      String fileUrl = serverBaseUrl + contextPath + urlPrefix + "/" + uniqueFilename;
       log.info("File uploaded successfully to local storage: {}", fileUrl);
 
       return fileUrl;
@@ -614,7 +617,7 @@ public class TenantEventService {
         Files.write(filePath, imageBytes);
 
         // URL 생성 (context path 포함)
-        String imageUrl = contextPath + urlPrefix + "/" + filename;
+        String imageUrl = serverBaseUrl + contextPath + urlPrefix + "/" + filename;
 
         log.info("Base64 image converted to URL: {} ({} bytes)", imageUrl, imageBytes.length);
 
