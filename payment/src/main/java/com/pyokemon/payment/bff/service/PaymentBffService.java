@@ -35,7 +35,7 @@ public class PaymentBffService {
 
     Payment payment = paymentOpt.get();
 
-    return PaymentDto.builder().paymentId(paymentId).amount(payment.getAmount())
+    return PaymentDto.builder().id(paymentId).amount(payment.getAmount())
         .method(payment.getMethod()).status(payment.getStatus()).updatedAt(payment.getUpdatedAt())
         .build();
   }
@@ -65,7 +65,7 @@ public class PaymentBffService {
   }
 
   private static PaymentDto toDto(Long paymentId, Payment payment) {
-    return PaymentDto.builder().paymentId(paymentId).amount(payment.getAmount())
+    return PaymentDto.builder().id(paymentId).amount(payment.getAmount())
         .method(payment.getMethod()).status(payment.getStatus()).updatedAt(payment.getUpdatedAt())
         .build();
   }

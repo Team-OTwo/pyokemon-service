@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDto {
-  private Long paymentId;
+  private Long id;
   private Long amount;
   private String method;
   private Enum status;

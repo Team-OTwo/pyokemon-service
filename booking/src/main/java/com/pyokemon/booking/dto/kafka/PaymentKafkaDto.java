@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentKafkaDto {
-  private Long paymentId;
+  private Long id;
   private Long bookingId;
   private String status;
 }
