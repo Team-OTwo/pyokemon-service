@@ -3,16 +3,16 @@ package com.pyokemon.event.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.pyokemon.event.dto.kafka.EventKafkaDto;
-import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
-import com.pyokemon.event.producer.KafkaMessageProducer;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pyokemon.event.dto.*;
 import com.pyokemon.event.dto.EventDetailResponseDTO;
+import com.pyokemon.event.dto.kafka.EventKafkaDto;
+import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
 import com.pyokemon.event.entity.SavedEvent;
+import com.pyokemon.event.producer.KafkaMessageProducer;
 import com.pyokemon.event.repository.*;
 import com.pyokemon.event.repository.EventRepository;
 
@@ -39,7 +39,7 @@ public class EventService {
   // 관심공연 등록
   @Transactional
   public String saveSavedEvent(Long accountId, Long eventId) {
-//    Object event = eventRepository.findEventDetailByEventId(eventId);
+    // Object event = eventRepository.findEventDetailByEventId(eventId);
     EventDetailResponseDTO event = eventRepository.findEventDetailByEventId(eventId);
     String title = event.getTitle();
     LocalDateTime ticketOpenAt = event.getTicketOpenAt();

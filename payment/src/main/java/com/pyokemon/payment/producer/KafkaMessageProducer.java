@@ -15,7 +15,7 @@ public class KafkaMessageProducer {
   private final KafkaMessageSender kafkaMessageSender;
 
   public void sendPaymentConfirmed(PaymentKafkaDto dto) {
-    kafkaMessageSender.send(KafkaTopicConstants.PAYMENT_STATUS_UPDATED,
-        String.valueOf(dto.getId()), dto);
+    kafkaMessageSender.send(KafkaTopicConstants.PAYMENT_STATUS_UPDATED, String.valueOf(dto.getId()),
+        dto);
   }
 }

@@ -4,11 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.pyokemon.notification.dto.SavedNotificationDto;
-import com.pyokemon.notification.entity.SavedNotification;
-import com.pyokemon.notification.remote.account.RemoteAccountService;
-import com.pyokemon.notification.remote.account.dto.UserInfoResponseDto;
-import com.pyokemon.notification.repository.SavedNotificationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +12,13 @@ import com.google.firebase.messaging.*;
 import com.pyokemon.notification.dto.NotificationListResponseDtoApp;
 import com.pyokemon.notification.dto.NotificationResponseDto;
 import com.pyokemon.notification.dto.NotificationSendRequestDto;
+import com.pyokemon.notification.dto.SavedNotificationDto;
 import com.pyokemon.notification.entity.Notifications;
+import com.pyokemon.notification.entity.SavedNotification;
+import com.pyokemon.notification.remote.account.RemoteAccountService;
+import com.pyokemon.notification.remote.account.dto.UserInfoResponseDto;
 import com.pyokemon.notification.repository.NotificationRepository;
+import com.pyokemon.notification.repository.SavedNotificationRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,25 +92,23 @@ public class NotificationService {
     }
   }
 
-  public String savedNotification(Long accountId, Long eventId, String title, LocalDateTime ticketOpenAt) {
-     SavedNotificationDto existing = savedNotificationRepository.selectNotification(accountId, eventId);
+  public String savedNotification(Long accountId, Long eventId, String title,
+      LocalDateTime ticketOpenAt) {
+    SavedNotificationDto existing =
+        savedNotificationRepository.selectNotification(accountId, eventId);
 
-    if(existing==null) {
-      SavedNotificationDto dto = SavedNotificationDto.builder()
-              .accountId(accountId)
-              .eventId(eventId)
-              .title(title)
-              .message(title + "북마크 등록 되었습니다.")
-              .ticketOpenAt(ticketOpenAt)
-              .build();
+    if (existing == null) {
+      SavedNotificationDto dto =
+          SavedNotificationDto.builder().accountId(accountId).eventId(eventId).title(title)
+              .message(title + "북마크 등록 되었습니다.").ticketOpenAt(ticketOpenAt).build();
 
       savedNotificationRepository.saveNotification(dto);
 
       return dto.getMessage();
-    }else {
+    } else {
       savedNotificationRepository.deleteNotification(accountId, eventId);
 
-      return title+"북마크 취소되었습니다.";
+      return title + "북마크 취소되었습니다.";
     }
   }
 
@@ -121,10 +119,10 @@ public class NotificationService {
 
 
     LocalDateTime start = now.plusHours(1).withSecond(0).withNano(0);
-    LocalDateTime end   = start.plusMinutes(1);
+    LocalDateTime end = start.plusMinutes(1);
 
     List<SavedNotificationDto> notifications =
-            savedNotificationRepository.findByTicketOpenAtBetween(start, end);
+        savedNotificationRepository.findByTicketOpenAtBetween(start, end);
 
     for (SavedNotificationDto notification : notifications) {
       try {
@@ -143,13 +141,10 @@ public class NotificationService {
 
         String title = notification.getTitle();
 
-        Message message = Message.builder()
-                .setToken(fcmToken)
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(title + " 티켓이 1시간 후 오픈됩니다!")
-                        .build())
-                .build();
+        Message message = Message.builder().setToken(fcmToken)
+            .setNotification(
+                Notification.builder().setTitle(title).setBody(title + " 티켓이 1시간 후 오픈됩니다!").build())
+            .build();
 
         String response = FirebaseMessaging.getInstance().sendAsync(message).get();
         log.info("FCM sent: {}, accountId={}", response, notification.getAccountId());
@@ -158,9 +153,11 @@ public class NotificationService {
         log.error("FCM 전송 실패 (accountId={}): {}", notification.getAccountId(), e.getMessage());
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-        log.error("FCM 전송 중 인터럽트 발생 (accountId={}): {}", notification.getAccountId(), e.getMessage());
+        log.error("FCM 전송 중 인터럽트 발생 (accountId={}): {}", notification.getAccountId(),
+            e.getMessage());
       } catch (Exception e) {
-        log.error("FCM 전송 중 알 수 없는 오류 (accountId={}): {}", notification.getAccountId(), e.getMessage(), e);
+        log.error("FCM 전송 중 알 수 없는 오류 (accountId={}): {}", notification.getAccountId(),
+            e.getMessage(), e);
       }
     }
   }

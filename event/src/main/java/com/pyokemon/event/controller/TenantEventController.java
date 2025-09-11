@@ -50,19 +50,21 @@ public class TenantEventController {
       @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile) {
     try {
       // JSON 문자열을 EventRegisterDto로 변환
-      EventRegisterDto eventRegisterDto = objectMapper.readValue(eventDataJson, EventRegisterDto.class);
-      
+      EventRegisterDto eventRegisterDto =
+          objectMapper.readValue(eventDataJson, EventRegisterDto.class);
+
       // 썸네일 파일이 있으면 Base64로 변환
       if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
         String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
         eventRegisterDto.setThumbnailUrl(base64Thumbnail);
       }
-      
+
       EventResponseDto registeredEvent =
           tenantEventService.registerEvent(eventRegisterDto, eventRegisterDto.getAccountId());
       return ResponseDto.success(registeredEvent, "Event registered successfully");
     } catch (Exception e) {
-      throw new BusinessException("Failed to process multipart request", "MULTIPART_PROCESSING_FAILED");
+      throw new BusinessException("Failed to process multipart request",
+          "MULTIPART_PROCESSING_FAILED");
     }
   }
 
@@ -75,17 +77,18 @@ public class TenantEventController {
       // JSON 문자열을 EventUpdateDto로 변환
       EventUpdateDto eventUpdateDto = objectMapper.readValue(eventDataJson, EventUpdateDto.class);
       eventUpdateDto.setEventId(eventId);
-      
+
       // 썸네일 파일이 있으면 Base64로 변환
       if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
         String base64Thumbnail = convertMultipartFileToBase64(thumbnailFile);
         eventUpdateDto.setThumbnailUrl(base64Thumbnail);
       }
-      
+
       EventResponseDto updatedEvent = tenantEventService.updateEvent(eventUpdateDto);
       return ResponseDto.success(updatedEvent, "Event updated successfully");
     } catch (Exception e) {
-      throw new BusinessException("Failed to process multipart request", "MULTIPART_PROCESSING_FAILED");
+      throw new BusinessException("Failed to process multipart request",
+          "MULTIPART_PROCESSING_FAILED");
     }
   }
 

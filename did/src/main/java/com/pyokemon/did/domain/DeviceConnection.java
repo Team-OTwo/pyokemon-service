@@ -50,7 +50,7 @@ public class DeviceConnection extends BaseEntity {
     }
   }
 
-  public void update(){
+  public void update() {
     this.status = INVITATION_SENT;
     this.setPublicDid(null);
     this.setConnectionId(null);

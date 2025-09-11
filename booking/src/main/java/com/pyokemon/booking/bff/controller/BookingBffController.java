@@ -22,7 +22,7 @@ public class BookingBffController {
 
   @GetMapping("/event-schedules/{eventScheduleId}/bookings")
   public List<BookingDto> getEventScheduleBookings(@PathVariable Long eventScheduleId) {
-  return bookingBffService.getEventScheduleBookings(eventScheduleId);
+    return bookingBffService.getEventScheduleBookings(eventScheduleId);
   }
 
   @GetMapping("/accounts/{accountId}/bookings")

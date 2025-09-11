@@ -172,10 +172,10 @@ public class GatewayRequestHeaderUtils {
    *
    * @return 사용자 ID 또는 null
    */
-  public static Long getAccountId(){
+  public static Long getAccountId() {
     HttpServletRequest request = getCurrentRequest();
     String accountId = request.getHeader(GatewayHeaderConstants.Auth.X_AUTH_ACCOUNT_ID);
-    if(accountId == null || accountId.isEmpty()){
+    if (accountId == null || accountId.isEmpty()) {
       return null;
     }
 
@@ -183,7 +183,7 @@ public class GatewayRequestHeaderUtils {
       return Long.valueOf(accountId);
     } catch (NumberFormatException e) {
       throw new BusinessException("사용자 ID가 올바른 숫자 형식이 아닙니다: " + accountId,
-              DidErrorCodes.ACCESS_DENIED);
+          DidErrorCodes.ACCESS_DENIED);
     }
   }
 

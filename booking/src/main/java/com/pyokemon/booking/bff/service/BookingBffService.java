@@ -26,8 +26,7 @@ public class BookingBffService {
       return null;
     }
 
-    return bookings.stream().map(this::toDto)
-        .toList();
+    return bookings.stream().map(this::toDto).toList();
   }
 
   public List<BookingDto> getAccountIdBookings(Long accountId) {

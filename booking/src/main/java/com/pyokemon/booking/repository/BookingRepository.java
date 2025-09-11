@@ -28,9 +28,9 @@ public interface BookingRepository {
   Optional<Booking> findById(@Param("id") Long id);
 
   List<Booking> findPendingBookingsOlderThan(@Param("createdAt") java.time.LocalDateTime createdAt);
-  
-  List<Booking> findPendingBookingsBetween(@Param("startTime") java.time.LocalDateTime startTime, 
-                                          @Param("endTime") java.time.LocalDateTime endTime);
+
+  List<Booking> findPendingBookingsBetween(@Param("startTime") java.time.LocalDateTime startTime,
+      @Param("endTime") java.time.LocalDateTime endTime);
 
   List<ValidBookingDetail> findValidBookingsWithEventInfo(
       @Param("bookingIds") List<Long> bookingIds, @Param("accountId") Long accountId);

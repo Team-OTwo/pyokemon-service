@@ -50,12 +50,12 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     try {
 
-        // User ACA-Py 초대장 생성
-        String userAcaPyInvitationUrl = createUserAcaPyInvitationUrl(deviceId, userId, userToken);
-        // Mediator ACA-Py 초대장 생성
-        String mediatorAcaPyInvitationUrl = createMediatorAcaPyInvitationUrl(deviceId, userId);
+      // User ACA-Py 초대장 생성
+      String userAcaPyInvitationUrl = createUserAcaPyInvitationUrl(deviceId, userId, userToken);
+      // Mediator ACA-Py 초대장 생성
+      String mediatorAcaPyInvitationUrl = createMediatorAcaPyInvitationUrl(deviceId, userId);
 
-        return new InvitationResponse(mediatorAcaPyInvitationUrl, userAcaPyInvitationUrl);
+      return new InvitationResponse(mediatorAcaPyInvitationUrl, userAcaPyInvitationUrl);
     } catch (BusinessException e) {
       throw e;
     } catch (Exception e) {
@@ -115,7 +115,8 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
 
     String userAlias = String.format("credo:user:%d#device:%s", userId, deviceId);
 
-    Optional<DeviceConnection> existingConnection = deviceConnectionRepository.findByAlias(userAlias);
+    Optional<DeviceConnection> existingConnection =
+        deviceConnectionRepository.findByAlias(userAlias);
 
     if (existingConnection.isEmpty()) {
       createNewDeviceConnection(userId, deviceId, userAlias, "신규 사용자");
@@ -134,11 +135,11 @@ public class DeviceConnectionServiceImpl implements DeviceConnectionService {
       createNewDeviceConnection(userId, deviceId, userAlias, "deviceId 변경");
     }
 
-    // 동일 디바이스의 기존 연결이 있는 경우 →  새 연결 생성 (재발급)
-    if (existing.getDeviceId().equals(deviceId)){
+    // 동일 디바이스의 기존 연결이 있는 경우 → 새 연결 생성 (재발급)
+    if (existing.getDeviceId().equals(deviceId)) {
       updateDeviceConnection(existing);
       log.info("앱 초기화로 연결 재생성: id={}, oldDeviceId={}, newDeviceId={}", existing.getId(),
-              existing.getDeviceId(), deviceId);
+          existing.getDeviceId(), deviceId);
     }
   }
 

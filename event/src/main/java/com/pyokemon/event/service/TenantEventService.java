@@ -142,7 +142,8 @@ public class TenantEventService {
     }
 
     // thumbnail 필드의 Base64 이미지를 서버에 저장하고 URL로 변환
-    if (eventRegisterDto.getThumbnailUrl() != null && eventRegisterDto.getThumbnailUrl().startsWith("data:image")) {
+    if (eventRegisterDto.getThumbnailUrl() != null
+        && eventRegisterDto.getThumbnailUrl().startsWith("data:image")) {
       String thumbnailUrl = convertBase64ImageToUrl(eventRegisterDto.getThumbnailUrl());
       eventRegisterDto.setThumbnailUrl(thumbnailUrl);
     }
@@ -251,7 +252,8 @@ public class TenantEventService {
 
     event.setGenre(updateDto.getGenre());
     // thumbnail 필드의 Base64 이미지를 서버에 저장하고 URL로 변환
-    if (updateDto.getThumbnailUrl() != null && updateDto.getThumbnailUrl().startsWith("data:image")) {
+    if (updateDto.getThumbnailUrl() != null
+        && updateDto.getThumbnailUrl().startsWith("data:image")) {
       String thumbnailUrl = convertBase64ImageToUrl(updateDto.getThumbnailUrl());
       event.setThumbnailUrl(thumbnailUrl);
     } else {
@@ -671,8 +673,9 @@ public class TenantEventService {
       String base64Data = parts[1];
 
       // MIME 타입에서 이미지 타입 추출
-      String imageType = mimeTypePart.substring(mimeTypePart.indexOf("/") + 1, mimeTypePart.indexOf(";"));
-      
+      String imageType =
+          mimeTypePart.substring(mimeTypePart.indexOf("/") + 1, mimeTypePart.indexOf(";"));
+
       // Base64를 바이트 배열로 변환
       byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
 
@@ -695,7 +698,8 @@ public class TenantEventService {
       // URL 생성 (context path 포함)
       String imageUrl = contextPath + urlPrefix + "/" + filename;
 
-      log.info("Base64 thumbnail image converted to URL: {} ({} bytes)", imageUrl, imageBytes.length);
+      log.info("Base64 thumbnail image converted to URL: {} ({} bytes)", imageUrl,
+          imageBytes.length);
 
       return imageUrl;
 

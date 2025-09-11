@@ -32,8 +32,8 @@ public class BffEventService {
     if (ids == null || ids.isEmpty())
       return List.of();
     List<BffEventScheduleDto> rows = repo.findEventSchedulesByIdIn(ids);
-    Map<Long, BffEventScheduleDto> byId = rows.stream()
-        .collect(Collectors.toMap(BffEventScheduleDto::getId, Function.identity()));
+    Map<Long, BffEventScheduleDto> byId =
+        rows.stream().collect(Collectors.toMap(BffEventScheduleDto::getId, Function.identity()));
     List<Long> missing = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
 
     if (!missing.isEmpty()) {
@@ -131,8 +131,8 @@ public class BffEventService {
       return List.of();
 
     List<BffSeatClassDto> rows = repo.findSeatClassesByIdIn(seatClassIds);
-    Map<Long, BffSeatClassDto> byId = rows.stream()
-        .collect(Collectors.toMap(BffSeatClassDto::getId, Function.identity()));
+    Map<Long, BffSeatClassDto> byId =
+        rows.stream().collect(Collectors.toMap(BffSeatClassDto::getId, Function.identity()));
 
     // 누락 처리: 기존 정책에 맞춰서 예외 or skip
     List<Long> missing =

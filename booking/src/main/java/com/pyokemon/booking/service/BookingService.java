@@ -208,12 +208,12 @@ public class BookingService {
     try {
       LocalDateTime now = LocalDateTime.now();
       LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
-      
+
       log.info("스케줄러 실행 - 현재시간: {}, 5분전: {}", now, fiveMinutesAgo);
-      
+
       List<Booking> expiredBookings =
           bookingRepository.findPendingBookingsOlderThan(fiveMinutesAgo);
-          
+
       log.info("만료 대상 예약 수: {}", expiredBookings.size());
 
       expiredBookings.parallelStream().forEach(booking -> {

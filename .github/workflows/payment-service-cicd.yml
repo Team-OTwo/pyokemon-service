@@ -86,6 +86,7 @@ jobs:
               -e SPRING_PROFILES_ACTIVE=dev \
               -e LOG_PATH=/app/logs \
               -e SERVICE_NAME=payment-service \
+              -e TOSS_SECRET_KEY=${{ secrets.TOSS_SECRET_KEY }} \
               -v /volume1/docker/pyokemon/payment-service/logs:/app/logs \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-payment-service/payment-service:latest

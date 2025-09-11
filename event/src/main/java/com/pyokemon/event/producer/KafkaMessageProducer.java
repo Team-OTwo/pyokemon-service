@@ -1,12 +1,12 @@
 package com.pyokemon.event.producer;
 
-import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.pyokemon.common.kafka.KafkaMessageSender;
 import com.pyokemon.common.kafka.KafkaTopicConstants;
 import com.pyokemon.event.dto.kafka.EventKafkaDto;
+import com.pyokemon.event.dto.kafka.SaveEventKafkaDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +31,9 @@ public class KafkaMessageProducer {
         String.valueOf(eventScheduleId), dto);
   }
 
-  public void saveEventKafka(SaveEventKafkaDto dto){
+  public void saveEventKafka(SaveEventKafkaDto dto) {
     kafkaMessageSender.send(KafkaTopicConstants.EVENT_SAVED_UPDATED,
-            String.valueOf(dto.getEventId()), dto);
+        String.valueOf(dto.getEventId()), dto);
   }
 
 }

@@ -1,6 +1,5 @@
 package com.pyokemon.notification.config;
 
-import com.pyokemon.notification.dto.kafka.SaveEventKafkaDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +7,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 
 import com.pyokemon.common.config.CommonKafkaConfig;
+import com.pyokemon.notification.dto.kafka.SaveEventKafkaDto;
 import com.pyokemon.notification.event.consumer.message.booking.BookingEvent;
 
 @Configuration
@@ -38,13 +38,14 @@ public class KafkaConfig {
   @Bean
   public ConsumerFactory<String, SaveEventKafkaDto> eventKafkaDtoConsumerFactory() {
     return CommonKafkaConfig.createConsumerFactory(bootstrapServers, applicationName,
-            SaveEventKafkaDto.class, "com.pyokemon.notification.dto.kafka", "com.pyokemon.notification.dto.kafka");
+        SaveEventKafkaDto.class, "com.pyokemon.notification.dto.kafka",
+        "com.pyokemon.notification.dto.kafka");
   }
 
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, SaveEventKafkaDto> eventkafkaListenerContainerFactory() {
     ConcurrentKafkaListenerContainerFactory<String, SaveEventKafkaDto> factory =
-            new ConcurrentKafkaListenerContainerFactory<>();
+        new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(eventKafkaDtoConsumerFactory());
     return factory;
   }

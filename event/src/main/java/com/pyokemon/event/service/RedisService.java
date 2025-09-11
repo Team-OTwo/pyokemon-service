@@ -270,8 +270,7 @@ public class RedisService {
           initSeatStatuses(eventScheduleId, venueId);
         } catch (Exception e) {
           log.error("Redis 초기화 실패: eventScheduleId={}, venueId={}, error={}",
-              eventSchedule.get("id"), eventSchedule.get("venue_id"), e.getMessage(),
-              e);
+              eventSchedule.get("id"), eventSchedule.get("venue_id"), e.getMessage(), e);
           continue;
         }
       }
