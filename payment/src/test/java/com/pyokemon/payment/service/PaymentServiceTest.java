@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -50,7 +51,7 @@ class PaymentServiceTest {
     response.setMethod("카드");
 
     Payment persisted =
-        Payment.builder().id(100L).bookingId(200L).status(PaymentStatus.DONE).build();
+        Payment.builder().bookingId(100L).bookingId(200L).status(PaymentStatus.DONE).build();
 
     when(paymentRepository.findByOrderId("ORDER_123")).thenReturn(persisted);
 
@@ -79,7 +80,7 @@ class PaymentServiceTest {
     request.setOrderId("ORDER_999");
 
     Payment failedRow =
-        Payment.builder().id(999L).bookingId(888L).status(PaymentStatus.FAILED).build();
+        Payment.builder().bookingId(999L).bookingId(888L).status(PaymentStatus.FAILED).build();
 
     when(paymentRepository.findByOrderId("ORDER_999")).thenReturn(failedRow);
 
@@ -108,7 +109,7 @@ class PaymentServiceTest {
     request.setPaymentKey("PAYMENT_KEY_123");
 
     Payment readyPayment =
-        Payment.builder().id(100L).bookingId(200L).status(PaymentStatus.READY).build();
+        Payment.builder().bookingId(100L).bookingId(200L).status(PaymentStatus.READY).build();
 
     when(paymentRepository.findByOrderIdAndStatus("ORDER_123")).thenReturn(readyPayment);
     when(paymentRepository.findByOrderId("ORDER_123")).thenReturn(readyPayment);
