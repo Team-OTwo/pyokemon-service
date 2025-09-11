@@ -45,7 +45,7 @@ Configuration:
   
   Loggers:
     Root:
-      level: INFO
+      level: DEBUG
       AppenderRef:
         - ref: Console
         - ref: JsonFile
@@ -54,4 +54,4 @@ Configuration:
       - name: com.pyokemon
         level: DEBUG
       - name: org.springframework
-        level: INFO 
+        level: DEBUG
